@@ -43,3 +43,5 @@ def build_query_command(subparsers):
         metavar="File",
         help="Single-end reads to be used for query. Specify one file: -s file",
     )
+
+    # TODO: Probably come up with a better name for this script
