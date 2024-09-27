@@ -39,7 +39,7 @@ def build_query_command(subparsers):
         "-s",
         "--single",
         required=False,
-        metavar="file",
-        nargs=1,
+        type=str,
+        metavar="File",
         help="Single-end reads to be used for query. Specify one file: -s file",
     )

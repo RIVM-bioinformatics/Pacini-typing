@@ -12,10 +12,10 @@ Fill in later...
 
 __author__ = "Mark Van de Streek"
 __data__ = "2024-09-24"
-__all__ = ["main"]
+__all__ = [""]
 
 import logging
-import main
+import makedatabase
 import argument_parser.build_parser
 import validating.validating_input_arguments
 
@@ -32,14 +32,8 @@ if __name__ == "__main__":
         level=args.verbose and logging.DEBUG or logging.INFO,
         format="%(asctime)s - %(levelname)s - %(message)s")
 
+    validating.validating_input_arguments.main(args)
+
     # Check if the options are available
     if args.options == "makedatabase":
-        main.DatabaseBuilder(
-            database_path=args.database_path,
-            database_name=args.database_name,
-            input_fasta_file=args.input,
-            database_type=args.database_type
-        )
-
-    if args.options == "query":
-        validating.validating_input_arguments.main(args)
+        makedatabase.main(args)
