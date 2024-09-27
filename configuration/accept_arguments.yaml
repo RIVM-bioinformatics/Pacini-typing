@@ -1,0 +1,9 @@
+name : Configuration file for argument parsing
+
+accepted_input_extensions:
+  - .fq
+  - .fastq
+  - .fq.gz
+  - .fastq.gz
+  - .fna
+  - .fasta

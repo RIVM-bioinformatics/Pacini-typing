@@ -1,2 +1,15 @@
+![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
+![Git](https://img.shields.io/badge/git-%23F05033.svg?style=for-the-badge&logo=git&logoColor=white)
+
 # Pacini-typing
+
 Bacterial genotyping pipeline that can demonstrate the presence or absence of certain genetic variation
+
+## What is Pacini?
+
+The Pacini project is a software application which can be used to determine genetic variants in bacteria. These variants are:
+
+1. Presence or absence of certain genes
+2. Single nucleotide polymorphisms (SNPs)
+
+> Based on these variants, the application can estimate the pathogenicity of the given bacteria/organism. The pathongenicity patterns are defined in a set of rules in a configuration file.
