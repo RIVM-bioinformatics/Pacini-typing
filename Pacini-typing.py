@@ -15,8 +15,6 @@ __data__ = "2024-09-24"
 __all__ = ["main"]
 
 import logging
-import os
-
 import main
 import argument_parser.build_parser
 import validating.validating_input_arguments

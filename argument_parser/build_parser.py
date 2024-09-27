@@ -33,7 +33,7 @@ def main():
         - args: parsed object with the arguments
     ----------
     """
-    # Optional: custom_argument_parser.py
+    # Optional: Use custom argument parser
     # parser = argument_parser.custom_argument_parser.CustomArgumentParser(
     #         prog="Pacini",
     #         description="Bacterial Genotyping Tool for RIVM IDS-Bioinformatics",
