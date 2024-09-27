@@ -64,10 +64,9 @@ class DatabaseBuilder:
                 if not os.path.exists(self.database_path):
                     logging.debug("Database path for KMA does not exist, creating path")
                     os.mkdir(self.database_path)
-                result = self.create_kma_database()
+                self.create_kma_database()
             else:
-                result = self.create_blast_database()
-            #self.check_for_errors(result, self.database_type)
+                self.create_blast_database()
         else:
             logging.info("Database already exists in the specified path")
             pass
@@ -137,23 +136,3 @@ def main(args):
         input_fasta_file=args.input,
         database_type=args.database_type
     )
-    # @staticmethod
-    # def check_for_errors(result, command_name) -> None:
-    #     """
-    #     Generic function to check if a command was executed successfully.
-    #     The result object is a subprocess.run object and the command_name is a
-    #     basic string which is used for error handling and debugging.
-    #     ----------
-    #     Input:
-    #         - result: subprocess.run
-    #         - command_name: str
-    #     Output:
-    #         - None
-    #     ----------
-    #     """
-    #     logging.debug(f"Checking for errors in {command_name}")
-    #     if result.returncode == 0:
-    #         logging.info(f"{command_name} executed successfully")
-    #     else:
-    #         logging.error(f"Error executing {command_name}")
-    #         logging.error(result.stderr)
