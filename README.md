@@ -3,9 +3,7 @@
 
 # Pacini-typing
 
-Bacterial genotyping pipeline that can demonstrate the presence or absence of certain genetic variation
-
-## What is Pacini?
+---
 
 The Pacini project is a software application which can be used to determine genetic variants in bacteria. These variants are:
 
