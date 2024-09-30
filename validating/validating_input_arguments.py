@@ -89,6 +89,26 @@ def check_file_existence(file):
         return True
 
 
+# def check_double_files(args):
+#     """
+#     Function that checks if the input files are not exactly the same.
+#     We are not checking for the file contents, just the file names.
+#     ----------
+#     Input:
+#         - args: parsed object with the arguments
+#     ----------
+#     """
+#     result = subprocess.run(
+#         ["diff", args.paired[0], args.paired[1]],
+#         capture_output=True,
+#         text=True,
+#         # TODO: Come up with a better way to handle this
+#         #  this is taking way too long
+#     )
+#     if result.returncode == 0:
+#         logging.error("The input files are the same, exiting...")
+#         sys.exit(1)
+
 def check_double_files(args):
     """
     Function that checks if the input files are not exactly the same.
@@ -98,12 +118,20 @@ def check_double_files(args):
         - args: parsed object with the arguments
     ----------
     """
-    result = subprocess.run(
-        ["diff", args.paired[0], args.paired[1]],
-        capture_output=True,
-        text=True)
-    if result.returncode == 0:
+    file1, file2 = args.paired[0], args.paired[1]
+
+    try:
+        with open(file1, 'r') as f1, open(file2, 'r') as f2:
+            for _ in range(50):
+                line1 = f1.readline()
+                line2 = f2.readline()
+                if line1 != line2:
+                    logging.debug("Files are different.")
+                    return
         logging.error("The input files are the same, exiting...")
+        sys.exit(1)
+    except Exception as e:
+        logging.error(f"An error occurred while comparing files: {e}")
         sys.exit(1)
 
 
@@ -135,7 +163,7 @@ def run_file_checks(args):
     if args:
         for file in args:
             if check_file_existence(file) and validate_file_extensions(file):
-                return True
+                pass
             else:
                 sys.exit(1)
 
