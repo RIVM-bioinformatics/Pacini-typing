@@ -52,7 +52,7 @@ class FileValidator:
         self.type = {}
         self.retrieve_body()
         self.determine_file_type()
-        if len(self.type) > 1:
+        if len(self.type) == 2:
             self.compare_types()
 
     def determine_file_type(self):
@@ -88,7 +88,7 @@ class FileValidator:
                     self.type[file] = "FASTQ"
                 else:
                     logging.error("The file is not a valid FASTA or FASTQ file.")
-                logging.info(f"File type: {self.type}")
+                    sys.exit(1)
 
     def retrieve_body(self):
         """
@@ -129,7 +129,7 @@ class FileValidator:
             return True
         else:
             logging.error(f"{file} is not a valid FASTA or FASTQ file, the sequence is not valid.")
-            return False
+            sys.exit(1)
 
     def compare_types(self):
         """
@@ -145,7 +145,7 @@ class FileValidator:
         ----------
         """
         if len(set(self.type.values())) == 1:
-            logging.debug("All files are of the same type, continuing...")
+            logging.debug("All files are valid and the same type, continuing...")
         else:
             logging.error(f"The input files are not of the same type: {self.type} Exiting...")
             sys.exit(1)
