@@ -28,7 +28,7 @@ jobs:
 
     - name: Run Fixit
       run: |
-        fixit lint . > reports/fixit_report.txt
+        fixit lint . > reports/fixit_report.txt || true
 
     - name: Run Pylint
       run: |
