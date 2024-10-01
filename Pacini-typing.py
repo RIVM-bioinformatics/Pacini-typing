@@ -17,7 +17,7 @@ import logging
 import makedatabase
 import argument_parser.build_parser
 import validating.validating_input_arguments
-import validating.validating_input_file
+from validating.determine_input_type import FileValidator
 
 LOGGER = logging.getLogger(__name__)
 
@@ -41,8 +41,11 @@ if __name__ == "__main__":
     if args.options == "makedatabase":
         logging.info("Running makedatabase")
         makedatabase.main(args)
+
     elif args.options == "query":
         if hasattr(args, "single") and args.single:
-            validating.validating_input_file.main([args.single])
+            file_type = FileValidator(args.paired).get_file_type()
+            logging.debug("File type for single input: %s", file_type)
         elif hasattr(args, "paired") and args.paired:
-            validating.validating_input_file.main(args.paired)
+            file_type = FileValidator(args.paired).get_file_type()
+            logging.debug("File type for paired input: %s", file_type)

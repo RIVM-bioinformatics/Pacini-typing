@@ -71,7 +71,7 @@ class DatabaseBuilder:
             logging.info("Database already exists in the specified path")
             pass
 
-    @Decorators.log
+    @decorators.log
     def create_kma_database(self) -> subprocess.CompletedProcess:
         """
         kma_index -i input_fasta_file -o path + name
@@ -94,7 +94,7 @@ class DatabaseBuilder:
 
         return result
 
-    @Decorators.log
+    @decorators.log
     def create_blast_database(self) -> subprocess.CompletedProcess:
         """
         Method that creates a BLAST database using the makeblastdb command.

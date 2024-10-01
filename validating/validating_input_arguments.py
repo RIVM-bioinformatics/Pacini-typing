@@ -90,7 +90,7 @@ def check_file_existence(file):
 def check_double_files(args):
     """
     Function that checks if the input files are not exactly the same.
-    We are not checking for the file contents, just the file names.
+    The first 150 lines of both files are compared.
     ----------
     Input:
         - args: parsed object with the arguments
@@ -101,7 +101,7 @@ def check_double_files(args):
     try:
         with (open(file1, 'r', encoding="utf-8") as f1,
               open(file2, 'r', encoding="utf-8") as f2):
-            for _ in range(50):
+            for _ in range(150):
                 line1 = f1.readline()
                 line2 = f2.readline()
                 if line1 != line2:

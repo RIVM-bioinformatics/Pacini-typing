@@ -20,7 +20,7 @@ Check the input files:
 
 __author__ = "Mark Van de Streek"
 __data__ = "2024-09-24"
-__all__ = ["main"]
+__all__ = ["FileValidator"]
 
 import logging
 import re
@@ -52,6 +52,8 @@ class FileValidator:
         self.determine_file_type()
         if len(self.type) == 2:
             self.compare_types()
+        logging.error(self.type)
+        self.get_file_type()
 
     def determine_file_type(self):
         """
@@ -147,9 +149,8 @@ class FileValidator:
             logging.error("The input files are not of the same type: %s Exiting...", self.type)
             sys.exit(1)
 
-
-def main(file_list):
-    """
-    ...
-    """
-    FileValidator(file_list)
+    def get_file_type(self):
+        """
+        Getter function that returns the type dictionary.
+        """
+        return next(iter(self.type.values()))
