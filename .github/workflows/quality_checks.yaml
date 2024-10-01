@@ -19,11 +19,11 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install mypy fixit pylint flake8 coverage
-        mypy --install-types
 
     - name: Run Mypy
       run: |
         mkdir -p reports
+        mypy --install-types --non-interactive .
         mypy . > reports/mypy_report.txt
 
     - name: Run Fixit
