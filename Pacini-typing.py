@@ -27,13 +27,12 @@ if __name__ == "__main__":
     args = argument_parser.build_parser.main()
 
     # Configure the logging
-    log_format = "%(filename)s - %(funcName)s: %(message)s"
     logging.basicConfig(
         level=args.verbose and logging.DEBUG or logging.INFO,
         format="%(asctime)s - %(levelname)s - %(message)s")
 
     logging.info("Starting the program...")
-    logging.debug(f"Arguments have been parsed, validating them...")
+    logging.debug("Arguments have been parsed, validating them...")
 
     if validating.validating_input_arguments.main(args):
         logging.debug("Input arguments have been validated")

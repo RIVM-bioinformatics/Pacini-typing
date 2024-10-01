@@ -28,20 +28,21 @@ def log(func):
     def wrapper(*args, **kwargs):
         """
         Wrapper function that executes and checks for possible errors in the function result
-        This wrapper could only be used for functions that return a subprocess.CompletedProcess object
+        This wrapper could only be used for functions that return a
+        subprocess.CompletedProcess object
         """
         try:
             result = func(*args, **kwargs)
-            logging.debug(f"Checking for errors in {result.args[0]}")
+            logging.debug("Checking for errors in %s", result.args[0])
             if result.returncode == 0:
-                logging.debug(f"{result.args[0]} executed successfully")
+                logging.debug("%s executed successfully", result.args[0])
             else:
-                logging.error(f"Error executing {result.args[0]}")
+                logging.error("Error executing %s", result.args[0])
                 logging.error(result.stderr)
             return result
         except Exception as e:
-            logging.error(f"Exception occurred in {func.__name__}. exception: {str(e)}")
-            logging.debug(f"Arguments: {args}")
-            logging.debug(f"Keyword arguments: {kwargs}")
+            logging.error("Exception occurred in %s. exception: %s", func.__name__, str(e))
+            logging.debug("Arguments: %s", args)
+            logging.debug("Keyword arguments: %s", kwargs)
             raise e
     return wrapper

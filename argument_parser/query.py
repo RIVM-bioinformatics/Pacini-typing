@@ -6,11 +6,7 @@ To be filed in later...
 
 __author__ = "Mark Van de Streek"
 __data__ = "2024-09-24"
-__all__ = ["main"]
-
-import sys
-import os
-import subprocess
+__all__ = ["build_query_command"]
 
 
 def build_query_command(subparsers):
@@ -32,7 +28,8 @@ def build_query_command(subparsers):
         required=False,
         metavar=("file1", "file2"),
         nargs=2,
-        help="Paired-end reads to be used for query. Specify two files separated by a space: -p file1 file2",
+        help="Paired-end reads to be used for query. "
+             "Specify two files separated by a space: -p file1 file2",
     )
 
     query.add_argument(

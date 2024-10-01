@@ -8,6 +8,14 @@
     https://github.com/features/copilot
 
 To be filed in later...
+
+Check the input files:
+    - What information is needed?
+    - What information is available in the header?
+    - Is there a quality score line available?
+        - Is there a line with a "+"? between the header and the quality score line?
+    - Does the header line start with a ">"?
+    - Does the header line start with a "@"?
 """
 
 __author__ = "Mark Van de Streek"
@@ -17,16 +25,6 @@ __all__ = ["main"]
 import logging
 import re
 import sys
-
-"""
-Check the input files:
-    - What information is needed?
-    - What information is available in the header?
-    - Is there a quality score line available?
-        - Is there a line with a "+"? between the header and the quality score line?
-    - Does the header line start with a ">"?
-    - Does the header line start with a "@"?
-"""
 
 
 class FileValidator:
@@ -108,7 +106,7 @@ class FileValidator:
         ----------
         """
         for file in self.input_files:
-            with open(file, "r") as f:
+            with open(file, "r", encoding="utf-8") as f:
                 self.body[file] = [f.readline().strip() for _ in range(5)]
 
     def check_valid_sequence(self, file):
@@ -127,9 +125,8 @@ class FileValidator:
         """
         if re.fullmatch(r"[ACTG]+", self.body[file][1]):
             return True
-        else:
-            logging.error("%s is not a valid FASTA or FASTQ file, the sequence is not valid.", file)
-            sys.exit(1)
+        logging.error("%s is not a valid FASTA or FASTQ file, the sequence is not valid.", file)
+        sys.exit(1)
 
     def compare_types(self):
         """

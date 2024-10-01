@@ -34,10 +34,9 @@ def validate_file_extensions(file):
     if ext in config["accepted_input_extensions"]:
         logging.debug("File %s is accepted", file)
         return True
-    else:
-        logging.error("File %s is not accepted", file)
-        logging.error("Accepted file extensions are: %s", config['accepted_input_extensions'])
-        return False
+    logging.error("File %s is not accepted", file)
+    logging.error("Accepted file extensions are: %s", config['accepted_input_extensions'])
+    return False
 
 
 def get_file_extension(file_extension):
@@ -68,7 +67,7 @@ def get_config_input():
         - config: dictionary with the configuration file
     ----------
     """
-    with open("configuration/accept_arguments.yaml", "r") as file:
+    with open("configuration/accept_arguments.yaml", "r", encoding="utf-8") as file:
         config = yaml.safe_load(file)
     return config
 
@@ -81,12 +80,11 @@ def check_file_existence(file):
         - file: string with the file path
     ----------
     """
-    if not os.path.isfile(file) and not os.path.exists(file):
-        logging.error("File %s does not exist", file)
-        return False
-    else:
+    if os.path.isfile(file) and os.path.exists(file):
         logging.debug("File %s exists", file)
         return True
+    logging.error("File %s does not exist", file)
+    return False
 
 
 def check_double_files(args):
@@ -101,7 +99,8 @@ def check_double_files(args):
     file1, file2 = args.paired[0], args.paired[1]
 
     try:
-        with open(file1, 'r') as f1, open(file2, 'r') as f2:
+        with (open(file1, 'r', encoding="utf-8") as f1,
+              open(file2, 'r', encoding="utf-8") as f2):
             for _ in range(50):
                 line1 = f1.readline()
                 line2 = f2.readline()
@@ -110,7 +109,7 @@ def check_double_files(args):
                     return
         logging.error("The input files are the same, exiting...")
         sys.exit(1)
-    except Exception as e:
+    except OSError as e:
         logging.error("An error occurred while comparing files: %s", e)
         sys.exit(1)
 
@@ -143,9 +142,9 @@ def run_file_checks(args):
     if args:
         for file in args:
             if check_file_existence(file) and validate_file_extensions(file):
-                pass
-            else:
-                sys.exit(1)
+                return True
+            sys.exit(1)
+    return False
 
 
 def main(args):
@@ -167,7 +166,7 @@ def main(args):
     if hasattr(args, "single") and args.single:
         return run_file_checks([args.single])
 
-    elif hasattr(args, "input") and args.input:
+    if hasattr(args, "input") and args.input:
         return run_file_checks([args.input])
 
-    # TODO: Translate this script to a class?
+    return False

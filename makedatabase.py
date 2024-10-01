@@ -20,7 +20,7 @@ __all__ = ["DatabaseBuilder"]
 import os
 import subprocess
 import logging
-from decorators import Decorators
+from decorators import decorators
 
 
 class DatabaseBuilder:
