@@ -23,20 +23,21 @@ jobs:
         python -m pip install --upgrade pip
         pip install pylint
 
-    - name: Run Pylint
+    - name: Run Pylint and extract last line
       id: pylint
       run: |
-        pylint_score=$(pylint **/*.py | tee pylint_output.txt | tail -2 | head -1 | grep -oP '\d+(\.\d+)?(?=/10)')
-        echo "$pylint_score" >> $GITHUB_ENV
+        pylint_output=$(pylint **/*.py | tee pylint_output.txt | tail -2 | head -1)
+        echo "$pylint_output"
+        echo "pylint_output=$pylint_output" >> $GITHUB_ENV
 
-    - name: Update README with Pylint score
+    - name: Update README with Pylint output
       run: |
-        sed -i 's/Pylint score: .*/Pylint score: '"$pylint_score"'/g' README.md
+        sed -i 's|Pylint output:.*|Pylint output: '"$pylint_output"'|g' README.md
 
     - name: Commit changes
       run: |
         git config --global user.name 'github-actions[bot]'
         git config --global user.email 'github-actions[bot]@users.noreply.github.com'
         git add README.md
-        git commit -m "Update Pylint score in README"
+        git commit -m "Update Pylint output in README"
         git push
