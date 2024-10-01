@@ -16,7 +16,6 @@ __all__ = ["validate_file_extensions"]
 
 import sys
 import os
-import subprocess
 import logging
 import yaml
 
@@ -31,6 +30,7 @@ def validate_file_extensions(file):
     """
     config = get_config_input()
     ext = get_file_extension(file.split("."))
+    ext = ext.lower()
     if ext in config["accepted_input_extensions"]:
         logging.debug(f"File {file} is accepted")
         return True
@@ -88,26 +88,6 @@ def check_file_existence(file):
         logging.debug(f"File {file} exists")
         return True
 
-
-# def check_double_files(args):
-#     """
-#     Function that checks if the input files are not exactly the same.
-#     We are not checking for the file contents, just the file names.
-#     ----------
-#     Input:
-#         - args: parsed object with the arguments
-#     ----------
-#     """
-#     result = subprocess.run(
-#         ["diff", args.paired[0], args.paired[1]],
-#         capture_output=True,
-#         text=True,
-#         # TODO: Come up with a better way to handle this
-#         #  this is taking way too long
-#     )
-#     if result.returncode == 0:
-#         logging.error("The input files are the same, exiting...")
-#         sys.exit(1)
 
 def check_double_files(args):
     """
@@ -189,3 +169,5 @@ def main(args):
 
     elif hasattr(args, "input") and args.input:
         return run_file_checks([args.input])
+
+    # TODO: Translate this script to a class?

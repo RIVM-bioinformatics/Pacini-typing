@@ -7,3 +7,4 @@ accepted_input_extensions:
   - .fastq.gz
   - .fna
   - .fasta
+  - .tar.gz
