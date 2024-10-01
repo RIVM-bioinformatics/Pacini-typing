@@ -27,15 +27,21 @@ if __name__ == "__main__":
     args = argument_parser.build_parser.main()
 
     # Configure the logging
+    # logging.basicConfig(
+    #     level=args.verbose and logging.DEBUG or logging.INFO,
+    #     format="%(asctime)s - %(levelname)s - %(message)s")
+
     logging.basicConfig(
         level=args.verbose and logging.DEBUG or logging.INFO,
-        format="%(asctime)s - %(levelname)s - %(message)s")
+        format="%(asctime)sZ  %(levelname)-5s %(process)d --- %(name)-5s : %(message)s",
+        datefmt="%Y-%m-%dT%H:%M:%S"
+    )
 
     logging.info("Starting the program...")
     logging.debug("Arguments have been parsed, validating them...")
 
     if validating.validating_input_arguments.main(args):
-        logging.debug("Input arguments have been validated")
+        logging.info("Input arguments have been validated, found no issues.")
 
     # Check if the options are available
     if args.options == "makedatabase":
@@ -43,9 +49,10 @@ if __name__ == "__main__":
         makedatabase.main(args)
 
     elif args.options == "query":
+        logging.info("Option query was selected, retrieving the file type...")
         if hasattr(args, "single") and args.single:
             file_type = FileValidator(args.paired).get_file_type()
-            logging.debug("File type for single input: %s", file_type)
+            logging.info("File type for single input: %s", file_type)
         elif hasattr(args, "paired") and args.paired:
             file_type = FileValidator(args.paired).get_file_type()
-            logging.debug("File type for paired input: %s", file_type)
+            logging.info("File type for paired input: %s", file_type)
