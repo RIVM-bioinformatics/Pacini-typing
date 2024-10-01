@@ -12,7 +12,6 @@ Fill in later...
 
 __author__ = "Mark Van de Streek"
 __data__ = "2024-09-24"
-__all__ = [""]
 
 import logging
 import makedatabase
