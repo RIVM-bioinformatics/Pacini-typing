@@ -44,7 +44,7 @@ jobs:
         coverage report > reports/coverage_report.txt
 
     - name: Upload reports as artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: code-quality-reports
         path: reports/
