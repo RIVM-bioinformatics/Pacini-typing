@@ -3,7 +3,7 @@
 
 ![Unit tests](https://github.com/RIVM-bioinformatics/Pacini-typing/actions/workflows/run_unit_tests.yaml/badge.svg)
 
-Pylint score: N/A
+Pylint score: 
 
 # Pacini-typing
 
