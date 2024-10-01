@@ -30,6 +30,12 @@ jobs:
         echo "$pylint_output"
         echo "pylint_output=$pylint_output" >> $GITHUB_ENV
 
+    - name: Ignore pylint_output.txt
+      run: |
+        echo "pylint_output.txt" >> .gitignore
+        git add .gitignore
+        git commit -m "Ignore pylint_output.txt"
+
     - name: Update README with Pylint output
       run: |
         sed -i 's|Pylint output:.*|Pylint output: '"$pylint_output"'|g' README.md
