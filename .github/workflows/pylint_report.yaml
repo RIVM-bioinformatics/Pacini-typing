@@ -27,7 +27,8 @@ jobs:
       id: pylint
       run: |
         pylint_score=$(pylint **/*.py | tee pylint_output.txt | tail -2 | head -1 | grep -oP '\d+(\.\d+)?(?=/10)')
-        echo "::set-output name=score::$pylint_score"
+        echo "$pylint_score" >> $GITHUB_ENV
+        echo "$pylint_score"
 
     - name: Update README with Pylint score
       run: |
