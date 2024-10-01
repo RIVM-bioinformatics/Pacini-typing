@@ -39,13 +39,19 @@ jobs:
       run: |
         echo "pylint_output.txt" >> .gitignore
         git add .gitignore
-        git commit -m "Ignore pylint_output.txt"
+        git commit -m "Ignore pylint_output.txt" || echo "No changes to commit for .gitignore"
 
     - name: Update README with Pylint output
       run: |
         sed -i 's|Pylint output:.*|Pylint output: '"$pylint_output"'|g' README.md
 
+    - name: Check if README was modified
+      id: check_modified
+      run: |
+        git diff --exit-code README.md || echo "README.md has been modified."
+
     - name: Commit changes to README
+      if: steps.check_modified.outputs.stdout != ''
       run: |
         git add README.md
         git commit -m "Update Pylint output in README"
