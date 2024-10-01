@@ -32,11 +32,11 @@ def validate_file_extensions(file):
     ext = get_file_extension(file.split("."))
     ext = ext.lower()
     if ext in config["accepted_input_extensions"]:
-        logging.debug(f"File {file} is accepted")
+        logging.debug("File %s is accepted", file)
         return True
     else:
-        logging.error(f"File {file} is not accepted")
-        logging.error(f"Accepted file extensions are: {config['accepted_input_extensions']}")
+        logging.error("File %s is not accepted", file)
+        logging.error("Accepted file extensions are: %s", config['accepted_input_extensions'])
         return False
 
 
@@ -82,10 +82,10 @@ def check_file_existence(file):
     ----------
     """
     if not os.path.isfile(file) and not os.path.exists(file):
-        logging.error(f"File {file} does not exist")
+        logging.error("File %s does not exist", file)
         return False
     else:
-        logging.debug(f"File {file} exists")
+        logging.debug("File %s exists", file)
         return True
 
 
@@ -111,7 +111,7 @@ def check_double_files(args):
         logging.error("The input files are the same, exiting...")
         sys.exit(1)
     except Exception as e:
-        logging.error(f"An error occurred while comparing files: {e}")
+        logging.error("An error occurred while comparing files: %s", e)
         sys.exit(1)
 
 

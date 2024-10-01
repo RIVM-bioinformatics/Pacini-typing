@@ -128,7 +128,7 @@ class FileValidator:
         if re.fullmatch(r"[ACTG]+", self.body[file][1]):
             return True
         else:
-            logging.error(f"{file} is not a valid FASTA or FASTQ file, the sequence is not valid.")
+            logging.error("%s is not a valid FASTA or FASTQ file, the sequence is not valid.", file)
             sys.exit(1)
 
     def compare_types(self):
@@ -147,7 +147,7 @@ class FileValidator:
         if len(set(self.type.values())) == 1:
             logging.debug("All files are valid and the same type, continuing...")
         else:
-            logging.error(f"The input files are not of the same type: {self.type} Exiting...")
+            logging.error("The input files are not of the same type: %s Exiting...", self.type)
             sys.exit(1)
 
 
