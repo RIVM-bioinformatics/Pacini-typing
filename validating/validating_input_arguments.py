@@ -140,10 +140,9 @@ def run_file_checks(args):
     ----------
     """
     if args:
-        for file in args:
-            if check_file_existence(file) and validate_file_extensions(file):
-                return True
-            sys.exit(1)
+        if check_file_existence(args) and validate_file_extensions(args):
+            return True
+        sys.exit(1)
     return False
 
 
@@ -159,14 +158,18 @@ def main(args):
     ----------
     """
     if hasattr(args, "paired") and args.paired:
-        check_double_files(args)
-        check_for_same_name(args)
-        return run_file_checks(args.paired)
+        # First run both files through the checks,
+        # if they pass, check if they are not the same
+        if all(run_file_checks(file) for file in args.paired):
+            check_double_files(args)
+            check_for_same_name(args)
+            return True
+        return False
 
     if hasattr(args, "single") and args.single:
-        return run_file_checks([args.single])
+        return run_file_checks(args.single)
 
     if hasattr(args, "input") and args.input:
-        return run_file_checks([args.input])
+        return run_file_checks(args.input)
 
     return False

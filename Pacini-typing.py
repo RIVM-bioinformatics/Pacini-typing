@@ -14,26 +14,19 @@ __author__ = "Mark Van de Streek"
 __data__ = "2024-09-24"
 
 import logging
-import makedatabase
+from makedatabase import DatabaseBuilder
 import argument_parser.build_parser
 import validating.validating_input_arguments
 from validating.determine_input_type import FileValidator
-
-LOGGER = logging.getLogger(__name__)
 
 
 if __name__ == "__main__":
     # Retrieve the args object, arguments have been parsed at this point
     args = argument_parser.build_parser.main()
 
-    # Configure the logging
-    # logging.basicConfig(
-    #     level=args.verbose and logging.DEBUG or logging.INFO,
-    #     format="%(asctime)s - %(levelname)s - %(message)s")
-
     logging.basicConfig(
         level=args.verbose and logging.DEBUG or logging.INFO,
-        format="%(asctime)sZ  %(levelname)-5s %(process)d --- %(name)-5s : %(message)s",
+        format="%(asctime)s %(levelname)-5s %(process)d : %(message)s",
         datefmt="%Y-%m-%dT%H:%M:%S"
     )
 
@@ -46,13 +39,25 @@ if __name__ == "__main__":
     # Check if the options are available
     if args.options == "makedatabase":
         logging.info("Running makedatabase")
-        makedatabase.main(args)
+        DatabaseBuilder(
+            database_path=args.database_path,
+            database_name=args.database_name,
+            input_fasta_file=args.input,
+            database_type=args.database_type
+        )
 
     elif args.options == "query":
+        file_type = None
         logging.info("Option query was selected, retrieving the file type...")
         if hasattr(args, "single") and args.single:
-            file_type = FileValidator(args.paired).get_file_type()
+            # Sending the files as list to handle both,
+            # single and paired files with same functions
+            file_type = FileValidator([args.single]).get_file_type()
             logging.info("File type for single input: %s", file_type)
         elif hasattr(args, "paired") and args.paired:
             file_type = FileValidator(args.paired).get_file_type()
             logging.info("File type for paired input: %s", file_type)
+
+        if file_type:
+            logging.info("File type has been retrieved, running query...")
+            # Run the query

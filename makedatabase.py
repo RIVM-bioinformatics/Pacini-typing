@@ -120,19 +120,3 @@ class DatabaseBuilder:
             text=True)
 
         return result
-
-
-def main(args):
-    """
-    Main function that calls the DatabaseBuilder class with the necessary arguments.
-    ----------
-    Input:
-        - args
-    ----------
-    """
-    DatabaseBuilder(
-        database_path=args.database_path,
-        database_name=args.database_name,
-        input_fasta_file=args.input,
-        database_type=args.database_type
-    )
