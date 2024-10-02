@@ -18,6 +18,7 @@ from makedatabase import DatabaseBuilder
 import argument_parser.build_parser
 import validating.validating_input_arguments
 from validating.determine_input_type import FileValidator
+from run_queries.blast_runner import BlastRunner
 
 
 if __name__ == "__main__":
@@ -35,6 +36,8 @@ if __name__ == "__main__":
 
     if validating.validating_input_arguments.main(args):
         logging.info("Input arguments have been validated, found no issues.")
+
+    # TODO: Add a check for the database path and database name...
 
     # Check if the options are available
     if args.options == "makedatabase":
@@ -60,4 +63,21 @@ if __name__ == "__main__":
 
         if file_type:
             logging.info("File type has been retrieved, running query...")
-            # Run the query
+            if file_type == "FASTA":
+                # TODO: Edge case, two different fasta files are passed here
+                # BlastRunner(
+                #     input_file=args.single,
+                #     database=args.database,
+                #     output_file=args.output
+                # ).run()
+
+                # Maak een BlastRunner instantie aan
+                blast_runner = BlastRunner(
+                    input_file=args.single,
+                    database=args.database,
+                    output_file=args.output
+                )
+                blast_runner.run()
+
+                runtime = blast_runner.get_runtime()
+                logging.debug("Query runtime: %s seconds", round(runtime, 2))
