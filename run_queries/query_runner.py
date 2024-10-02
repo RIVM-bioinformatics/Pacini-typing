@@ -19,6 +19,8 @@ import logging
 import time
 
 import decorators.decorators
+from run_queries.blast_runner import prepare_query as blast_prepare_query
+from run_queries.kma_runner import prepare_query as kma_prepare_query
 
 
 class QueryRunner:
@@ -26,13 +28,29 @@ class QueryRunner:
     Fill in later...
     """
 
-    def __init__(self, query):
+    def __init__(self, input_file_type, input_file, database, output_file):
         """
         Fill in later...
         """
-        self.query = query
+        self.input_file_type = input_file_type
+        self.input_file = input_file
+        self.database = database
+        self.output_file = output_file
         self.start_time = None
         self.stop_time = None
+
+        if self.input_file_type == "FASTA":
+            self.query = blast_prepare_query(
+                input_file=self.input_file,
+                database=self.database,
+                output_file=self.output_file
+            )
+        elif self.input_file_type == "FASTQ":
+            self.query = kma_prepare_query(
+                input_file=self.input_file,
+                database=self.database,
+                output_file=self.output_file
+            )
 
     def __str__(self):
         """
@@ -42,7 +60,7 @@ class QueryRunner:
         return f"QueryRunner(query={self.query})"
 
     @decorators.decorators.log
-    def run_query(self):
+    def run(self):
         """
         Fill in later...
         """

@@ -12,43 +12,21 @@ To be filed in later...
 
 __author__ = "Mark Van de Streek"
 __data__ = "2024-09-24"
-__all__ = ["BlastRunner"]
+__all__ = ["prepare_query"]
 
-from run_queries.query_runner import QueryRunner
+RUN_OPTION = "blastn"
+OUTPUT_FORMAT = "6"
 
 
-class BlastRunner(QueryRunner):
+def prepare_query(input_file, database, output_file):
     """
-    Fill in later...
+    Simple class method that prepares the query for the BLAST run.
+    This query is passed to the super class QueryRunner.
     """
-    RUN_OPTION = "blastn"
-    OUTPUT_FORMAT = "10"
-
-    def __init__(self, input_file, database, output_file):
-        """
-        Fill in later...
-        """
-        self.input_file = input_file
-        self.database = database
-        self.output_file = output_file
-        super().__init__(
-            self.prepare_query())
-
-    def run(self):
-        """
-        Fill in later...
-        """
-        self.run_query()
-
-    def prepare_query(self):
-        """
-        Simple class method that prepares the query for the BLAST run.
-        This query is passed to the super class QueryRunner.
-        """
-        return [
-            self.RUN_OPTION,
-            "-query", self.input_file,
-            "-db", self.database,
-            "-out", self.output_file,
-            "-outfmt", self.OUTPUT_FORMAT
-        ]
+    return [
+        RUN_OPTION,
+        "-query", input_file,
+        "-db", database,
+        "-out", output_file,
+        "-outfmt", OUTPUT_FORMAT
+    ]

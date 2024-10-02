@@ -12,44 +12,21 @@ To be filed in later...
 
 __author__ = "Mark Van de Streek"
 __data__ = "2024-09-24"
-__all__ = ["KMARunner"]
+__all__ = ["prepare_query"]
 
-from run_queries.query_runner import QueryRunner
+RUN_OPTION = "kma"
+PAIRED_OPTION = "-ipe"
+OUTPUT_FORMAT = "still to be determined..."
 
 
-class KMARunner(QueryRunner):
+def prepare_query(input_file, database, output_file):
     """
-    Fill in later...
+    Simple class method that prepares the query for the KMA run.
+    This query is passed to the super class QueryRunner
     """
-    RUN_OPTION = "kma"
-    PAIRED_OPTION = "-ipe"
-    OUTPUT_FORMAT = "still to be determined..."
-
-    def __init__(self, input_file, database, output_file):
-        """
-        Fill in later...
-        """
-        self.input_file = input_file
-        self.database = database
-        self.output_file = output_file
-        super().__init__(
-            query=self.prepare_query()
-        )
-
-    def run(self):
-        """
-        Fill in later...
-        """
-        self.run_query()
-
-    def prepare_query(self):
-        """
-        Simple class method that prepares the query for the KMA run.
-        This query is passed to the super class QueryRunner
-        """
-        return [
-            self.RUN_OPTION,
-            self.PAIRED_OPTION, self.input_file[0], self.input_file[1],
-            "-t_db", self.database,
-            "-o", self.output_file,
-        ]
+    return [
+        RUN_OPTION,
+        PAIRED_OPTION, input_file[0], input_file[1],
+        "-t_db", database,
+        "-o", output_file,
+    ]

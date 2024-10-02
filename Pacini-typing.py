@@ -18,8 +18,7 @@ from makedatabase import DatabaseBuilder
 import argument_parser.build_parser
 import validating.validating_input_arguments
 from validating.determine_input_type import FileValidator
-from run_queries.blast_runner import BlastRunner
-from run_queries.kma_runner import KMARunner
+from run_queries.query_runner import QueryRunner
 
 
 if __name__ == "__main__":
@@ -58,8 +57,8 @@ if __name__ == "__main__":
 
         if file_type:
             logging.info("File type has been retrieved, running query...")
-            runner_class = BlastRunner if file_type == "FASTA" else KMARunner
-            runner = runner_class(
+            runner = QueryRunner(
+                input_file_type=file_type,
                 input_file=args.single if file_type == "FASTA" else args.paired,
                 database=args.database,
                 output_file=args.output
