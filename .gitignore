@@ -161,3 +161,6 @@ cython_debug/
 *.fq
 README.md.bak
 pylint_output.txt
+refdir/
+data/
+*.csv
