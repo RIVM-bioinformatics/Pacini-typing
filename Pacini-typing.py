@@ -58,7 +58,6 @@ if __name__ == "__main__":
 
         if file_type:
             logging.info("File type has been retrieved, running query...")
-            # TODO: Edge case, two different fasta files are passed here
             runner_class = BlastRunner if file_type == "FASTA" else KMARunner
             runner = runner_class(
                 input_file=args.single if file_type == "FASTA" else args.paired,

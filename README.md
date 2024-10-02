@@ -3,7 +3,7 @@
 
 ![Unit tests](https://github.com/RIVM-bioinformatics/Pacini-typing/actions/workflows/run_unit_tests.yaml/badge.svg)
 
-Pylint output: Your code has been rated at 10.00/10 (previous run: 9.93/10, +0.07)
+Pylint output: Your code has been rated at 10.00/10 (previous run: 10.00/10, +0.00)
 
 # Pacini-typing
 

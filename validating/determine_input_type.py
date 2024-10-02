@@ -142,7 +142,11 @@ class FileValidator:
             - logging.error: if the files are not of the same type, sys.exit(1)
         ----------
         """
-        if len(set(self.type.values())) == 1:
+        file_types = set(self.type.values())
+        if len(file_types) == 1:
+            if "FASTA" in file_types and len(self.type) == 2:
+                logging.error("Two input FASTA files are not allowed. Exiting...")
+                sys.exit(1)
             logging.debug("All files are valid and the same type, continuing...")
         else:
             logging.error("The input files are not of the same type: %s Exiting...", self.type)
