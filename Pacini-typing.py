@@ -19,6 +19,7 @@ import argument_parser.build_parser
 import validating.validating_input_arguments
 from validating.determine_input_type import FileValidator
 from run_queries.blast_runner import BlastRunner
+from run_queries.kma_runner import KMARunner
 
 
 if __name__ == "__main__":
@@ -50,34 +51,19 @@ if __name__ == "__main__":
         )
 
     elif args.options == "query":
-        file_type = None
         logging.info("Option query was selected, retrieving the file type...")
-        if hasattr(args, "single") and args.single:
-            # Sending the files as list to handle both,
-            # single and paired files with same functions
-            file_type = FileValidator([args.single]).get_file_type()
-            logging.info("File type for single input: %s", file_type)
-        elif hasattr(args, "paired") and args.paired:
-            file_type = FileValidator(args.paired).get_file_type()
-            logging.info("File type for paired input: %s", file_type)
+        file_type = FileValidator([args.single] if
+                                  hasattr(args, "single") and args.single else args.paired).get_file_type()
+        logging.info("File type for input: %s", file_type)
 
         if file_type:
             logging.info("File type has been retrieved, running query...")
-            if file_type == "FASTA":
-                # TODO: Edge case, two different fasta files are passed here
-                # BlastRunner(
-                #     input_file=args.single,
-                #     database=args.database,
-                #     output_file=args.output
-                # ).run()
-
-                # Maak een BlastRunner instantie aan
-                blast_runner = BlastRunner(
-                    input_file=args.single,
-                    database=args.database,
-                    output_file=args.output
-                )
-                blast_runner.run()
-
-                runtime = blast_runner.get_runtime()
-                logging.debug("Query runtime: %s seconds", round(runtime, 2))
+            # TODO: Edge case, two different fasta files are passed here
+            runner_class = BlastRunner if file_type == "FASTA" else KMARunner
+            runner = runner_class(
+                input_file=args.single if file_type == "FASTA" else args.paired,
+                database=args.database,
+                output_file=args.output
+            )
+            runner.run()
+            logging.debug("Query runtime: %s seconds", round(runner.get_runtime(), 2))

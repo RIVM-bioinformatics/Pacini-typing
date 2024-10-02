@@ -8,18 +8,12 @@
     https://github.com/features/copilot
 
 To be filed in later...
-
-blastn -query VIB_AA7903AA_AS.result.fasta -db blastdb/vibrio_genes_database -out myresults.csv -outfmt
-
-kma -ipe corrected_VIB_AA7903AA_AS/VIB_AA7903AA1.fq corrected_VIB_AA7903AA_AS/VIB_AA7903AA2.fq -t_db kmadb/kma_vibrio_database -o VIB_AA7903AA_AS_KMA
 """
 
 __author__ = "Mark Van de Streek"
 __data__ = "2024-09-24"
 __all__ = ["QueryRunner"]
 
-import sys
-import os
 import subprocess
 import logging
 import time
@@ -57,7 +51,8 @@ class QueryRunner:
         result = subprocess.run(
             self.query,
             capture_output=True,
-            text=True)
+            text=True,
+            check=True)
         self.stop_time = time.time()
 
         return result

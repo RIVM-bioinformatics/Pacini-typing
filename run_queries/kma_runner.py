@@ -12,17 +12,18 @@ To be filed in later...
 
 __author__ = "Mark Van de Streek"
 __data__ = "2024-09-24"
-__all__ = ["BlastRunner"]
+__all__ = ["KMARunner"]
 
 from run_queries.query_runner import QueryRunner
 
 
-class BlastRunner(QueryRunner):
+class KMARunner(QueryRunner):
     """
     Fill in later...
     """
-    RUN_OPTION = "blastn"
-    OUTPUT_FORMAT = "10"
+    RUN_OPTION = "kma"
+    PAIRED_OPTION = "-ipe"
+    OUTPUT_FORMAT = "still to be determined..."
 
     def __init__(self, input_file, database, output_file):
         """
@@ -32,7 +33,8 @@ class BlastRunner(QueryRunner):
         self.database = database
         self.output_file = output_file
         super().__init__(
-            self.prepare_query())
+            query=self.prepare_query()
+        )
 
     def run(self):
         """
@@ -42,13 +44,12 @@ class BlastRunner(QueryRunner):
 
     def prepare_query(self):
         """
-        Simple class method that prepares the query for the BLAST run.
-        This query is passed to the super class QueryRunner.
+        Simple class method that prepares the query for the KMA run.
+        This query is passed to the super class QueryRunner
         """
         return [
             self.RUN_OPTION,
-            "-query", self.input_file,
-            "-db", self.database,
-            "-out", self.output_file,
-            "-outfmt", self.OUTPUT_FORMAT
+            self.PAIRED_OPTION, self.input_file[0], self.input_file[1],
+            "-t_db", self.database,
+            "-o", self.output_file,
         ]
