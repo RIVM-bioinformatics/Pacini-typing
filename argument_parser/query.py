@@ -41,4 +41,20 @@ def build_query_command(subparsers):
         help="Single-end reads to be used for query. Specify one file: -s file",
     )
 
-    # TODO: Probably come up with a better name for this script
+    query.add_argument(
+        "-d",
+        "--database",
+        required=True,
+        type=str,
+        metavar="Database",
+        help="Reference database to be used for query. Specify a database: -d database",
+    )
+
+    query.add_argument(
+        "-o",
+        "--output",
+        required=True,
+        type=str,
+        metavar="Output",
+        help="Output file to store the results. Specify an output file: -o output",
+    )
