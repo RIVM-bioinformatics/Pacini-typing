@@ -76,7 +76,7 @@ def test_check_file_existence(file, expected):
     assert v.check_file_existence(file) == expected
 
 
-def test_check_double_files():
+def test_compare_paired_files():
     """
     Test the check_double_files() function
     It should raise a SystemExit exception if the same file is passed twice
@@ -85,13 +85,13 @@ def test_check_double_files():
     args = Args(paired=["README.md", "README.md"])
 
     with pytest.raises(SystemExit) as ex:
-        v.check_double_files(args)
+        v.compare_paired_files(args)
 
     assert ex.value.code == 1
 
     args = Args(paired=["README.md", "Pacini-typing.py"])
     try:
-        v.check_double_files(args)
+        v.compare_paired_files(args)
     except SystemExit:
         pytest.fail("check_double_files() raised SystemExit unexpectedly!")
 

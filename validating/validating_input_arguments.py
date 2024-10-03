@@ -18,6 +18,7 @@ import sys
 import os
 import logging
 import yaml
+import hashlib
 
 
 def validate_file_extensions(file):
@@ -87,31 +88,46 @@ def check_file_existence(file):
     return False
 
 
-def check_double_files(args):
+def compare_paired_files(args):
     """
     Function that checks if the input files are not exactly the same.
-    The first 150 lines of both files are compared.
+    For this operation, a SHA256 hash is created for both files,
+    this is done in the create_sha_hash function.
+    The hash is then compared, if they are the same,
+    the program will exit with an error message.
     ----------
     Input:
         - args: parsed object with the arguments
     ----------
     """
-    file1, file2 = args.paired[0], args.paired[1]
+    logging.info("Comparing paired input files using SHA256 hash...")
+    if create_sha_hash(args.paired[0]) == create_sha_hash(args.paired[1]):
+        logging.error("Input files: %s and %s are the same, exiting...",
+                      args.paired[0], args.paired[1])
+        sys.exit(1)
+    else:
+        logging.debug("Input files are not the same, continuing...")
 
-    try:
-        with (open(file1, 'r', encoding="utf-8") as f1,
-              open(file2, 'r', encoding="utf-8") as f2):
-            for _ in range(150):
-                line1 = f1.readline()
-                line2 = f2.readline()
-                if line1 != line2:
-                    logging.debug("Files are different.")
-                    return
-        logging.error("The input files are the same, exiting...")
-        sys.exit(1)
-    except OSError as e:
-        logging.error("An error occurred while comparing files: %s", e)
-        sys.exit(1)
+
+def create_sha_hash(file):
+    """
+    Method that creates a SHA256 hash for a given file.
+    The file is read in chunks of 4096 bytes and the hash is updated.
+    The Hash is then returned as a hexadecimal string.
+    ----------
+    Input:
+        - file: string with the file path
+    Output:
+        - hash_obj.hexdigest(): string with the SHA256 hash
+    ----------
+    """
+    logging.debug("Creating SHA256 hash for file: %s", file)
+    hash_obj = hashlib.sha256()
+    with open(file, "rb") as f:
+        for chunk in iter(lambda: f.read(4096), b""):
+            hash_obj.update(chunk)
+
+    return hash_obj.hexdigest()
 
 
 def check_for_same_name(args):
@@ -161,8 +177,9 @@ def main(args):
         # First run both files through the checks,
         # if they pass, check if they are not the same
         if all(run_file_checks(file) for file in args.paired):
-            check_double_files(args)
+            # First check for same name to prevent unnecessary I/O
             check_for_same_name(args)
+            compare_paired_files(args)
             return True
         return False
 
