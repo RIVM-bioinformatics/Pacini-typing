@@ -20,7 +20,7 @@ OUTPUT_FORMAT = "6"
 
 def prepare_query(input_file, database, output_file):
     """
-    Simple class method that prepares the query for the BLAST run.
+    Simple method that prepares the query for the BLAST run.
     This query is passed to the super class QueryRunner.
     """
     return [
