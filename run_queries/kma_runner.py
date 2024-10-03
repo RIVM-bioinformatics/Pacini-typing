@@ -16,12 +16,12 @@ __all__ = ["prepare_query"]
 
 RUN_OPTION = "kma"
 PAIRED_OPTION = "-ipe"
-OUTPUT_FORMAT = "still to be determined..."
+OUTPUT_FORMAT = "-tsv"
 
 
 def prepare_query(input_file, database, output_file):
     """
-    Simple class method that prepares the query for the KMA run.
+    Simple method that prepares the query for the KMA run.
     This query is passed to the super class QueryRunner
     """
     return [
@@ -29,4 +29,5 @@ def prepare_query(input_file, database, output_file):
         PAIRED_OPTION, input_file[0], input_file[1],
         "-t_db", database,
         "-o", output_file,
+        OUTPUT_FORMAT
     ]

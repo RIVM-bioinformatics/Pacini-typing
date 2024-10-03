@@ -16,9 +16,9 @@ __all__ = ["validate_file_extensions"]
 
 import sys
 import os
+import hashlib
 import logging
 import yaml
-import hashlib
 
 
 def validate_file_extensions(file):
