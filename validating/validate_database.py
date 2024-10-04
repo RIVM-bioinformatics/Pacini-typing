@@ -23,9 +23,11 @@ def check_for_database_existence(database_path, database_name, input_file_type):
     """
     Function that checks if the database exists.
     Based on the input type, the method will check if the files exist:
-    for option fasta/blast: db_name.ndb, db_name.nhr, db_name.nin, db_name.njs, db_name.not, db_name.nsq, db_name.ntf, db_name.nto
-
-    for option fastq/kma: db_name.comp.b, db_name.length.b, db_name.name, db_name.seq.b
+    for option fasta/blast:
+        db_name.ndb, db_name.nhr, db_name.nin,
+        db_name.njs, db_name.not, db_name.nsq, db_name.ntf, db_name.nto
+    for option fastq/kma:
+        db_name.comp.b, db_name.length.b, db_name.name, db_name.seq.b
     ----------
     Input:
         - database_name: string with the database name

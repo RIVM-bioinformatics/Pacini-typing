@@ -25,6 +25,8 @@ from run_queries.query_runner import QueryRunner
 if __name__ == "__main__":
     # Retrieve the args object, arguments have been parsed at this point
     args = argument_parser.build_parser.main()
+    # TODO - Make the input db arguments required all the time
+    # TODO - Change name of the pacini-typing.py to pacini_typing.py
 
     logging.basicConfig(
         level=args.verbose and logging.DEBUG or logging.INFO,
@@ -65,6 +67,7 @@ if __name__ == "__main__":
 
         if file_type:
             logging.info("File type has been retrieved, running query...")
+            # TODO - Use less arguments in the QueryRunner class, maybe prepare_query() on forehand?
             runner = QueryRunner(
                 input_file_type=file_type,
                 input_file=args.single if file_type == "FASTA" else args.paired,
