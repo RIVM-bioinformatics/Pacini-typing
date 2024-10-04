@@ -14,6 +14,7 @@ __author__ = "Mark Van de Streek"
 __data__ = "2024-09-24"
 __all__ = ["validate_file_extensions"]
 
+import re
 import sys
 import os
 import hashlib
@@ -144,6 +145,24 @@ def check_for_same_name(args):
         sys.exit(1)
 
 
+def check_paired_names(args):
+    """
+    Function that checks if the input files are paired.
+    This means, 1 and 2 are in the file names, or something similar.
+    ---------
+    Input:
+        - args: parsed object with the arguments
+    ----------
+    """
+    pattern1 = re.compile(r".+(_1|R1).+")
+    pattern2 = re.compile(r".+(_2|R2).+")
+    # Check if the patterns are in the file names
+    if not (pattern1.search(args.paired[0]) and pattern2.search(args.paired[1])):
+        logging.error("Paired mode requires '_1' and '_2' or "
+                      "'R1' and 'R2' in the file names, exiting...")
+        sys.exit(1)
+
+
 def run_file_checks(args):
     """
     Method that walks through the input files and checks if they are valid.
@@ -180,6 +199,8 @@ def main(args):
             # First check for same name to prevent unnecessary I/O
             check_for_same_name(args)
             compare_paired_files(args)
+            # TODO: Implement paired mode checks
+            check_paired_names(args)
             return True
         return False
 

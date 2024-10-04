@@ -129,6 +129,46 @@ def test_check_for_same_name_good(args1, args2):
         pytest.fail("check_for_same_name() raised SystemExit unexpectedly!")
 
 
+@pytest.mark.parametrize("args1, args2", [
+    ("mysample_1.fq", "mysample_2.fq"),
+    ("mysample_R1.fq", "mysample_R2.fq"),
+    ("mysample_R1_is_great.fq", "mysample_R2_is_great.fq"),
+    ("mysample_1_is_great.fq", "mysample_2_is_great.fq"),
+    ("mysampleR1.fq", "mysampleR2.fq")])
+def test_check_paired_names_good(args1, args2):
+    """
+    Test the check_paired_names() function.
+    Function should not raise any exceptions
+    """
+    args = Args(paired=[args1, args2])
+
+    try:
+        v.check_paired_names(args)
+    except SystemExit:
+        pytest.fail("check_paired_names() raised SystemExit unexpectedly!")
+
+
+@pytest.mark.parametrize("args1, args2", [
+    ("mysample1.fq", "mysampl2.fq"),
+    ("mysample_R1.fq", "mysample_R1.fq"),
+    ("mysample_R1_is_great.fq", "mysample_R1_is_great.fq"),
+    ("mysample_2_is_great.fq", "mysample_1_is_great.fq"),
+    ("_1Sample.fq", "_2Sample.fq"),
+    ("R1Sample.fq", "R2Sample.fq"),
+    ("Sample.R1", "Sample.R2"),
+    ("mysampleR1.fq", "mysampleR1.fq")])
+def test_check_paired_names_fail(args1, args2):
+    """
+    Test the check_paired_names() function
+    It should raise a SystemExit exception if the file names are not paired
+    """
+    args = Args(paired=[args1, args2])
+
+    with pytest.raises(SystemExit) as ex:
+        v.check_paired_names(args)
+    assert ex.value.code == 1
+
+
 def test_run_file_checks():
     """
     Test the run_file_checks() function
