@@ -69,7 +69,6 @@ class DatabaseBuilder:
                 self.create_blast_database()
         else:
             logging.info("Database already exists in the specified path")
-            pass
 
     @decorators.log
     def create_kma_database(self) -> subprocess.CompletedProcess:
@@ -90,7 +89,8 @@ class DatabaseBuilder:
                 "-o", self.full_database_path
             ],
             capture_output=True,
-            text=True)
+            text=True,
+            check=True)
 
         return result
 
@@ -117,6 +117,7 @@ class DatabaseBuilder:
                 "-out", self.full_database_path
             ],
             capture_output=True,
-            text=True)
+            text=True,
+            check=True)
 
         return result

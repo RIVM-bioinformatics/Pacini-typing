@@ -66,7 +66,7 @@ def test_validate_file_extensions(filename, expected):
     ("argument_parser/build_parser", False),
     ("argument_parser/build_parser.sh", False),
     ("readme", False),
-    ("Pacini-typing.py", True),
+    ("pacini-typing.py", True),
     ("tests/test_validating_input_arguments.py", True)])
 def test_check_file_existence(file, expected):
     """
@@ -89,7 +89,7 @@ def test_compare_paired_files():
 
     assert ex.value.code == 1
 
-    args = Args(paired=["README.md", "Pacini-typing.py"])
+    args = Args(paired=["README.md", "pacini-typing.py"])
     try:
         v.compare_paired_files(args)
     except SystemExit:
@@ -99,7 +99,7 @@ def test_compare_paired_files():
 @pytest.mark.parametrize("args1, args2", [
     ("README.md", "README.md"),
     ("1234.md", "1234.md"),
-    ("Pacini-typing.py", "Pacini-typing.py"),])
+    ("pacini-typing.py", "pacini-typing.py"),])
 def test_check_for_same_name_fail(args1, args2):
     """
     Test the check_for_same_name() function
@@ -113,9 +113,9 @@ def test_check_for_same_name_fail(args1, args2):
 
 
 @pytest.mark.parametrize("args1, args2", [
-    ("README.md", "Pacini-typing.py"),
+    ("README.md", "pacini-typing.py"),
     ("1234.md", "12345.md"),
-    ("Pacini-typing.md", "Pacini-typing.py"),])
+    ("Pacini-typing.md", "pacini-typing.py"),])
 def test_check_for_same_name_good(args1, args2):
     """
     Test the check_for_same_name() function.
@@ -175,7 +175,7 @@ def test_run_file_checks():
     It should raise a SystemExit exception if the file extension is not valid
     The Patch decorator is used to mock the return value of the called functions
     """
-    args = Args(paired=["README.md", "Pacini-typing.py"])
+    args = Args(paired=["README.md", "pacini-typing.py"])
 
     with patch('validating.validating_input_arguments.check_file_existence',
                return_value=True), \

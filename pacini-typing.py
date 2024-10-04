@@ -51,8 +51,9 @@ if __name__ == "__main__":
 
     elif args.options == "query":
         logging.info("Option query was selected, retrieving the file type...")
-        file_type = FileValidator([args.single] if
-                                  hasattr(args, "single") and args.single else args.paired).get_file_type()
+        file_type = (FileValidator(
+            [args.single] if hasattr(args, "single") and args.single else args.paired)
+                     .get_file_type())
         logging.info("File type for input: %s", file_type)
 
         if file_type:
