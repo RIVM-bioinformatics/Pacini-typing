@@ -154,6 +154,30 @@ class FileValidator:
 
     def get_file_type(self):
         """
-        Getter function that returns the type dictionary.
+        Simple getter function to retrieve the file type in string format
+        ----------
+        Output:
+            - string: with the file type
+        ----------
         """
         return next(iter(self.type.values()))
+
+    @staticmethod
+    def check_single_file(file_type, args):
+        """
+        This method checks if the file type is correct for the input arguments.
+        To be precise, it checks if the file type is FASTA for single files
+        and FASTQ for paired files. If not, it will exit the program.
+        This method is static and is called after the file type has been determined.
+        ----------
+        Input:
+            - file_type: string with the file type
+            - args: object with the input arguments
+        ----------
+        """
+        print(args)
+        if (file_type == "FASTQ" and args.single) or (file_type == "FASTA" and args.paired):
+            logging.error(
+                "Only FASTA files are allowed for single files "
+                "and only FASTQ files are allowed for paired files.")
+            sys.exit(1)
