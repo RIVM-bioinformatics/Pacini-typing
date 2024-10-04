@@ -199,7 +199,6 @@ def main(args):
             # First check for same name to prevent unnecessary I/O
             check_for_same_name(args)
             compare_paired_files(args)
-            # TODO: Implement paired mode checks
             check_paired_names(args)
             return True
         return False
