@@ -42,12 +42,20 @@ def build_query_command(subparsers):
     )
 
     query.add_argument(
-        "-d",
-        "--database",
-        required=True,
+        "-db_name",
+        "--database_name",
         type=str,
-        metavar="Database",
-        help="Reference database to be used for query. Specify a database: -d database",
+        required=True,
+        metavar="name",
+        help="Specify the name of the database",
+    )
+    query.add_argument(
+        "-db_path",
+        "--database_path",
+        type=str,
+        required=True,
+        metavar="location",
+        help="Specify the location of the database, ending with /",
     )
 
     query.add_argument(

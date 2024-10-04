@@ -28,13 +28,14 @@ class QueryRunner:
     Fill in later...
     """
 
-    def __init__(self, input_file_type, input_file, database, output_file):
+    def __init__(self, input_file_type, input_file,
+                 database_path, database_name, output_file):
         """
         Fill in later...
         """
         self.input_file_type = input_file_type
         self.input_file = input_file
-        self.database = database
+        self.database = database_path + database_name
         self.output_file = output_file
         self.start_time = None
         self.stop_time = None

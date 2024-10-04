@@ -57,6 +57,6 @@ def build_makedatabase_command(subparsers):
         "--database_path",
         type=str,
         required=True,
-        metavar="File",
+        metavar="path",
         help="Specify the path of the database",
     )
