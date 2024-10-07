@@ -114,6 +114,7 @@ def run_query(query_args, input_file_type):
     Input:
     ----------
     """
+    # TODO - Way to many input arguments, consider refactoring
     runner = QueryRunner(
         input_file_type=input_file_type,
         input_file=query_args.single if input_file_type == "FASTA" else query_args.paired,
