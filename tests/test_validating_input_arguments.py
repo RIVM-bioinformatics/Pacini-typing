@@ -7,11 +7,33 @@
     “GitHub Copilot: Your AI pair programmer” (GPT-3). GitHub, Inc.
     https://github.com/features/copilot
 
-To be filed in later...
+This script contains the tests for the validating_input_arguments.py module.
+The tests are used to check the functions that validate the input arguments.
+Both good and bad cases are tested to ensure the functions work as expected.
+
+Parametrized tests are used to test the functions with different input parameters
+
+For example:
+
+@pytest.mark.parametrize("filename, expected", [
+    ("myfile.txt", False),
+    ("myfile.txt.gz", False),
+    ("myfile.fasta", True)])
+def my_good_unit_test(filename, expected):
+    assert my_function(filename) == expected
+
+The above code will run the my_good_unit_test *3* times with the given parameters,
+this is the same as running:
+    assert my_function("myfile.txt") == False
+    assert my_function("myfile.txt.gz") == False
+    assert my_function("myfile.fasta") == True
+
+Good: The function should return the expected value
+Bad: The function should raise an exception or return a different value
 """
 
 __author__ = "Mark Van de Streek"
-__data__ = "2024-09-24"
+__date__ = "2024-10-07"
 
 from unittest.mock import patch
 import pytest
@@ -66,7 +88,7 @@ def test_validate_file_extensions(filename, expected):
     ("argument_parser/build_parser", False),
     ("argument_parser/build_parser.sh", False),
     ("readme", False),
-    ("pacini-typing.py", True),
+    ("pacini_typing.py", True),
     ("tests/test_validating_input_arguments.py", True)])
 def test_check_file_existence(file, expected):
     """
@@ -89,7 +111,7 @@ def test_compare_paired_files():
 
     assert ex.value.code == 1
 
-    args = Args(paired=["README.md", "pacini-typing.py"])
+    args = Args(paired=["README.md", "pacini_typing.py"])
     try:
         v.compare_paired_files(args)
     except SystemExit:
@@ -99,7 +121,7 @@ def test_compare_paired_files():
 @pytest.mark.parametrize("args1, args2", [
     ("README.md", "README.md"),
     ("1234.md", "1234.md"),
-    ("pacini-typing.py", "pacini-typing.py"),])
+    ("pacini_typing.py", "pacini_typing.py"),])
 def test_check_for_same_name_fail(args1, args2):
     """
     Test the check_for_same_name() function
@@ -113,9 +135,9 @@ def test_check_for_same_name_fail(args1, args2):
 
 
 @pytest.mark.parametrize("args1, args2", [
-    ("README.md", "pacini-typing.py"),
+    ("README.md", "pacini_typing.py"),
     ("1234.md", "12345.md"),
-    ("Pacini-typing.md", "pacini-typing.py"),])
+    ("Pacini-typing.md", "pacini_typing.py"),])
 def test_check_for_same_name_good(args1, args2):
     """
     Test the check_for_same_name() function.
@@ -175,7 +197,7 @@ def test_run_file_checks():
     It should raise a SystemExit exception if the file extension is not valid
     The Patch decorator is used to mock the return value of the called functions
     """
-    args = Args(paired=["README.md", "pacini-typing.py"])
+    args = Args(paired=["README.md", "pacini_typing.py"])
 
     with patch('validating.validating_input_arguments.check_file_existence',
                return_value=True), \

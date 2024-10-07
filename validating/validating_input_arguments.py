@@ -12,7 +12,9 @@ Fill in later...
 
 __author__ = "Mark Van de Streek"
 __data__ = "2024-09-24"
-__all__ = ["validate_file_extensions"]
+__all__ = ["validate_file_extensions", "get_file_extension", "get_config_input",
+           "check_file_existence", "compare_paired_files", "create_sha_hash",
+           "check_for_same_name", "check_paired_names", "run_file_checks", "main"]
 
 import re
 import sys
@@ -25,14 +27,16 @@ import yaml
 def validate_file_extensions(file):
     """
     Main function that is used to validate the input file extensions.
+    Other functions are used to retrieve the configuration file and extract extensions.
+    With these information, this function checks if extension is in the accepted list.
+    If not, the program will exit with an error message.
     ----------
     Input:
         - args: parsed object with the arguments
     ----------
     """
     config = get_config_input()
-    ext = get_file_extension(file.split("."))
-    ext = ext.lower()
+    ext = get_file_extension(file.split(".")).lower()
     if ext in config["accepted_input_extensions"]:
         logging.debug("File %s is accepted", file)
         return True
@@ -64,6 +68,7 @@ def get_config_input():
     """
     Simple function that retrieves the configuration file and loads it into a dictionary.
     This dictionary is then returned and used for the input validation.
+    See ./configuration/accept_arguments.yaml for the configuration file.
     ----------
     Output:
         - config: dictionary with the configuration file
@@ -76,13 +81,13 @@ def get_config_input():
 
 def check_file_existence(file):
     """
-    Function that checks if the input file exists and is a file.
+    Function that checks if a given file exists and is a file.
     ----------
     Input:
         - file: string with the file path
     ----------
     """
-    if os.path.isfile(file) and os.path.exists(file):
+    if os.path.exists(file) and os.path.isfile(file):
         logging.debug("File %s exists", file)
         return True
     logging.error("File %s does not exist", file)
@@ -101,20 +106,19 @@ def compare_paired_files(args):
         - args: parsed object with the arguments
     ----------
     """
-    logging.info("Comparing paired input files using SHA256 hash...")
+    logging.debug("Comparing paired input files using SHA256 hash...")
     if create_sha_hash(args.paired[0]) == create_sha_hash(args.paired[1]):
         logging.error("Input files: %s and %s are the same, exiting...",
                       args.paired[0], args.paired[1])
         sys.exit(1)
-    else:
-        logging.debug("Input files are not the same, continuing...")
+    logging.debug("Input files are not the same, continuing...")
 
 
 def create_sha_hash(file):
     """
     Method that creates a SHA256 hash for a given file.
     The file is read in chunks of 4096 bytes and the hash is updated.
-    The Hash is then returned as a hexadecimal string.
+    The Hash is then returned as a hexadecimal string for comparison.
     ----------
     Input:
         - file: string with the file path
@@ -134,7 +138,9 @@ def create_sha_hash(file):
 def check_for_same_name(args):
     """
     Function that checks if the input files are not exactly the same.
-    If so, the program will exit with an error message.
+    This check is done right before the paired file check.
+    Therefore, no big operations are done before this check,
+    because the program will exit with an error message.
     ---------
     Input:
         - args: parsed object with the arguments
@@ -156,7 +162,6 @@ def check_paired_names(args):
     """
     pattern1 = re.compile(r".+(_1|R1).+")
     pattern2 = re.compile(r".+(_2|R2).+")
-    # Check if the patterns are in the file names
     if not (pattern1.search(args.paired[0]) and pattern2.search(args.paired[1])):
         logging.error("Paired mode requires '_1' and '_2' or "
                       "'R1' and 'R2' in the file names, exiting...")
@@ -166,6 +171,9 @@ def check_paired_names(args):
 def run_file_checks(args):
     """
     Method that walks through the input files and checks if they are valid.
+    The following checks are done:
+        - Validate the file extensions
+        - Check if the file exists
     If not, the program will exit with an error message.
     ----------
     Input:
@@ -184,7 +192,7 @@ def run_file_checks(args):
 def main(args):
     """
     Main function that is used to validate the input file extensions.
-    Paired mode holds two files, therefore an extra sameness check is needed.
+    Paired mode holds two files, therefore extra checks are required.
     For input and single mode, these arguments hold a single file.
     Therefore, it's send as a list.
     ----------

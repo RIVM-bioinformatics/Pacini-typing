@@ -109,6 +109,9 @@ class FileValidator:
         for file in self.input_files:
             with open(file, "r", encoding="utf-8") as f:
                 self.body[file] = [f.readline().strip() for _ in range(5)]
+                # TODO: Think about checking the whole file for valid sequences and not just the first 5 lines
+                #   if so, maybe combine it with hash function in validating input arguments script
+                #   to not read the whole file twice
 
     def check_valid_sequence(self, file):
         """
@@ -166,7 +169,7 @@ class FileValidator:
     def check_single_file(file_type, args):
         """
         This method checks if the file type is correct for the input arguments.
-        To be precise, it checks if the file type is FASTA for single files
+        To be precise, it checks if the file type is FASTA for single file input
         and FASTQ for paired files. If not, it will exit the program.
         This method is static and is called after the file type has been determined.
         ----------
@@ -175,7 +178,6 @@ class FileValidator:
             - args: object with the input arguments
         ----------
         """
-        print(args)
         if (file_type == "FASTQ" and args.single) or (file_type == "FASTA" and args.paired):
             logging.error(
                 "Only FASTA files are allowed for single files "

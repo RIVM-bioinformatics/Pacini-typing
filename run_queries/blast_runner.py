@@ -17,11 +17,24 @@ __all__ = ["prepare_query"]
 RUN_OPTION = "blastn"
 OUTPUT_FORMAT = "6"
 
+# TODO: This file was first a class, but quite overkill for the purpose,
+#  maybe additional information could be added to this script in the future.
+#  This way, blast operations parameters could easily be changed or extended.
+
 
 def prepare_query(input_file, database, output_file):
     """
     Simple method that prepares the query for the BLAST run.
     This query is passed to the super class QueryRunner.
+    The script-constants are used to set the run option and output format.
+    ----------
+    Input:
+        - input_file: str
+        - database: str
+        - output_file: str
+    Output:
+        - list with the query to run BLAST
+    ----------
     """
     return [
         RUN_OPTION,

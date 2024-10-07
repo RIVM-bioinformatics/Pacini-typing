@@ -25,9 +25,9 @@ from run_queries.query_runner import QueryRunner
 if __name__ == "__main__":
     # Retrieve the args object, arguments have been parsed at this point
     args = argument_parser.build_parser.main()
-    # TODO - Make the input db arguments required all the time
 
-    # TODO - Change name of the pacini-typing.py to pacini_typing.py
+    # TODO - Make the input db arguments required all the time,
+    #   so that the database could be created if not found running the query
 
     logging.basicConfig(
         level=args.verbose and logging.DEBUG or logging.INFO,
@@ -77,4 +77,4 @@ if __name__ == "__main__":
                 output_file=args.output
             )
             runner.run()
-            logging.debug("Query runtime: %s seconds", round(runner.get_runtime(), 2))
+            logging.debug("Query runtime: %s seconds", runner.get_runtime())

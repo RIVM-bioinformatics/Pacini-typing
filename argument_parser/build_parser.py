@@ -18,8 +18,8 @@ __all__ = ["main"]
 import argparse
 
 import argument_parser.custom_argument_parser
-import argument_parser.makedatabase
-import argument_parser.query
+import argument_parser.args_makedatabase
+import argument_parser.args_query
 
 
 def main():
@@ -33,13 +33,6 @@ def main():
         - args: parsed object with the arguments
     ----------
     """
-    # Optional: Use custom argument parser
-    # parser = argument_parser.custom_argument_parser.CustomArgumentParser(
-    #         prog="Pacini",
-    #         description="Bacterial Genotyping Tool for RIVM IDS-Bioinformatics",
-    #         epilog="See github.com/RIVM-Bioinformatics for more information",
-    #     )
-
     parser = argparse.ArgumentParser(
         prog="Pacini",
         description="Bacterial Genotyping Tool for RIVM IDS-Bioinformatics",
@@ -60,7 +53,7 @@ def main():
         dest="options"
     )
 
-    argument_parser.makedatabase.build_makedatabase_command(subparsers)
-    argument_parser.query.build_query_command(subparsers)
+    argument_parser.args_makedatabase.build_makedatabase_command(subparsers)
+    argument_parser.args_query.build_query_command(subparsers)
 
     return parser.parse_args()

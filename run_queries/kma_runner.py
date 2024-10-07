@@ -18,11 +18,23 @@ RUN_OPTION = "kma"
 PAIRED_OPTION = "-ipe"
 OUTPUT_FORMAT = "-tsv"
 
+# TODO: This file was first a class, but quite overkill for the purpose,
+#  maybe additional information could be added to this script in the future.
+#  This way, blast operations parameters could easily be changed or extended.
+
 
 def prepare_query(input_file, database, output_file):
     """
     Simple method that prepares the query for the KMA run.
     This query is passed to the super class QueryRunner
+    ----------
+    Input:
+        - input_file: list with the input files
+        - database: str
+        - output_file: str
+    Output:
+        - list with the query to run KMA
+    ----------
     """
     return [
         RUN_OPTION,

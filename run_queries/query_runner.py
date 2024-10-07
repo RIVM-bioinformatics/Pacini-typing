@@ -25,13 +25,24 @@ from run_queries.kma_runner import prepare_query as kma_prepare_query
 
 class QueryRunner:
     """
-    Fill in later...
+    Main class that runs the input query against the reference database.
+    The query is prepared by the prepare_query method from the respective runner.
     """
 
     def __init__(self, input_file_type, input_file,
                  database_path, database_name, output_file):
         """
-        Fill in later...
+        Constructor of the QueryRunner class.
+        The constructor calls the prepare_query method based
+        on the input type (FASTA/FASTQ).
+        ----------
+        Input:
+            - input_file_type: str
+            - input_file: str
+            - database_path: str
+            - database_name: str
+            - output_file: str
+        ----------
         """
         self.input_file_type = input_file_type
         self.input_file = input_file
@@ -58,12 +69,21 @@ class QueryRunner:
         Readable representation of the class.
         This function is called when the class is printed.
         """
+        # TODO: Is this function necessary?
         return f"QueryRunner(query={self.query})"
 
     @decorators.decorators.log
     def run(self):
         """
-        Fill in later...
+        The query is already prepared in the constructor. This function runs the query.
+        The runtime is started and stopped to calculate the runtime.
+        The decorated log function logs the query command,
+            see the ./decorators/decorators.py file for more information.
+            This decorator also checks if the query was successful.
+        ----------
+        Output:
+            - Result of the subprocess.run
+        ----------
         """
         logging.info("Running query with the following command: %s", self.query)
         self.start_time = time.time()
@@ -74,10 +94,16 @@ class QueryRunner:
             check=True)
         self.stop_time = time.time()
 
+        # TODO: This return statement is not used anywhere, should it be removed?
         return result
 
     def get_runtime(self):
         """
-        Fill in later...
+        Simple method that returns the runtime of the query.
+        The function is called in a logging event in the main script (pacini_typing.py).
+        ----------
+        - Output:
+            - float: with the runtime in seconds
+        ----------
         """
-        return self.stop_time - self.start_time
+        return round((self.stop_time - self.start_time), 2)
