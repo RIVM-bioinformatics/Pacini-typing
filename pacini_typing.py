@@ -26,6 +26,7 @@ if __name__ == "__main__":
     # Retrieve the args object, arguments have been parsed at this point
     args = argument_parser.build_parser.main()
     # TODO - Make the input db arguments required all the time
+
     # TODO - Change name of the pacini-typing.py to pacini_typing.py
 
     logging.basicConfig(
