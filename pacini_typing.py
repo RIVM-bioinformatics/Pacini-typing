@@ -27,7 +27,10 @@ from run_queries.query_runner import QueryRunner
 
 def setup_logging(logging_args):
     """
-    Fill in later...
+    Still have to fill in the docstring...
+    ----------
+    Input:
+    ----------
     """
     logging.basicConfig(
         level=logging_args.verbose and logging.DEBUG or logging.INFO,
@@ -38,7 +41,7 @@ def setup_logging(logging_args):
 
 def get_input_filenames():
     """
-    Fill in later...
+    Still have to fill in the docstring...
     ----------
     Input:
     ----------
@@ -57,7 +60,7 @@ def get_input_filenames():
 
 def check_for_unzip_files(input_file_list):
     """
-    Fill in later...
+    Still have to fill in the docstring...
     ----------
     Input:
     ----------
@@ -71,24 +74,28 @@ def check_for_unzip_files(input_file_list):
 
 def unzip_gz_files(file_list):
     """
-    Fill in later...
+    Still have to fill in the docstring...
     ----------
     Input:
     ----------
     """
     unzipped_files = []
     for file in file_list:
-        with gzip.open(file, "rb") as f_in:
-            with open(file[:-3], "wb") as f_out:
-                shutil.copyfileobj(f_in, f_out)
-        unzipped_files.append(file[:-3])
+        try:
+            with gzip.open(file, "rb") as f_in:
+                with open(file[:-3], "wb") as f_out:
+                    shutil.copyfileobj(f_in, f_out)
+            unzipped_files.append(file[:-3])
+        except Exception as e:
+            logging.error("Error while unzipping file %s: %s", file, e)
+            sys.exit(1)
 
     return unzipped_files
 
 
 def validate_arguments(validate_args):
     """
-    Fill in later...
+    Still have to fill in the docstring...
     ----------
     Input:
     ----------
@@ -103,7 +110,7 @@ def validate_arguments(validate_args):
 
 def run_makedatabase(makedatabase_args, input_file_list):
     """
-    Fill in later...
+    Still have to fill in the docstring...
     ----------
     Input:
     ----------
@@ -118,7 +125,7 @@ def run_makedatabase(makedatabase_args, input_file_list):
 
 def get_file_type(input_files_list):
     """
-    Fill in later...
+    Still have to fill in the docstring...
     ----------
     Input:
     ----------
@@ -148,7 +155,7 @@ def check_valid_option_with_args(input_file_list, input_file_type):
 
 def check_valid_database_path(database_args, input_file_type):
     """
-    Fill in later...
+    Still have to fill in the docstring...
     ----------
     Input:
     ----------
@@ -158,7 +165,7 @@ def check_valid_database_path(database_args, input_file_type):
 
 def run_query(query_args, input_file_type, input_file_list):
     """
-    Fill in later...
+    Still have to fill in the docstring...
     ----------
     Input:
     ----------

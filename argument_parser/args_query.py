@@ -1,7 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-To be filed in later...
+> This script was developed with assistance from GitHub Copilot for code suggestions.
+> AI-generated suggestions have been reviewed and modified as necessary by the developer.
+> GitHub, OpenAI, & Microsoft. (2021). GitHub Copilot [Software]. In
+    “GitHub Copilot: Your AI pair programmer” (GPT-3). GitHub, Inc.
+    https://github.com/features/copilot
+
+This script is used to build the query subcommand for the parser.
+This subcommand is added to the main parsing object in the build_parser script.
 """
 
 __author__ = "Mark Van de Streek"

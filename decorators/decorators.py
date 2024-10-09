@@ -30,6 +30,12 @@ def log(func):
         Wrapper function that executes and checks for possible errors in the function result
         This wrapper could only be used for functions that return a
         subprocess.CompletedProcess object
+        ----------
+        Input:
+            - *args: positional arguments
+            - **kwargs: keyword arguments
+        Output:
+            - result: subprocess.CompletedProcess object
         """
         try:
             result = func(*args, **kwargs)

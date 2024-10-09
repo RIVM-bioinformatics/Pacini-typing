@@ -17,7 +17,6 @@ __all__ = ["main"]
 
 import argparse
 
-import argument_parser.custom_argument_parser
 import argument_parser.args_makedatabase
 import argument_parser.args_query
 
