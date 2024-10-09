@@ -104,16 +104,16 @@ def test_compare_paired_files():
     It should raise a SystemExit exception if the same file is passed twice
     not identical names should pass without raising any exceptions
     """
-    args = Args(paired=["README.md", "README.md"])
+    input_list = ["README.md", "README.md"]
 
     with pytest.raises(SystemExit) as ex:
-        v.compare_paired_files(args)
+        v.compare_paired_files(input_list)
 
     assert ex.value.code == 1
 
-    args = Args(paired=["README.md", "pacini_typing.py"])
+    input_list = ["README.md", "pacini_typing.py"]
     try:
-        v.compare_paired_files(args)
+        v.compare_paired_files(input_list)
     except SystemExit:
         pytest.fail("check_double_files() raised SystemExit unexpectedly!")
 
@@ -127,10 +127,10 @@ def test_check_for_same_name_fail(args1, args2):
     Test the check_for_same_name() function
     It should raise a SystemExit exception if the same file is passed twice
     """
-    args = Args(paired=[args1, args2])
+    input_list = [args1, args2]
 
     with pytest.raises(SystemExit) as ex:
-        v.check_for_same_name(args)
+        v.check_for_same_name(input_list)
     assert ex.value.code == 1
 
 
@@ -143,10 +143,10 @@ def test_check_for_same_name_good(args1, args2):
     Test the check_for_same_name() function.
     Function should not raise any exceptions
     """
-    args = Args(paired=[args1, args2])
+    input_list = [args1, args2]
 
     try:
-        v.check_for_same_name(args)
+        v.check_for_same_name(input_list)
     except SystemExit:
         pytest.fail("check_for_same_name() raised SystemExit unexpectedly!")
 
@@ -162,10 +162,10 @@ def test_check_paired_names_good(args1, args2):
     Test the check_paired_names() function.
     Function should not raise any exceptions
     """
-    args = Args(paired=[args1, args2])
+    input_list = [args1, args2]
 
     try:
-        v.check_paired_names(args)
+        v.check_paired_names(input_list)
     except SystemExit:
         pytest.fail("check_paired_names() raised SystemExit unexpectedly!")
 
@@ -184,10 +184,10 @@ def test_check_paired_names_fail(args1, args2):
     Test the check_paired_names() function
     It should raise a SystemExit exception if the file names are not paired
     """
-    args = Args(paired=[args1, args2])
+    input_list = [args1, args2]
 
     with pytest.raises(SystemExit) as ex:
-        v.check_paired_names(args)
+        v.check_paired_names(input_list)
     assert ex.value.code == 1
 
 
@@ -197,14 +197,14 @@ def test_run_file_checks():
     It should raise a SystemExit exception if the file extension is not valid
     The Patch decorator is used to mock the return value of the called functions
     """
-    args = Args(paired=["README.md", "pacini_typing.py"])
+    input_list = ["README.md", "pacini_typing.py"]
 
     with patch('validating.validating_input_arguments.check_file_existence',
                return_value=True), \
             patch('validating.validating_input_arguments.validate_file_extensions',
                   return_value=True):
         try:
-            v.run_file_checks(args.paired)
+            v.run_file_checks(input_list)
         except SystemExit:
             pytest.fail("run_file_checks() raised SystemExit unexpectedly!")
 
@@ -213,6 +213,6 @@ def test_run_file_checks():
             patch('validating.validating_input_arguments.validate_file_extensions',
                   return_value=False):
         with pytest.raises(SystemExit) as ex:
-            v.run_file_checks(args.paired)
+            v.run_file_checks(input_list)
 
         assert ex.value.code == 1
