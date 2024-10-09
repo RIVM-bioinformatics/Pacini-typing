@@ -209,6 +209,6 @@ def main(input_files):
             check_paired_names(input_files)
             return True
         return False
-    elif len(input_files) == 1:
+    if len(input_files) == 1:
         return run_file_checks(input_files[0])
     return False
