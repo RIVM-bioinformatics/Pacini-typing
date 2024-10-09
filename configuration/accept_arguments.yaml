@@ -8,3 +8,5 @@ accepted_input_extensions:
   - .fna
   - .fasta
   - .tar.gz
+  - .fasta.gz
+  - .scaffold.fasta

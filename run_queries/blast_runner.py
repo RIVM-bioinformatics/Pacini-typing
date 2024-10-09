@@ -38,7 +38,7 @@ def prepare_query(input_file, database, output_file):
     """
     return [
         RUN_OPTION,
-        "-query", input_file,
+        "-query", input_file[0],
         "-db", database,
         "-out", output_file,
         "-outfmt", OUTPUT_FORMAT
