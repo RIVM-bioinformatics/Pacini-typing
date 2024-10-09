@@ -14,6 +14,8 @@ __author__ = "Mark Van de Streek"
 __data__ = "2024-09-24"
 
 import logging
+import gzip
+import shutil
 import sys
 from makedatabase import DatabaseBuilder
 import argument_parser.build_parser
@@ -32,7 +34,56 @@ def setup_logging(logging_args):
         format="%(asctime)s %(levelname)-5s %(process)d : %(message)s",
         datefmt="%Y-%m-%dT%H:%M:%S"
     )
-    logging.info("Starting the application...")
+
+
+def get_input_filenames():
+    """
+    Fill in later...
+    ----------
+    Input:
+    ----------
+    """
+    input_files_list = []
+    if hasattr(args, "single") and args.single:
+        input_files_list.append(args.single)
+    elif hasattr(args, "paired") and args.paired:
+        print(args.paired)
+        input_files_list.extend(args.paired)
+    elif hasattr(args, "input") and args.input:
+        input_files_list.append(args.input)
+
+    return input_files_list
+
+
+def check_for_unzip_files(input_file_list):
+    """
+    Fill in later...
+    ----------
+    Input:
+    ----------
+    """
+    for file in input_file_list:
+        if file.endswith(".gz"):
+            logging.info("Unzipping file %s", file)
+            return unzip_gz_files(input_files)
+    return input_files
+
+
+def unzip_gz_files(file_list):
+    """
+    Fill in later...
+    ----------
+    Input:
+    ----------
+    """
+    unzipped_files = []
+    for file in file_list:
+        with gzip.open(file, "rb") as f_in:
+            with open(file[:-3], "wb") as f_out:
+                shutil.copyfileobj(f_in, f_out)
+        unzipped_files.append(file[:-3])
+
+    return unzipped_files
 
 
 def validate_arguments(validate_args):
@@ -50,7 +101,7 @@ def validate_arguments(validate_args):
         sys.exit(1)
 
 
-def run_makedatabase(makedatabase_args):
+def run_makedatabase(makedatabase_args, input_file_list):
     """
     Fill in later...
     ----------
@@ -60,24 +111,22 @@ def run_makedatabase(makedatabase_args):
     DatabaseBuilder(
         database_path=makedatabase_args.database_path,
         database_name=makedatabase_args.database_name,
-        input_fasta_file=makedatabase_args.input,
+        input_fasta_file=input_file_list[0],
         database_type=makedatabase_args.database_type
     )
 
 
-def get_file_type(file_type_args):
+def get_file_type(input_files_list):
     """
     Fill in later...
     ----------
     Input:
     ----------
     """
-    if hasattr(file_type_args, "single") and file_type_args.single:
-        return FileValidator([file_type_args.single]).get_file_type()
-    return FileValidator(file_type_args.paired).get_file_type()
+    return FileValidator(input_files_list).get_file_type()
 
 
-def check_valid_option_with_args(validate_option_args, input_file_type):
+def check_valid_option_with_args(input_file_list, input_file_type):
     """
     This method checks if the file type is correct for the input arguments.
     To be precise, it checks if the file type is FASTA for single file input
@@ -89,8 +138,8 @@ def check_valid_option_with_args(validate_option_args, input_file_type):
         - args: object with the input arguments
     ----------
     """
-    if ((input_file_type == "FASTQ" and validate_option_args.single) or
-            (input_file_type == "FASTA" and validate_option_args.paired)):
+    if (len(input_file_list) == 1 and input_file_type == "FASTQ") or \
+            (len(input_file_list) == 2 and input_file_type == "FASTA"):
         logging.error(
             "Only FASTA files are allowed for single files "
             "and only FASTQ files are allowed for paired files.")
@@ -107,7 +156,7 @@ def check_valid_database_path(database_args, input_file_type):
     db.check_for_database_path(database_args, input_file_type)
 
 
-def run_query(query_args, input_file_type):
+def run_query(query_args, input_file_type, input_file_list):
     """
     Fill in later...
     ----------
@@ -117,7 +166,7 @@ def run_query(query_args, input_file_type):
     # TODO - Way to many input arguments, consider refactoring
     runner = QueryRunner(
         input_file_type=input_file_type,
-        input_file=query_args.single if input_file_type == "FASTA" else query_args.paired,
+        input_file=input_file_list,
         database_path=query_args.database_path,
         database_name=query_args.database_name,
         output_file=query_args.output
@@ -129,6 +178,27 @@ def run_query(query_args, input_file_type):
 if __name__ == "__main__":
     # Retrieve the args object, arguments have been parsed at this point
     args = argument_parser.build_parser.main()
+    # Setup up the logging, i.e., level and format
+    setup_logging(args)
+    # Get the input files
+    input_files = get_input_filenames()
+    # Check if they may need to be unzipped
+    input_files = check_for_unzip_files(input_files)
+    # Validate all input arguments
+    validate_arguments(input_files)
+
+    if args.options == "makedatabase":
+        # Run with the validated arguments
+        run_makedatabase(args, input_files)
+    elif args.options == "query":
+        # Reterieve the file type
+        file_type = get_file_type(input_files)
+        # Check if the file type is correct for the input arguments
+        check_valid_option_with_args(input_files, file_type)
+        # Make sure the database exists
+        check_valid_database_path(args, file_type)
+        # Run the query
+        run_query(args, file_type, input_files)
 
     # TODO - Make the input db arguments required all the time,
     #   so that the database could be created if not found running the query
@@ -137,24 +207,6 @@ if __name__ == "__main__":
 
     # TODO - Add logging to every method above to make debugging easier,
     #  keep in mind the verbosity level
-
-    # Setup up the logging, i.e., level and format
-    setup_logging(args)
-    # Validate all input arguments
-    validate_arguments(args)
-
-    # Subcommand makedatabase
-    if args.options == "makedatabase":
-        # Run with the validated arguments
-        run_makedatabase(args)
-
-    elif args.options == "query":
-        # Reterieve the file type
-        file_type = get_file_type(args)
-        # Make sure the database exists
-        check_valid_database_path(args, file_type)
-        # Run the query
-        run_query(args, file_type)
 
     ##################################################################################
 

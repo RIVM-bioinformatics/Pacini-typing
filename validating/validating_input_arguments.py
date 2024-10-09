@@ -94,7 +94,7 @@ def check_file_existence(file):
     return False
 
 
-def compare_paired_files(args):
+def compare_paired_files(input_file_list):
     """
     Function that checks if the input files are not exactly the same.
     For this operation, a SHA256 hash is created for both files,
@@ -107,9 +107,9 @@ def compare_paired_files(args):
     ----------
     """
     logging.debug("Comparing paired input files using SHA256 hash...")
-    if create_sha_hash(args.paired[0]) == create_sha_hash(args.paired[1]):
+    if create_sha_hash(input_file_list[0]) == create_sha_hash(input_file_list[1]):
         logging.error("Input files: %s and %s are the same, exiting...",
-                      args.paired[0], args.paired[1])
+                      input_file_list[0], input_file_list[1])
         sys.exit(1)
     logging.debug("Input files are not the same, continuing...")
 
@@ -135,7 +135,7 @@ def create_sha_hash(file):
     return hash_obj.hexdigest()
 
 
-def check_for_same_name(args):
+def check_for_same_name(input_file_list):
     """
     Function that checks if the input files are not exactly the same.
     This check is done right before the paired file check.
@@ -146,12 +146,12 @@ def check_for_same_name(args):
         - args: parsed object with the arguments
     ----------
     """
-    if args.paired[0] == args.paired[1]:
+    if input_file_list[0] == input_file_list[1]:
         logging.error("The input filenames are the same, exiting...")
         sys.exit(1)
 
 
-def check_paired_names(args):
+def check_paired_names(input_file_list):
     """
     Function that checks if the input files are paired.
     This means, 1 and 2 are in the file names, or something similar.
@@ -162,13 +162,13 @@ def check_paired_names(args):
     """
     pattern1 = re.compile(r".+(_1|R1).+")
     pattern2 = re.compile(r".+(_2|R2).+")
-    if not (pattern1.search(args.paired[0]) and pattern2.search(args.paired[1])):
+    if not (pattern1.search(input_file_list[0]) and pattern2.search(input_file_list[1])):
         logging.error("Paired mode requires '_1' and '_2' or "
                       "'R1' and 'R2' in the file names, exiting...")
         sys.exit(1)
 
 
-def run_file_checks(args):
+def run_file_checks(file):
     """
     Method that walks through the input files and checks if they are valid.
     The following checks are done:
@@ -182,39 +182,33 @@ def run_file_checks(args):
         in single mode it is a single file
     ----------
     """
-    if args:
-        if check_file_existence(args) and validate_file_extensions(args):
+    if file:
+        if check_file_existence(file) and validate_file_extensions(file):
             return True
         sys.exit(1)
     return False
 
 
-def main(args):
+def main(input_files):
     """
-    Main function that is used to validate the input file extensions.
+    Main function that is used to validate the input files.
     Paired mode holds two files, therefore extra checks are required.
-    For input and single mode, these arguments hold a single file.
-    Therefore, it's send as a list.
+    Most errors will exit the program with an error message.
     ----------
     Input:
-        - args: parsed object with the arguments
+        - input_files: list with the input files
+    Output:
+        - True: if the files are valid
+        - False: if the files are not valid
     ----------
     """
-    if hasattr(args, "paired") and args.paired:
-        # First run both files through the checks,
-        # if they pass, check if they are not the same
-        if all(run_file_checks(file) for file in args.paired):
-            # First check for same name to prevent unnecessary I/O
-            check_for_same_name(args)
-            compare_paired_files(args)
-            check_paired_names(args)
+    if len(input_files) == 2:
+        if all(run_file_checks(file) for file in input_files):
+            check_for_same_name(input_files)
+            compare_paired_files(input_files)
+            check_paired_names(input_files)
             return True
         return False
-
-    if hasattr(args, "single") and args.single:
-        return run_file_checks(args.single)
-
-    if hasattr(args, "input") and args.input:
-        return run_file_checks(args.input)
-
+    elif len(input_files) == 1:
+        return run_file_checks(input_files[0])
     return False
