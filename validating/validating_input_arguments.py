@@ -74,6 +74,7 @@ def get_config_input():
         - config: dictionary with the configuration file
     ----------
     """
+    # FIXME - remove relative path, os.path.dirname(os.path.abspath(__file__))
     with open("configuration/accept_arguments.yaml", "r", encoding="utf-8") as file:
         config = yaml.safe_load(file)
     return config
