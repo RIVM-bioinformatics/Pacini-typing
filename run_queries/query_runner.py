@@ -27,15 +27,22 @@ class QueryRunner:
     """
     Main class that runs the input query against the reference database.
     The query is prepared by the prepare_query method from the respective runner.
+    ----------
+    Methods:
+        - __init__: Constructor for the QueryRunner class
+        - run: Method that runs the query
+        - get_runtime: Method that returns the runtime of the query
+    ----------
     """
 
-    def __init__(self, input_file_type, input_file, query_args, filter_args):
+    def __init__(self, run_options):
         """
         Constructor of the QueryRunner class.
-        The constructor calls the prepare_query method based
-        on the input type (FASTA/FASTQ).
+        The constructor calls the prepare_query method based on
+        the input type (FASTA/FASTQ).
+        The arguments are coming from the input dictionary.
         ----------
-        Input:
+        Input used:
             - input_file_type: str
             - input_file: str
             - database_path: str
@@ -43,11 +50,11 @@ class QueryRunner:
             - output_file: str
         ----------
         """
-        self.input_file_type = input_file_type
-        self.input_file = input_file
-        self.database = query_args.database_path + query_args.database_name
-        self.output_file = query_args.output
-        self.filter_args = filter_args
+        self.input_file_type = run_options["file_type"]
+        self.input_file = run_options["input_file_list"]
+        self.database = run_options["database_path"] + run_options["database_name"]
+        self.output_file = run_options["query"]["output"]
+        self.filter_args = run_options["query"]["filters"]
         self.start_time = None
         self.stop_time = None
 

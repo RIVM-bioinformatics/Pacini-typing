@@ -27,22 +27,31 @@ class DatabaseBuilder:
     """
     Class that contains the methods to build a database using either KMA or BLAST.
     ----------
-    Input:
-        - database_path: str
-        - database_name: str
-        - input_fasta_file: str
-        - database_type: str
-    Output:
-        - Database in the specified path
+    Methods:
+        - __init__: Constructor for the DatabaseBuilder class
+        - build_database: Generic function to build a database using either KMA or BLAST
+        - create_kma_database: Method that creates a KMA database
+        - create_blast_database: Method that creates a BLAST database
     ----------
     """
 
-    def __init__(self, database_path, database_name, input_fasta_file, database_type):
+    def __init__(self, arg_options):
+        """
+        Constructor for the DatabaseBuilder class.
+        The constructor initializes the class attributes.
+        These methods come from the input arguments dictionary / self option
+        ----------
+        Input used:
+            - database_path: str
+            - database_name: str
+            - input_fasta_file: str
+            - database_type: str
+        """
         self.full_database_path = None
-        self.database_path = database_path
-        self.database_name = database_name
-        self.input_fasta_file = input_fasta_file
-        self.database_type = database_type
+        self.database_path = arg_options["database_path"]
+        self.database_name = arg_options["database_name"]
+        self.input_fasta_file = arg_options["makedatabase"]["input"]
+        self.database_type = arg_options["makedatabase"]["type"]
         self.build_database()
 
     def build_database(self) -> None:

@@ -19,7 +19,7 @@ import os
 import logging
 
 
-def check_for_database_existence(database_path, database_name, input_file_type):
+def check_for_database_existence(arg_options):
     """
     Function that checks if the database exists.
     Based on the input type, the method will check if the files exist:
@@ -34,9 +34,9 @@ def check_for_database_existence(database_path, database_name, input_file_type):
         - input_file_type: string with the input file type
     ----------
     """
-    db_files = create_database_file_list(database_name, input_file_type)
+    db_files = create_database_file_list(arg_options)
     for db_file in db_files:
-        if not os.path.exists(database_path + db_file):
+        if not os.path.exists(arg_options["database_path"] + db_file):
             logging.error(
                 "The database file %s does not exist. "
                 "Please provide a valid database name or path.", db_file)
@@ -44,7 +44,7 @@ def check_for_database_existence(database_path, database_name, input_file_type):
         return True
 
 
-def create_database_file_list(database_name, input_file_type):
+def create_database_file_list(arg_options):
     """
     Function that creates a list of database files based on the input file type.
     ----------
@@ -54,17 +54,17 @@ def create_database_file_list(database_name, input_file_type):
     ----------
     """
     db_files = []
-    if input_file_type == "FASTA":
-        db_files = [f"{database_name}.{ext}" for ext in
+    if arg_options["file_type"] == "FASTA":
+        db_files = [f"{arg_options['database_name']}.{ext}" for ext in
                     ["ndb", "nhr", "nin", "njs", "not", "nsq", "ntf", "nto"]]
-    elif input_file_type == "FASTQ":
-        db_files = [f"{database_name}.{ext}" for ext in
+    elif arg_options["file_type"] == "FASTQ":
+        db_files = [f"{arg_options['database_name']}.{ext}" for ext in
                     ["comp.b", "length.b", "name", "seq.b"]]
 
     return db_files
 
 
-def check_for_database_path(args, file_type):
+def check_for_database_path(arg_options):
     """
     Function that checks if the database path exists.
     If not, the program will exit with an error message.
@@ -73,12 +73,12 @@ def check_for_database_path(args, file_type):
         - input_path: string with the database path
     ----------
     """
-    if not args.database_path.endswith("/"):
+    if not arg_options["database_path"].endswith("/"):
         logging.warning(
             "The database path does not end with a forward slash. "
             "Appending it to run checks.")
-        args.database_path += "/"
-    if not os.path.exists(args.database_path):
+        arg_options["database_path"] += "/"
+    if not os.path.exists(arg_options["database_path"]):
         logging.error(
             "The database path does not exist. "
             "Please provide a valid path, "
@@ -87,5 +87,4 @@ def check_for_database_path(args, file_type):
     logging.info(
         "The database path exists. "
         "Checking if the database name is provided...")
-    return check_for_database_existence(
-        args.database_path, args.database_name, file_type)
+    return check_for_database_existence(arg_options)
