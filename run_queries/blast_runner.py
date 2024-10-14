@@ -12,35 +12,44 @@ To be filed in later...
 
 __author__ = "Mark Van de Streek"
 __data__ = "2024-09-24"
-__all__ = ["prepare_query"]
+__all__ = ["BLASTn"]
 
-RUN_OPTION = "blastn"
-OUTPUT_FORMAT = "6"
-
-# TODO: This file was first a class, but quite overkill for the purpose,
-#  maybe additional information could be added to this script in the future.
-#  This way, blast operations parameters could easily be changed or extended.
+from enum import Enum
 
 
-def prepare_query(input_file, database, output_file, filter_args):
+class BLASTn(Enum):
     """
-    Simple method that prepares the query for the BLAST run.
-    This query is passed to the super class QueryRunner.
-    The script-constants are used to set the run option and output format.
+    Enum class to store BLAST options and flags.
+    With this Enum class, the options are stored in a more structured way
+    and could be changed very easily.
     ----------
-    Input:
-        - input_file: str
-        - database: str
-        - output_file: str
-    Output:
-        - list with the query to run BLAST
-    ----------
+    RUN_OPTION: string that is used in the subprocess.run() method
+    OUTPUT_FORMAT: flag for the output format
     """
-    return [
-        RUN_OPTION,
-        "-query", input_file[0],
-        "-db", database,
-        "-out", output_file,
-        "-perc_identity", str(filter_args["identity"]),
-        "-outfmt", OUTPUT_FORMAT
-    ]
+    RUN_OPTION = "blastn"
+    OUTPUT_FORMAT = "10" #"7 sseqid bitscore evalue slen pident qcovs"
+    IDENTITY = "-perc_identity"
+
+    @staticmethod
+    def get_query(option):
+        """
+        Simple method that prepares the query for the BLAST run.
+        This query is passed to the super class QueryRunner.
+        The script-constants are used to set the run option and output format.
+        ----------
+        Input:
+            - input_file: str
+            - database: str
+            - output_file: str
+        Output:
+            - list with the query to run BLAST
+        ----------
+        """
+        return [
+            BLASTn.RUN_OPTION.value,
+            "-query", option["input_file_list"][0],
+            "-db", option["database_path"] + option["database_name"],
+            "-out", option["query"]["output"] + ".tsv",
+            "-outfmt", BLASTn.OUTPUT_FORMAT.value,
+            BLASTn.IDENTITY.value, str(option["query"]["filters"]["identity"]),
+        ]

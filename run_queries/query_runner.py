@@ -19,8 +19,8 @@ import logging
 import time
 
 import decorators.decorators
-from run_queries.blast_runner import prepare_query as blast_prepare_query
-from run_queries.kma_runner import prepare_query as kma_prepare_query
+from run_queries.blast_runner import BLASTn
+from run_queries.kma_runner import KMA
 
 
 class QueryRunner:
@@ -51,26 +51,21 @@ class QueryRunner:
         ----------
         """
         self.input_file_type = run_options["file_type"]
-        self.input_file = run_options["input_file_list"]
-        self.database = run_options["database_path"] + run_options["database_name"]
-        self.output_file = run_options["query"]["output"]
-        self.filter_args = run_options["query"]["filters"]
+        # self.input_file = run_options["input_file_list"]
+        # self.database = run_options["database_path"] + run_options["database_name"]
+        # self.output_file = run_options["query"]["output"]
+        # self.filter_args = run_options["query"]["filters"]
         self.start_time = None
         self.stop_time = None
 
+        logging.debug("Preparing the query...")
         if self.input_file_type == "FASTA":
-            self.query = blast_prepare_query(
-                input_file=self.input_file,
-                database=self.database,
-                output_file=self.output_file,
-                filter_args=self.filter_args
+            self.query = BLASTn.get_query(
+                option=run_options
             )
         elif self.input_file_type == "FASTQ":
-            self.query = kma_prepare_query(
-                input_file=self.input_file,
-                database=self.database,
-                output_file=self.output_file,
-                filter_args=self.filter_args
+            self.query = KMA.get_query(
+                option=run_options
             )
 
     def __str__(self):
@@ -94,7 +89,8 @@ class QueryRunner:
             - Result of the subprocess.run
         ----------
         """
-        logging.info("Running query with the following command: %s", self.query)
+        logging.debug("Running query...")
+        logging.debug(f"Query: {' '.join(self.query)}")
         self.start_time = time.time()
         result = subprocess.run(
             self.query,
@@ -115,4 +111,5 @@ class QueryRunner:
             - float: with the runtime in seconds
         ----------
         """
+        logging.debug("Getting the runtime of the query...")
         return round((self.stop_time - self.start_time), 2)

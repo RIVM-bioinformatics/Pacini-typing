@@ -12,37 +12,49 @@ To be filed in later...
 
 __author__ = "Mark Van de Streek"
 __data__ = "2024-09-24"
-__all__ = ["prepare_query"]
+__all__ = ["KMA"]
 
-RUN_OPTION = "kma"
-PAIRED_OPTION = "-ipe"
-OUTPUT_FORMAT = "-tsv"
-
-# TODO: This file was first a class, but quite overkill for the purpose,
-#  maybe additional information could be added to this script in the future.
-#  This way, blast operations parameters could easily be changed or extended.
+from enum import Enum
 
 
-def prepare_query(input_file, database, output_file, filter_args):
+class KMA(Enum):
     """
-    Simple method that prepares the query for the KMA run.
-    This query is passed to the super class QueryRunner
+    Enum class to store K-mer alignment options and flags.
+    With this Enum class, the options are stored in a more structured way
+    and could be changed very easily.
     ----------
-    Input:
-        - input_file: list with the input files
-        - database: str
-        - output_file: str
-    Output:
-        - list with the query to run KMA
+    RUN_OPTION: string that is used in the subprocess.run() method
+    PAIRED_OPTION: option for paired-end reads
+    OUTPUT_FORMAT: flag for the output format
+    MIN_IDENTITY: flag for the minimum identity percentage
     ----------
     """
-    return [
-        RUN_OPTION,
-        PAIRED_OPTION, input_file[0], input_file[1],
-        "-t_db", database,
-        "-o", output_file,
-        "-ID", str(filter_args["identity"]),
-        "-mrc", "0.7",
-        "-pm", "p",
-        OUTPUT_FORMAT
-    ]
+    RUN_OPTION = "kma"
+    PAIRED_OPTION = "-ipe"
+    OUTPUT_FORMAT = "-tsv"
+    IDENTITY = "-ID"
+
+    @staticmethod
+    def get_query(option):
+        """
+        Simple method that prepares the query for the KMA run.
+        This query is passed to the super class QueryRunner
+        ----------
+        Input:
+            - input_file: list with the input files
+            - database: str
+            - output_file: str
+        Output:
+            - list with the query to run KMA
+        ----------
+        """
+        return [
+            KMA.RUN_OPTION.value,
+            KMA.PAIRED_OPTION.value, option["input_file_list"][0], option["input_file_list"][1],
+            KMA.IDENTITY.value, str(option["query"]["filters"]["identity"]),
+            KMA.OUTPUT_FORMAT.value,
+            "-t_db", option["database_path"] + option["database_name"],
+            "-o", option["query"]["output"],
+            "-mrc", "0.7",
+            "-pm", "p",
+        ]
