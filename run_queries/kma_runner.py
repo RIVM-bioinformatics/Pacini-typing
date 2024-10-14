@@ -41,7 +41,7 @@ def prepare_query(input_file, database, output_file, filter_args):
         PAIRED_OPTION, input_file[0], input_file[1],
         "-t_db", database,
         "-o", output_file,
-        "-ID", filter_args["identity"],
+        "-ID", str(filter_args["identity"]),
         "-mrc", "0.7",
         "-pm", "p",
         OUTPUT_FORMAT

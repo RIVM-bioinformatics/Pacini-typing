@@ -41,6 +41,6 @@ def prepare_query(input_file, database, output_file, filter_args):
         "-query", input_file[0],
         "-db", database,
         "-out", output_file,
-        "-perc_identity", filter_args["identity"],
+        "-perc_identity", str(filter_args["identity"]),
         "-outfmt", OUTPUT_FORMAT
     ]
