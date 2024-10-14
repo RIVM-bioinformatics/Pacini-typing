@@ -78,8 +78,8 @@ def build_query_command(subparsers):
         "-id",
         "--identity",
         required=False,
-        type=str,
+        type=int,
         metavar="Min. identity",
         help="Minimum identity percentage for the query",
-        default="95",
+        default=95,
     )

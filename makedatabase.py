@@ -44,7 +44,6 @@ class DatabaseBuilder:
         self.input_fasta_file = input_fasta_file
         self.database_type = database_type
         self.build_database()
-        # TODO: Think about moving the database existence check to this class
 
     def build_database(self) -> None:
         """
