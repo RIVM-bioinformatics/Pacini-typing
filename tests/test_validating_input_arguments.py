@@ -43,7 +43,8 @@ from validating.validating_input_arguments import ArgsValidator
 def test_get_file_extension():
     """
     Test the get_file_extension() function from the validating_input_arguments.py module.
-    This function is responsible for extracting the file extension from a list of file name components.
+    This function is responsible for extracting the file extension from
+    a list of file name components.
     The test verifies that the function correctly identifies and
     returns the file extension in various scenarios.
     """
@@ -74,7 +75,8 @@ def test_validate_file_extensions(filename, expected):
     Parametrized test for the validate_file_extensions() function.
     This function checks if the file extension of
     the given filename is valid based on predefined criteria.
-    The test runs multiple times with different filenames to ensure the function behaves as expected.
+    The test runs multiple times with different filenames to
+    ensure the function behaves as expected.
     """
     v = ArgsValidator(option={"input_file_list": [], "run_path": "./pacini_typing.py"})
     assert v.validate_file_extensions(filename) == expected
@@ -103,7 +105,8 @@ def test_compare_paired_files():
     Test the compare_paired_files() function.
     This function checks if the same file is passed twice in the input list.
     It should raise a SystemExit exception if duplicate files are found.
-    The test verifies that the function behaves correctly for both duplicate and unique file names.
+    The test verifies that the function behaves correctly
+    for both duplicate and unique file names.
     """
     input_list = ["README.md", "README.md"]
     v = ArgsValidator(option={"input_file_list": input_list})
@@ -130,7 +133,8 @@ def test_check_for_same_name_fail(args1, args2):
     Test the check_for_same_name() function for failure cases.
     This function checks if the same file name is passed twice in the input list.
     It should raise a SystemExit exception if duplicate file names are found.
-    The test verifies that the function correctly identifies and handles duplicate file names.
+    The test verifies that the function correctly identifies
+    and handles duplicate file names.
     """
     input_list = [args1, args2]
     v = ArgsValidator(option={"input_file_list": input_list})
@@ -214,18 +218,22 @@ def test_run_file_checks():
     input_list = ["README.md", "pacini_typing.py"]
     v = ArgsValidator(option={"input_file_list": input_list})
 
-    with patch('validating.validating_input_arguments.ArgsValidator.check_file_existence',
+    with patch('validating.validating_input_arguments.'
+               'ArgsValidator.check_file_existence',
                return_value=True), \
-            patch('validating.validating_input_arguments.ArgsValidator.validate_file_extensions',
+            patch('validating.validating_input_arguments.'
+                  'ArgsValidator.validate_file_extensions',
                   return_value=True):
         try:
             v.run_file_checks(input_list)
         except SystemExit:
             pytest.fail("run_file_checks() raised SystemExit unexpectedly!")
 
-    with patch('validating.validating_input_arguments.ArgsValidator.check_file_existence',
+    with patch('validating.validating_input_arguments.'
+               'ArgsValidator.check_file_existence',
                return_value=True), \
-            patch('validating.validating_input_arguments.ArgsValidator.validate_file_extensions',
+            patch('validating.validating_input_arguments.'
+                  'ArgsValidator.validate_file_extensions',
                   return_value=False):
         with pytest.raises(SystemExit) as ex:
             v.run_file_checks(input_list)

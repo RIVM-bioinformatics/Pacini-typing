@@ -235,6 +235,9 @@ class PaciniTyping:
         logging.info("Query runtime: %s seconds", runner.get_runtime())
 
     def run(self):
+        """
+        Still have to fill in the docstring...
+        """
         # Retrieve the args object, arguments have been parsed at this point
         # Place all arguments in a dictionary
         self.parse_all_args()

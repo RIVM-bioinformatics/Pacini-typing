@@ -90,7 +90,7 @@ class QueryRunner:
         ----------
         """
         logging.debug("Running query...")
-        logging.debug(f"Query: {' '.join(self.query)}")
+        logging.debug("Query: %s", " ".join(self.query))
         self.start_time = time.time()
         result = subprocess.run(
             self.query,
