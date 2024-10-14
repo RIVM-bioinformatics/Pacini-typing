@@ -190,6 +190,19 @@ def run_file_checks(file):
     return False
 
 
+def check_filter_arguments(filter_arguments):
+    """
+    Still have to fill in the docstring...
+    ----------
+    Input:
+    ----------
+    """
+    if filter_arguments["identity"] < 0 or filter_arguments["identity"] > 100:
+        logging.error("Identity should be between 0 and 100, exiting...")
+        sys.exit(1)
+    return filter_arguments
+
+
 def main(input_files):
     """
     Main function that is used to validate the input files.

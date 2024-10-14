@@ -73,3 +73,13 @@ def build_query_command(subparsers):
         metavar="Output",
         help="Output file to store the results. Specify an output file: -o output",
     )
+
+    query.add_argument(
+        "-id",
+        "--identity",
+        required=False,
+        type=str,
+        metavar="Min. identity",
+        help="Minimum identity percentage for the query",
+        default="95",
+    )
