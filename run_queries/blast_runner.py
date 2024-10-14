@@ -22,7 +22,7 @@ OUTPUT_FORMAT = "6"
 #  This way, blast operations parameters could easily be changed or extended.
 
 
-def prepare_query(input_file, database, output_file):
+def prepare_query(input_file, database, output_file, filter_args):
     """
     Simple method that prepares the query for the BLAST run.
     This query is passed to the super class QueryRunner.
@@ -41,5 +41,6 @@ def prepare_query(input_file, database, output_file):
         "-query", input_file[0],
         "-db", database,
         "-out", output_file,
+        "-perc_identity", filter_args["identity"],
         "-outfmt", OUTPUT_FORMAT
     ]

@@ -29,8 +29,7 @@ class QueryRunner:
     The query is prepared by the prepare_query method from the respective runner.
     """
 
-    def __init__(self, input_file_type, input_file,
-                 database_path, database_name, output_file):
+    def __init__(self, input_file_type, input_file, query_args, filter_args):
         """
         Constructor of the QueryRunner class.
         The constructor calls the prepare_query method based
@@ -46,8 +45,9 @@ class QueryRunner:
         """
         self.input_file_type = input_file_type
         self.input_file = input_file
-        self.database = database_path + database_name
-        self.output_file = output_file
+        self.database = query_args.database_path + query_args.database_name
+        self.output_file = query_args.output
+        self.filter_args = filter_args
         self.start_time = None
         self.stop_time = None
 
@@ -55,13 +55,15 @@ class QueryRunner:
             self.query = blast_prepare_query(
                 input_file=self.input_file,
                 database=self.database,
-                output_file=self.output_file
+                output_file=self.output_file,
+                filter_args=self.filter_args
             )
         elif self.input_file_type == "FASTQ":
             self.query = kma_prepare_query(
                 input_file=self.input_file,
                 database=self.database,
-                output_file=self.output_file
+                output_file=self.output_file,
+                filter_args=self.filter_args
             )
 
     def __str__(self):

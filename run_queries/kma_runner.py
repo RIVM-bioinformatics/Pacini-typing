@@ -23,7 +23,7 @@ OUTPUT_FORMAT = "-tsv"
 #  This way, blast operations parameters could easily be changed or extended.
 
 
-def prepare_query(input_file, database, output_file):
+def prepare_query(input_file, database, output_file, filter_args):
     """
     Simple method that prepares the query for the KMA run.
     This query is passed to the super class QueryRunner
@@ -41,5 +41,8 @@ def prepare_query(input_file, database, output_file):
         PAIRED_OPTION, input_file[0], input_file[1],
         "-t_db", database,
         "-o", output_file,
+        "-ID", filter_args["identity"],
+        "-mrc", "0.7",
+        "-pm", "p",
         OUTPUT_FORMAT
     ]
