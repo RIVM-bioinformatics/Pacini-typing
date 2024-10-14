@@ -37,23 +37,17 @@ __date__ = "2024-10-07"
 
 from unittest.mock import patch
 import pytest
-import validating.validating_input_arguments as v
-
-
-class Args:
-    """
-    Class that is used to simulate the argparse object.
-    """
-    # pylint: disable=too-few-public-methods
-    def __init__(self, paired):
-        self.paired = paired
+from validating.validating_input_arguments import ArgsValidator
 
 
 def test_get_file_extension():
     """
-    Test the get_file_extension() function from the validating_input_arguments.py module
-    The function gets the valid file extension from a configuration file
+    Test the get_file_extension() function from the validating_input_arguments.py module.
+    This function is responsible for extracting the file extension from a list of file name components.
+    The test verifies that the function correctly identifies and
+    returns the file extension in various scenarios.
     """
+    v = ArgsValidator(option={"input_file_list": []})
     assert v.get_file_extension(["myfile", "txt"]) == ".txt"
     assert v.get_file_extension(["myfile", "txt", "gz"]) == ".txt.gz"
     assert v.get_file_extension(["myfile", "txt", "gz", "tar"]) == ".gz.tar"
@@ -77,9 +71,12 @@ def test_get_file_extension():
     ("myfile.fasta", True)])
 def test_validate_file_extensions(filename, expected):
     """
-    Parametrized test for the validate_file_extensions() function
-    The function gets runs every time with different parameters
+    Parametrized test for the validate_file_extensions() function.
+    This function checks if the file extension of
+    the given filename is valid based on predefined criteria.
+    The test runs multiple times with different filenames to ensure the function behaves as expected.
     """
+    v = ArgsValidator(option={"input_file_list": [], "run_path": "./pacini_typing.py"})
     assert v.validate_file_extensions(filename) == expected
 
 
@@ -92,28 +89,34 @@ def test_validate_file_extensions(filename, expected):
     ("tests/test_validating_input_arguments.py", True)])
 def test_check_file_existence(file, expected):
     """
-    Parametrized test for the check_file_existence() function
-    The function gets runs every time with different parameters
+    Parametrized test for the check_file_existence() function.
+    This function verifies whether a given file exists and is a valid file.
+    The test runs multiple times with different file paths to ensure the
+    function correctly identifies existing and non-existing files.
     """
+    v = ArgsValidator(option={"input_file_list": []})
     assert v.check_file_existence(file) == expected
 
 
 def test_compare_paired_files():
     """
-    Test the check_double_files() function
-    It should raise a SystemExit exception if the same file is passed twice
-    not identical names should pass without raising any exceptions
+    Test the compare_paired_files() function.
+    This function checks if the same file is passed twice in the input list.
+    It should raise a SystemExit exception if duplicate files are found.
+    The test verifies that the function behaves correctly for both duplicate and unique file names.
     """
     input_list = ["README.md", "README.md"]
+    v = ArgsValidator(option={"input_file_list": input_list})
 
     with pytest.raises(SystemExit) as ex:
-        v.compare_paired_files(input_list)
+        v.compare_paired_files()
 
     assert ex.value.code == 1
 
     input_list = ["README.md", "pacini_typing.py"]
+    v = ArgsValidator(option={"input_file_list": input_list})
     try:
-        v.compare_paired_files(input_list)
+        v.compare_paired_files()
     except SystemExit:
         pytest.fail("check_double_files() raised SystemExit unexpectedly!")
 
@@ -124,13 +127,15 @@ def test_compare_paired_files():
     ("pacini_typing.py", "pacini_typing.py"),])
 def test_check_for_same_name_fail(args1, args2):
     """
-    Test the check_for_same_name() function
-    It should raise a SystemExit exception if the same file is passed twice
+    Test the check_for_same_name() function for failure cases.
+    This function checks if the same file name is passed twice in the input list.
+    It should raise a SystemExit exception if duplicate file names are found.
+    The test verifies that the function correctly identifies and handles duplicate file names.
     """
     input_list = [args1, args2]
-
+    v = ArgsValidator(option={"input_file_list": input_list})
     with pytest.raises(SystemExit) as ex:
-        v.check_for_same_name(input_list)
+        v.check_for_same_name()
     assert ex.value.code == 1
 
 
@@ -140,13 +145,16 @@ def test_check_for_same_name_fail(args1, args2):
     ("Pacini-typing.md", "pacini_typing.py"),])
 def test_check_for_same_name_good(args1, args2):
     """
-    Test the check_for_same_name() function.
-    Function should not raise any exceptions
+    Test the check_for_same_name() function for success cases.
+    This function checks if the same file name is passed twice in the input list.
+    It should not raise any exceptions if the file names are unique.
+    The test verifies that the function behaves correctly for unique file names.
     """
     input_list = [args1, args2]
+    v = ArgsValidator(option={"input_file_list": input_list})
 
     try:
-        v.check_for_same_name(input_list)
+        v.check_for_same_name()
     except SystemExit:
         pytest.fail("check_for_same_name() raised SystemExit unexpectedly!")
 
@@ -159,13 +167,16 @@ def test_check_for_same_name_good(args1, args2):
     ("mysampleR1.fq", "mysampleR2.fq")])
 def test_check_paired_names_good(args1, args2):
     """
-    Test the check_paired_names() function.
-    Function should not raise any exceptions
+    Test the check_paired_names() function for success cases.
+    This function checks if the file names in the input list are correctly paired.
+    It should not raise any exceptions if the file names are paired correctly.
+    The test verifies that the function behaves correctly for valid paired file names.
     """
     input_list = [args1, args2]
+    v = ArgsValidator(option={"input_file_list": input_list})
 
     try:
-        v.check_paired_names(input_list)
+        v.check_paired_names()
     except SystemExit:
         pytest.fail("check_paired_names() raised SystemExit unexpectedly!")
 
@@ -181,13 +192,16 @@ def test_check_paired_names_good(args1, args2):
     ("mysampleR1.fq", "mysampleR1.fq")])
 def test_check_paired_names_fail(args1, args2):
     """
-    Test the check_paired_names() function
-    It should raise a SystemExit exception if the file names are not paired
+    Test the check_paired_names() function for failure cases.
+    This function checks if the file names in the input list are correctly paired.
+    It should raise a SystemExit exception if the file names are not paired correctly.
+    The test verifies that the function correctly identifies and handles unpaired file names.
     """
     input_list = [args1, args2]
+    v = ArgsValidator(option={"input_file_list": input_list})
 
     with pytest.raises(SystemExit) as ex:
-        v.check_paired_names(input_list)
+        v.check_paired_names()
     assert ex.value.code == 1
 
 
@@ -198,19 +212,20 @@ def test_run_file_checks():
     The Patch decorator is used to mock the return value of the called functions
     """
     input_list = ["README.md", "pacini_typing.py"]
+    v = ArgsValidator(option={"input_file_list": input_list})
 
-    with patch('validating.validating_input_arguments.check_file_existence',
+    with patch('validating.validating_input_arguments.ArgsValidator.check_file_existence',
                return_value=True), \
-            patch('validating.validating_input_arguments.validate_file_extensions',
+            patch('validating.validating_input_arguments.ArgsValidator.validate_file_extensions',
                   return_value=True):
         try:
             v.run_file_checks(input_list)
         except SystemExit:
             pytest.fail("run_file_checks() raised SystemExit unexpectedly!")
 
-    with patch('validating.validating_input_arguments.check_file_existence',
+    with patch('validating.validating_input_arguments.ArgsValidator.check_file_existence',
                return_value=True), \
-            patch('validating.validating_input_arguments.validate_file_extensions',
+            patch('validating.validating_input_arguments.ArgsValidator.validate_file_extensions',
                   return_value=False):
         with pytest.raises(SystemExit) as ex:
             v.run_file_checks(input_list)
