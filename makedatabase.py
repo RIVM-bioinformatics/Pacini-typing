@@ -51,7 +51,7 @@ class DatabaseBuilder:
         self.database_path = arg_options["database_path"]
         self.database_name = arg_options["database_name"]
         self.input_fasta_file = arg_options["makedatabase"]["input"]
-        self.database_type = arg_options["makedatabase"]["type"]
+        self.database_type = arg_options["makedatabase"]["database_type"]
         self.build_database()
 
     def build_database(self) -> None:
@@ -91,7 +91,7 @@ class DatabaseBuilder:
             - Result of the subprocess.run
         ----------
         """
-        logging.debug("Creating KMA database")
+        logging.debug("Running KMA subprocess to create database")
         result = subprocess.run([
                 "kma_index",
                 "-i", os.path.join(self.input_fasta_file),
@@ -118,7 +118,7 @@ class DatabaseBuilder:
             - Result of the subprocess.run
         ----------
         """
-        logging.debug("Creating BLAST database")
+        logging.debug("Running BLAST subprocess to create database")
         result = subprocess.run([
                 "makeblastdb",
                 "-in", os.path.join(self.input_fasta_file),

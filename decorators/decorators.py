@@ -41,7 +41,7 @@ def log(func):
             result = func(*args, **kwargs)
             logging.debug("Checking for errors in %s", result.args[0])
             if result.returncode == 0:
-                logging.debug("Command %s executed successfully", result.args[0])
+                logging.info("Command %s executed successfully", result.args[0])
             else:
                 logging.error("Error executing %s", result.args[0])
                 logging.error(result.stderr)

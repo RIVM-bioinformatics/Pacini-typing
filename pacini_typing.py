@@ -20,10 +20,16 @@ import os
 import sys
 from makedatabase import DatabaseBuilder
 import argument_parser.build_parser
-import validating.validating_input_arguments
+from validating.validating_input_arguments import ArgsValidator
 import validating.validate_database as db
 from validating.determine_input_type import FileValidator
 from run_queries.query_runner import QueryRunner
+
+logging.basicConfig(
+    level=logging.INFO,  # Default to DEBUG level, can be adjusted later
+    format="%(asctime)s %(levelname)-5s %(process)d : %(message)s",
+    datefmt="%Y-%m-%dT%H:%M:%S"
+)
 
 
 class PaciniTyping:
@@ -33,7 +39,6 @@ class PaciniTyping:
     The following operations are performed:
         - Parse all arguments into a dictionary
         - Setup logging
-
     """
 
     def __init__(self, input_args):
@@ -53,12 +58,13 @@ class PaciniTyping:
         Input:
         ----------
         """
+        logging.debug("Placing all args and necessary information in a dictionary")
         self.option = {
             "database_path": self.input_args.database_path,
             "database_name": self.input_args.database_name,
             "option": self.input_args.options,
             "verbose": self.input_args.verbose,
-            "run_path": os.path.abspath(__file__),
+            "run_path": os.path.abspath(__file__).rsplit('.', 1)[0],
             "query": None,
             "makedatabase": None
         }
@@ -85,10 +91,9 @@ class PaciniTyping:
         Input:
         ----------
         """
-        logging.basicConfig(
-            level=self.option["verbose"] and logging.DEBUG or logging.INFO,
-            format="%(asctime)s %(levelname)-5s %(process)d : %(message)s",
-            datefmt="%Y-%m-%dT%H:%M:%S"
+        logging.debug("Setting up logging-level")
+        logging.getLogger().setLevel(
+            self.option["verbose"] and logging.DEBUG or logging.INFO
         )
 
     def get_input_filenames(self):
@@ -98,6 +103,7 @@ class PaciniTyping:
         Input:
         ----------
         """
+        logging.debug("Retrieving input files and placing them in a list")
         input_files_list = []
         if self.option["query"]:
             if self.option["query"]["single"]:
@@ -115,9 +121,10 @@ class PaciniTyping:
         Input:
         ----------
         """
+        logging.debug("Searching for .gz files in the input list")
         for file in self.option["input_file_list"]:
             if file.endswith(".gz"):
-                logging.info("Unzipping file %s", file)
+                logging.info("Found a file that needs to be unzipped, unzipping...")
                 self.unzip_gz_files()
 
     def unzip_gz_files(self):
@@ -127,6 +134,7 @@ class PaciniTyping:
         Input:
         ----------
         """
+        logging.debug("Unzipping file %s...", self.option["input_file_list"])
         unzipped_files = []
         for file in self.option["input_file_list"]:
             try:
@@ -137,6 +145,7 @@ class PaciniTyping:
             except Exception as e:
                 logging.error("Error while unzipping file %s: %s", file, e)
                 sys.exit(1)
+        logging.debug("Updating input file list with unzipped files")
         self.option["input_file_list"] = unzipped_files
 
     def validate_file_arguments(self):
@@ -146,7 +155,9 @@ class PaciniTyping:
         Input:
         ----------
         """
-        if validating.validating_input_arguments.main(self.option["input_file_list"]):
+        logging.debug("Validating the input arguments...")
+        argsvalidator = ArgsValidator(self.option)
+        if argsvalidator.validate():
             logging.info("Input arguments have been validated, found no issues.")
         else:
             logging.error("Error while validating the input arguments, "
@@ -160,6 +171,7 @@ class PaciniTyping:
         Input:
         ----------
         """
+        logging.debug("Running the makedatabase operation...")
         DatabaseBuilder(
             arg_options=self.option
         )
@@ -171,9 +183,12 @@ class PaciniTyping:
         Input:
         ----------
         """
+        logging.debug("Determining the file type of the input file(s)...")
         self.option["file_type"] = (
             FileValidator(self.option["input_file_list"])
             .get_file_type())
+        logging.info("File type has been determined: %s",
+                     self.option["file_type"])
 
     def check_valid_option_with_args(self):
         """
@@ -187,6 +202,7 @@ class PaciniTyping:
             - args: object with the input arguments
         ----------
         """
+        logging.debug("Checking if the file type is correct for the input arguments...")
         if (len(self.option["input_file_list"]) == 1 and self.option["file_type"] == "FASTQ") or \
                 (len(self.option["input_file_list"]) == 2 and self.option["file_type"] == "FASTA"):
             logging.error(
@@ -201,6 +217,7 @@ class PaciniTyping:
         Input:
         ----------
         """
+        logging.debug("Checking if the database exists...")
         db.check_for_database_path(arg_options=self.option)
 
     def run_query(self):
@@ -210,11 +227,12 @@ class PaciniTyping:
         Input:
         ----------
         """
+        logging.debug("Running the query operation against database...")
         runner = QueryRunner(
             run_options=self.option
         )
         runner.run()
-        logging.debug("Query runtime: %s seconds", runner.get_runtime())
+        logging.info("Query runtime: %s seconds", runner.get_runtime())
 
     def run(self):
         # Retrieve the args object, arguments have been parsed at this point
@@ -226,13 +244,8 @@ class PaciniTyping:
         self.get_input_filenames()
         # Check if they may need to be unzipped
         self.check_for_unzip_files()
-
         # Validate all input arguments
         self.validate_file_arguments()
-
-        # Construct and validate the filter arguments
-        # IMPLEMENT
-        # TODO - filter_arguments = self.parse_filter_arguments(args)
 
         if self.option["makedatabase"]:
             # Run with the validated arguments
@@ -252,13 +265,12 @@ class PaciniTyping:
     # TODO - Make the input db arguments required all the time,
     #   so that the database could be created if not found running the query
 
-    # TODO - Translate this script to a class-based structure
-
     # TODO - Add logging to every method above to make debugging easier,
     #  keep in mind the verbosity level
 
 
 if __name__ == "__main__":
+    logging.info("Starting the Pacini-Typing pipeline, parsing arguments...")
     args = argument_parser.build_parser.main()
     pacini_typing = PaciniTyping(args)
     pacini_typing.run()

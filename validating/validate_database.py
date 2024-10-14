@@ -34,6 +34,7 @@ def check_for_database_existence(arg_options):
         - input_file_type: string with the input file type
     ----------
     """
+    logging.debug("Checking if the database exists.")
     db_files = create_database_file_list(arg_options)
     for db_file in db_files:
         if not os.path.exists(arg_options["database_path"] + db_file):
@@ -53,6 +54,7 @@ def create_database_file_list(arg_options):
         - input_file_type: string with the input file type
     ----------
     """
+    logging.debug("Creating a list of database files based on the input file type.")
     db_files = []
     if arg_options["file_type"] == "FASTA":
         db_files = [f"{arg_options['database_name']}.{ext}" for ext in
@@ -84,7 +86,4 @@ def check_for_database_path(arg_options):
             "Please provide a valid path, "
             "make sure the path is correct and ending with a forward slash. /")
         sys.exit(1)
-    logging.info(
-        "The database path exists. "
-        "Checking if the database name is provided...")
     return check_for_database_existence(arg_options)

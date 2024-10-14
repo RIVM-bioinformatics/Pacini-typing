@@ -74,6 +74,7 @@ class FileValidator:
             - self.type: dictionary with the file name and the type (FASTA or FASTQ)
         ----------
         """
+        logging.debug("Determining the file type of the input files...")
         for file in self.input_files:
             if self.check_valid_sequence(file):
                 if ((self.body[file][0].startswith(">")
@@ -106,12 +107,11 @@ class FileValidator:
             - self.body: dictionary with the file name and the first 5 lines
         ----------
         """
+        logging.debug("Retrieving the body of the input files...")
         for file in self.input_files:
             with open(file, "r", encoding="utf-8") as f:
-                self.body[file] = [f.readline().strip() for _ in range(5)]
-        # TODO: Think about checking the whole file for valid sequences and not just the first 5 lines
-        #   if so, maybe combine it with hash function in validating input arguments script
-        #   to not read the whole file twice
+                # self.body[file] = [f.readline().strip() for _ in range(5)]
+                self.body[file] = [line.strip() for line in f.readlines()]
 
     def check_valid_sequence(self, file):
         """
@@ -127,11 +127,21 @@ class FileValidator:
             - False: if the sequence is not valid
         ----------
         """
+        logging.debug("Checking if the sequence is valid...")
         if re.fullmatch(r"[ACTG]+", self.body[file][1]):
             return True
         logging.error("%s is not a valid FASTA or FASTQ file, "
                       "the sequence is not valid.", file)
         sys.exit(1)
+
+        # TODO: Is it necessary to check the entire file?
+        #  It's probably better, but how to efficiently do it?
+        # for index, lines in enumerate(self.body[file]):
+        #     line = lines.strip()
+        #     if line and index % 4 == 1:
+        #         if not re.fullmatch(r"[ACTG]+", line):
+        #             logging.error("The sequence is not valid.")
+        #             sys.exit(1)
 
     def compare_types(self):
         """
@@ -146,6 +156,7 @@ class FileValidator:
             - logging.error: if the files are not of the same type, sys.exit(1)
         ----------
         """
+        logging.debug("Comparing the types of the input files...")
         file_types = set(self.type.values())
         if len(file_types) == 1:
             if "FASTA" in file_types and len(self.type) == 2:
@@ -164,4 +175,5 @@ class FileValidator:
             - string: with the file type
         ----------
         """
+        logging.debug("Getting the file type...")
         return next(iter(self.type.values()))
