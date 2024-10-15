@@ -34,7 +34,7 @@ class FileValidator:
     The determined file is returned by the class.
     """
 
-    def __init__(self, input_files):
+    def __init__(self, input_files) -> None:
         """
         Constructor of the class. It initializes the class with the input files.
         Additionally, it initializes the body and type dictionaries.
@@ -46,15 +46,15 @@ class FileValidator:
         ----------
         """
         self.input_files = input_files
-        self.body = {}
-        self.type = {}
+        self.body: dict[str, list[str]] = {}
+        self.type: dict[str, str] = {}
         self.retrieve_body()
         self.determine_file_type()
         if len(self.type) == 2:
             self.compare_types()
         self.get_file_type()
 
-    def determine_file_type(self):
+    def determine_file_type(self) -> None:
         """
         Main logic function of the class that does the checking.
         With the body of the file, the function determines if the file is a FASTA or FASTQ file.
@@ -92,7 +92,7 @@ class FileValidator:
                     logging.error("The file is not a valid FASTA or FASTQ file.")
                     sys.exit(1)
 
-    def retrieve_body(self):
+    def retrieve_body(self) -> None:
         """
         Method that retrieves the body of the input file.
         The first 5 lines of the file are retrieved and stored in a dictionary.
@@ -115,7 +115,7 @@ class FileValidator:
                 self.body[file] = [f.readline().strip() for _ in range(5)]
                 # self.body[file] = [line.strip() for line in f.readlines()]
 
-    def check_valid_sequence(self, file):
+    def check_valid_sequence(self, file) -> bool:
         """
         Simple method to check if the sequence is valid.
         It simply checks if the sequence is a valid DNA sequence,
@@ -133,7 +133,7 @@ class FileValidator:
         if re.fullmatch(r"[ACTG]+", self.body[file][1]):
             return True
         logging.error(
-            "%s is not a valid FASTA or FASTQ file, " "the sequence is not valid.", file
+            "%s is not a valid FASTA or FASTQ file, the sequence is not valid.", file
         )
         sys.exit(1)
 
@@ -146,7 +146,7 @@ class FileValidator:
         #             logging.error("The sequence is not valid.")
         #             sys.exit(1)
 
-    def compare_types(self):
+    def compare_types(self) -> None:
         """
         Compare the types of input files
         This function makes sure the user is not mixing FASTA and FASTQ files
@@ -172,7 +172,7 @@ class FileValidator:
             )
             sys.exit(1)
 
-    def get_file_type(self):
+    def get_file_type(self) -> str:
         """
         Simple getter function to retrieve the file type in string format
         ----------

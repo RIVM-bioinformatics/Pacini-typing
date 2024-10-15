@@ -43,13 +43,13 @@ def main():
         "--verbose",
         action="store_true",
         default=0,
-        help="Increase output verbosity"
+        help="Increase output verbosity",
     )
 
     subparsers = parser.add_subparsers(
         title="operations",
         description="For more information on a specific command, type: Pacini.py <command> -h",
-        dest="options"
+        dest="options",
     )
 
     argument_parser.args_makedatabase.build_makedatabase_command(subparsers)

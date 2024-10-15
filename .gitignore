@@ -166,3 +166,4 @@ data/
 *.csv
 *coverage*
 test_data/
+.vscode/

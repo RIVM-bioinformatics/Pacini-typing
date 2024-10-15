@@ -60,13 +60,9 @@ class QueryRunner:
 
         logging.debug("Preparing the query...")
         if self.input_file_type == "FASTA":
-            self.query = BLASTn.get_query(
-                option=run_options
-            )
+            self.query = BLASTn.get_query(option=run_options)
         elif self.input_file_type == "FASTQ":
-            self.query = KMA.get_query(
-                option=run_options
-            )
+            self.query = KMA.get_query(option=run_options)
 
     def __str__(self):
         """
@@ -92,11 +88,7 @@ class QueryRunner:
         logging.debug("Running query...")
         logging.debug("Query: %s", " ".join(self.query))
         self.start_time = time.time()
-        result = subprocess.run(
-            self.query,
-            capture_output=True,
-            text=True,
-            check=True)
+        result = subprocess.run(self.query, capture_output=True, text=True, check=True)
         self.stop_time = time.time()
 
         # TODO: This return statement is not used anywhere, should it be removed?

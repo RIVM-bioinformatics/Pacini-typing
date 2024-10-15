@@ -29,6 +29,7 @@ class KMA(Enum):
     MIN_IDENTITY: flag for the minimum identity percentage
     ----------
     """
+
     RUN_OPTION = "kma"
     PAIRED_OPTION = "-ipe"
     OUTPUT_FORMAT = "-tsv"
@@ -50,11 +51,18 @@ class KMA(Enum):
         """
         return [
             KMA.RUN_OPTION.value,
-            KMA.PAIRED_OPTION.value, option["input_file_list"][0], option["input_file_list"][1],
-            KMA.IDENTITY.value, str(option["query"]["filters"]["identity"]),
+            KMA.PAIRED_OPTION.value,
+            option["input_file_list"][0],
+            option["input_file_list"][1],
+            KMA.IDENTITY.value,
+            str(option["query"]["filters"]["identity"]),
             KMA.OUTPUT_FORMAT.value,
-            "-t_db", option["database_path"] + option["database_name"],
-            "-o", option["query"]["output"],
-            "-mrc", "0.7",
-            "-pm", "p",
+            "-t_db",
+            option["database_path"] + option["database_name"],
+            "-o",
+            option["query"]["output"],
+            "-mrc",
+            "0.7",
+            "-pm",
+            "p",
         ]

@@ -26,8 +26,9 @@ class BLASTn(Enum):
     RUN_OPTION: string that is used in the subprocess.run() method
     OUTPUT_FORMAT: flag for the output format
     """
+
     RUN_OPTION = "blastn"
-    OUTPUT_FORMAT = "10" #"7 sseqid bitscore evalue slen pident qcovs"
+    OUTPUT_FORMAT = "10"  # "7 sseqid bitscore evalue slen pident qcovs"
     IDENTITY = "-perc_identity"
 
     @staticmethod
@@ -47,9 +48,14 @@ class BLASTn(Enum):
         """
         return [
             BLASTn.RUN_OPTION.value,
-            "-query", option["input_file_list"][0],
-            "-db", option["database_path"] + option["database_name"],
-            "-out", option["query"]["output"] + ".tsv",
-            "-outfmt", BLASTn.OUTPUT_FORMAT.value,
-            BLASTn.IDENTITY.value, str(option["query"]["filters"]["identity"]),
+            "-query",
+            option["input_file_list"][0],
+            "-db",
+            option["database_path"] + option["database_name"],
+            "-out",
+            option["query"]["output"] + ".tsv",
+            "-outfmt",
+            BLASTn.OUTPUT_FORMAT.value,
+            BLASTn.IDENTITY.value,
+            str(option["query"]["filters"]["identity"]),
         ]

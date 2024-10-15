@@ -36,7 +36,7 @@ def build_query_command(subparsers):
         metavar=("file1", "file2"),
         nargs=2,
         help="Paired-end reads to be used for query. "
-             "Specify two files separated by a space: -p file1 file2",
+        "Specify two files separated by a space: -p file1 file2",
     )
 
     query.add_argument(

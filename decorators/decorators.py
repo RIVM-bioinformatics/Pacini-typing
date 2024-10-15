@@ -47,8 +47,11 @@ def log(func):
                 logging.error(result.stderr)
             return result
         except Exception as e:
-            logging.error("Exception occurred in %s. exception: %s", func.__name__, str(e))
+            logging.error(
+                "Exception occurred in %s. exception: %s", func.__name__, str(e)
+            )
             logging.debug("Arguments: %s", args)
             logging.debug("Keyword arguments: %s", kwargs)
             raise e
+
     return wrapper
