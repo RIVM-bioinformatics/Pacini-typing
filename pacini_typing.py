@@ -274,6 +274,8 @@ class PaciniTyping:
     # TODO - Add logging to every method above to make debugging easier,
     #  keep in mind the verbosity level
 
+    # TODO - raise exceptions instead of sys.exit(1) to make the code more robust
+
 
 if __name__ == "__main__":
     logging.info("Starting the Pacini-Typing pipeline, parsing arguments...")
