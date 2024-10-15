@@ -14,9 +14,9 @@ __author__ = "Mark Van de Streek"
 __data__ = "2024-09-24"
 __all__ = ["check_for_database_path"]
 
-import sys
-import os
 import logging
+import os
+import sys
 
 
 def check_for_database_existence(arg_options):
@@ -40,7 +40,9 @@ def check_for_database_existence(arg_options):
         if not os.path.exists(arg_options["database_path"] + db_file):
             logging.error(
                 "The database file %s does not exist. "
-                "Please provide a valid database name or path.", db_file)
+                "Please provide a valid database name or path.",
+                db_file,
+            )
             sys.exit(1)
         return True
 
@@ -57,11 +59,15 @@ def create_database_file_list(arg_options):
     logging.debug("Creating a list of database files based on the input file type.")
     db_files = []
     if arg_options["file_type"] == "FASTA":
-        db_files = [f"{arg_options['database_name']}.{ext}" for ext in
-                    ["ndb", "nhr", "nin", "njs", "not", "nsq", "ntf", "nto"]]
+        db_files = [
+            f"{arg_options['database_name']}.{ext}"
+            for ext in ["ndb", "nhr", "nin", "njs", "not", "nsq", "ntf", "nto"]
+        ]
     elif arg_options["file_type"] == "FASTQ":
-        db_files = [f"{arg_options['database_name']}.{ext}" for ext in
-                    ["comp.b", "length.b", "name", "seq.b"]]
+        db_files = [
+            f"{arg_options['database_name']}.{ext}"
+            for ext in ["comp.b", "length.b", "name", "seq.b"]
+        ]
 
     return db_files
 
@@ -78,12 +84,14 @@ def check_for_database_path(arg_options):
     if not arg_options["database_path"].endswith("/"):
         logging.warning(
             "The database path does not end with a forward slash. "
-            "Appending it to run checks.")
+            "Appending it to run checks."
+        )
         arg_options["database_path"] += "/"
     if not os.path.exists(arg_options["database_path"]):
         logging.error(
             "The database path does not exist. "
             "Please provide a valid path, "
-            "make sure the path is correct and ending with a forward slash. /")
+            "make sure the path is correct and ending with a forward slash. /"
+        )
         sys.exit(1)
     return check_for_database_existence(arg_options)

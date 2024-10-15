@@ -14,8 +14,8 @@ __author__ = "Mark Van de Streek"
 __data__ = "2024-09-24"
 __all__ = ["QueryRunner"]
 
-import subprocess
 import logging
+import subprocess
 import time
 
 import decorators.decorators

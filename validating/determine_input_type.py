@@ -77,14 +77,16 @@ class FileValidator:
         logging.debug("Determining the file type of the input files...")
         for file in self.input_files:
             if self.check_valid_sequence(file):
-                if ((self.body[file][0].startswith(">")
-                        and not self.body[file][1].startswith("+"))
-                        and not self.body[file][2].startswith("@")):
+                if (
+                    self.body[file][0].startswith(">")
+                    and not self.body[file][1].startswith("+")
+                ) and not self.body[file][2].startswith("@"):
                     self.type[file] = "FASTA"
-                elif ((self.body[file][0].startswith("@")
-                       and self.body[file][2].startswith("+")
-                       and len(self.body[file][1]) == len(self.body[file][3]))
-                      and self.body[file][4].startswith("@")):
+                elif (
+                    self.body[file][0].startswith("@")
+                    and self.body[file][2].startswith("+")
+                    and len(self.body[file][1]) == len(self.body[file][3])
+                ) and self.body[file][4].startswith("@"):
                     self.type[file] = "FASTQ"
                 else:
                     logging.error("The file is not a valid FASTA or FASTQ file.")
@@ -110,8 +112,8 @@ class FileValidator:
         logging.debug("Retrieving the body of the input files...")
         for file in self.input_files:
             with open(file, "r", encoding="utf-8") as f:
-                # self.body[file] = [f.readline().strip() for _ in range(5)]
-                self.body[file] = [line.strip() for line in f.readlines()]
+                self.body[file] = [f.readline().strip() for _ in range(5)]
+                # self.body[file] = [line.strip() for line in f.readlines()]
 
     def check_valid_sequence(self, file):
         """
@@ -130,8 +132,9 @@ class FileValidator:
         logging.debug("Checking if the sequence is valid...")
         if re.fullmatch(r"[ACTG]+", self.body[file][1]):
             return True
-        logging.error("%s is not a valid FASTA or FASTQ file, "
-                      "the sequence is not valid.", file)
+        logging.error(
+            "%s is not a valid FASTA or FASTQ file, " "the sequence is not valid.", file
+        )
         sys.exit(1)
 
         # TODO: Is it necessary to check the entire file?
@@ -164,7 +167,9 @@ class FileValidator:
                 sys.exit(1)
             logging.debug("All files are valid and the same type, continuing...")
         else:
-            logging.error("The input files are not of the same type: %s Exiting...", self.type)
+            logging.error(
+                "The input files are not of the same type: %s Exiting...", self.type
+            )
             sys.exit(1)
 
     def get_file_type(self):

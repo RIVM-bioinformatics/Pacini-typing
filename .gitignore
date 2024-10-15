@@ -165,3 +165,4 @@ refdir/
 data/
 *.csv
 *coverage*
+test_data/

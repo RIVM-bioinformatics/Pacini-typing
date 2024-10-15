@@ -13,20 +13,21 @@ Fill in later...
 __author__ = "Mark Van de Streek"
 __data__ = "2024-09-24"
 
-import logging
 import gzip
-import shutil
+import logging
 import os
+import shutil
 import sys
-from makedatabase import DatabaseBuilder
+
 import argument_parser.build_parser
-from validating.validating_input_arguments import ArgsValidator
 import validating.validate_database as db
-from validating.determine_input_type import FileValidator
+from makedatabase import DatabaseBuilder
 from run_queries.query_runner import QueryRunner
+from validating.determine_input_type import FileValidator
+from validating.validating_input_arguments import ArgsValidator
 
 logging.basicConfig(
-    level=logging.INFO,  # Default to DEBUG level, can be adjusted later
+    level=logging.INFO,
     format="%(asctime)s %(levelname)-5s %(process)d : %(message)s",
     datefmt="%Y-%m-%dT%H:%M:%S"
 )
@@ -122,21 +123,21 @@ class PaciniTyping:
         ----------
         """
         logging.debug("Searching for .gz files in the input list")
-        for file in self.option["input_file_list"]:
-            if file.endswith(".gz"):
-                logging.info("Found a file that needs to be unzipped, unzipping...")
-                self.unzip_gz_files()
+        gz_files = [file for file in self.option["input_file_list"] if file.endswith(".gz")]
+        if gz_files:
+            logging.info("Found files that need to be unzipped, unzipping...")
+            self.unzip_gz_files(gz_files)
 
-    def unzip_gz_files(self):
+    def unzip_gz_files(self, gz_files):
         """
         Still have to fill in the docstring...
         ----------
         Input:
         ----------
         """
-        logging.debug("Unzipping file %s...", self.option["input_file_list"])
+        logging.debug("Unzipping files %s...", gz_files)
         unzipped_files = []
-        for file in self.option["input_file_list"]:
+        for file in gz_files:
             try:
                 with gzip.open(file, "rb") as f_in:
                     with open(file[:-3], "wb") as f_out:
@@ -146,7 +147,9 @@ class PaciniTyping:
                 logging.error("Error while unzipping file %s: %s", file, e)
                 sys.exit(1)
         logging.debug("Updating input file list with unzipped files")
-        self.option["input_file_list"] = unzipped_files
+        self.option["input_file_list"] = [
+            file[:-3] if file in gz_files else file for file in self.option["input_file_list"]
+        ]
 
     def validate_file_arguments(self):
         """

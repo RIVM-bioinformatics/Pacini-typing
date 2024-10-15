@@ -36,7 +36,9 @@ __author__ = "Mark Van de Streek"
 __date__ = "2024-10-07"
 
 from unittest.mock import patch
+
 import pytest
+
 from validating.validating_input_arguments import ArgsValidator
 
 

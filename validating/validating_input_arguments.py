@@ -14,11 +14,12 @@ __author__ = "Mark Van de Streek"
 __data__ = "2024-09-24"
 __all__ = ["ArgsValidator"]
 
-import re
-import sys
-import os
 import hashlib
 import logging
+import os
+import re
+import sys
+
 import yaml
 
 
@@ -75,7 +76,9 @@ class ArgsValidator:
         if ext in self.config["accepted_input_extensions"]:
             return True
         logging.error("File %s is not accepted", file)
-        logging.error("Accepted file extensions are: %s", self.config['accepted_input_extensions'])
+        logging.error(
+            "Accepted file extensions are: %s", self.config["accepted_input_extensions"]
+        )
         return False
 
     @staticmethod
@@ -107,8 +110,11 @@ class ArgsValidator:
         The config variable is placed in a class attribute.
         """
         logging.debug("Retrieving configuration file...")
-        config_path = os.path.join(os.path.dirname(self.option["run_path"]),
-                                   "configuration", "accept_arguments.yaml")
+        config_path = os.path.join(
+            os.path.dirname(self.option["run_path"]),
+            "configuration",
+            "accept_arguments.yaml",
+        )
         with open(config_path, "r", encoding="utf-8") as file:
             self.config = yaml.safe_load(file)
 
@@ -140,10 +146,14 @@ class ArgsValidator:
         the program will exit with an error message.
         """
         logging.debug("Comparing paired input files using hash...")
-        if (self.create_sha_hash(self.input_file_list[0]) ==
-                self.create_sha_hash(self.input_file_list[1])):
-            logging.error("Input files: %s and %s are the same, exiting...",
-                          self.input_file_list[0], self.input_file_list[1])
+        if self.create_sha_hash(self.input_file_list[0]) == self.create_sha_hash(
+            self.input_file_list[1]
+        ):
+            logging.error(
+                "Input files: %s and %s are the same, exiting...",
+                self.input_file_list[0],
+                self.input_file_list[1],
+            )
             sys.exit(1)
         logging.debug("Input files are not the same, continuing...")
 
@@ -189,10 +199,14 @@ class ArgsValidator:
         logging.debug("Checking if the paired input contains valid names...")
         pattern1 = re.compile(r".+(_1|R1).+")
         pattern2 = re.compile(r".+(_2|R2).+")
-        if not (pattern1.search(self.option["input_file_list"][0]) and
-                pattern2.search(self.option["input_file_list"][1])):
-            logging.error("Paired mode requires '_1' and '_2' or "
-                          "'R1' and 'R2' in the file names, exiting...")
+        if not (
+            pattern1.search(self.option["input_file_list"][0])
+            and pattern2.search(self.option["input_file_list"][1])
+        ):
+            logging.error(
+                "Paired mode requires '_1' and '_2' or "
+                "'R1' and 'R2' in the file names, exiting..."
+            )
             sys.exit(1)
 
     def validate_filter_arguments(self):
@@ -204,11 +218,15 @@ class ArgsValidator:
         """
         logging.debug("Validating filter arguments...")
         if self.option["query"]:
-            if (self.option["query"]["filters"]["identity"] < 0 or
-                    self.option["query"]["filters"]["identity"] > 100):
-                logging.error("Identity should be between 0 and 100, "
-                              "current value: %s, exiting...",
-                              self.option["query"]["filters"]["identity"])
+            if (
+                self.option["query"]["filters"]["identity"] < 0
+                or self.option["query"]["filters"]["identity"] > 100
+            ):
+                logging.error(
+                    "Identity should be between 0 and 100, "
+                    "current value: %s, exiting...",
+                    self.option["query"]["filters"]["identity"],
+                )
                 sys.exit(1)
 
     def run_file_checks(self, file):
@@ -227,10 +245,10 @@ class ArgsValidator:
             - sys.exit(1): if the checks do not pass
         ----------
         """
-        logging.debug("Checking file existence and"
-                      "valid extension for file: %s...", file)
-        if (self.check_file_existence(file) and
-                self.validate_file_extensions(file)):
+        logging.debug(
+            "Checking file existence and" "valid extension for file: %s...", file
+        )
+        if self.check_file_existence(file) and self.validate_file_extensions(file):
             return True
         sys.exit(1)
 
