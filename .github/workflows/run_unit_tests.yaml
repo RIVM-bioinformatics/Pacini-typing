@@ -21,4 +21,9 @@ jobs:
         pip install pyyaml
     - name: Run tests
       run: |
-        pytest
+        pytest -v 
+        ls test_data/
+        file test_data/VIB_AA2784AA_AS.scaffold.fasta
+        file test_data/ERR976461_2.fastq.gz
+        head -n 3 test_data/VIB_AA2784AA_AS.scaffold.fasta
+        head -n 3 test_data/ERR976461_2.fastq.gz
