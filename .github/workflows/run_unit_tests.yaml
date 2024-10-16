@@ -21,4 +21,5 @@ jobs:
         pip install pyyaml
     - name: Run tests
       run: |
-        pytest
+        pytest -v 
+        ls test_data
