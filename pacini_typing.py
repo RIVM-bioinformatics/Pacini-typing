@@ -29,7 +29,7 @@ from validating.validating_input_arguments import ArgsValidator
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s %(levelname)-5s %(process)d : %(message)s",
-    datefmt="%Y-%m-%dT%H:%M:%S"
+    datefmt="%Y-%m-%dT%H:%M:%S",
 )
 
 
@@ -65,9 +65,9 @@ class PaciniTyping:
             "database_name": self.input_args.database_name,
             "option": self.input_args.options,
             "verbose": self.input_args.verbose,
-            "run_path": os.path.abspath(__file__).rsplit('.', 1)[0],
+            "run_path": os.path.abspath(__file__).rsplit(".", 1)[0],
             "query": None,
-            "makedatabase": None
+            "makedatabase": None,
         }
         if self.input_args.options == "query":
             self.option["query"] = {
@@ -76,13 +76,14 @@ class PaciniTyping:
                 "output": self.input_args.output,
                 "filters": {
                     "identity": self.input_args.identity,
-                }
+                    "coverage": self.input_args.coverage,
+                },
             }
 
         elif self.input_args.options == "makedatabase":
             self.option["makedatabase"] = {
                 "database_type": self.input_args.database_type,
-                "input": self.input_args.input
+                "input": self.input_args.input,
             }
 
     def setup_logging(self):
@@ -123,7 +124,9 @@ class PaciniTyping:
         ----------
         """
         logging.debug("Searching for .gz files in the input list")
-        gz_files = [file for file in self.option["input_file_list"] if file.endswith(".gz")]
+        gz_files = [
+            file for file in self.option["input_file_list"] if file.endswith(".gz")
+        ]
         if gz_files:
             logging.info("Found files that need to be unzipped, unzipping...")
             self.unzip_gz_files(gz_files)
@@ -148,7 +151,8 @@ class PaciniTyping:
                 sys.exit(1)
         logging.debug("Updating input file list with unzipped files")
         self.option["input_file_list"] = [
-            file[:-3] if file in gz_files else file for file in self.option["input_file_list"]
+            file[:-3] if file in gz_files else file
+            for file in self.option["input_file_list"]
         ]
 
     def validate_file_arguments(self):
@@ -163,8 +167,10 @@ class PaciniTyping:
         if argsvalidator.validate():
             logging.info("Input arguments have been validated, found no issues.")
         else:
-            logging.error("Error while validating the input arguments, "
-                          "please check the above logs for more information.")
+            logging.error(
+                "Error while validating the input arguments, "
+                "please check the above logs for more information."
+            )
             sys.exit(1)
 
     def run_makedatabase(self):
@@ -175,9 +181,7 @@ class PaciniTyping:
         ----------
         """
         logging.debug("Running the makedatabase operation...")
-        DatabaseBuilder(
-            arg_options=self.option
-        )
+        DatabaseBuilder(arg_options=self.option)
 
     def get_file_type(self):
         """
@@ -187,11 +191,10 @@ class PaciniTyping:
         ----------
         """
         logging.debug("Determining the file type of the input file(s)...")
-        self.option["file_type"] = (
-            FileValidator(self.option["input_file_list"])
-            .get_file_type())
-        logging.info("File type has been determined: %s",
-                     self.option["file_type"])
+        self.option["file_type"] = FileValidator(
+            self.option["input_file_list"]
+        ).get_file_type()
+        logging.info("File type has been determined: %s", self.option["file_type"])
 
     def check_valid_option_with_args(self):
         """
@@ -206,11 +209,17 @@ class PaciniTyping:
         ----------
         """
         logging.debug("Checking if the file type is correct for the input arguments...")
-        if (len(self.option["input_file_list"]) == 1 and self.option["file_type"] == "FASTQ") or \
-                (len(self.option["input_file_list"]) == 2 and self.option["file_type"] == "FASTA"):
+        if (
+            len(self.option["input_file_list"]) == 1
+            and self.option["file_type"] == "FASTQ"
+        ) or (
+            len(self.option["input_file_list"]) == 2
+            and self.option["file_type"] == "FASTA"
+        ):
             logging.error(
                 "Only FASTA files are allowed for single files "
-                "and only FASTQ files are allowed for paired files.")
+                "and only FASTQ files are allowed for paired files."
+            )
             sys.exit(1)
 
     def check_valid_database_path(self):
@@ -231,9 +240,7 @@ class PaciniTyping:
         ----------
         """
         logging.debug("Running the query operation against database...")
-        runner = QueryRunner(
-            run_options=self.option
-        )
+        runner = QueryRunner(run_options=self.option)
         runner.run()
         logging.info("Query runtime: %s seconds", runner.get_runtime())
 

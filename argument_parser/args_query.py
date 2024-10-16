@@ -81,5 +81,17 @@ def build_query_command(subparsers):
         type=int,
         metavar="Min. identity",
         help="Minimum identity percentage for the query",
-        default=95,
+        default=90,
+        # Default is set to 90% identity, this keeps most of the results alive
+        # In the parsing module, manual filtering can be done to remove unwanted results
+    )
+
+    query.add_argument(
+        "-cov",
+        "--coverage",
+        required=False,
+        type=int,
+        metavar="Min. coverage",
+        help="Minimum coverage percentage for the query",
+        default=70,
     )
