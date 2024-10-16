@@ -22,4 +22,7 @@ jobs:
     - name: Run tests
       run: |
         pytest -v 
-        ls test_data
+        ls test_data/
+        file test_data/VIB_AA2784AA_AS.scaffold.fasta
+        file test_data/ERR976461_2.fastq.gz
+        head -n 3 test_data/VIB_AA2784AA_AS.scaffold.fastas
