@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/RIVM-bioinformatics/Pacini-typing/compare/v1.1.0...v1.1.1) (2024-10-16)
+
+
+### Bug Fixes
+
+* tried to fix a github actions problem ([68c4d09](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/68c4d0958672c9639817ba923d6dcc5a3c085ac9))
+
 ## [1.1.0](https://github.com/RIVM-bioinformatics/Pacini-typing/compare/v1.0.0...v1.1.0) (2024-10-15)
 
 
