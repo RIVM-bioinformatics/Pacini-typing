@@ -15,6 +15,7 @@ __data__ = "2024-09-24"
 __all__ = ["test_full_run"]
 
 import os
+import platform
 import shutil
 import subprocess
 
@@ -28,6 +29,7 @@ DATABASE_FILES = [
 ]
 
 
+@pytest.mark.skipif(platform.system() == "Linux", reason="Test not supported on Linux")
 def test_create_database():
     """
     Method that tests the creation of a database
@@ -58,6 +60,7 @@ def test_create_database():
         pytest.fail(f"Process failed with error: {e}")
 
 
+@pytest.mark.skipif(platform.system() == "Linux", reason="Test not supported on Linux")
 @pytest.mark.parametrize("file", DATABASE_FILES)
 def test_database_creation(file):
     """
@@ -95,6 +98,7 @@ def test_full_run():
     )
 
 
+@pytest.mark.skipif(platform.system() == "Linux", reason="Test not supported on Linux")
 def test_cleanup():
     """
     Method that first removes all files created during the test
