@@ -263,6 +263,7 @@ class ArgsValidator:
             - False: if the files are not valid
         ----------
         """
+        self.validate_filter_arguments()
         if len(self.input_file_list) == 2:
             if all(self.run_file_checks(file) for file in self.input_file_list):
                 self.check_for_same_name()
@@ -272,5 +273,4 @@ class ArgsValidator:
             return False
         if len(self.input_file_list) == 1:
             return self.run_file_checks(self.input_file_list[0])
-        self.validate_filter_arguments()
         return False

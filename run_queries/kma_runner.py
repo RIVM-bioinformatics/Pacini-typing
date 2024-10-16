@@ -36,7 +36,7 @@ class KMA(Enum):
     IDENTITY = "-ID"
 
     @staticmethod
-    def get_query(option):
+    def get_query(option: dict) -> list:
         """
         Simple method that prepares the query for the KMA run.
         This query is passed to the super class QueryRunner
@@ -61,8 +61,7 @@ class KMA(Enum):
             option["database_path"] + option["database_name"],
             "-o",
             option["query"]["output"],
-            "-mrc",
-            "0.7",
-            "-pm",
-            "p",
+            "-nf",
+            # p-value can be added by -P option
+            # "-mrc", str(option["query"]["filters"]["coverage"] / 100),
         ]

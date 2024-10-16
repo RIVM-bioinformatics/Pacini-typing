@@ -32,7 +32,7 @@ class BLASTn(Enum):
     IDENTITY = "-perc_identity"
 
     @staticmethod
-    def get_query(option):
+    def get_query(option: dict) -> list:
         """
         Simple method that prepares the query for the BLAST run.
         This query is passed to the super class QueryRunner.
@@ -58,4 +58,5 @@ class BLASTn(Enum):
             BLASTn.OUTPUT_FORMAT.value,
             BLASTn.IDENTITY.value,
             str(option["query"]["filters"]["identity"]),
+            # Some sort of coverage option "-qcov_hsp_perc", option["query"]["filters"]["coverage"]
         ]
