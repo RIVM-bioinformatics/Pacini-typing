@@ -17,9 +17,9 @@ __all__ = ["test_get_file_type"]
 from validating.determine_input_type import FileValidator
 
 FILE_VALIDATOR = FileValidator(["test_data/VIB_AA2784AA_AS.scaffold.fasta"])
-# PAIRED_VALIDATOR = FileValidator(
-#     ["./../test_data/ERR976461_1.fastq", "./../test_data/ERR976461_2.fastq"]
-# )
+PAIRED_VALIDATOR = FileValidator(
+    ["test_data/ERR976461_1.fastq", "test_data/ERR976461_2.fastq"]
+)
 
 
 def test_get_file_type():
@@ -34,16 +34,4 @@ def test_get_file_type():
     }
     """
     assert FILE_VALIDATOR.get_file_type() == "FASTA"
-    # assert PAIRED_VALIDATOR.get_file_type() == "FASTQ"
-
-
-# def test_body():
-#     """
-#     Test function that test the main goal of the FileValidator class,
-#     determine the file type.
-#     It passes the file in test_data/ as input and makes sure the output is correct
-#     """
-#     print("hello!")
-#     # assert FILE_VALIDATOR.body["./../test_data/VIB_AA2784AA_AS.scaffold.fasta"][
-#     #     0
-#     # ].startswith(">")
+    assert PAIRED_VALIDATOR.get_file_type() == "FASTQ"
