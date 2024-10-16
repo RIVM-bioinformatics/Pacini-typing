@@ -71,6 +71,7 @@ def test_database_creation(file):
         pytest.fail("Database was not created")
 
 
+@pytest.mark.skipif(platform.system() == "Linux", reason="Test not supported on Linux")
 def test_full_run():
     """
     Method that tests the full run of the Pacini CLI
