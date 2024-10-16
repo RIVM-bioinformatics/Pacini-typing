@@ -1,2 +1,4 @@
 test_data/ERR976461_1.fastq.gz filter=lfs diff=lfs merge=lfs -text
 test_data/ERR976461_2.fastq.gz filter=lfs diff=lfs merge=lfs -text
+test_data/ERR976461_1.fastq filter=lfs diff=lfs merge=lfs -text
+test_data/ERR976461_2.fastq filter=lfs diff=lfs merge=lfs -text
