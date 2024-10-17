@@ -67,6 +67,7 @@ def test_prepare_query():
     ]
 
 
+
 def test_get_query_different():
     """
     Function that tests the prepare_query() function(s) of the enums
@@ -86,6 +87,7 @@ def test_get_query_different():
         "./refdir/my_new_db",
         "-o",
         "/dummy/path",
+        "-mrc",
         "0.7",
         "-pm",
         "p",
@@ -111,6 +113,7 @@ def test_get_query_verbose_false():
         "./refdir/mydb",
         "-o",
         "/dummy/path",
+        "-mrc",
         "0.7",
         "-pm",
         "p",
