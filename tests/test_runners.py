@@ -59,7 +59,11 @@ def test_prepare_query():
         "-t_db",
         "./refdir/mydb",
         "-o",
-        "/dummy/path"
+        "/dummy/path",
+        "-mrc",
+        "0.7",
+        "-pm",
+        "p",
     ]
 
 
@@ -81,7 +85,10 @@ def test_get_query_different():
         "-t_db",
         "./refdir/my_new_db",
         "-o",
-        "/dummy/path"
+        "/dummy/path",
+        "0.7",
+        "-pm",
+        "p",
     ]
 
 
@@ -103,7 +110,10 @@ def test_get_query_verbose_false():
         "-t_db",
         "./refdir/mydb",
         "-o",
-        "/dummy/path"
+        "/dummy/path",
+        "0.7",
+        "-pm",
+        "p",
     ]
 
 
