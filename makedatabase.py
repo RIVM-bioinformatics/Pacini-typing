@@ -36,7 +36,7 @@ class DatabaseBuilder:
     ----------
     """
 
-    def __init__(self, arg_options):
+    def __init__(self, arg_options: dict) -> None:
         """
         Constructor for the DatabaseBuilder class.
         The constructor initializes the class attributes.
@@ -48,7 +48,7 @@ class DatabaseBuilder:
             - input_fasta_file: str
             - database_type: str
         """
-        self.full_database_path = None
+        self.full_database_path = ""
         self.database_path = arg_options["database_path"]
         self.database_name = arg_options["database_name"]
         self.input_fasta_file = arg_options["makedatabase"]["input"]
@@ -93,14 +93,18 @@ class DatabaseBuilder:
         ----------
         """
         logging.debug("Running KMA subprocess to create database")
-        result = subprocess.run([
+        result = subprocess.run(
+            [
                 "kma_index",
-                "-i", os.path.join(self.input_fasta_file),
-                "-o", self.full_database_path
+                "-i",
+                os.path.join(self.input_fasta_file),
+                "-o",
+                self.full_database_path,
             ],
             capture_output=True,
             text=True,
-            check=True)
+            check=True,
+        )
 
         return result
 
@@ -120,14 +124,19 @@ class DatabaseBuilder:
         ----------
         """
         logging.debug("Running BLAST subprocess to create database")
-        result = subprocess.run([
+        result = subprocess.run(
+            [
                 "makeblastdb",
-                "-in", os.path.join(self.input_fasta_file),
-                "-dbtype", "nucl",
-                "-out", self.full_database_path
+                "-in",
+                os.path.join(self.input_fasta_file),
+                "-dbtype",
+                "nucl",
+                "-out",
+                self.full_database_path,
             ],
             capture_output=True,
             text=True,
-            check=True)
+            check=True,
+        )
 
         return result

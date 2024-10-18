@@ -19,7 +19,7 @@ import os
 import sys
 
 
-def check_for_database_existence(arg_options):
+def check_for_database_existence(arg_options: dict) -> bool:
     """
     Function that checks if the database exists.
     Based on the input type, the method will check if the files exist:
@@ -44,10 +44,10 @@ def check_for_database_existence(arg_options):
                 db_file,
             )
             sys.exit(1)
-        return True
+    return True
 
 
-def create_database_file_list(arg_options):
+def create_database_file_list(arg_options: dict) -> list:
     """
     Function that creates a list of database files based on the input file type.
     ----------
@@ -72,7 +72,7 @@ def create_database_file_list(arg_options):
     return db_files
 
 
-def check_for_database_path(arg_options):
+def check_for_database_path(arg_options: dict) -> bool:
     """
     Function that checks if the database path exists.
     If not, the program will exit with an error message.

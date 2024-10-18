@@ -43,7 +43,7 @@ class ArgsValidator:
     ----------
     """
 
-    def __init__(self, option):
+    def __init__(self, option: dict) -> None:
         """
         Constructor for the ArgsValidator class.
         The main option dictionary is passed to
@@ -53,9 +53,10 @@ class ArgsValidator:
         self.option = option
         self.config = None
         self.config = None
+        self.get_config_input()
         self.input_file_list = self.option["input_file_list"]
 
-    def validate_file_extensions(self, file):
+    def validate_file_extensions(self, file: str) -> bool:
         """
         Main function that is used to validate the input file extensions.
         Other functions are used to retrieve the configuration file and extract extensions.
@@ -70,9 +71,9 @@ class ArgsValidator:
         ----------
         """
         logging.debug("Validating file extension for file: %s...", file)
-        self.get_config_input()
         file_name = os.path.basename(file)
         ext = self.get_file_extension(file_name.split(".")).lower()
+        assert self.config is not None
         if ext in self.config["accepted_input_extensions"]:
             return True
         logging.error("File %s is not accepted", file)
@@ -82,7 +83,7 @@ class ArgsValidator:
         return False
 
     @staticmethod
-    def get_file_extension(file_extension):
+    def get_file_extension(file_extension: list) -> str:
         """
         Function that retrieves the file extension from a file name.
         It handles both single and double file extensions.
@@ -101,7 +102,7 @@ class ArgsValidator:
             ext = f".{file_extension[-2]}.{file_extension[-1]}"
         return ext
 
-    def get_config_input(self):
+    def get_config_input(self) -> None:
         """
         Simple function that retrieves the configuration file and loads it into a dictionary.
         The method gets the run path from the input arguments to make sure
@@ -119,7 +120,7 @@ class ArgsValidator:
             self.config = yaml.safe_load(file)
 
     @staticmethod
-    def check_file_existence(file):
+    def check_file_existence(file: str) -> bool:
         """
         Function that checks if a given file exists and is a file.
         If not exists, the program will exit and the error will be logged.
@@ -137,7 +138,7 @@ class ArgsValidator:
         logging.error("File %s does not exist", file)
         return False
 
-    def compare_paired_files(self):
+    def compare_paired_files(self) -> None:
         """
         Function that checks if the input files are not exactly the same.
         For this operation, a SHA256 hash is created for both files,
@@ -158,7 +159,7 @@ class ArgsValidator:
         logging.debug("Input files are not the same, continuing...")
 
     @staticmethod
-    def create_sha_hash(file):
+    def create_sha_hash(file: str) -> str:
         """
         Method that creates a SHA256 hash for a given file.
         The file is read in chunks of 4096 bytes and the hash is updated.
@@ -178,7 +179,7 @@ class ArgsValidator:
 
         return hash_obj.hexdigest()
 
-    def check_for_same_name(self):
+    def check_for_same_name(self) -> None:
         """
         Function that checks if the input files are not exactly the same.
         This check is done right before the paired file check.
@@ -190,7 +191,7 @@ class ArgsValidator:
             logging.error("The input filenames are the same, exiting...")
             sys.exit(1)
 
-    def check_paired_names(self):
+    def check_paired_names(self) -> None:
         """
         Function that checks if the input files are paired.
         This means, 1 and 2 are in the file names, or something similar.
@@ -209,7 +210,7 @@ class ArgsValidator:
             )
             sys.exit(1)
 
-    def validate_filter_arguments(self):
+    def validate_filter_arguments(self) -> None:
         """
         Method that validates the filter arguments.
         For example, the identity should be between 0 and 100.
@@ -229,7 +230,7 @@ class ArgsValidator:
                 )
                 sys.exit(1)
 
-    def run_file_checks(self, file):
+    def run_file_checks(self, file: str) -> bool:
         """
         Method runs checks on the input files.
         If these checks pass, the method returns True.
@@ -246,13 +247,13 @@ class ArgsValidator:
         ----------
         """
         logging.debug(
-            "Checking file existence and" "valid extension for file: %s...", file
+            "Checking file existence and valid extension for file: %s...", file
         )
         if self.check_file_existence(file) and self.validate_file_extensions(file):
             return True
         sys.exit(1)
 
-    def validate(self):
+    def validate(self) -> bool:
         """
         Main validate function that is used to validate the input files.
         It first checks if the input is paired, single or input for creating database.
@@ -263,6 +264,7 @@ class ArgsValidator:
             - False: if the files are not valid
         ----------
         """
+        self.validate_filter_arguments()
         if len(self.input_file_list) == 2:
             if all(self.run_file_checks(file) for file in self.input_file_list):
                 self.check_for_same_name()
@@ -272,5 +274,4 @@ class ArgsValidator:
             return False
         if len(self.input_file_list) == 1:
             return self.run_file_checks(self.input_file_list[0])
-        self.validate_filter_arguments()
         return False

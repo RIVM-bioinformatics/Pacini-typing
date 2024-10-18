@@ -113,7 +113,7 @@ def test_get_file_extension(file_list, expected):
     The test verifies that the function correctly identifies and
     returns the file extension in various scenarios.
     """
-    v = ArgsValidator(option={"input_file_list": []})
+    v = ArgsValidator(option={"input_file_list": [], "run_path": "./pacini_typing.py"})
     assert v.get_file_extension(file_list) == expected
 
 
@@ -138,7 +138,7 @@ def test_check_file_existence(file, expected):
     The test runs multiple times with different file paths to ensure the
     function correctly identifies existing and non-existing files.
     """
-    v = ArgsValidator(option={"input_file_list": []})
+    v = ArgsValidator(option={"input_file_list": [], "run_path": "./pacini_typing.py"})
     assert v.check_file_existence(file) == expected
 
 
@@ -151,14 +151,18 @@ def test_compare_paired_files():
     for both duplicate and unique file names.
     """
     input_list = ["README.md", "README.md"]
-    v = ArgsValidator(option={"input_file_list": input_list})
+    v = ArgsValidator(
+        option={"input_file_list": input_list, "run_path": "./pacini_typing.py"}
+    )
     with pytest.raises(SystemExit) as ex:
         v.compare_paired_files()
 
     assert ex.value.code == 1
 
     input_list = ["README.md", "pacini_typing.py"]
-    v = ArgsValidator(option={"input_file_list": input_list})
+    v = ArgsValidator(
+        option={"input_file_list": input_list, "run_path": "./pacini_typing.py"}
+    )
     try:
         v.compare_paired_files()
     except SystemExit:
@@ -175,7 +179,9 @@ def test_check_for_same_name_fail(args1, args2):
     and handles duplicate file names.
     """
     input_list = [args1, args2]
-    v = ArgsValidator(option={"input_file_list": input_list})
+    v = ArgsValidator(
+        option={"input_file_list": input_list, "run_path": "./pacini_typing.py"}
+    )
     with pytest.raises(SystemExit) as ex:
         v.check_for_same_name()
     assert ex.value.code == 1
@@ -190,7 +196,9 @@ def test_check_for_same_name_good(args1, args2):
     The test verifies that the function behaves correctly for unique file names.
     """
     input_list = [args1, args2]
-    v = ArgsValidator(option={"input_file_list": input_list})
+    v = ArgsValidator(
+        option={"input_file_list": input_list, "run_path": "./pacini_typing.py"}
+    )
 
     try:
         v.check_for_same_name()
@@ -207,7 +215,7 @@ def test_check_paired_names_good(args1, args2):
     The test verifies that the function behaves correctly for valid paired file names.
     """
     input_list = [args1, args2]
-    v = ArgsValidator(option={"input_file_list": input_list})
+    v = ArgsValidator(option={"input_file_list": input_list, "run_path": "./pacini_typing.py"})
 
     try:
         v.check_paired_names()
@@ -224,7 +232,9 @@ def test_check_paired_names_fail(args1, args2):
     The test verifies that the function correctly identifies and handles unpaired file names.
     """
     input_list = [args1, args2]
-    v = ArgsValidator(option={"input_file_list": input_list})
+    v = ArgsValidator(
+        option={"input_file_list": input_list, "run_path": "./pacini_typing.py"}
+    )
 
     with pytest.raises(SystemExit) as ex:
         v.check_paired_names()
@@ -238,7 +248,9 @@ def test_run_file_checks():
     The Patch decorator is used to mock the return value of the called functions
     """
     input_list = ["README.md", "pacini_typing.py"]
-    v = ArgsValidator(option={"input_file_list": input_list})
+    v = ArgsValidator(
+        option={"input_file_list": input_list, "run_path": "./pacini_typing.py"}
+    )
 
     with patch(
         "validating.validating_input_arguments.ArgsValidator.check_file_existence",

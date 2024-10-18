@@ -16,7 +16,10 @@ __data__ = "2024-09-24"
 __all__ = ["build_query_command"]
 
 
-def build_query_command(subparsers):
+from argparse import _SubParsersAction
+
+
+def build_query_command(subparsers: _SubParsersAction) -> None:
     """
     Script that builds the query subcommand for the parser
     ----------

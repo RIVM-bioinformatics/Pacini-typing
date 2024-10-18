@@ -21,7 +21,7 @@ import argument_parser.args_makedatabase
 import argument_parser.args_query
 
 
-def main():
+def main() -> argparse.Namespace:
     """
     main and only function of this script that will be used to
     create a parser object and return the arguments in a parsed object.

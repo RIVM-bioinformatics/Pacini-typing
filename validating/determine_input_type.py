@@ -7,15 +7,16 @@
     “GitHub Copilot: Your AI pair programmer” (GPT-3). GitHub, Inc.
     https://github.com/features/copilot
 
-To be filed in later...
+FASTA and FASTQ file validator.
+Example FASTA File:
+    >MY Sequence
+    ATCGTACGATCGATCGATCGATCGATCGATCG
 
-Check the input files:
-    - What information is needed?
-    - What information is available in the header?
-    - Is there a quality score line available?
-        - Is there a line with a "+"? between the header and the quality score line?
-    - Does the header line start with a ">"?
-    - Does the header line start with a "@"?
+Example FASTQ File:
+    @My Sequence
+    ATCGTACGATCGATCGATCGATCGATCGATCG
+    +
+    B@@FDFFFHHGHHJIJJIIJJJJIJIJIIJJI
 """
 
 __author__ = "Mark Van de Streek"
@@ -34,7 +35,7 @@ class FileValidator:
     The determined file is returned by the class.
     """
 
-    def __init__(self, input_files) -> None:
+    def __init__(self, input_files: list) -> None:
         """
         Constructor of the class. It initializes the class with the input files.
         Additionally, it initializes the body and type dictionaries.
@@ -115,7 +116,7 @@ class FileValidator:
                 self.body[file] = [f.readline().strip() for _ in range(5)]
                 # self.body[file] = [line.strip() for line in f.readlines()]
 
-    def check_valid_sequence(self, file) -> bool:
+    def check_valid_sequence(self, file: str) -> bool:
         """
         Simple method to check if the sequence is valid.
         It simply checks if the sequence is a valid DNA sequence,

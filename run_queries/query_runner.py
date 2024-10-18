@@ -35,7 +35,7 @@ class QueryRunner:
     ----------
     """
 
-    def __init__(self, run_options):
+    def __init__(self, run_options: dict) -> None:
         """
         Constructor of the QueryRunner class.
         The constructor calls the prepare_query method based on
@@ -50,21 +50,17 @@ class QueryRunner:
             - output_file: str
         ----------
         """
-        self.input_file_type = run_options["file_type"]
-        # self.input_file = run_options["input_file_list"]
-        # self.database = run_options["database_path"] + run_options["database_name"]
-        # self.output_file = run_options["query"]["output"]
-        # self.filter_args = run_options["query"]["filters"]
-        self.start_time = None
-        self.stop_time = None
+        self.run_options = run_options
+        self.start_time = 0.0
+        self.stop_time = 0.0
 
         logging.debug("Preparing the query...")
-        if self.input_file_type == "FASTA":
-            self.query = BLASTn.get_query(option=run_options)
-        elif self.input_file_type == "FASTQ":
-            self.query = KMA.get_query(option=run_options)
+        if self.run_options["file_type"] == "FASTA":
+            self.query = BLASTn.get_query(option=self.run_options)
+        elif self.run_options["file_type"] == "FASTQ":
+            self.query = KMA.get_query(option=self.run_options)
 
-    def __str__(self):
+    def __str__(self) -> str:
         """
         Readable representation of the class.
         This function is called when the class is printed.
@@ -73,7 +69,7 @@ class QueryRunner:
         return f"QueryRunner(query={self.query})"
 
     @decorators.decorators.log
-    def run(self):
+    def run(self) -> subprocess.CompletedProcess:
         """
         The query is already prepared in the constructor. This function runs the query.
         The runtime is started and stopped to calculate the runtime.
@@ -94,7 +90,7 @@ class QueryRunner:
         # TODO: This return statement is not used anywhere, should it be removed?
         return result
 
-    def get_runtime(self):
+    def get_runtime(self) -> float:
         """
         Simple method that returns the runtime of the query.
         The function is called in a logging event in the main script (pacini_typing.py).
