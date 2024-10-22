@@ -39,7 +39,7 @@ from unittest.mock import patch
 
 import pytest
 
-from validating.validating_input_arguments import ArgsValidator
+from validation.validating_input_arguments import ArgsValidator
 
 GET_FILE_EXTENSIONS = [
     (["myfile", "txt"], ".txt"),
@@ -65,9 +65,9 @@ VALIDATE_FILE_EXTENSIONS = [
 ]
 
 CHECK_FILE_EXISTENCE = [
-    ("argument_parser/build_parser.py", True),
-    ("argument_parser/build_parser", False),
-    ("argument_parser/build_parser.sh", False),
+    ("argsparse/build_parser.py", True),
+    ("argsparse/build_parser", False),
+    ("argsparse/build_parser.sh", False),
     ("readme", False),
     ("pacini_typing.py", True),
 ]
@@ -255,10 +255,10 @@ def test_run_file_checks():
     )
 
     with patch(
-        "validating.validating_input_arguments.ArgsValidator.check_file_existence",
+        "validation.validating_input_arguments.ArgsValidator.check_file_existence",
         return_value=True,
     ), patch(
-        "validating.validating_input_arguments."
+        "validation.validating_input_arguments."
         "ArgsValidator.validate_file_extensions",
         return_value=True,
     ):
@@ -268,10 +268,10 @@ def test_run_file_checks():
             pytest.fail("run_file_checks() raised SystemExit unexpectedly!")
 
     with patch(
-        "validating.validating_input_arguments.ArgsValidator.check_file_existence",
+        "validation.validating_input_arguments.ArgsValidator.check_file_existence",
         return_value=True,
     ), patch(
-        "validating.validating_input_arguments."
+        "validation.validating_input_arguments."
         "ArgsValidator.validate_file_extensions",
         return_value=False,
     ):

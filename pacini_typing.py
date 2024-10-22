@@ -21,12 +21,12 @@ import shutil
 import sys
 from typing import Any
 
-import argument_parser.build_parser
-import validating.validate_database as db
+import argsparse.build_parser
+import validation.validate_database as db
 from makedatabase import DatabaseBuilder
-from run_queries.query_runner import QueryRunner
-from validating.determine_input_type import FileValidator
-from validating.validating_input_arguments import ArgsValidator
+from queries.query_runner import QueryRunner
+from validation.determine_input_type import FileValidator
+from validation.validating_input_arguments import ArgsValidator
 
 logging.basicConfig(
     level=logging.INFO,
@@ -169,7 +169,7 @@ class PaciniTyping:
             logging.info("Input arguments have been validated, found no issues.")
         else:
             logging.error(
-                "Error while validating the input arguments, "
+                "Error while validation the input arguments, "
                 "please check the above logs for more information."
             )
             sys.exit(1)
@@ -287,6 +287,6 @@ class PaciniTyping:
 
 if __name__ == "__main__":
     logging.info("Starting the Pacini-Typing pipeline, parsing arguments...")
-    args = argument_parser.build_parser.main()
+    args = argsparse.build_parser.main()
     pacini_typing = PaciniTyping(args)
     pacini_typing.run()

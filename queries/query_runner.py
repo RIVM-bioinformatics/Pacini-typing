@@ -19,8 +19,8 @@ import subprocess
 import time
 
 import decorators.decorators
-from run_queries.blast_runner import BLASTn
-from run_queries.kma_runner import KMA
+from queries.blast_runner import BLASTn
+from queries.kma_runner import KMA
 
 
 class QueryRunner:

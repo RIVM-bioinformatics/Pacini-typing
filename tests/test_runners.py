@@ -26,9 +26,9 @@ import time
 
 import pytest
 
-from run_queries.blast_runner import BLASTn
-from run_queries.kma_runner import KMA
-from run_queries.query_runner import QueryRunner
+from queries.blast_runner import BLASTn
+from queries.kma_runner import KMA
+from queries.query_runner import QueryRunner
 
 OPTION = {
     "database_path": "./refdir/",

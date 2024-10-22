@@ -29,7 +29,7 @@ from unittest import mock
 
 import pytest
 
-from validating.validate_database import (
+from validation.validate_database import (
     check_for_database_existence,
     check_for_database_path,
     create_database_file_list,

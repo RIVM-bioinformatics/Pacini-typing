@@ -17,8 +17,8 @@ __all__ = ["main"]
 
 import argparse
 
-import argument_parser.args_makedatabase
-import argument_parser.args_query
+import argsparse.args_makedatabase
+import argsparse.args_query
 
 
 def main() -> argparse.Namespace:
@@ -52,7 +52,7 @@ def main() -> argparse.Namespace:
         dest="options",
     )
 
-    argument_parser.args_makedatabase.build_makedatabase_command(subparsers)
-    argument_parser.args_query.build_query_command(subparsers)
+    argsparse.args_makedatabase.build_makedatabase_command(subparsers)
+    argsparse.args_query.build_query_command(subparsers)
 
     return parser.parse_args()

@@ -30,7 +30,7 @@ import sys
 
 class FileValidator:
     """
-    Class that is responsible for validating the input file.
+    Class that is responsible for validation the input file.
     It takes a file as input and checks if the file is a valid FASTA or FASTQ file.
     The determined file is returned by the class.
     """

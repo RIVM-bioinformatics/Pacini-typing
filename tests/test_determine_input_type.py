@@ -18,7 +18,7 @@ import platform
 
 import pytest
 
-from validating.determine_input_type import FileValidator
+from validation.determine_input_type import FileValidator
 
 
 @pytest.mark.skipif(platform.system() == "Linux", reason="Test not supported on Linux")

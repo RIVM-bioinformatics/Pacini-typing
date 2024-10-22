@@ -25,13 +25,13 @@ import yaml
 
 class ArgsValidator:
     """
-    Class responsible for validating the input arguments.
+    Class responsible for validation the input arguments.
     ----------
     Methods:
         - __init__: Constructor for the ArgsValidator class
         - validate_file_extensions: Function that validates the file extensions
         - get_file_extension: Function that retrieves the file extension from a file name
-        - get_config_input: Function that retrieves the configuration file
+        - get_config_input: Function that retrieves the config file
         - check_file_existence: Function that checks if a given file exists and is a file
         - compare_paired_files: Function that checks if the input files are not exactly the same
         - create_sha_hash: Function that creates a SHA256 hash for a given file
@@ -59,7 +59,7 @@ class ArgsValidator:
     def validate_file_extensions(self, file: str) -> bool:
         """
         Main function that is used to validate the input file extensions.
-        Other functions are used to retrieve the configuration file and extract extensions.
+        Other functions are used to retrieve the config file and extract extensions.
         With these information, this function checks if extension is in the accepted list.
         If not, the program will exit with an error message.
         ----------
@@ -104,16 +104,16 @@ class ArgsValidator:
 
     def get_config_input(self) -> None:
         """
-        Simple function that retrieves the configuration file and loads it into a dictionary.
+        Simple function that retrieves the config file and loads it into a dictionary.
         The method gets the run path from the input arguments to make sure
         the path is found from external runs.
-        See ./configuration/accept_arguments.yaml for the configuration file.
+        See ./config/accept_arguments.yaml for the config file.
         The config variable is placed in a class attribute.
         """
-        logging.debug("Retrieving configuration file...")
+        logging.debug("Retrieving config file...")
         config_path = os.path.join(
             os.path.dirname(self.option["run_path"]),
-            "configuration",
+            "config",
             "accept_arguments.yaml",
         )
         with open(config_path, "r", encoding="utf-8") as file:
