@@ -215,7 +215,9 @@ def test_check_paired_names_good(args1, args2):
     The test verifies that the function behaves correctly for valid paired file names.
     """
     input_list = [args1, args2]
-    v = ArgsValidator(option={"input_file_list": input_list, "run_path": "./pacini_typing.py"})
+    v = ArgsValidator(
+        option={"input_file_list": input_list, "run_path": "./pacini_typing.py"}
+    )
 
     try:
         v.check_paired_names()

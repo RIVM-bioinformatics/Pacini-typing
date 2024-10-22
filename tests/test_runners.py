@@ -12,7 +12,14 @@ To be filed in later...
 
 __author__ = "Mark Van de Streek"
 __data__ = "2024-10-17"
-__all__ = ["test"]
+__all__ = [
+    "test_prepare_query",
+    "test_get_query_different",
+    "test_get_query_verbose_false",
+    "test_blast_prepare_query",
+    "test_blast_get_query_different",
+    "test_get_runtime",
+]
 
 import os
 import time
@@ -30,7 +37,6 @@ OPTION = {
     "verbose": True,
     "input_file_list": ["1.fq", "2.fq"],
     "run_path": os.path.abspath(__file__).rsplit(".", 1)[0],
-    "query": None,
     "file_type": "FASTA",
     "makedatabase": None,
     "query": {
@@ -42,6 +48,15 @@ OPTION = {
         },
     },
 }
+
+RUN_TIMES = [
+    0.1,
+    0.04,
+    1.5673,
+    1.4567,
+    1.2345,
+    0.01,
+]
 
 
 def test_prepare_query():
@@ -71,6 +86,8 @@ def test_prepare_query():
 def test_get_query_different():
     """
     Function that tests the prepare_query() function(s) of the enums
+    It uses a different database name by simply copying the
+    OPTION dictionary and changing the database name
     """
     SUB_OPTION = OPTION.copy()
     SUB_OPTION["database_name"] = "my_new_db"
@@ -162,40 +179,6 @@ def test_blast_get_query_different():
     ]
 
 
-# class QueryRunner:
-#     def __init__(self):
-#         self.start_time = None
-#         self.stop_time = None
-
-#     def start(self):
-#         self.start_time = time.time()
-
-#     def stop(self):
-#         self.stop_time = time.time()
-
-#     def get_runtime(self):
-#         """
-#         Simple method that returns the runtime of the query.
-#         The function is called in a logging event in the main script (pacini_typing.py).
-#         ----------
-#         - Output:
-#             - float: with the runtime in seconds
-#         ----------
-#         """
-#         logging.debug("Getting the runtime of the query...")
-#         return round((self.stop_time - self.start_time), 2)
-
-
-RUN_TIMES = [
-    0.1,
-    0.04,
-    1.5673,
-    1.4567,
-    1.2345,
-    0.01,
-]
-
-
 @pytest.mark.parametrize("runtime", RUN_TIMES)
 def test_get_runtime(runtime):
     """
@@ -203,29 +186,7 @@ def test_get_runtime(runtime):
     """
     runner = QueryRunner(OPTION)
     runner.start_time = time.time()
-    time.sleep(runtime)  # Simulate a query that takes 1 second
+    time.sleep(runtime)
     runner.stop_time = time.time()
-    runtime = runner.get_runtime()
-    assert runtime == runtime
 
-
-# @pytest.mark.parametrize(
-#     "runtime, expected",
-#     [
-#         (0.1, 0.1),
-#         (0.04, 0.04),
-#         (1.2345, 1.24),
-#         (1.4567, 1.46),
-#         (1.5673, 1.57),
-#     ],
-# )
-# def test_get_runtime_rounding(runtime, expected):
-#     """
-#     Function that tests the get_runtime() method of the QueryRunner class for correct rounding
-#     """
-#     runner = QueryRunner(OPTION)
-#     runner.start_time = time.time()
-#     time.sleep(runtime)  # Simulate a query that takes the specified time
-#     runner.stop_time = time.time()
-#     actual_runtime = runner.get_runtime()
-#     assert actual_runtime == expected
+    assert runner.get_runtime() == pytest.approx(runtime, 1)
