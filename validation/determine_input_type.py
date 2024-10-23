@@ -131,7 +131,7 @@ class FileValidator:
         ----------
         """
         logging.debug("Checking if the sequence is valid...")
-        if re.fullmatch(r"[ACTG]+", self.body[file][1]):
+        if re.fullmatch(r"[ACTGN]+", self.body[file][1]):
             return True
         logging.error(
             "%s is not a valid FASTA or FASTQ file, the sequence is not valid.", file

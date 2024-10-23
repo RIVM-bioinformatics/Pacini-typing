@@ -132,7 +132,7 @@ class PaciniTyping:
             logging.info("Found files that need to be unzipped, unzipping...")
             self.unzip_gz_files(gz_files)
 
-    def unzip_gz_files(self, gz_files: list[str]) -> None:
+    def unzip_gz_files(self, gz_files) -> None:
         """
         Still have to fill in the docstring...
         ----------
@@ -283,6 +283,9 @@ class PaciniTyping:
     #  keep in mind the verbosity level
 
     # TODO - raise exceptions instead of sys.exit(1) to make the code more robust
+
+    # Idea - With end2end tests, sys args are not empty. So when sys args, don't parse the arguments but use the sys args
+    # 
 
 
 if __name__ == "__main__":
