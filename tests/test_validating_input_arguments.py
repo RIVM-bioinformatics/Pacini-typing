@@ -72,7 +72,7 @@ VALIDATE_FILE_EXTENSIONS = [
 CHECK_FILE_EXISTENCE_GOOD = [
     ("argsparse/build_parser.py", True),
     ("pacini_typing.py", True),
-    ("readme.md", True),
+    ("README.md", True),
 ]
 
 CHECK_FILE_EXISTENCE_FAIL = [
