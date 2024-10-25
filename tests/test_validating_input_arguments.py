@@ -35,6 +35,7 @@ Bad: The function should raise an exception or return a different value
 __author__ = "Mark Van de Streek"
 __date__ = "2024-10-07"
 
+from unittest import mock
 from unittest.mock import patch
 
 import pytest
@@ -266,7 +267,16 @@ def test_check_paired_names_fail(args1, args2):
         v.check_paired_names()
 
 
-def test_run_file_checks():
+@mock.patch(
+    target="validation.validating_input_arguments.ArgsValidator.check_file_existence",
+    return_value=False,
+)
+@mock.patch(
+    target="validation.validating_input_arguments.ArgsValidator.validate_file_extensions",
+    return_value=False,
+)
+# pylint: disable=unused-argument
+def test_run_file_checks(mock_validate, mock_check):
     """
     Test the run_file_checks() function
     It should raise a SystemExit exception if the file extension is not valid
@@ -277,28 +287,7 @@ def test_run_file_checks():
         option={"input_file_list": input_list, "run_path": "./pacini_typing.py"}
     )
 
-    with patch(
-        "validation.validating_input_arguments.ArgsValidator.check_file_existence",
-        return_value=True,
-    ), patch(
-        "validation.validating_input_arguments."
-        "ArgsValidator.validate_file_extensions",
-        return_value=True,
-    ):
-        try:
-            v.run_file_checks(input_list)
-        except SystemExit:
-            pytest.fail("run_file_checks() raised SystemExit unexpectedly!")
+    with pytest.raises(SystemExit) as ex:
+        v.run_file_checks(input_list)
 
-    with patch(
-        "validation.validating_input_arguments.ArgsValidator.check_file_existence",
-        return_value=True,
-    ), patch(
-        "validation.validating_input_arguments."
-        "ArgsValidator.validate_file_extensions",
-        return_value=False,
-    ):
-        with pytest.raises(SystemExit) as ex:
-            v.run_file_checks(input_list)
-
-        assert ex.value.code == 1
+    assert ex.value.code == 1

@@ -65,7 +65,6 @@ class QueryRunner:
         Readable representation of the class.
         This function is called when the class is printed.
         """
-        # TODO: Is this function necessary?
         return f"QueryRunner(query={self.query})"
 
     @decorators.decorators.log
@@ -86,8 +85,7 @@ class QueryRunner:
         self.start_time = time.time()
         result = subprocess.run(self.query, capture_output=True, text=True, check=True)
         self.stop_time = time.time()
-
-        # TODO: This return statement is not used anywhere, should it be removed?
+        
         return result
 
     def get_runtime(self) -> float:

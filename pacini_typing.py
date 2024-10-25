@@ -284,7 +284,15 @@ class PaciniTyping:
 
     # TODO - raise exceptions instead of sys.exit(1) to make the code more robust
 
-    # Idea - With end2end tests, sys args are not empty. So when sys args, don't parse the arguments but use the sys args
+    # TODO - With end2end tests, sys args are not empty. So when sys args, don't parse the arguments but use the sys args
+
+    # TODO: query_runner:__str__ - Is this function necessary?
+
+    # TODO: query_runner:run - This return statement is not used anywhere, should it be removed?
+
+    # TODO : validating_input_arguments - Store certain values from main OPTION as class variable
+
+    # TODO : validating_input_arguments - Compare if two files really are paired
 
 
 if __name__ == "__main__":

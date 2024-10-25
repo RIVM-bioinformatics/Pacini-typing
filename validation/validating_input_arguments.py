@@ -50,10 +50,6 @@ class ArgsValidator:
     ----------
     """
 
-    # TODO - Store certain values from main OPTION as class variable
-
-    # TODO - Compare if two files really are paired
-
     def __init__(self, option: dict) -> None:
         """
         Constructor for the ArgsValidator class.
