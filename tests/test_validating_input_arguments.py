@@ -39,6 +39,11 @@ from unittest.mock import patch
 
 import pytest
 
+from exceptions.validation_exceptions import (
+    FileNotExistsError,
+    InvalidFileExtensionError,
+    InvalidPairedError,
+)
 from validation.validating_input_arguments import ArgsValidator
 
 GET_FILE_EXTENSIONS = [
@@ -64,12 +69,16 @@ VALIDATE_FILE_EXTENSIONS = [
     ("myfile.fasta", True),
 ]
 
-CHECK_FILE_EXISTENCE = [
+CHECK_FILE_EXISTENCE_GOOD = [
     ("argsparse/build_parser.py", True),
+    ("pacini_typing.py", True),
+    ("readme.md", True),
+]
+
+CHECK_FILE_EXISTENCE_FAIL = [
     ("argsparse/build_parser", False),
     ("argsparse/build_parser.sh", False),
     ("readme", False),
-    ("pacini_typing.py", True),
 ]
 
 CHECK_FOR_SAME_NAME_FAIL = [
@@ -127,11 +136,16 @@ def test_validate_file_extensions(filename, expected):
     ensure the function behaves as expected.
     """
     v = ArgsValidator(option={"input_file_list": [], "run_path": "./pacini_typing.py"})
-    assert v.validate_file_extensions(filename) == expected
+
+    if expected is False:
+        with pytest.raises(InvalidFileExtensionError) as ex:
+            v.validate_file_extensions(filename)
+    else:
+        assert v.validate_file_extensions(filename) == expected
 
 
-@pytest.mark.parametrize("file, expected", CHECK_FILE_EXISTENCE)
-def test_check_file_existence(file, expected):
+@pytest.mark.parametrize("file, expected", CHECK_FILE_EXISTENCE_GOOD)
+def test_check_file_existence_good(file, expected):
     """
     Parametrized test for the check_file_existence() function.
     This function verifies whether a given file exists and is a valid file.
@@ -140,6 +154,18 @@ def test_check_file_existence(file, expected):
     """
     v = ArgsValidator(option={"input_file_list": [], "run_path": "./pacini_typing.py"})
     assert v.check_file_existence(file) == expected
+
+
+@pytest.mark.parametrize("file, expected", CHECK_FILE_EXISTENCE_FAIL)
+def test_check_file_existence_fail(file, expected):
+    """
+    Parametrized test for the check_file_existence() function.
+    This function verifies whether a given file not exists
+    and is not a valid file.
+    """
+    v = ArgsValidator(option={"input_file_list": [], "run_path": "./pacini_typing.py"})
+    with pytest.raises(FileNotExistsError) as ex:
+        v.check_file_existence(file)
 
 
 def test_compare_paired_files():
@@ -154,10 +180,9 @@ def test_compare_paired_files():
     v = ArgsValidator(
         option={"input_file_list": input_list, "run_path": "./pacini_typing.py"}
     )
-    with pytest.raises(SystemExit) as ex:
-        v.compare_paired_files()
 
-    assert ex.value.code == 1
+    with pytest.raises(InvalidPairedError) as ex:
+        v.compare_paired_files()
 
     input_list = ["README.md", "pacini_typing.py"]
     v = ArgsValidator(
@@ -182,9 +207,8 @@ def test_check_for_same_name_fail(args1, args2):
     v = ArgsValidator(
         option={"input_file_list": input_list, "run_path": "./pacini_typing.py"}
     )
-    with pytest.raises(SystemExit) as ex:
+    with pytest.raises(InvalidPairedError) as ex:
         v.check_for_same_name()
-    assert ex.value.code == 1
 
 
 @pytest.mark.parametrize("args1, args2", CHECK_FOR_SAME_NAME_GOOD)
@@ -238,9 +262,8 @@ def test_check_paired_names_fail(args1, args2):
         option={"input_file_list": input_list, "run_path": "./pacini_typing.py"}
     )
 
-    with pytest.raises(SystemExit) as ex:
+    with pytest.raises(InvalidPairedError) as ex:
         v.check_paired_names()
-    assert ex.value.code == 1
 
 
 def test_run_file_checks():

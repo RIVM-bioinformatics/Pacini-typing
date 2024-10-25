@@ -285,7 +285,6 @@ class PaciniTyping:
     # TODO - raise exceptions instead of sys.exit(1) to make the code more robust
 
     # Idea - With end2end tests, sys args are not empty. So when sys args, don't parse the arguments but use the sys args
-    # 
 
 
 if __name__ == "__main__":

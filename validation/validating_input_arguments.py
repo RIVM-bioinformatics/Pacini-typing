@@ -22,6 +22,13 @@ import sys
 
 import yaml
 
+from exceptions.validation_exceptions import (
+    FileNotExistsError,
+    InvalidFileExtensionError,
+    InvalidFilterOptionsError,
+    InvalidPairedError,
+)
+
 
 class ArgsValidator:
     """
@@ -42,6 +49,10 @@ class ArgsValidator:
         - validate: Main validate function that is used to validate the input files
     ----------
     """
+
+    # TODO - Store certain values from main OPTION as class variable
+
+    # TODO - Compare if two files really are paired
 
     def __init__(self, option: dict) -> None:
         """
@@ -76,11 +87,8 @@ class ArgsValidator:
         assert self.config is not None
         if ext in self.config["accepted_input_extensions"]:
             return True
-        logging.error("File %s is not accepted", file)
-        logging.error(
-            "Accepted file extensions are: %s", self.config["accepted_input_extensions"]
-        )
-        return False
+        logging.error("Error in vile extension, Exiting...")
+        raise InvalidFileExtensionError(file, self.config["accepted_input_extensions"])
 
     @staticmethod
     def get_file_extension(file_extension: list) -> str:
@@ -135,8 +143,8 @@ class ArgsValidator:
         logging.debug("Checking if file %s exists...", file)
         if os.path.exists(file) and os.path.isfile(file):
             return True
-        logging.error("File %s does not exist", file)
-        return False
+        logging.error("File not found, exiting...")
+        raise FileNotExistsError(file)
 
     def compare_paired_files(self) -> None:
         """
@@ -150,12 +158,8 @@ class ArgsValidator:
         if self.create_sha_hash(self.input_file_list[0]) == self.create_sha_hash(
             self.input_file_list[1]
         ):
-            logging.error(
-                "Input files: %s and %s are the same, exiting...",
-                self.input_file_list[0],
-                self.input_file_list[1],
-            )
-            sys.exit(1)
+            logging.error("Paired content is the same, exiting...")
+            raise InvalidPairedError(self.input_file_list[0], self.input_file_list[1])
         logging.debug("Input files are not the same, continuing...")
 
     @staticmethod
@@ -188,8 +192,10 @@ class ArgsValidator:
         """
         logging.debug("Checking if the input file names are not the same...")
         if self.option["input_file_list"][0] == self.option["input_file_list"][1]:
-            logging.error("The input filenames are the same, exiting...")
-            sys.exit(1)
+            logging.error("Error in validating paired names, exiting...")
+            raise InvalidPairedError(
+                self.option["input_file_list"][0], self.option["input_file_list"][1]
+            )
 
     def check_paired_names(self) -> None:
         """
@@ -204,11 +210,10 @@ class ArgsValidator:
             pattern1.search(self.option["input_file_list"][0])
             and pattern2.search(self.option["input_file_list"][1])
         ):
-            logging.error(
-                "Paired mode requires '_1' and '_2' or "
-                "'R1' and 'R2' in the file names, exiting..."
+            logging.error("Error in validating paired names, exiting...")
+            raise InvalidPairedError(
+                self.option["input_file_list"][0], self.option["input_file_list"][1]
             )
-            sys.exit(1)
 
     def validate_filter_arguments(self) -> None:
         """
@@ -223,12 +228,10 @@ class ArgsValidator:
                 self.option["query"]["filters"]["identity"] < 0
                 or self.option["query"]["filters"]["identity"] > 100
             ):
-                logging.error(
-                    "Identity should be between 0 and 100, "
-                    "current value: %s, exiting...",
-                    self.option["query"]["filters"]["identity"],
+                logging.error("Error in filter arguments, exiting...")
+                raise InvalidFilterOptionsError(
+                    self.option["query"]["filters"]["identity"]
                 )
-                sys.exit(1)
 
     def run_file_checks(self, file: str) -> bool:
         """
