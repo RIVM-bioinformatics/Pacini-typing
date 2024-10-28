@@ -20,12 +20,18 @@ Example FASTQ File:
 """
 
 __author__ = "Mark Van de Streek"
-__data__ = "2024-09-24"
+__date__ = "2024-09-24"
 __all__ = ["FileValidator"]
 
 import logging
 import re
 import sys
+
+from exceptions.determine_input_type_exceptions import (
+    InvalidFastaOrFastqError,
+    InvalidSequenceError,
+    InvalidSequencingTypesError,
+)
 
 
 class FileValidator:
@@ -89,8 +95,8 @@ class FileValidator:
                 ) and self.body[file][4].startswith("@"):
                     self.type[file] = "FASTQ"
                 else:
-                    logging.error("The file is not a valid FASTA or FASTQ file.")
-                    sys.exit(1)
+                    logging.error("Invalid FASTA or FASTQ file provided. Exiting...")
+                    raise InvalidFastaOrFastqError(file)
 
     def retrieve_body(self) -> None:
         """
@@ -132,10 +138,8 @@ class FileValidator:
         logging.debug("Checking if the sequence is valid...")
         if re.fullmatch(r"[ACTGN]+", self.body[file][1]):
             return True
-        logging.error(
-            "%s is not a valid FASTA or FASTQ file, the sequence is not valid.", file
-        )
-        sys.exit(1)
+        logging.error("Invalid sequence provided. Exiting...")
+        raise InvalidSequenceError(self.body[file][1], file)
 
         # TODO: Thinks about reading in batches of 4 lines?
 
@@ -165,14 +169,12 @@ class FileValidator:
         file_types = set(self.type.values())
         if len(file_types) == 1:
             if "FASTA" in file_types and len(self.type) == 2:
-                logging.error("Two input FASTA files are not allowed. Exiting...")
-                sys.exit(1)
+                logging.error("Error while comparing the types. Exiting...")
+                raise InvalidSequencingTypesError(self.input_files)
             logging.debug("All files are valid and the same type, continuing...")
         else:
-            logging.error(
-                "The input files are not of the same type: %s Exiting...", self.type
-            )
-            sys.exit(1)
+            logging.error("Error while comparing the types. Exiting...")
+            raise InvalidSequencingTypesError(self.input_files)
 
     def get_file_type(self) -> str:
         """
