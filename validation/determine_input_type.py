@@ -137,6 +137,8 @@ class FileValidator:
         )
         sys.exit(1)
 
+        # TODO: Thinks about reading in batches of 4 lines?
+
         # TODO: Is it necessary to check the entire file?
         #  It's probably better, but how to efficiently do it?
         # for index, lines in enumerate(self.body[file]):

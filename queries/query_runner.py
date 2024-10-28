@@ -85,7 +85,7 @@ class QueryRunner:
         self.start_time = time.time()
         result = subprocess.run(self.query, capture_output=True, text=True, check=True)
         self.stop_time = time.time()
-        
+
         return result
 
     def get_runtime(self) -> float:

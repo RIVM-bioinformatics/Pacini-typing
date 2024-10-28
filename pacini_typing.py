@@ -300,8 +300,10 @@ def main(provided_args: list[str] | None = None) -> None:
     """
     Main entry point for the Pacini-Typing pipeline.
     Parses command-line arguments and initiates the pipeline.
+
+    If using (unit)tests, there is no sys.argv, so the provided_args are used.
+    Otherwise, sys.argv is used to parse the arguments.
     """
-    # If args are provided (by pytest), use them, otherwise just use sys.argv
     if provided_args:
         args = argsparse.build_parser.main(provided_args)
     else:

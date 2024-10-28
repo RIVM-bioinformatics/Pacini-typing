@@ -142,13 +142,6 @@ def test_paired_run(setup_teardown_paired_input: list[str]) -> None:
     assert os.path.exists("test_full_run/myresults.aln")
 
 
-
-
-
-
-
-
-
 # ------------------- OLD TESTS -------------------
 
 # @pytest.mark.skipif(platform.system() == "Linux", reason="Test not supported on Linux")

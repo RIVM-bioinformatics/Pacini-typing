@@ -39,4 +39,3 @@ def test_get_file_type():
     )
     assert FILE_VALIDATOR.get_file_type() == "FASTA"
     assert PAIRED_VALIDATOR.get_file_type() == "FASTQ"
-    
