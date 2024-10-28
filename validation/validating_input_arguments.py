@@ -18,7 +18,6 @@ import hashlib
 import logging
 import os
 import re
-import sys
 
 import yaml
 
@@ -27,6 +26,7 @@ from exceptions.validation_exceptions import (
     InvalidFileExtensionError,
     InvalidFilterOptionsError,
     InvalidPairedError,
+    ValidationError,
 )
 
 
@@ -250,7 +250,7 @@ class ArgsValidator:
         )
         if self.check_file_existence(file) and self.validate_file_extensions(file):
             return True
-        sys.exit(1)
+        raise ValidationError()
 
     def validate(self) -> bool:
         """

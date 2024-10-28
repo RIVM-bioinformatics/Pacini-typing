@@ -44,6 +44,7 @@ from exceptions.validation_exceptions import (
     FileNotExistsError,
     InvalidFileExtensionError,
     InvalidPairedError,
+    ValidationError,
 )
 from validation.validating_input_arguments import ArgsValidator
 
@@ -139,7 +140,7 @@ def test_validate_file_extensions(filename, expected):
     v = ArgsValidator(option={"input_file_list": [], "run_path": "./pacini_typing.py"})
 
     if expected is False:
-        with pytest.raises(InvalidFileExtensionError) as ex:
+        with pytest.raises(InvalidFileExtensionError):
             v.validate_file_extensions(filename)
     else:
         assert v.validate_file_extensions(filename) == expected
@@ -165,7 +166,7 @@ def test_check_file_existence_fail(file, expected):
     and is not a valid file.
     """
     v = ArgsValidator(option={"input_file_list": [], "run_path": "./pacini_typing.py"})
-    with pytest.raises(FileNotExistsError) as ex:
+    with pytest.raises(FileNotExistsError):
         v.check_file_existence(file)
 
 
@@ -182,7 +183,7 @@ def test_compare_paired_files():
         option={"input_file_list": input_list, "run_path": "./pacini_typing.py"}
     )
 
-    with pytest.raises(InvalidPairedError) as ex:
+    with pytest.raises(InvalidPairedError):
         v.compare_paired_files()
 
     input_list = ["README.md", "pacini_typing.py"]
@@ -263,7 +264,7 @@ def test_check_paired_names_fail(args1, args2):
         option={"input_file_list": input_list, "run_path": "./pacini_typing.py"}
     )
 
-    with pytest.raises(InvalidPairedError) as ex:
+    with pytest.raises(InvalidPairedError):
         v.check_paired_names()
 
 
@@ -287,7 +288,5 @@ def test_run_file_checks(mock_validate, mock_check):
         option={"input_file_list": input_list, "run_path": "./pacini_typing.py"}
     )
 
-    with pytest.raises(SystemExit) as ex:
+    with pytest.raises(ValidationError):
         v.run_file_checks(input_list)
-
-    assert ex.value.code == 1

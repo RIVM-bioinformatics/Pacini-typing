@@ -53,7 +53,6 @@ class FileValidator:
         self.determine_file_type()
         if len(self.type) == 2:
             self.compare_types()
-        self.get_file_type()
 
     def determine_file_type(self) -> None:
         """

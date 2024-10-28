@@ -33,12 +33,10 @@ def test_get_file_type():
         file2: [line1, line2, line3, line4, line5]
     }
     """
-    try:
-        FILE_VALIDATOR = FileValidator(["test_data/VIB_AA2784AA_AS.scaffold.fasta"])
-        PAIRED_VALIDATOR = FileValidator(
-            ["test_data/ERR976461_1.fastq", "test_data/ERR976461_2.fastq"]
-        )
-        assert FILE_VALIDATOR.get_file_type() == "FASTA"
-        assert PAIRED_VALIDATOR.get_file_type() == "FASTQ"
-    except (FileNotFoundError, ValueError) as e:
-        pytest.fail(f"Error: {e}")
+    FILE_VALIDATOR = FileValidator(["test_data/VIB_AA2784AA_AS.scaffold.fasta"])
+    PAIRED_VALIDATOR = FileValidator(
+        ["test_data/ERR976461_1.fastq", "test_data/ERR976461_2.fastq"]
+    )
+    assert FILE_VALIDATOR.get_file_type() == "FASTA"
+    assert PAIRED_VALIDATOR.get_file_type() == "FASTQ"
+    

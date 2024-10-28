@@ -12,6 +12,7 @@ Fill in later...
 
 __author__ = "Mark Van de Streek"
 __data__ = "2024-09-24"
+__all__ = ["PaciniTyping", "main"]
 
 import argparse
 import gzip
@@ -295,8 +296,21 @@ class PaciniTyping:
     # TODO : validating_input_arguments - Compare if two files really are paired
 
 
-if __name__ == "__main__":
-    logging.info("Starting the Pacini-Typing pipeline, parsing arguments...")
-    args = argsparse.build_parser.main()
+def main(provided_args: list[str] | None = None) -> None:
+    """
+    Main entry point for the Pacini-Typing pipeline.
+    Parses command-line arguments and initiates the pipeline.
+    """
+    # If args are provided (by pytest), use them, otherwise just use sys.argv
+    if provided_args:
+        args = argsparse.build_parser.main(provided_args)
+    else:
+        args = argsparse.build_parser.main(sys.argv[1:])
+
     pacini_typing = PaciniTyping(args)
     pacini_typing.run()
+
+
+if __name__ == "__main__":
+    logging.info("Starting the Pacini-Typing pipeline, parsing arguments...")
+    main()

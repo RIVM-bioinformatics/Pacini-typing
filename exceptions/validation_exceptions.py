@@ -111,3 +111,25 @@ class InvalidFilterOptionsError(Exception):
             - Provide plausible filter options (i.e., id between 0-100)
         ----------------------------------------------------
                 """
+
+
+class ValidationError(Exception):
+    """
+    Raised when a validation error occurs.
+    """
+
+    def __init__(self) -> None:
+        self.message = "validating_input_arguments.py raised a general error"
+
+    def __str__(self) -> str:
+        return f"""
+        ---------------------------------------------------
+        ERROR: Validation Error with the provided arguments
+        ---------------------------------------------------
+        {self.message}
+        ----------------------------------------------------
+        SUGGESTION:
+            - Debug the error message
+            - Python3 pacini_typing.py -h for help
+        ----------------------------------------------------
+                """
