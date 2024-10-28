@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.2.0](https://github.com/RIVM-bioinformatics/Pacini-typing/compare/v1.1.1...v1.2.0) (2024-10-28)
+
+
+### Features
+
+* implement custom error exceptions for input type validation ([75913b6](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/75913b6b5f2c89627e897c62184603c666181291))
+
+
+### Bug Fixes
+
+* implemented custom error exceptions for better debugging ([5f0413c](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/5f0413c82f9854431caa21808df4fa61f4039779))
+
 ## [1.1.1](https://github.com/RIVM-bioinformatics/Pacini-typing/compare/v1.1.0...v1.1.1) (2024-10-16)
 
 
