@@ -11,15 +11,16 @@ To be filed in later...
 """
 
 __author__ = "Mark Van de Streek"
-__data__ = "2024-09-24"
+__date__ = "2024-09-24"
 __all__ = ["check_for_database_path"]
 
 import logging
 import os
-import sys
+
+from exceptions.validate_database_exceptions import InvalidDatabaseError
 
 
-def check_for_database_existence(arg_options):
+def check_for_database_existence(arg_options: dict) -> bool:
     """
     Function that checks if the database exists.
     Based on the input type, the method will check if the files exist:
@@ -38,16 +39,14 @@ def check_for_database_existence(arg_options):
     db_files = create_database_file_list(arg_options)
     for db_file in db_files:
         if not os.path.exists(arg_options["database_path"] + db_file):
-            logging.error(
-                "The database file %s does not exist. "
-                "Please provide a valid database name or path.",
-                db_file,
+            logging.error("Database does not exist, exiting...")
+            raise InvalidDatabaseError(
+                arg_options["database_path"], arg_options["database_name"]
             )
-            sys.exit(1)
-        return True
+    return True
 
 
-def create_database_file_list(arg_options):
+def create_database_file_list(arg_options: dict) -> list:
     """
     Function that creates a list of database files based on the input file type.
     ----------
@@ -72,7 +71,7 @@ def create_database_file_list(arg_options):
     return db_files
 
 
-def check_for_database_path(arg_options):
+def check_for_database_path(arg_options: dict) -> bool:
     """
     Function that checks if the database path exists.
     If not, the program will exit with an error message.
@@ -88,10 +87,8 @@ def check_for_database_path(arg_options):
         )
         arg_options["database_path"] += "/"
     if not os.path.exists(arg_options["database_path"]):
-        logging.error(
-            "The database path does not exist. "
-            "Please provide a valid path, "
-            "make sure the path is correct and ending with a forward slash. /"
+        logging.error("Database does not exist, exiting...")
+        raise InvalidDatabaseError(
+            arg_options["database_path"], arg_options["database_name"]
         )
-        sys.exit(1)
     return check_for_database_existence(arg_options)

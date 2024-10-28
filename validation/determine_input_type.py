@@ -7,34 +7,41 @@
     “GitHub Copilot: Your AI pair programmer” (GPT-3). GitHub, Inc.
     https://github.com/features/copilot
 
-To be filed in later...
+FASTA and FASTQ file validator.
+Example FASTA File:
+    >MY Sequence
+    ATCGTACGATCGATCGATCGATCGATCGATCG
 
-Check the input files:
-    - What information is needed?
-    - What information is available in the header?
-    - Is there a quality score line available?
-        - Is there a line with a "+"? between the header and the quality score line?
-    - Does the header line start with a ">"?
-    - Does the header line start with a "@"?
+Example FASTQ File:
+    @My Sequence
+    ATCGTACGATCGATCGATCGATCGATCGATCG
+    +
+    B@@FDFFFHHGHHJIJJIIJJJJIJIJIIJJI
 """
 
 __author__ = "Mark Van de Streek"
-__data__ = "2024-09-24"
+__date__ = "2024-09-24"
 __all__ = ["FileValidator"]
 
 import logging
 import re
 import sys
 
+from exceptions.determine_input_type_exceptions import (
+    InvalidFastaOrFastqError,
+    InvalidSequenceError,
+    InvalidSequencingTypesError,
+)
+
 
 class FileValidator:
     """
-    Class that is responsible for validating the input file.
+    Class that is responsible for validation the input file.
     It takes a file as input and checks if the file is a valid FASTA or FASTQ file.
     The determined file is returned by the class.
     """
 
-    def __init__(self, input_files) -> None:
+    def __init__(self, input_files: list) -> None:
         """
         Constructor of the class. It initializes the class with the input files.
         Additionally, it initializes the body and type dictionaries.
@@ -52,7 +59,6 @@ class FileValidator:
         self.determine_file_type()
         if len(self.type) == 2:
             self.compare_types()
-        self.get_file_type()
 
     def determine_file_type(self) -> None:
         """
@@ -89,8 +95,8 @@ class FileValidator:
                 ) and self.body[file][4].startswith("@"):
                     self.type[file] = "FASTQ"
                 else:
-                    logging.error("The file is not a valid FASTA or FASTQ file.")
-                    sys.exit(1)
+                    logging.error("Invalid FASTA or FASTQ file provided. Exiting...")
+                    raise InvalidFastaOrFastqError(file)
 
     def retrieve_body(self) -> None:
         """
@@ -115,7 +121,7 @@ class FileValidator:
                 self.body[file] = [f.readline().strip() for _ in range(5)]
                 # self.body[file] = [line.strip() for line in f.readlines()]
 
-    def check_valid_sequence(self, file) -> bool:
+    def check_valid_sequence(self, file: str) -> bool:
         """
         Simple method to check if the sequence is valid.
         It simply checks if the sequence is a valid DNA sequence,
@@ -130,12 +136,12 @@ class FileValidator:
         ----------
         """
         logging.debug("Checking if the sequence is valid...")
-        if re.fullmatch(r"[ACTG]+", self.body[file][1]):
+        if re.fullmatch(r"[ACTGN]+", self.body[file][1]):
             return True
-        logging.error(
-            "%s is not a valid FASTA or FASTQ file, the sequence is not valid.", file
-        )
-        sys.exit(1)
+        logging.error("Invalid sequence provided. Exiting...")
+        raise InvalidSequenceError(self.body[file][1], file)
+
+        # TODO: Thinks about reading in batches of 4 lines?
 
         # TODO: Is it necessary to check the entire file?
         #  It's probably better, but how to efficiently do it?
@@ -163,14 +169,12 @@ class FileValidator:
         file_types = set(self.type.values())
         if len(file_types) == 1:
             if "FASTA" in file_types and len(self.type) == 2:
-                logging.error("Two input FASTA files are not allowed. Exiting...")
-                sys.exit(1)
+                logging.error("Error while comparing the types. Exiting...")
+                raise InvalidSequencingTypesError(self.input_files)
             logging.debug("All files are valid and the same type, continuing...")
         else:
-            logging.error(
-                "The input files are not of the same type: %s Exiting...", self.type
-            )
-            sys.exit(1)
+            logging.error("Error while comparing the types. Exiting...")
+            raise InvalidSequencingTypesError(self.input_files)
 
     def get_file_type(self) -> str:
         """

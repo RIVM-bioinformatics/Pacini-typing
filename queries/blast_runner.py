@@ -12,57 +12,50 @@ To be filed in later...
 
 __author__ = "Mark Van de Streek"
 __data__ = "2024-09-24"
-__all__ = ["KMA"]
+__all__ = ["BLASTn"]
 
 from enum import Enum
 
 
-class KMA(Enum):
+class BLASTn(Enum):
     """
-    Enum class to store K-mer alignment options and flags.
+    Enum class to store BLAST options and flags.
     With this Enum class, the options are stored in a more structured way
     and could be changed very easily.
     ----------
     RUN_OPTION: string that is used in the subprocess.run() method
-    PAIRED_OPTION: option for paired-end reads
     OUTPUT_FORMAT: flag for the output format
-    MIN_IDENTITY: flag for the minimum identity percentage
-    ----------
     """
 
-    RUN_OPTION = "kma"
-    PAIRED_OPTION = "-ipe"
-    OUTPUT_FORMAT = "-tsv"
-    IDENTITY = "-ID"
+    RUN_OPTION = "blastn"
+    OUTPUT_FORMAT = "10"  # "7 sseqid bitscore evalue slen pident qcovs"
+    IDENTITY = "-perc_identity"
 
     @staticmethod
-    def get_query(option):
+    def get_query(option: dict) -> list:
         """
-        Simple method that prepares the query for the KMA run.
-        This query is passed to the super class QueryRunner
+        Simple method that prepares the query for the BLAST run.
+        This query is passed to the super class QueryRunner.
+        The script-constants are used to set the run option and output format.
         ----------
         Input:
-            - input_file: list with the input files
+            - input_file: str
             - database: str
             - output_file: str
         Output:
-            - list with the query to run KMA
+            - list with the query to run BLAST
         ----------
         """
         return [
-            KMA.RUN_OPTION.value,
-            KMA.PAIRED_OPTION.value,
+            BLASTn.RUN_OPTION.value,
+            "-query",
             option["input_file_list"][0],
-            option["input_file_list"][1],
-            KMA.IDENTITY.value,
-            str(option["query"]["filters"]["identity"]),
-            KMA.OUTPUT_FORMAT.value,
-            "-t_db",
+            "-db",
             option["database_path"] + option["database_name"],
-            "-o",
-            option["query"]["output"],
-            "-mrc",
-            "0.7",
-            "-pm",
-            "p",
+            "-out",
+            option["query"]["output"] + ".tsv",
+            "-outfmt",
+            BLASTn.OUTPUT_FORMAT.value,
+            BLASTn.IDENTITY.value,
+            str(option["query"]["filters"]["identity"]),
         ]

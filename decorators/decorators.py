@@ -27,7 +27,7 @@ def log(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         """
-        Wrapper function that executes and checks for possible errors in the function result
+        Wrapper function that executes and checks for possible exceptions in the function result
         This wrapper could only be used for functions that return a
         subprocess.CompletedProcess object
         ----------
@@ -39,7 +39,7 @@ def log(func):
         """
         try:
             result = func(*args, **kwargs)
-            logging.debug("Checking for errors in %s", result.args[0])
+            logging.debug("Checking for exceptions in %s", result.args[0])
             if result.returncode == 0:
                 logging.info("Command %s executed successfully", result.args[0])
             else:

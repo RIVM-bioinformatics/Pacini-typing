@@ -17,11 +17,11 @@ __all__ = ["main"]
 
 import argparse
 
-import argument_parser.args_makedatabase
-import argument_parser.args_query
+import argsparse.args_makedatabase
+import argsparse.args_query
 
 
-def main():
+def main(givenargs: list[str]) -> argparse.Namespace:
     """
     main and only function of this script that will be used to
     create a parser object and return the arguments in a parsed object.
@@ -52,7 +52,7 @@ def main():
         dest="options",
     )
 
-    argument_parser.args_makedatabase.build_makedatabase_command(subparsers)
-    argument_parser.args_query.build_query_command(subparsers)
+    argsparse.args_makedatabase.build_makedatabase_command(subparsers)
+    argsparse.args_query.build_query_command(subparsers)
 
-    return parser.parse_args()
+    return parser.parse_args(givenargs)

@@ -12,24 +12,27 @@ Fill in later...
 
 __author__ = "Mark Van de Streek"
 __data__ = "2024-09-24"
+__all__ = ["PaciniTyping", "main"]
 
+import argparse
 import gzip
 import logging
 import os
 import shutil
 import sys
+from typing import Any
 
-import argument_parser.build_parser
-import validating.validate_database as db
+import argsparse.build_parser
+import validation.validate_database as db
 from makedatabase import DatabaseBuilder
-from run_queries.query_runner import QueryRunner
-from validating.determine_input_type import FileValidator
-from validating.validating_input_arguments import ArgsValidator
+from queries.query_runner import QueryRunner
+from validation.determine_input_type import FileValidator
+from validation.validating_input_arguments import ArgsValidator
 
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s %(levelname)-5s %(process)d : %(message)s",
-    datefmt="%Y-%m-%dT%H:%M:%S"
+    datefmt="%Y-%m-%dT%H:%M:%S",
 )
 
 
@@ -42,7 +45,7 @@ class PaciniTyping:
         - Setup logging
     """
 
-    def __init__(self, input_args):
+    def __init__(self, input_args: argparse.Namespace) -> None:
         """
         Constructor for the PaciniTyping class.
         The contstructor accepts the parsed input arguments from argparse.
@@ -50,9 +53,9 @@ class PaciniTyping:
         The run method is responsible for calling all other methods.
         """
         self.input_args = input_args
-        self.option = {}
+        self.option: dict[str, Any] = {}
 
-    def parse_all_args(self):
+    def parse_all_args(self) -> None:
         """
         Still have to fill in the docstring...
         ----------
@@ -65,9 +68,9 @@ class PaciniTyping:
             "database_name": self.input_args.database_name,
             "option": self.input_args.options,
             "verbose": self.input_args.verbose,
-            "run_path": os.path.abspath(__file__).rsplit('.', 1)[0],
+            "run_path": os.path.abspath(__file__).rsplit(".", 1)[0],
             "query": None,
-            "makedatabase": None
+            "makedatabase": None,
         }
         if self.input_args.options == "query":
             self.option["query"] = {
@@ -76,16 +79,16 @@ class PaciniTyping:
                 "output": self.input_args.output,
                 "filters": {
                     "identity": self.input_args.identity,
-                }
+                },
             }
 
         elif self.input_args.options == "makedatabase":
             self.option["makedatabase"] = {
                 "database_type": self.input_args.database_type,
-                "input": self.input_args.input
+                "input": self.input_args.input,
             }
 
-    def setup_logging(self):
+    def setup_logging(self) -> None:
         """
         Still have to fill in the docstring...
         ----------
@@ -97,7 +100,7 @@ class PaciniTyping:
             self.option["verbose"] and logging.DEBUG or logging.INFO
         )
 
-    def get_input_filenames(self):
+    def get_input_filenames(self) -> None:
         """
         Still have to fill in the docstring...
         ----------
@@ -115,7 +118,7 @@ class PaciniTyping:
             input_files_list.append(self.option["makedatabase"]["input"])
         self.option["input_file_list"] = input_files_list
 
-    def check_for_unzip_files(self):
+    def check_for_unzip_files(self) -> None:
         """
         Still have to fill in the docstring...
         ----------
@@ -123,12 +126,14 @@ class PaciniTyping:
         ----------
         """
         logging.debug("Searching for .gz files in the input list")
-        gz_files = [file for file in self.option["input_file_list"] if file.endswith(".gz")]
+        gz_files = [
+            file for file in self.option["input_file_list"] if file.endswith(".gz")
+        ]
         if gz_files:
             logging.info("Found files that need to be unzipped, unzipping...")
             self.unzip_gz_files(gz_files)
 
-    def unzip_gz_files(self, gz_files):
+    def unzip_gz_files(self, gz_files) -> None:
         """
         Still have to fill in the docstring...
         ----------
@@ -143,15 +148,16 @@ class PaciniTyping:
                     with open(file[:-3], "wb") as f_out:
                         shutil.copyfileobj(f_in, f_out)
                 unzipped_files.append(file[:-3])
-            except Exception as e:
+            except (OSError, gzip.BadGzipFile) as e:
                 logging.error("Error while unzipping file %s: %s", file, e)
                 sys.exit(1)
         logging.debug("Updating input file list with unzipped files")
         self.option["input_file_list"] = [
-            file[:-3] if file in gz_files else file for file in self.option["input_file_list"]
+            file[:-3] if file in gz_files else file
+            for file in self.option["input_file_list"]
         ]
 
-    def validate_file_arguments(self):
+    def validate_file_arguments(self) -> None:
         """
         Still have to fill in the docstring...
         ----------
@@ -163,11 +169,13 @@ class PaciniTyping:
         if argsvalidator.validate():
             logging.info("Input arguments have been validated, found no issues.")
         else:
-            logging.error("Error while validating the input arguments, "
-                          "please check the above logs for more information.")
+            logging.error(
+                "Error while validation the input arguments, "
+                "please check the above logs for more information."
+            )
             sys.exit(1)
 
-    def run_makedatabase(self):
+    def run_makedatabase(self) -> None:
         """
         Still have to fill in the docstring...
         ----------
@@ -175,11 +183,9 @@ class PaciniTyping:
         ----------
         """
         logging.debug("Running the makedatabase operation...")
-        DatabaseBuilder(
-            arg_options=self.option
-        )
+        DatabaseBuilder(arg_options=self.option)
 
-    def get_file_type(self):
+    def get_file_type(self) -> None:
         """
         Still have to fill in the docstring...
         ----------
@@ -187,13 +193,12 @@ class PaciniTyping:
         ----------
         """
         logging.debug("Determining the file type of the input file(s)...")
-        self.option["file_type"] = (
-            FileValidator(self.option["input_file_list"])
-            .get_file_type())
-        logging.info("File type has been determined: %s",
-                     self.option["file_type"])
+        self.option["file_type"] = FileValidator(
+            self.option["input_file_list"]
+        ).get_file_type()
+        logging.info("File type has been determined: %s", self.option["file_type"])
 
-    def check_valid_option_with_args(self):
+    def check_valid_option_with_args(self) -> None:
         """
         This method checks if the file type is correct for the input arguments.
         To be precise, it checks if the file type is FASTA for single file input
@@ -206,14 +211,20 @@ class PaciniTyping:
         ----------
         """
         logging.debug("Checking if the file type is correct for the input arguments...")
-        if (len(self.option["input_file_list"]) == 1 and self.option["file_type"] == "FASTQ") or \
-                (len(self.option["input_file_list"]) == 2 and self.option["file_type"] == "FASTA"):
+        if (
+            len(self.option["input_file_list"]) == 1
+            and self.option["file_type"] == "FASTQ"
+        ) or (
+            len(self.option["input_file_list"]) == 2
+            and self.option["file_type"] == "FASTA"
+        ):
             logging.error(
                 "Only FASTA files are allowed for single files "
-                "and only FASTQ files are allowed for paired files.")
+                "and only FASTQ files are allowed for paired files."
+            )
             sys.exit(1)
 
-    def check_valid_database_path(self):
+    def check_valid_database_path(self) -> None:
         """
         Still have to fill in the docstring...
         ----------
@@ -223,7 +234,7 @@ class PaciniTyping:
         logging.debug("Checking if the database exists...")
         db.check_for_database_path(arg_options=self.option)
 
-    def run_query(self):
+    def run_query(self) -> None:
         """
         Still have to fill in the docstring...
         ----------
@@ -231,13 +242,11 @@ class PaciniTyping:
         ----------
         """
         logging.debug("Running the query operation against database...")
-        runner = QueryRunner(
-            run_options=self.option
-        )
+        runner = QueryRunner(run_options=self.option)
         runner.run()
         logging.info("Query runtime: %s seconds", runner.get_runtime())
 
-    def run(self):
+    def run(self) -> None:
         """
         Still have to fill in the docstring...
         """
@@ -276,9 +285,34 @@ class PaciniTyping:
 
     # TODO - raise exceptions instead of sys.exit(1) to make the code more robust
 
+    # TODO - With end2end tests, sys args are not empty. So when sys args, don't parse the arguments but use the sys args
+
+    # TODO: query_runner:__str__ - Is this function necessary?
+
+    # TODO: query_runner:run - This return statement is not used anywhere, should it be removed?
+
+    # TODO : validating_input_arguments - Store certain values from main OPTION as class variable
+
+    # TODO : validating_input_arguments - Compare if two files really are paired
+
+
+def main(provided_args: list[str] | None = None) -> None:
+    """
+    Main entry point for the Pacini-Typing pipeline.
+    Parses command-line arguments and initiates the pipeline.
+
+    If using (unit)tests, there is no sys.argv, so the provided_args are used.
+    Otherwise, sys.argv is used to parse the arguments.
+    """
+    if provided_args:
+        args = argsparse.build_parser.main(provided_args)
+    else:
+        args = argsparse.build_parser.main(sys.argv[1:])
+
+    pacini_typing = PaciniTyping(args)
+    pacini_typing.run()
+
 
 if __name__ == "__main__":
     logging.info("Starting the Pacini-Typing pipeline, parsing arguments...")
-    args = argument_parser.build_parser.main()
-    pacini_typing = PaciniTyping(args)
-    pacini_typing.run()
+    main()

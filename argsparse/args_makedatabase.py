@@ -14,7 +14,10 @@ __author__ = "Mark Van de Streek"
 __data__ = "2024-09-24"
 
 
-def build_makedatabase_command(subparsers):
+from argparse import _SubParsersAction
+
+
+def build_makedatabase_command(subparsers: _SubParsersAction) -> None:
     """
     Script that builds the makedatabase subcommand for the parser
     This subcommand is added to the main parsing object in the build_parser script.
