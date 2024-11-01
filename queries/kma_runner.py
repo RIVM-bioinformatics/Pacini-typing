@@ -61,8 +61,4 @@ class KMA(Enum):
             option["database_path"] + option["database_name"],
             "-o",
             option["query"]["output"],
-            "-mrc",
-            "0.7",
-            "-pm",
-            "p",
         ]

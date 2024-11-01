@@ -15,6 +15,7 @@ __data__ = "2024-09-24"
 __all__ = ["BLASTn"]
 
 from enum import Enum
+from typing import Any
 
 
 class BLASTn(Enum):
@@ -32,7 +33,7 @@ class BLASTn(Enum):
     IDENTITY = "-perc_identity"
 
     @staticmethod
-    def get_query(option: dict) -> list:
+    def get_query(option: dict[str, Any]) -> list[str]:
         """
         Simple method that prepares the query for the BLAST run.
         This query is passed to the super class QueryRunner.

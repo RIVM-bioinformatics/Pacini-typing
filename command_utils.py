@@ -45,6 +45,7 @@ def execute(
     Output:
         - tuple of (stdout, stderr) if capture is True
         - bool indicating success if capture is False
+    ----------
     """
     try:
         result = subprocess.run(
@@ -71,4 +72,4 @@ def execute(
         )
         if not allow_fail:
             raise
-        return None
+        return False

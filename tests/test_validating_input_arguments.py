@@ -289,4 +289,5 @@ def test_run_file_checks(mock_validate, mock_check):
     )
 
     with pytest.raises(ValidationError):
-        v.run_file_checks(input_list)
+        for file in input_list:
+            v.run_file_checks(file)

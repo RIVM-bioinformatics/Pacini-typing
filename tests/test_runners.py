@@ -23,6 +23,7 @@ __all__ = [
 
 import os
 import time
+from typing import Any, Dict
 
 import pytest
 
@@ -30,7 +31,7 @@ from queries.blast_runner import BLASTn
 from queries.kma_runner import KMA
 from queries.query_runner import QueryRunner
 
-OPTION = {
+OPTION: Dict[str, Any] = {
     "database_path": "./refdir/",
     "database_name": "mydb",
     "option": "query",
@@ -76,10 +77,6 @@ def test_prepare_query():
         "./refdir/mydb",
         "-o",
         "/dummy/path",
-        "-mrc",
-        "0.7",
-        "-pm",
-        "p",
     ]
 
 
@@ -91,7 +88,7 @@ def test_get_query_different():
     """
     SUB_OPTION = OPTION.copy()
     SUB_OPTION["database_name"] = "my_new_db"
-    query = KMA.get_query(SUB_OPTION)
+    query: list[str] = KMA.get_query(SUB_OPTION)
     assert query == [
         "kma",
         "-ipe",
@@ -104,10 +101,6 @@ def test_get_query_different():
         "./refdir/my_new_db",
         "-o",
         "/dummy/path",
-        "-mrc",
-        "0.7",
-        "-pm",
-        "p",
     ]
 
 
@@ -130,10 +123,6 @@ def test_get_query_verbose_false():
         "./refdir/mydb",
         "-o",
         "/dummy/path",
-        "-mrc",
-        "0.7",
-        "-pm",
-        "p",
     ]
 
 
@@ -180,7 +169,7 @@ def test_blast_get_query_different():
 
 
 @pytest.mark.parametrize("runtime", RUN_TIMES)
-def test_get_runtime(runtime):
+def test_get_runtime(runtime: float):
     """
     Function that tests the get_runtime() method of the QueryRunner class
     """
