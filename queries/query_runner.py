@@ -15,12 +15,19 @@ __data__ = "2024-09-24"
 __all__ = ["QueryRunner"]
 
 import logging
+import os
 import subprocess
+import sys
 import time
+from typing import Tuple
 
 import decorators.decorators
 from queries.blast_runner import BLASTn
 from queries.kma_runner import KMA
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+from command_utils import execute
 
 
 class QueryRunner:
@@ -67,8 +74,8 @@ class QueryRunner:
         """
         return f"QueryRunner(query={self.query})"
 
-    @decorators.decorators.log
-    def run(self) -> subprocess.CompletedProcess:
+    # @decorators.decorators.log - not necessary anymore with my wrapper
+    def run(self) -> Tuple[str, str] | bool:
         """
         The query is already prepared in the constructor. This function runs the query.
         The runtime is started and stopped to calculate the runtime.
@@ -81,9 +88,9 @@ class QueryRunner:
         ----------
         """
         logging.debug("Running query...")
-        logging.debug("Query: %s", " ".join(self.query))
         self.start_time = time.time()
-        result = subprocess.run(self.query, capture_output=True, text=True, check=True)
+        # Use the execute function from command_utils
+        result = execute(self.query, capture=True)
         self.stop_time = time.time()
 
         return result

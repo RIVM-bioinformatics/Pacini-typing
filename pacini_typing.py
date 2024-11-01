@@ -20,7 +20,7 @@ import logging
 import os
 import shutil
 import sys
-from typing import Any
+from typing import Any, Tuple
 
 import argsparse.build_parser
 import validation.validate_database as db
@@ -234,7 +234,7 @@ class PaciniTyping:
         logging.debug("Checking if the database exists...")
         db.check_for_database_path(arg_options=self.option)
 
-    def run_query(self) -> None:
+    def run_query(self) -> Tuple[str, str] | bool:
         """
         Still have to fill in the docstring...
         ----------
@@ -243,8 +243,10 @@ class PaciniTyping:
         """
         logging.debug("Running the query operation against database...")
         runner = QueryRunner(run_options=self.option)
-        runner.run()
+        result = runner.run()
         logging.info("Query runtime: %s seconds", runner.get_runtime())
+
+        return result
 
     def run(self) -> None:
         """
@@ -273,7 +275,9 @@ class PaciniTyping:
             # Make sure the database exists
             self.check_valid_database_path()
             # Run the query
-            self.run_query()
+            result = self.run_query()
+
+            # Parse the results.....
 
     ###########################################################################
 

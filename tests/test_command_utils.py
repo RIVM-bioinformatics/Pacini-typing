@@ -25,6 +25,18 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from command_utils import execute
 
 
+@pytest.fixture
+def temp_files():
+    stdout_file = "test_stdout.txt"
+    stderr_file = "test_stderr.txt"
+    with open(stdout_file, "w", encoding="utf-8") as stdout_f, open(
+        stderr_file, "w", encoding="utf-8"
+    ) as stderr_f:
+        yield stdout_f, stderr_f
+    os.remove(stdout_file)
+    os.remove(stderr_file)
+
+
 def test_execute_capture_output():
     result = execute(["echo", "Hello World"], capture=True)
     assert result[0].strip() == "Hello World"
@@ -36,23 +48,19 @@ def test_execute_no_capture_output():
     assert result is True
 
 
-def test_execute_with_stdout():
-    with open("test_stdout.txt", "w", encoding="utf-8") as stdout_f:
-        with open("test_stderr.txt", "w", encoding="utf-8") as stderr_f:
-            execute(
-                ["echo", "Hello World"],
-                stdout_file=stdout_f,
-                stderr_file=stderr_f,
-                capture=False,
-            )
+def test_execute_with_stdout(temp_files):
+    stdout_f, stderr_f = temp_files
+    execute(
+        ["echo", "Hello World"],
+        stdout_file=stdout_f,
+        stderr_file=stderr_f,
+        capture=False,
+    )
 
     with open("test_stdout.txt", "r", encoding="utf-8") as stdout_f:
         stdout_content = stdout_f.read().strip()
 
     assert stdout_content == "Hello World"
-
-    os.remove("test_stdout.txt")
-    os.remove("test_stderr.txt")
 
 
 def test_execute_failing_command_allow_fail_false():
@@ -65,16 +73,16 @@ def test_execute_failing_command_allow_fail_true():
     assert result is None
 
 
-def test_execute_failing_command():
-    with open("test_stderr.txt", "w", encoding="utf-8") as stderr_f:
-        with pytest.raises(subprocess.CalledProcessError):
-            result = execute(
-                ["ls", "xyz"],
-                stderr_file=stderr_f,
-                allow_fail=False,
-            )
+def pytest_capture_error_file(temp_files):
+    stdout_f, stderr_f = temp_files
+    with pytest.raises(subprocess.CalledProcessError):
+        result = execute(
+            ["ls", "xyz"],
+            stdout_file=stdout_f,
+            stderr_file=stderr_f,
+            allow_fail=False,
+        )
+
     with open("test_stderr.txt", "r", encoding="utf-8") as stderr_f:
         stderr_content = stderr_f.read().strip()
         assert stderr_content == "ls: xyz: No such file or directory"
-
-    os.remove("test_stderr.txt")

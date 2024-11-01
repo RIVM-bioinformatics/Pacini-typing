@@ -19,11 +19,8 @@ __all__ = ["execute"]
 
 import logging
 import subprocess
-import sys
-import time
 from pathlib import Path
-
-from executor import ExternalCommand, ExternalCommandFailed
+from typing import Tuple
 
 
 def execute(
@@ -33,46 +30,7 @@ def execute(
     stdout_file=None,
     stderr_file=None,
     allow_fail=False,
-):
-    """
-    This function executes a shell command in the specified directory.
-    The command is executed using the subprocess.run function.
-    The output of the command can be captured and returned.
-    ----------
-    Input:
-        - cmd: list of strings, the command to be executed
-        - directory: Path, the directory in which to execute the command
-        - capture: bool, whether to capture the output of the command
-        - stdout_file: Path, the file to which to write the standard output
-        - stderr_file: Path, the file to which to write the standard error
-        - allow_fail: bool, whether to allow the command to fail
-
-    Output:
-        - If capture is True, a tuple of strings containing the standard output and standard error
-        - If capture is False, a bool indicating whether the command was successful
-
-    Raises:
-        - subprocess.CalledProcessError: if the command fails and allow_fail is False
-
-    Example:
-        - execute(["ls", "-l"], directory="/tmp", capture=True)
-    ----------
-    """
-    import subprocess
-
-
-import logging
-from pathlib import Path
-
-
-def execute(
-    cmd,
-    directory=Path.cwd(),
-    capture=False,
-    stdout_file=None,
-    stderr_file=None,
-    allow_fail=False,
-):
+) -> Tuple[str, str] | bool:
     """
     Executes a shell command in a specified directory with optional capturing of output.
     ----------
@@ -103,12 +61,14 @@ def execute(
             check=True,
         )
 
-        # Return captured output if requested
         if capture:
             return result.stdout, result.stderr
         return result.returncode == 0
 
     except subprocess.CalledProcessError as e:
+        logging.error(
+            "Command failed with return code %d:\n%s\n%s", e.returncode, e.cmd, e.stderr
+        )
         if not allow_fail:
             raise
         return None
