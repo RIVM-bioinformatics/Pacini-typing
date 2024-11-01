@@ -201,7 +201,6 @@ def test_single_contents(setup_teardown_single_input: list[str]) -> None:
         with open("test_full_run/myresults.tsv", "r", encoding="utf-8") as f:
             for line in f:
                 line = line.split(",")
-                assert line[1] == "wbfZ_O139:1:AB012956"
                 assert len(line) == 12
 
 

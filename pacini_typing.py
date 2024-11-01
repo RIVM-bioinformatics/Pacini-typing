@@ -295,6 +295,10 @@ class PaciniTyping:
 
     # TODO : validating_input_arguments - Compare if two files really are paired
 
+    # TODO : Don't use a output file but take the output as a string:
+    #  zcat/cat data/vibrio_genes.fasta | blastn -query data/VIB_AA4147AA_AS_2.fna -subject - -outfmt '6 qseqid sseqid pident qcovs' -perc_identity 70
+    #  Or: kma -i data/VIB_AA4147AA_AS_2.fna -t_db refdir/mykma -t 4 -ID 70 -mrc 0.7 -o temp_output && cut -f 1,5 temp_output.res && rm temp_output.*
+
 
 def main(provided_args: list[str] | None = None) -> None:
     """
