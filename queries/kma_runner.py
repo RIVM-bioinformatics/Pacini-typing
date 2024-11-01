@@ -15,6 +15,7 @@ __data__ = "2024-09-24"
 __all__ = ["KMA"]
 
 from enum import Enum
+from typing import Any
 
 
 class KMA(Enum):
@@ -36,7 +37,7 @@ class KMA(Enum):
     IDENTITY = "-ID"
 
     @staticmethod
-    def get_query(option: dict) -> list:
+    def get_query(option: dict[str, Any]) -> list[str]:
         """
         Simple method that prepares the query for the KMA run.
         This query is passed to the super class QueryRunner

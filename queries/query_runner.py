@@ -16,12 +16,10 @@ __all__ = ["QueryRunner"]
 
 import logging
 import os
-import subprocess
 import sys
 import time
 from typing import Tuple
 
-import decorators.decorators
 from queries.blast_runner import BLASTn
 from queries.kma_runner import KMA
 

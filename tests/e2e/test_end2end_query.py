@@ -25,7 +25,7 @@ __all__ = [
 import os
 import platform
 import shutil
-from typing import Any, Generator
+from typing import Generator
 
 import pytest
 
@@ -115,7 +115,9 @@ def setup_teardown_single_input() -> Generator[list[str], None, None]:
 
 
 @pytest.fixture()
-@pytest.mark.skipif(platform.system() == "Linux", reason="Test not supported on Linux")
+@pytest.mark.skipif(
+    platform.system() == "Linux", reason="Test not supported on Linux"
+)
 def setup_teardown_paired_input() -> Generator[list[str], None, None]:
     """
     Pytest fixture that sets up the arguments for the paired input test
@@ -164,7 +166,9 @@ def cleanup_files(dir_path: str) -> None:
         os.rmdir(dir_path)
 
 
-@pytest.mark.skipif(platform.system() == "Linux", reason="Test not supported on Linux")
+@pytest.mark.skipif(
+    platform.system() == "Linux", reason="Test not supported on Linux"
+)
 def test_single_run(
     setup_teardown_single_input: Generator[list[str], None, None]
 ) -> None:
@@ -176,7 +180,9 @@ def test_single_run(
     assert os.path.exists("test_full_run/myresults.tsv")
 
 
-@pytest.mark.skipif(platform.system() == "Linux", reason="Test not supported on Linux")
+@pytest.mark.skipif(
+    platform.system() == "Linux", reason="Test not supported on Linux"
+)
 def test_paired_run(
     setup_teardown_paired_input: Generator[list[str], None, None]
 ) -> None:
@@ -191,7 +197,9 @@ def test_paired_run(
     assert os.path.exists("test_full_run/myresults.aln")
 
 
-@pytest.mark.skipif(platform.system() == "Linux", reason="Test not supported on Linux")
+@pytest.mark.skipif(
+    platform.system() == "Linux", reason="Test not supported on Linux"
+)
 def test_single_contents(
     setup_teardown_single_input: Generator[list[str], None, None]
 ) -> None:
@@ -211,7 +219,9 @@ def test_single_contents(
         #         assert len(line) == 12
 
 
-@pytest.mark.skipif(platform.system() == "Linux", reason="Test not supported on Linux")
+@pytest.mark.skipif(
+    platform.system() == "Linux", reason="Test not supported on Linux"
+)
 def test_paired_contents(
     setup_teardown_paired_input: Generator[list[str], None, None]
 ) -> None:

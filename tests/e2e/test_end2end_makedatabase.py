@@ -117,7 +117,9 @@ def cleanup_files(dir_path: str) -> None:
         os.rmdir(dir_path)
 
 
-@pytest.mark.skipif(platform.system() == "Linux", reason="Test not supported on Linux")
+@pytest.mark.skipif(
+    platform.system() == "Linux", reason="Test not supported on Linux"
+)
 def test_make_kma_database(setup_teardown: list[str]) -> None:
     """
     ...
@@ -127,7 +129,9 @@ def test_make_kma_database(setup_teardown: list[str]) -> None:
         assert os.path.exists(f"{DATABASE_PATH}{DATABASE_NAME}{kma_extension}")
 
 
-@pytest.mark.skipif(platform.system() == "Linux", reason="Test not supported on Linux")
+@pytest.mark.skipif(
+    platform.system() == "Linux", reason="Test not supported on Linux"
+)
 def test_make_blast_database(setup_teardown: list[str]) -> None:
     """
     ...
@@ -135,4 +139,6 @@ def test_make_blast_database(setup_teardown: list[str]) -> None:
     setup_teardown[-1] = "blast"
     main(setup_teardown)
     for blast_extension in BLAST_EXTENSIONS:
-        assert os.path.exists(f"{DATABASE_PATH}{DATABASE_NAME}{blast_extension}")
+        assert os.path.exists(
+            f"{DATABASE_PATH}{DATABASE_NAME}{blast_extension}"
+        )

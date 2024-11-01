@@ -62,7 +62,9 @@ class PaciniTyping:
         Input:
         ----------
         """
-        logging.debug("Placing all args and necessary information in a dictionary")
+        logging.debug(
+            "Placing all args and necessary information in a dictionary"
+        )
         self.option = {
             "database_path": self.input_args.database_path,
             "database_name": self.input_args.database_name,
@@ -127,7 +129,9 @@ class PaciniTyping:
         """
         logging.debug("Searching for .gz files in the input list")
         gz_files = [
-            file for file in self.option["input_file_list"] if file.endswith(".gz")
+            file
+            for file in self.option["input_file_list"]
+            if file.endswith(".gz")
         ]
         if gz_files:
             logging.info("Found files that need to be unzipped, unzipping...")
@@ -167,7 +171,9 @@ class PaciniTyping:
         logging.debug("Validating the input arguments...")
         argsvalidator = ArgsValidator(self.option)
         if argsvalidator.validate():
-            logging.info("Input arguments have been validated, found no issues.")
+            logging.info(
+                "Input arguments have been validated, found no issues."
+            )
         else:
             logging.error(
                 "Error while validation the input arguments, "
@@ -196,7 +202,9 @@ class PaciniTyping:
         self.option["file_type"] = FileValidator(
             self.option["input_file_list"]
         ).get_file_type()
-        logging.info("File type has been determined: %s", self.option["file_type"])
+        logging.info(
+            "File type has been determined: %s", self.option["file_type"]
+        )
 
     def check_valid_option_with_args(self) -> None:
         """
@@ -210,7 +218,9 @@ class PaciniTyping:
             - args: object with the input arguments
         ----------
         """
-        logging.debug("Checking if the file type is correct for the input arguments...")
+        logging.debug(
+            "Checking if the file type is correct for the input arguments..."
+        )
         if (
             len(self.option["input_file_list"]) == 1
             and self.option["file_type"] == "FASTQ"
@@ -275,8 +285,8 @@ class PaciniTyping:
             # Make sure the database exists
             self.check_valid_database_path()
             # Run the query
-            result = self.run_query()
-
+            self.run_query()
+            # result = self.run_query()
             # Parse the results.....
 
     ###########################################################################
@@ -289,7 +299,8 @@ class PaciniTyping:
 
     # TODO - raise exceptions instead of sys.exit(1) to make the code more robust
 
-    # TODO - With end2end tests, sys args are not empty. So when sys args, don't parse the arguments but use the sys args
+    # TODO - With end2end tests, sys args are not empty. So when sys args,
+    #  don't parse the arguments but use the sys args
 
     # TODO: query_runner:__str__ - Is this function necessary?
 
@@ -300,8 +311,10 @@ class PaciniTyping:
     # TODO : validating_input_arguments - Compare if two files really are paired
 
     # TODO : Don't use a output file but take the output as a string:
-    #  zcat/cat data/vibrio_genes.fasta | blastn -query data/VIB_AA4147AA_AS_2.fna -subject - -outfmt '6 qseqid sseqid pident qcovs' -perc_identity 70
-    #  Or: kma -i data/VIB_AA4147AA_AS_2.fna -t_db refdir/mykma -t 4 -ID 70 -mrc 0.7 -o temp_output && cut -f 1,5 temp_output.res && rm temp_output.*
+    #  zcat/cat data/vibrio_genes.fasta | blastn -query data/VIB_AA4147AA_AS_2.fna
+    # -subject - -outfmt '6 qseqid sseqid pident qcovs' -perc_identity 70
+    #  Or: kma -i data/VIB_AA4147AA_AS_2.fna -t_db refdir/mykma -t 4 -ID 70 -mrc 0.7 -o
+    # temp_output && cut -f 1,5 temp_output.res && rm temp_output.*
 
 
 def main(provided_args: list[str] | None = None) -> None:

@@ -190,7 +190,8 @@ class ArgsValidator:
         if self.option["input_file_list"][0] == self.option["input_file_list"][1]:
             logging.error("Error in validating paired names, exiting...")
             raise InvalidPairedError(
-                self.option["input_file_list"][0], self.option["input_file_list"][1]
+                self.option["input_file_list"][0],
+                self.option["input_file_list"][1],
             )
 
     def check_paired_names(self) -> None:
@@ -208,7 +209,8 @@ class ArgsValidator:
         ):
             logging.error("Error in validating paired names, exiting...")
             raise InvalidPairedError(
-                self.option["input_file_list"][0], self.option["input_file_list"][1]
+                self.option["input_file_list"][0],
+                self.option["input_file_list"][1],
             )
 
     def validate_filter_arguments(self) -> None:

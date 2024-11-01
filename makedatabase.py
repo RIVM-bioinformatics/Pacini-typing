@@ -68,11 +68,15 @@ class DatabaseBuilder:
             - Database in the specified path
         ----------
         """
-        self.full_database_path = os.path.join(self.database_path, self.database_name)
+        self.full_database_path = os.path.join(
+            self.database_path, self.database_name
+        )
         if not os.path.exists(self.full_database_path):
             if self.database_type == "kma":
                 if not os.path.exists(self.database_path):
-                    logging.debug("Database path for KMA does not exist, creating path")
+                    logging.debug(
+                        "Database path for KMA does not exist, creating path"
+                    )
                     os.mkdir(self.database_path)
                 self.create_kma_database()
             else:

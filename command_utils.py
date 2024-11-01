@@ -53,10 +53,14 @@ def execute(
             shell=True,
             cwd=directory,
             stdout=(
-                stdout_file if stdout_file else (subprocess.PIPE if capture else None)
+                stdout_file
+                if stdout_file
+                else (subprocess.PIPE if capture else None)
             ),
             stderr=(
-                stderr_file if stderr_file else (subprocess.PIPE if capture else None)
+                stderr_file
+                if stderr_file
+                else (subprocess.PIPE if capture else None)
             ),
             text=True,
             check=True,
@@ -68,7 +72,10 @@ def execute(
 
     except subprocess.CalledProcessError as e:
         logging.error(
-            "Command failed with return code %d:\n%s\n%s", e.returncode, e.cmd, e.stderr
+            "Command failed with return code %d:\n%s\n%s",
+            e.returncode,
+            e.cmd,
+            e.stderr,
         )
         if not allow_fail:
             raise

@@ -60,11 +60,11 @@ RUN_TIMES = [
 ]
 
 
-def test_prepare_query():
+def test_prepare_query() -> None:
     """
     Function that tests the prepare_query() function(s) of the enums
     """
-    query = KMA.get_query(OPTION)
+    query: list[str] = KMA.get_query(OPTION)
     assert query == [
         "kma",
         "-ipe",
@@ -80,15 +80,15 @@ def test_prepare_query():
     ]
 
 
-def test_get_query_different():
+def test_get_query_different() -> None:
     """
     Function that tests the prepare_query() function(s) of the enums
     It uses a different database name by simply copying the
     OPTION dictionary and changing the database name
     """
-    SUB_OPTION = OPTION.copy()
-    SUB_OPTION["database_name"] = "my_new_db"
-    query: list[str] = KMA.get_query(SUB_OPTION)
+    sub_option = OPTION.copy()
+    sub_option["database_name"] = "my_new_db"
+    query: list[str] = KMA.get_query(sub_option)
     assert query == [
         "kma",
         "-ipe",
@@ -108,9 +108,9 @@ def test_get_query_verbose_false():
     """
     Function that tests the prepare_query() function(s) of the enums with verbose set to False
     """
-    SUB_OPTION = OPTION.copy()
-    SUB_OPTION["verbose"] = False
-    query = KMA.get_query(SUB_OPTION)
+    sub_option = OPTION.copy()
+    sub_option["verbose"] = False
+    query = KMA.get_query(sub_option)
     assert query == [
         "kma",
         "-ipe",
@@ -150,9 +150,9 @@ def test_blast_get_query_different():
     """
     Function that tests the prepare_query() function(s) of the enums
     """
-    SUB_OPTION = OPTION.copy()
-    SUB_OPTION["database_name"] = "my_new_db"
-    query = BLASTn.get_query(SUB_OPTION)
+    sub_option = OPTION.copy()
+    sub_option["database_name"] = "my_new_db"
+    query = BLASTn.get_query(sub_option)
     assert query == [
         "blastn",
         "-query",

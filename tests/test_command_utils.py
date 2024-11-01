@@ -105,7 +105,7 @@ def pytest_capture_error_file(temp_files):
     """
     stdout_f, stderr_f = temp_files
     with pytest.raises(subprocess.CalledProcessError):
-        result = execute(
+        execute(
             ["ls", "xyz"],
             stdout_file=stdout_f,
             stderr_file=stderr_f,
