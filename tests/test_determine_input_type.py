@@ -38,4 +38,4 @@ def test_get_file_type():
         ["test_data/ERR976461_1.fastq", "test_data/ERR976461_2.fastq"]
     )
     assert file_validator.get_file_type() == "FASTA"
-    assert paired_validator.get_file_type() == "FASTA"
+    assert paired_validator.get_file_type() == "FASTQ"
