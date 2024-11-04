@@ -14,7 +14,7 @@ The Pacini project is a software application which can be used to determine gene
 1. Presence or absence of certain genes
 2. Single nucleotide polymorphisms (SNPs)
 
-> Based on these variants, the application can calculate the change of pathogenicity of the given bacteria.
+*Based on these variants, the application can calculate the change of pathogenicity of the given bacteria.*
 
 ## (very) Brief Overview of Pacini-typing
 
@@ -72,6 +72,8 @@ gen_groups:
         coverage_percentage: 0.0
 ```
 
+[Back to top](#pacini-typing)
+
 ### Methods of Detection
 
 Pacini-typing can accept different types of input data. This data can be used to determine the genetic variants of the bacteria. The following data is supported:
@@ -82,6 +84,8 @@ Pacini-typing can accept different types of input data. This data can be used to
 Assembled FASTA files can directly be used by *BLAST* to determine given genes. Paired FASTQ files are processed by a tool called *K-mer Alignment (KMA)*. These tool generate almost the same output, but via different names and formats. Both tool require different calls to the application as well.
 
 Method for detecting SNP's still have to be filled in here...
+
+[Back to top](#pacini-typing)
 
 ### Parsing and Calculation of Pathogenicity
 
@@ -97,6 +101,8 @@ Installation of the application can be done by cloning the repository and instal
 git clone https://github.com/RIVM-bioinformatics/Pacini-typing.git
 ```
 
+[Back to top](#pacini-typing)
+
 ## Getting Started
 
 To get started with the application, you can run the following command:
@@ -105,7 +111,13 @@ To get started with the application, you can run the following command:
 python pacini_typing.py --help
 ```
 
+[Back to top](#pacini-typing)
+
 ## Example Run of Pacini-typing
+
+- Input
+- Run
+- Output
 
 ### Input
 
@@ -119,7 +131,7 @@ ATGCCATGGAAGACCTACTCACGGAACTTGATGTATGCTGTCATAACTTTGATGTTGAATGTATTAAGCG
 AATTTTACTTGATGCACCTACGGGTTATTCGCCACAAAAATGAGAATAAAATGAAAGTATTGCATGTATA
 ```
 
-Example of a Paired FASTQ file containing the `rfbV` gene of the O1 serotype of _Vibrio cholerae_:
+Example of a *1* Paired FASTQ file _Vibrio cholerae_:
 
 ```fastq
 @ERR976461.1 1 length=100
@@ -151,3 +163,5 @@ O139,rfbV,0.0,0.0,
 ```
 
 2. Still have to fill in here...
+
+[Back to top](#pacini-typing)
