@@ -25,7 +25,6 @@ __all__ = ["FileValidator"]
 
 import logging
 import re
-import sys
 
 from exceptions.determine_input_type_exceptions import (
     InvalidFastaOrFastqError,

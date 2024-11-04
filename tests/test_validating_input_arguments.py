@@ -36,7 +36,6 @@ __author__ = "Mark Van de Streek"
 __date__ = "2024-10-07"
 
 from unittest import mock
-from unittest.mock import patch
 
 import pytest
 
@@ -180,7 +179,10 @@ def test_compare_paired_files():
     """
     input_list = ["README.md", "README.md"]
     v = ArgsValidator(
-        option={"input_file_list": input_list, "run_path": "./pacini_typing.py"}
+        option={
+            "input_file_list": input_list,
+            "run_path": "./pacini_typing.py",
+        }
     )
 
     with pytest.raises(InvalidPairedError):
@@ -188,7 +190,10 @@ def test_compare_paired_files():
 
     input_list = ["README.md", "pacini_typing.py"]
     v = ArgsValidator(
-        option={"input_file_list": input_list, "run_path": "./pacini_typing.py"}
+        option={
+            "input_file_list": input_list,
+            "run_path": "./pacini_typing.py",
+        }
     )
     try:
         v.compare_paired_files()
@@ -207,9 +212,12 @@ def test_check_for_same_name_fail(args1, args2):
     """
     input_list = [args1, args2]
     v = ArgsValidator(
-        option={"input_file_list": input_list, "run_path": "./pacini_typing.py"}
+        option={
+            "input_file_list": input_list,
+            "run_path": "./pacini_typing.py",
+        }
     )
-    with pytest.raises(InvalidPairedError) as ex:
+    with pytest.raises(InvalidPairedError):
         v.check_for_same_name()
 
 
@@ -223,7 +231,10 @@ def test_check_for_same_name_good(args1, args2):
     """
     input_list = [args1, args2]
     v = ArgsValidator(
-        option={"input_file_list": input_list, "run_path": "./pacini_typing.py"}
+        option={
+            "input_file_list": input_list,
+            "run_path": "./pacini_typing.py",
+        }
     )
 
     try:
@@ -242,7 +253,10 @@ def test_check_paired_names_good(args1, args2):
     """
     input_list = [args1, args2]
     v = ArgsValidator(
-        option={"input_file_list": input_list, "run_path": "./pacini_typing.py"}
+        option={
+            "input_file_list": input_list,
+            "run_path": "./pacini_typing.py",
+        }
     )
 
     try:
@@ -261,7 +275,10 @@ def test_check_paired_names_fail(args1, args2):
     """
     input_list = [args1, args2]
     v = ArgsValidator(
-        option={"input_file_list": input_list, "run_path": "./pacini_typing.py"}
+        option={
+            "input_file_list": input_list,
+            "run_path": "./pacini_typing.py",
+        }
     )
 
     with pytest.raises(InvalidPairedError):
@@ -285,8 +302,12 @@ def test_run_file_checks(mock_validate, mock_check):
     """
     input_list = ["README.md", "pacini_typing.py"]
     v = ArgsValidator(
-        option={"input_file_list": input_list, "run_path": "./pacini_typing.py"}
+        option={
+            "input_file_list": input_list,
+            "run_path": "./pacini_typing.py",
+        }
     )
 
     with pytest.raises(ValidationError):
-        v.run_file_checks(input_list)
+        for file in input_list:
+            v.run_file_checks(file)

@@ -42,7 +42,11 @@ def fasta_options():
     """
     Fixture that returns a dictionary of options for FASTA files.
     """
-    return {"database_path": "./refdir/", "database_name": "mydb", "file_type": "FASTA"}
+    return {
+        "database_path": "./refdir/",
+        "database_name": "mydb",
+        "file_type": "FASTA",
+    }
 
 
 @pytest.fixture
@@ -80,7 +84,12 @@ def test_create_database_file_list_fastq(fastq_options):
     """
     Test that the function returns the correct list of database files for FASTQ files.
     """
-    expected_files = ["mykma.comp.b", "mykma.length.b", "mykma.name", "mykma.seq.b"]
+    expected_files = [
+        "mykma.comp.b",
+        "mykma.length.b",
+        "mykma.name",
+        "mykma.seq.b",
+    ]
     assert create_database_file_list(fastq_options) == expected_files
 
 
