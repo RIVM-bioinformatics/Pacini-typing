@@ -50,6 +50,7 @@ class InvalidFileExtensionError(Exception):
         self.all_valid_extensions = all_valid_extensions
 
     def __str__(self) -> str:
+        formatted_extensions: str = "\n\t\t- ".join(self.all_valid_extensions)
         return f"""
         ---------------------------------------------------
         ERROR: Invalid file extension provided
@@ -60,7 +61,7 @@ class InvalidFileExtensionError(Exception):
         SUGGESTION:
             - Make sure the file extension is valid
             - Valid extensions include:
-                - {"\n\t\t- ".join(self.all_valid_extensions)}
+                - {formatted_extensions}
             - All extensions can be found/changed at:
                 -/config/accept_arguments.yaml
         ----------------------------------------------------

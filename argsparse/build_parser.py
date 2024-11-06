@@ -16,8 +16,9 @@ __data__ = "2024-09-24"
 __all__ = ["main"]
 
 import argparse
-import pkg_resources
 import sys
+
+import pkg_resources
 
 import argsparse.args_makedatabase
 import argsparse.args_query
