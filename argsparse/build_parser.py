@@ -16,6 +16,8 @@ __data__ = "2024-09-24"
 __all__ = ["main"]
 
 import argparse
+import pkg_resources
+import sys
 
 import argsparse.args_makedatabase
 import argsparse.args_query
@@ -46,6 +48,13 @@ def main(givenargs: list[str]) -> argparse.Namespace:
         help="Increase output verbosity",
     )
 
+    parser.add_argument(
+        "-V",
+        "--version",
+        action="version",
+        version=pkg_resources.get_distribution("pacini_typing").version,
+    )
+
     subparsers = parser.add_subparsers(
         title="operations",
         description="For more information on a specific command, type: Pacini.py <command> -h",
@@ -55,4 +64,10 @@ def main(givenargs: list[str]) -> argparse.Namespace:
     argsparse.args_makedatabase.build_makedatabase_command(subparsers)
     argsparse.args_query.build_query_command(subparsers)
 
-    return parser.parse_args(givenargs)
+    args = parser.parse_args(givenargs)
+
+    if not hasattr(args, "options") or args.options is None:
+        parser.print_help()
+        sys.exit(1)
+
+    return args
