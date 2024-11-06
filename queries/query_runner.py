@@ -18,7 +18,7 @@ import logging
 import os
 import sys
 import time
-from typing import Tuple
+from typing import Tuple, Any
 
 from queries.blast_runner import BLASTn
 from queries.kma_runner import KMA
@@ -40,7 +40,7 @@ class QueryRunner:
     ----------
     """
 
-    def __init__(self, run_options: dict) -> None:
+    def __init__(self, run_options: dict[str, Any]) -> None:
         """
         Constructor of the QueryRunner class.
         The constructor calls the prepare_query method based on
@@ -72,7 +72,6 @@ class QueryRunner:
         """
         return f"QueryRunner(query={self.query})"
 
-    # @decorators.decorators.log - not necessary anymore with my wrapper
     def run(self) -> Tuple[str, str] | bool:
         """
         The query is already prepared in the constructor. This function runs the query.
@@ -96,7 +95,8 @@ class QueryRunner:
     def get_runtime(self) -> float:
         """
         Simple method that returns the runtime of the query.
-        The function is called in a logging event in the main script (pacini_typing.py).
+        The function is called in a logging event in the
+        main script (pacini_typing.py).
         ----------
         - Output:
             - float: with the runtime in seconds

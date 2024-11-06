@@ -40,7 +40,7 @@ class FileValidator:
     The determined file is returned by the class.
     """
 
-    def __init__(self, input_files: list) -> None:
+    def __init__(self, input_files: list[str]) -> None:
         """
         Constructor of the class. It initializes the class with the input files.
         Additionally, it initializes the body and type dictionaries.

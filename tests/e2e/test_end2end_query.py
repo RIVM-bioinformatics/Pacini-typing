@@ -31,10 +31,10 @@ import pytest
 
 from pacini_typing import main
 
-FASTA_FILE = "data/VIB_DA2216AA_AS_1.fna"
+FASTA_FILE = "test_data/VIB_DA2216AA_AS_1.fna"
 RUN_OUTPUT = "test_full_run/myresults"
-FASTQ_FILE_1 = "data/sample_1.fq"
-FASTQ_FILE_2 = "data/sample_2.fq"
+FASTQ_FILE_1 = "test_data/sample_1.fq"
+FASTQ_FILE_2 = "test_data/sample_2.fq"
 KMA_DATABASE_NAME = "mykma"
 DATABASE_PATH = "./refdir/"
 DATABASE_NAME = "mydb"

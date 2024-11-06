@@ -110,7 +110,7 @@ class PaciniTyping:
         ----------
         """
         logging.debug("Retrieving input files and placing them in a list")
-        input_files_list = []
+        input_files_list: list[str] = []
         if self.option["query"]:
             if self.option["query"]["single"]:
                 input_files_list.append(self.option["query"]["single"])
@@ -137,7 +137,7 @@ class PaciniTyping:
             logging.info("Found files that need to be unzipped, unzipping...")
             self.unzip_gz_files(gz_files)
 
-    def unzip_gz_files(self, gz_files) -> None:
+    def unzip_gz_files(self, gz_files: list[str]) -> None:
         """
         Still have to fill in the docstring...
         ----------
@@ -145,14 +145,14 @@ class PaciniTyping:
         ----------
         """
         logging.debug("Unzipping files %s...", gz_files)
-        unzipped_files = []
+        unzipped_files: list[str] = []
         for file in gz_files:
             try:
                 with gzip.open(file, "rb") as f_in:
                     with open(file[:-3], "wb") as f_out:
                         shutil.copyfileobj(f_in, f_out)
                 unzipped_files.append(file[:-3])
-            except (OSError, gzip.BadGzipFile) as e:
+            except gzip.BadGzipFile as e:
                 logging.error("Error while unzipping file %s: %s", file, e)
                 sys.exit(1)
         logging.debug("Updating input file list with unzipped files")

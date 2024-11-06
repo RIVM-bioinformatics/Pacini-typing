@@ -66,7 +66,7 @@ class InvalidSequencingTypesError(Exception):
     Raised when two different sequencing types are provided.
     """
 
-    def __init__(self, files: list) -> None:
+    def __init__(self, files: list[str]) -> None:
         self.files = files
 
     def __str__(self) -> str:

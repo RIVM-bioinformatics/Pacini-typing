@@ -16,11 +16,12 @@ __all__ = ["check_for_database_path"]
 
 import logging
 import os
+from typing import Any
 
 from exceptions.validate_database_exceptions import InvalidDatabaseError
 
 
-def check_for_database_existence(arg_options: dict) -> bool:
+def check_for_database_existence(arg_options: dict[str, Any]) -> bool:
     """
     Function that checks if the database exists.
     Based on the input type, the method will check if the files exist:
@@ -46,7 +47,7 @@ def check_for_database_existence(arg_options: dict) -> bool:
     return True
 
 
-def create_database_file_list(arg_options: dict) -> list:
+def create_database_file_list(arg_options: dict[str, Any]) -> list[str]:
     """
     Function that creates a list of database files based on the input file type.
     ----------
@@ -71,7 +72,7 @@ def create_database_file_list(arg_options: dict) -> list:
     return db_files
 
 
-def check_for_database_path(arg_options: dict) -> bool:
+def check_for_database_path(arg_options: dict[str, Any]) -> bool:
     """
     Function that checks if the database path exists.
     If not, the program will exit with an error message.

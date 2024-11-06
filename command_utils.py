@@ -24,12 +24,12 @@ from typing import Tuple
 
 
 def execute(
-    cmd,
-    directory=Path.cwd(),
-    capture=False,
-    stdout_file=None,
-    stderr_file=None,
-    allow_fail=False,
+    cmd: list[str] | str,
+    directory: Path = Path.cwd(),
+    capture: bool = False,
+    stdout_file: str | None = None,
+    stderr_file: str | None = None,
+    allow_fail: bool = False,
 ) -> Tuple[str, str] | bool:
     """
     Executes a shell command in a specified directory with optional capturing of output.
@@ -53,14 +53,10 @@ def execute(
             shell=True,
             cwd=directory,
             stdout=(
-                stdout_file
-                if stdout_file
-                else (subprocess.PIPE if capture else None)
+                stdout_file if stdout_file else (subprocess.PIPE if capture else None)
             ),
             stderr=(
-                stderr_file
-                if stderr_file
-                else (subprocess.PIPE if capture else None)
+                stderr_file if stderr_file else (subprocess.PIPE if capture else None)
             ),
             text=True,
             check=True,

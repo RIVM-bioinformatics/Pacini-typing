@@ -26,7 +26,7 @@ import pytest
 
 from pacini_typing import main
 
-INPUT_FILE = "data/VIB_DA2216AA_AS_1.fna"
+INPUT_FILE = "test_data/VIB_DA2216AA_AS_1.fna"
 DATABASE_PATH = "./refdir/"
 DATABASE_NAME = "mydb"
 
