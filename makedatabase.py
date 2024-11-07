@@ -54,8 +54,8 @@ class DatabaseBuilder:
         self.full_database_path: str = ""
         self.database_path: str = arg_options["database_path"]
         self.database_name: str = arg_options["database_name"]
-        self.input_fasta_file: str = arg_options["makedatabase"]["input"]
-        self.database_type: str = arg_options["makedatabase"]["database_type"]
+        self.database_type: str = arg_options["database_type"]
+        self.input_fasta_file: str = arg_options["input_fasta_file"]
         self.build_database()
 
     def build_database(self) -> None:
