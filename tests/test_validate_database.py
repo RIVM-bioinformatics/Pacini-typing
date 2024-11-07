@@ -29,7 +29,6 @@ from unittest import mock
 
 import pytest
 
-from exceptions.validate_database_exceptions import InvalidDatabaseError
 from validation.validate_database import (
     check_for_database_existence,
     check_for_database_path,
@@ -116,8 +115,7 @@ def test_check_for_database_existence_missing_file(mock_exists, fasta_options):
 
     mock_exists.side_effect = mock_exists_side_effect
 
-    with pytest.raises(InvalidDatabaseError):
-        check_for_database_existence(fasta_options)
+    assert check_for_database_existence(fasta_options) is False
 
 
 @pytest.mark.skipif(platform.system() == "Linux", reason="Test not supported on Linux")
@@ -135,8 +133,7 @@ def test_check_for_database_path_invalid(fasta_options):
     """
     Test that the function raises a SystemExit when the database path is invalid.
     """
-    with pytest.raises(InvalidDatabaseError):
-        check_for_database_path(fasta_options)
+    assert check_for_database_path(fasta_options) is False
 
 
 @pytest.mark.skipif(platform.system() == "Linux", reason="Test not supported on Linux")

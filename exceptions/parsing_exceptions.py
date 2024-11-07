@@ -14,7 +14,7 @@ __author__ = "Mark Van de Streek"
 __date__ = "2024-10-28"
 
 
-class LoadingYAMLError(Exception):
+class YAMLLoadingError(Exception):
     """
     Raised when an error occurs while loading a YAML file.
     """
@@ -35,5 +35,29 @@ class LoadingYAMLError(Exception):
             - Look at the example YAML files for guidance
             - Error most likely to be an indentation or
                 '-' misplacement issue
+        ---------------------------------------------------
+                """
+
+
+class YAMLStructureError(Exception):
+    """
+    Raised when an error occurs in the structure of a YAML file.
+    """
+
+    def __init__(self, file_path: str) -> None:
+        self.file_path = file_path
+
+    def __str__(self) -> str:
+        return f"""
+        ---------------------------------------------------
+        ERROR: YAML file structure is incorrect
+        ---------------------------------------------------
+        The following YAML file has an incorrect structure:
+            - Path: {self.file_path}
+        ---------------------------------------------------
+        SUGGESTION:
+            - Check the structure of the YAML file
+            - Ensure the indentation is correct
+            - Make sure the keys are correctly aligned
         ---------------------------------------------------
                 """

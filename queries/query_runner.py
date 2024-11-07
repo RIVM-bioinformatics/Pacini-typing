@@ -18,7 +18,7 @@ import logging
 import os
 import sys
 import time
-from typing import Tuple, Any
+from typing import Any, Tuple
 
 from queries.blast_runner import BLASTn
 from queries.kma_runner import KMA
