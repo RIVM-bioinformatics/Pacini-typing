@@ -7,7 +7,11 @@
     “GitHub Copilot: Your AI pair programmer” (GPT-3). GitHub, Inc.
     https://github.com/features/copilot
 
-To be filed in later...
+End-to-end test for the makedatabase command of Pacini-typing
+This test checks if the KMA and BLAST databases are created successfully
+
+File contents are binary,
+so there is no need to check the contents of the files.
 """
 
 __author__ = "Mark Van de Streek"
@@ -26,7 +30,7 @@ import pytest
 
 from pacini_typing import main
 
-INPUT_FILE = "test_data/VIB_DA2216AA_AS_1.fna"
+INPUT_FILE = "test_data/vibrio_genes.fasta"
 DATABASE_PATH = "./refdir/"
 DATABASE_NAME = "mydb"
 
@@ -50,13 +54,30 @@ BLAST_EXTENSIONS = [
 
 
 def is_tool(name: str) -> bool:
-    """Check whether `name` is on PATH and marked as executable."""
+    """
+    Basic function to check if a tool is installed
+    It uses the shutil.which() function to check if the tool is in the PATH
+    ----------
+    Input:
+        name: str -> Name of the tool to check
+    Output:
+        bool -> True if the tool is installed, False otherwise
+    ----------
+    """
     return shutil.which(name) is not None
 
 
 @pytest.fixture(scope="module", autouse=True)
 def check_tools():
-    """Pytest fixture that checks if the required tools are installed"""
+    """
+    Fixture to check if the required tools are installed
+    If the tools are not installed, the test will fail
+    KMA and BLASTN are required for a run of Pacini-typing
+    ----------
+    Raises:
+        pytest.fail
+    ----------
+    """
     if platform.system() == "Linux":
         pytest.skip("Test not supported on Linux")
 
@@ -76,7 +97,12 @@ def setup_teardown() -> Generator[list[str], None, None]:
     After the test is run, it cleans up the files created during the test
     The generator does not accept or return any arguments
 
-    Test is skipped if the platform is Linux -> GitHub actions
+    Test is skipped if the platform is Linux,
+    this is due to the use of GitHub actions
+    ----------
+    Output:
+        args: list[str] -> List of arguments for the test
+    ----------
     """
     if platform.system() == "Linux":
         pytest.skip("Test not supported on Linux")
@@ -103,7 +129,12 @@ def setup_teardown() -> Generator[list[str], None, None]:
 
 def cleanup_files(dir_path: str) -> None:
     """
-    Fill in later...
+    Function to clean up the files created during the test
+    Is simply removes the directory and all files in it
+    ----------
+    Input:
+        dir_path: str -> Path to the directory to remove
+    ----------
     """
     if os.path.exists(dir_path):
         # Remove all files in the directory
@@ -117,22 +148,42 @@ def cleanup_files(dir_path: str) -> None:
         os.rmdir(dir_path)
 
 
-@pytest.mark.skipif(platform.system() == "Linux", reason="Test not supported on Linux")
+@pytest.mark.skipif(
+    platform.system() == "Linux", reason="Test not supported on Linux"
+)
 def test_make_kma_database(setup_teardown: list[str]) -> None:
     """
-    ...
+    Function to test the creation of a KMA database
+    It runs the main function of Pacini_typing with the setup_teardown fixture
+    After the test is run,
+    it checks if the database files are created successfully
+    ----------
+    Input:
+        setup_teardown: list[str] -> Arguments for the test
+    ----------
     """
     main(setup_teardown)
     for kma_extension in KMA_EXTENSIONS:
         assert os.path.exists(f"{DATABASE_PATH}{DATABASE_NAME}{kma_extension}")
 
 
-@pytest.mark.skipif(platform.system() == "Linux", reason="Test not supported on Linux")
+@pytest.mark.skipif(
+    platform.system() == "Linux", reason="Test not supported on Linux"
+)
 def test_make_blast_database(setup_teardown: list[str]) -> None:
     """
-    ...
+    Function to test the creation of a BLAST database
+    It runs the main function of Pacini_typing with the setup_teardown fixture
+    After the test is run,
+    it checks if the database files are created successfully
+    ----------
+    Input:
+        setup_teardown: list[str] -> Arguments for the test
+    ----------
     """
     setup_teardown[-1] = "blast"
     main(setup_teardown)
     for blast_extension in BLAST_EXTENSIONS:
-        assert os.path.exists(f"{DATABASE_PATH}{DATABASE_NAME}{blast_extension}")
+        assert os.path.exists(
+            f"{DATABASE_PATH}{DATABASE_NAME}{blast_extension}"
+        )
