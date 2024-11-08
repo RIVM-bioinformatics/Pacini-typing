@@ -117,7 +117,7 @@ def setup_teardown() -> Generator[list[str], None, None]:
         "--database_name",
         DATABASE_NAME,
         "--database_type",
-        "kma",
+        "fastq",
     ]
 
     dir_path = "test_full_run/"
@@ -181,7 +181,7 @@ def test_make_blast_database(setup_teardown: list[str]) -> None:
         setup_teardown: list[str] -> Arguments for the test
     ----------
     """
-    setup_teardown[-1] = "blast"
+    setup_teardown[-1] = "fasta"
     main(setup_teardown)
     for blast_extension in BLAST_EXTENSIONS:
         assert os.path.exists(

@@ -43,8 +43,8 @@ def build_makedatabase_command(subparsers: _SubParsersAction) -> None:
         "--database_type",
         type=lambda x: x.lower(),
         required=True,
-        metavar="kma/blast",
-        choices=["kma", "blast"],
+        metavar="fastq/fasta",
+        choices=["fastq", "fasta"],
         help="Specify the database type that is being used",
     )
     makedatabase.add_argument(
