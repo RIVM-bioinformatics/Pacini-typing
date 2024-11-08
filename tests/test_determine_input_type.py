@@ -21,9 +21,7 @@ import pytest
 from validation.determine_input_type import FileValidator
 
 
-@pytest.mark.skipif(
-    platform.system() == "Linux", reason="Test not supported on Linux"
-)
+@pytest.mark.skipif(platform.system() == "Linux", reason="Test not supported on Linux")
 def test_get_file_type():
     """
     Test the retrieve_body() function from the determine_input_type.py module
@@ -35,11 +33,9 @@ def test_get_file_type():
         file2: [line1, line2, line3, line4, line5]
     }
     """
-    file_validator = FileValidator(
-        ["test_data/VIB_AA2784AA_AS.scaffold.fasta"]
-    )
+    file_validator = FileValidator(["test_data/VIB_EA5348AA_AS.fasta"])
     paired_validator = FileValidator(
-        ["test_data/ERR976461_1.fastq", "test_data/ERR976461_2.fastq"]
+        ["test_data/VIB_EA5348AA_AS_1.fq", "test_data/VIB_EA5348AA_AS_2.fq"]
     )
     assert file_validator.get_file_type() == "FASTA"
     assert paired_validator.get_file_type() == "FASTQ"

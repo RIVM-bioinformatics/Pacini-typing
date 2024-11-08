@@ -140,7 +140,7 @@ def test_blast_prepare_query():
         "-out",
         "/dummy/path.tsv",
         "-outfmt",
-        "10",
+        "6",
         "-perc_identity",
         "100",
     ]
@@ -162,7 +162,7 @@ def test_blast_get_query_different():
         "-out",
         "/dummy/path.tsv",
         "-outfmt",
-        "10",
+        "6",
         "-perc_identity",
         "100",
     ]
