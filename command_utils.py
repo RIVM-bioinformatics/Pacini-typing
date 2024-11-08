@@ -48,15 +48,20 @@ def execute(
     ----------
     """
     try:
+        logging.info("running command: %s", " ".join(cmd))
         result = subprocess.run(
             " ".join(cmd) if isinstance(cmd, list) else cmd,
             shell=True,
             cwd=directory,
             stdout=(
-                stdout_file if stdout_file else (subprocess.PIPE if capture else None)
+                stdout_file
+                if stdout_file
+                else (subprocess.PIPE if capture else None)
             ),
             stderr=(
-                stderr_file if stderr_file else (subprocess.PIPE if capture else None)
+                stderr_file
+                if stderr_file
+                else (subprocess.PIPE if capture else None)
             ),
             text=True,
             check=True,

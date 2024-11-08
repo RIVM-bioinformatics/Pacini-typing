@@ -23,11 +23,11 @@ import sys
 from typing import Any, Tuple
 
 import argsparse.build_parser
-from validation.validate_database import check_for_database_path
 from exceptions.validate_database_exceptions import InvalidDatabaseError
 from makedatabase import DatabaseBuilder
 from queries.query_runner import QueryRunner
 from validation.determine_input_type import FileValidator
+from validation.validate_database import check_for_database_path
 from validation.validating_input_arguments import ArgsValidator
 
 logging.basicConfig(
@@ -63,7 +63,9 @@ class PaciniTyping:
         Input:
         ----------
         """
-        logging.debug("Placing all args and necessary information in a dictionary")
+        logging.debug(
+            "Placing all args and necessary information in a dictionary"
+        )
         self.option = {
             "database_path": self.input_args.database_path,
             "database_name": self.input_args.database_name,
@@ -128,7 +130,9 @@ class PaciniTyping:
         """
         logging.debug("Searching for .gz files in the input list")
         gz_files = [
-            file for file in self.option["input_file_list"] if file.endswith(".gz")
+            file
+            for file in self.option["input_file_list"]
+            if file.endswith(".gz")
         ]
         if gz_files:
             logging.info("Found files that need to be unzipped, unzipping...")
@@ -168,7 +172,9 @@ class PaciniTyping:
         logging.debug("Validating the input arguments...")
         argsvalidator = ArgsValidator(self.option)
         if argsvalidator.validate():
-            logging.info("Input arguments have been validated, found no issues.")
+            logging.info(
+                "Input arguments have been validated, found no issues."
+            )
         else:
             logging.error(
                 "Error while validation the input arguments, "
@@ -203,7 +209,9 @@ class PaciniTyping:
         self.option["file_type"] = FileValidator(
             self.option["input_file_list"]
         ).get_file_type()
-        logging.info("File type has been determined: %s", self.option["file_type"])
+        logging.info(
+            "File type has been determined: %s", self.option["file_type"]
+        )
 
     def check_valid_option_with_args(self) -> None:
         """
@@ -217,7 +225,9 @@ class PaciniTyping:
             - args: object with the input arguments
         ----------
         """
-        logging.debug("Checking if the file type is correct for the input arguments...")
+        logging.debug(
+            "Checking if the file type is correct for the input arguments..."
+        )
         if (
             len(self.option["input_file_list"]) == 1
             and self.option["file_type"] == "FASTQ"

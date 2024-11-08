@@ -17,7 +17,8 @@ __author__ = "Mark Van de Streek"
 __data__ = "2024-11-01"
 __all__ = ["get_version"]
 
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
+
 from command_utils import execute
 
 

@@ -29,7 +29,7 @@ class BLASTn(Enum):
     """
 
     RUN_OPTION = "blastn"
-    OUTPUT_FORMAT = "10"  # "7 sseqid bitscore evalue slen pident qcovs"
+    OUTPUT_FORMAT = "6"  # "7 sseqid bitscore evalue slen pident qcovs"
     IDENTITY = "-perc_identity"
 
     @staticmethod
