@@ -8,7 +8,7 @@ metadata:
 
 database:
   name: "VIB-O1"
-  path: "/databases/VIB-O1"
+  path: "databases"
   matching_seq_file: "VIB-O1.fasta"
 
 pattern:
