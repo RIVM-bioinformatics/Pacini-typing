@@ -7,7 +7,7 @@
     “GitHub Copilot: Your AI pair programmer” (GPT-3). GitHub, Inc.
     https://github.com/features/copilot
 
-Fill in later...
+#TODO - Fill in later...
 """
 
 __author__ = "Mark Van de Streek"
@@ -43,7 +43,7 @@ class ArgsValidator:
         - check_file_existence: Function that checks if a given file exists and is a file
         - compare_paired_files: Function that checks if the input files are not exactly the same
         - create_sha_hash: Function that creates a SHA256 hash for a given file
-        - check_for_same_name: Function that checks if the input files are not exactly the same
+        - check_for_same_name: Function that checks if the input file names are not the same
         - check_paired_names: Function that checks if the input files are paired
         - validate_filter_arguments: Function that validates the filter arguments
         - run_file_checks: Method runs checks on the input files

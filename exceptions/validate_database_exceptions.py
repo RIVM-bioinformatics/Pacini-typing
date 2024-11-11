@@ -7,7 +7,7 @@
     “GitHub Copilot: Your AI pair programmer” (GPT-3). GitHub, Inc.
     https://github.com/features/copilot
 
-Fill in later...
+# TODO - Fill in later...
 """
 
 __author__ = "Mark Van de Streek"
@@ -34,7 +34,12 @@ class InvalidDatabaseError(Exception):
         ---------------------------------------------------
         SUGGESTION:
             - Make sure the database path is correct
-            - Make sure all database files are present
+            - Make sure all database files are present:
+                - For fasta/blast database:
+                    - *.ndb, *.nhr, *.nin, *.njs,
+                    - *.not, *.nsq, *.ntf, *.nto
+                - For fastq/kma database:
+                    - *.comp.b, *.length.b, *.name, *.seq.b
             - Make a new reference database, help:
             - python3 pacini_typing.py makedatabase -h
         ----------------------------------------------------

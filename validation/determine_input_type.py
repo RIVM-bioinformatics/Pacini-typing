@@ -17,6 +17,7 @@ Example FASTQ File:
     ATCGTACGATCGATCGATCGATCGATCGATCG
     +
     B@@FDFFFHHGHHJIJJIIJJJJIJIJIIJJI
+#TODO - Add more comments and maybe rename the class?
 """
 
 __author__ = "Mark Van de Streek"

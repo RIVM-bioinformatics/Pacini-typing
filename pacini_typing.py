@@ -58,7 +58,7 @@ class PaciniTyping:
 
     def parse_all_args(self) -> None:
         """
-        Still have to fill in the docstring...
+        # TODO - Still have to fill in the docstring...
         ----------
         Input:
         ----------
@@ -93,7 +93,7 @@ class PaciniTyping:
 
     def setup_logging(self) -> None:
         """
-        Still have to fill in the docstring...
+        #TODO - Still have to fill in the docstring...
         ----------
         Input:
         ----------
@@ -105,7 +105,7 @@ class PaciniTyping:
 
     def get_input_filenames(self) -> None:
         """
-        Still have to fill in the docstring...
+        #TODO - Still have to fill in the docstring...
         ----------
         Input:
         ----------
@@ -123,7 +123,7 @@ class PaciniTyping:
 
     def check_for_unzip_files(self) -> None:
         """
-        Still have to fill in the docstring...
+        #TODO - Still have to fill in the docstring...
         ----------
         Input:
         ----------
@@ -140,7 +140,7 @@ class PaciniTyping:
 
     def unzip_gz_files(self, gz_files: list[str]) -> None:
         """
-        Still have to fill in the docstring...
+        #TODO - Still have to fill in the docstring...
         ----------
         Input:
         ----------
@@ -164,7 +164,7 @@ class PaciniTyping:
 
     def validate_file_arguments(self) -> None:
         """
-        Still have to fill in the docstring...
+        #TODO - Still have to fill in the docstring...
         ----------
         Input:
         ----------
@@ -184,7 +184,7 @@ class PaciniTyping:
 
     def run_makedatabase(self) -> None:
         """
-        Still have to fill in the docstring...
+        #TODO - Still have to fill in the docstring...
         ----------
         Input:
         ----------
@@ -200,7 +200,7 @@ class PaciniTyping:
 
     def get_file_type(self) -> None:
         """
-        Still have to fill in the docstring...
+        #TODO - Still have to fill in the docstring...
         ----------
         Input:
         ----------
@@ -243,7 +243,7 @@ class PaciniTyping:
 
     def check_valid_database_path(self) -> None:
         """
-        Still have to fill in the docstring...
+        #TODO - Still have to fill in the docstring...
         ----------
         Input:
         ----------
@@ -262,7 +262,7 @@ class PaciniTyping:
 
     def run_query(self) -> Tuple[str, str] | bool:
         """
-        Still have to fill in the docstring...
+        #TODO - Still have to fill in the docstring...
         ----------
         Input:
         ----------
@@ -276,7 +276,7 @@ class PaciniTyping:
 
     def run(self) -> None:
         """
-        Still have to fill in the docstring...
+        #TODO - Still have to fill in the docstring...
         """
         # Retrieve the args object, arguments have been parsed at this point
         # Place all arguments in a dictionary
@@ -293,6 +293,7 @@ class PaciniTyping:
         if self.option["makedatabase"]:
             # Run with the validated arguments
             self.run_makedatabase()
+
         elif self.option["query"]:
             # Retrieve the file type
             self.get_file_type()

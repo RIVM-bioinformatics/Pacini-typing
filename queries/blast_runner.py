@@ -7,7 +7,7 @@
     “GitHub Copilot: Your AI pair programmer” (GPT-3). GitHub, Inc.
     https://github.com/features/copilot
 
-To be filed in later...
+#TODO - To be filed in later...
 """
 
 __author__ = "Mark Van de Streek"
@@ -29,6 +29,7 @@ class BLASTn(Enum):
     """
 
     RUN_OPTION = "blastn"
+    # TODO - Move the output format to config file with explanation of the format
     OUTPUT_FORMAT = "6"  # "7 sseqid bitscore evalue slen pident qcovs"
     IDENTITY = "-perc_identity"
 

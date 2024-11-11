@@ -22,6 +22,8 @@ import subprocess
 from pathlib import Path
 from typing import Tuple
 
+# TODO: Implement a design pattern for the execute function
+
 
 def execute(
     cmd: list[str] | str,
@@ -54,14 +56,10 @@ def execute(
             shell=True,
             cwd=directory,
             stdout=(
-                stdout_file
-                if stdout_file
-                else (subprocess.PIPE if capture else None)
+                stdout_file if stdout_file else (subprocess.PIPE if capture else None)
             ),
             stderr=(
-                stderr_file
-                if stderr_file
-                else (subprocess.PIPE if capture else None)
+                stderr_file if stderr_file else (subprocess.PIPE if capture else None)
             ),
             text=True,
             check=True,
