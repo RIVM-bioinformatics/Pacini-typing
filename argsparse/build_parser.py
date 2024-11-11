@@ -7,7 +7,7 @@
     “GitHub Copilot: Your AI pair programmer” (GPT-3). GitHub, Inc.
     https://github.com/features/copilot
 
-This module is responsible for building the main parser object for 
+This module is responsible for building the main parser object for
 the Pacini-typing tool.
 
 The parser is being set up with the necessary arguments and subcommands

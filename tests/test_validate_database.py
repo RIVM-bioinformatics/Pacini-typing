@@ -7,7 +7,20 @@
     “GitHub Copilot: Your AI pair programmer” (GPT-3). GitHub, Inc.
     https://github.com/features/copilot
 
-To be filed in later...
+Test module for the validate_database module.
+This module tests the functions from the validate_database module.
+In other words, the functions that check the existence of the database files.
+
+The tests are divided into the following functions:
+- test_create_database_file_list_fasta
+- test_create_database_file_list_fastq
+- test_check_for_database_existence
+- test_check_for_database_existence_missing_file
+- test_check_for_database_path_valid
+- test_check_for_database_path_invalid
+
+The fixtures fasta_options and fastq_options are used
+to provide options for the tests.
 """
 
 __author__ = "Mark Van de Streek"

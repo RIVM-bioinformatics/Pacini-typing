@@ -7,15 +7,22 @@
     “GitHub Copilot: Your AI pair programmer” (GPT-3). GitHub, Inc.
     https://github.com/features/copilot
 
+End-to-end test for the main function of pacini_typing.
+This file tests full runs of the program with paired input
+
+The check_tools and is_tool functions are used to check if the required tools are installed.
+
+The setup_teardown_single_input fixture is used to set up the arguments for a paired input test.
+It creates a directory for the test and yields the arguments for the test.
+After the test is run, it cleans up the files created during the test.
+
+Example output of Pacini-typing for a paired input file (KMA results):
+
 Template_Name	Template_Length	Template_Identity	Template_Coverage	Template_Depth	Query_Identity	Query_Coverage	Query_Depth	Read_Count_Map	Read_Count_Aln	Score	Expected	q_value	p_value	ConClave_Score	ConClave_Quality
 rfbV_O1:1:AE003852	1233	100.000000	100.000000	48.077048	100.000000	100.000000	48.077048	421	421	59156	52648.350130	378.782282	1.000000e-26	59156	439.517332
 wbfZ_O139:1:AB012956	1177	96.176720	99.150382	48.905692	97.000857	97.000857	49.324764	405	401	51524	52873.156064	17.435552	2.972197e-05	51524	433.992120
 ctxA:1:CP001235	777	100.000000	100.000000	44.438867	100.000000	100.000000	44.438867	247	247	34493	34640.170051	0.313294	5.756657e-01	34493	417.940467
 ctxB:1:KJ437653	348	96.551724	100.287356	40.350575	96.275072	96.275072	40.234957	105	105	12277	15851.962347	454.348640	1.000000e-26	12277	376.619315
-
-End-to-end test for the main function with paired input
-Multiple functions are used to validate the existence
-and contents of the output file
 """
 
 __author__ = "Mark Van de Streek"

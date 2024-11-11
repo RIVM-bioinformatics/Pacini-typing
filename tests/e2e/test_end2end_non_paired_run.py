@@ -7,7 +7,16 @@
     “GitHub Copilot: Your AI pair programmer” (GPT-3). GitHub, Inc.
     https://github.com/features/copilot
 
-To be filed in later...
+End-to-end test for the main function of pacini_typing.
+This file tests full runs of the program with single input files (FASTA).
+
+The check_tools and is_tool functions are used to check if the required tools are installed.
+
+The setup_teardown_single_input fixture is used to set up the arguments for the single input test.
+It creates a directory for the test and yields the arguments for the test.
+After the test is run, it cleans up the files created during the test.
+
+Example output of Pacini-typing for a single input file (BLAST results):
 
 VIB_EA5348AA_AS_NODE_11_length_166519_cov_13.420434	rfbV_O1:1:AE003852	100.000	1233	0	0	106763	107995	1233	1	0.0	2278
 VIB_EA5348AA_AS_NODE_11_length_166519_cov_13.420434	wbfZ_O139:1:AB012956	96.907	1164	35	1	111617	112780	15	1177	0.0	1949

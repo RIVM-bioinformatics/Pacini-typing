@@ -7,7 +7,11 @@
     “GitHub Copilot: Your AI pair programmer” (GPT-3). GitHub, Inc.
     https://github.com/features/copilot
 
-# TODO - To be filed in later...
+Enum class to store all KMA-related options and flags.
+This class is used to create the right query for the KMA run.
+
+The get_query() method prepares the query for the KMA run
+and returns it to the (main) QueryRunner class.
 """
 
 __author__ = "Mark Van de Streek"
@@ -43,9 +47,8 @@ class KMA(Enum):
         This query is passed to the super class QueryRunner
         ----------
         Input:
-            - input_file: list with the input files
-            - database: str
-            - output_file: str
+            - dictionary with the input files,
+                database, and output file
         Output:
             - list with the query to run KMA
         ----------

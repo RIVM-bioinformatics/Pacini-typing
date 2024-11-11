@@ -7,7 +7,18 @@
     “GitHub Copilot: Your AI pair programmer” (GPT-3). GitHub, Inc.
     https://github.com/features/copilot
 
-To be filed in later...
+This file contains tests for the query_runner module.
+These tests are repsponsible for testing the query_runner module.
+
+The tests are divided into the following functions:
+- test_prepare_query
+- test_get_query_different
+- test_get_query_verbose_false
+- test_blast_prepare_query
+- test_blast_get_query_different
+- test_get_runtime
+
+The OPTION dictionary is a mock dictionary that is used in the tests.
 """
 
 __author__ = "Mark Van de Streek"

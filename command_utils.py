@@ -7,10 +7,27 @@
     “GitHub Copilot: Your AI pair programmer” (GPT-3). GitHub, Inc.
     https://github.com/features/copilot
 
-The main goal of this file is providing utils for executing shell commands in Python.
-Debugging and logging are easier with this way of executing shell commands.
+Wrapper module for executing shell commands in a specified directory.
+The main goal of this module is to provide a simple
+interface for running shell commands and capturing their output for
+further processing.
 
-See docstring for more explicit information about functions and their parameters.
+Example:
+        >>> from command_utils import execute
+        >>> stdout, stderr = execute(
+                ["ls", "-l", "my_directory"],
+                capture=True,
+            )
+
+Or capture output in a file:
+
+        >>> with open ("output.txt", "w") as f:
+                with open ("error.txt", "w") as e:
+                    execute(
+                        ["ls", "-l", "my_directory"],
+                        stdout_file=f,
+                        stderr_file=e,
+                    )
 """
 
 __author__ = "Mark Van de Streek"
@@ -34,7 +51,8 @@ def execute(
     allow_fail: bool = False,
 ) -> Tuple[str, str] | bool:
     """
-    Executes a shell command in a specified directory with optional capturing of output.
+    Executes a shell command in a specified directory with
+    optional capturing of output.
     ----------
     Input:
         - cmd: list of strings or str, the command to be executed
@@ -43,7 +61,6 @@ def execute(
         - stdout_file: Path, file to write standard output
         - stderr_file: Path, file to write standard error
         - allow_fail: bool, whether to allow command failures without exception
-
     Output:
         - tuple of (stdout, stderr) if capture is True
         - bool indicating success if capture is False

@@ -7,7 +7,10 @@
     “GitHub Copilot: Your AI pair programmer” (GPT-3). GitHub, Inc.
     https://github.com/features/copilot
 
-#TODO - Fill in later...
+Module responsible for validating the input arguments.
+The main goal of this module is to provide (basic) validation
+for the input files.
+See class ArgsValidator for more information about specific validation methods.
 """
 
 __author__ = "Mark Van de Streek"
@@ -268,7 +271,9 @@ class ArgsValidator:
         """
         self.validate_filter_arguments()
         if len(self.input_file_list) == 2:
-            if all(self.run_file_checks(file) for file in self.input_file_list):
+            if len(self.input_file_list) == 2 and all(
+                self.run_file_checks(file) for file in self.input_file_list
+            ):
                 self.check_for_same_name()
                 self.compare_paired_files()
                 self.check_paired_names()

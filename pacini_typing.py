@@ -61,7 +61,7 @@ import argsparse.build_parser
 from exceptions.validate_database_exceptions import InvalidDatabaseError
 from makedatabase import DatabaseBuilder
 from queries.query_runner import QueryRunner
-from validation.determine_input_type import FileValidator
+from validation.determine_input_type import InputFileInspector
 from validation.validate_database import check_for_database_path
 from validation.validating_input_arguments import ArgsValidator
 
@@ -289,7 +289,7 @@ class PaciniTyping:
         See validation/determine_input_type.py for more information.
         """
         logging.debug("Determining the file type of the input file(s)...")
-        self.option["file_type"] = FileValidator(
+        self.option["file_type"] = InputFileInspector(
             self.option["input_file_list"]
         ).get_file_type()
         logging.info("File type has been determined: %s", self.option["file_type"])
@@ -435,21 +435,21 @@ if __name__ == "__main__":
 
 ###########################################################################
 
-    # TODO - Make the input db arguments required all the time,
-    #   so that the database could be created if not found running the query
+# TODO - Make the input db arguments required all the time,
+#   so that the database could be created if not found running the query
 
-    # TODO: query_runner:__str__ - Is this function necessary?
+# TODO: query_runner:__str__ - Is this function necessary?
 
-    # TODO: query_runner:run - This return statement is not used anywhere, should it be removed?
+# TODO: query_runner:run - This return statement is not used anywhere, should it be removed?
 
-    # TODO : validating_input_arguments - Store certain values from main OPTION as class variable
+# TODO : validating_input_arguments - Store certain values from main OPTION as class variable
 
-    # TODO : validating_input_arguments - Compare if two files really are paired
+# TODO : validating_input_arguments - Compare if two files really are paired
 
-    # TODO : Don't use a output file but take the output as a string:
-    #  zcat/cat data/vibrio_genes.fasta | blastn -query data/VIB_AA4147AA_AS_2.fna
-    # -subject - -outfmt '6 qseqid sseqid pident qcovs' -perc_identity 70
-    #  Or: kma -i data/VIB_AA4147AA_AS_2.fna -t_db refdir/mykma -t 4 -ID 70 -mrc 0.7 -o
-    # temp_output && cut -f 1,5 temp_output.res && rm temp_output.*
+# TODO : Don't use a output file but take the output as a string:
+#  zcat/cat data/vibrio_genes.fasta | blastn -query data/VIB_AA4147AA_AS_2.fna
+# -subject - -outfmt '6 qseqid sseqid pident qcovs' -perc_identity 70
+#  Or: kma -i data/VIB_AA4147AA_AS_2.fna -t_db refdir/mykma -t 4 -ID 70 -mrc 0.7 -o
+# temp_output && cut -f 1,5 temp_output.res && rm temp_output.*
 
 ###########################################################################

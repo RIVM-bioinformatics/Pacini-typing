@@ -7,7 +7,11 @@
     “GitHub Copilot: Your AI pair programmer” (GPT-3). GitHub, Inc.
     https://github.com/features/copilot
 
-#TODO - To be filed in later...
+Enum class to store all BLAST-related options and flags.
+This class is used to create the right query for the BLAST run.
+
+The get_query() method prepares the query for the BLAST run
+and returns it to the (main) QueryRunner class.
 """
 
 __author__ = "Mark Van de Streek"
@@ -26,6 +30,8 @@ class BLASTn(Enum):
     ----------
     RUN_OPTION: string that is used in the subprocess.run() method
     OUTPUT_FORMAT: flag for the output format
+    IDENTITY: flag for the minimum identity percentage
+    ----------
     """
 
     RUN_OPTION = "blastn"
@@ -41,9 +47,8 @@ class BLASTn(Enum):
         The script-constants are used to set the run option and output format.
         ----------
         Input:
-            - input_file: str
-            - database: str
-            - output_file: str
+            - dictionary with the input files,
+                database, and output file
         Output:
             - list with the query to run BLAST
         ----------

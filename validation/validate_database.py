@@ -7,12 +7,17 @@
     “GitHub Copilot: Your AI pair programmer” (GPT-3). GitHub, Inc.
     https://github.com/features/copilot
 
-#TODO - To be filed in later...
+Module that validates the existence of the database.
+Based on the input type, the methods will check if the specific files exist.
 """
 
 __author__ = "Mark Van de Streek"
 __date__ = "2024-09-24"
-__all__ = ["check_for_database_path"]
+__all__ = [
+    "check_for_database_existence",
+    "create_database_file_list",
+    "check_for_database_path",
+]
 
 import logging
 import os

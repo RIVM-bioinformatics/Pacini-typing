@@ -7,7 +7,16 @@
     “GitHub Copilot: Your AI pair programmer” (GPT-3). GitHub, Inc.
     https://github.com/features/copilot
 
-#TODO - To be filed in later...
+Module that is responsible for running the
+right query against the reference database.
+
+First, the query is prepared by the respective runner
+(BLASTn or KMA). The query is then run by the QueryRunner
+class. The runtime of the query is calculated and the result
+is returned to the main script (pacini_typing.py).
+
+The actual shell code is executed by the
+execute function of the command_utils.py module.
 """
 
 __author__ = "Mark Van de Streek"
@@ -74,7 +83,8 @@ class QueryRunner:
 
     def run(self) -> Tuple[str, str] | bool:
         """
-        The query is already prepared in the constructor. This function runs the query.
+        The query is already prepared in the constructor.
+        This function runs the query.
         The runtime is started and stopped to calculate the runtime.
         The decorated log function logs the query command,
             see the ./decorators/decorators.py file for more information.

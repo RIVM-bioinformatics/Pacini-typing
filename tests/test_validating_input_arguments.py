@@ -11,25 +11,7 @@ This script contains the tests for the validating_input_arguments.py module.
 The tests are used to check the functions that validate the input arguments.
 Both good and bad cases are tested to ensure the functions work as expected.
 
-Parametrized tests are used to test the functions with different input parameters
-
-For example:
-
-@pytest.mark.parametrize("filename, expected", [
-    ("myfile.txt", False),
-    ("myfile.txt.gz", False),
-    ("myfile.fasta", True)])
-def my_good_unit_test(filename, expected):
-    assert my_function(filename) == expected
-
-The above code will run the my_good_unit_test *3* times with the given parameters,
-this is the same as running:
-    assert my_function("myfile.txt") == False
-    assert my_function("myfile.txt.gz") == False
-    assert my_function("myfile.fasta") == True
-
-Good: The function should return the expected value
-Bad: The function should raise an exception or return a different value
+Variables in capital letters are used to store the test data and are used in the tests.
 """
 
 __author__ = "Mark Van de Streek"
