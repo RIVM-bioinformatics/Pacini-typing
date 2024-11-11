@@ -7,7 +7,9 @@
     “GitHub Copilot: Your AI pair programmer” (GPT-3). GitHub, Inc.
     https://github.com/features/copilot
 
-# TODO - Fill in later...
+Module that contains custom exceptions for the parsing module.
+These exceptions are raised when invalid args or options are found.
+The raise statements are located in xxx module. # TODO: Update this line
 """
 
 __author__ = "Mark Van de Streek"

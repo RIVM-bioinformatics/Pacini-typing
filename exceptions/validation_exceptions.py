@@ -7,7 +7,10 @@
     “GitHub Copilot: Your AI pair programmer” (GPT-3). GitHub, Inc.
     https://github.com/features/copilot
 
-# TODO - Fill in later...
+Module that contains custom exceptions for the validation input arguments module.
+These exceptions are raised for basic validation errors in the input arguments,
+i.e., invalid file extensions, missing files, etc.
+The raise statements can be found in the validation/validate_input_arguments.py module.
 """
 
 __author__ = "Mark Van de Streek"

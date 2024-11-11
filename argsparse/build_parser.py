@@ -7,8 +7,11 @@
     “GitHub Copilot: Your AI pair programmer” (GPT-3). GitHub, Inc.
     https://github.com/features/copilot
 
-Building parser script that contains a main function that parses the arguments.
-See the main method for specific information.
+This module is responsible for building the main parser object for 
+the Pacini-typing tool.
+
+The parser is being set up with the necessary arguments and subcommands
+The subcommands are built in separate scripts and added to the main parser object.
 """
 
 __author__ = "Mark Van de Streek"
@@ -26,11 +29,14 @@ import argsparse.args_query
 
 def main(givenargs: list[str]) -> argparse.Namespace:
     """
-    main and only function of this script that will be used to
+    main and only function of this script that is used to
     create a parser object and return the arguments in a parsed object.
     The build_makedatabase_command function is used to build sub argument parser,
     this subparser is added to the main parser object.
     ----------
+    Input:
+        - givenargs: list of arguments that are passed to the script,
+            could be sys.argv[1:] or a test list of arguments
     Output:
         - args: parsed object with the arguments
     ----------
@@ -67,6 +73,8 @@ def main(givenargs: list[str]) -> argparse.Namespace:
 
     args = parser.parse_args(givenargs)
 
+    # A subcommand is required, if not provided, print help and exit
+    # This is done to ensure that the user provides a subcommand
     if not hasattr(args, "options") or args.options is None:
         parser.print_help()
         sys.exit(1)

@@ -7,7 +7,9 @@
     “GitHub Copilot: Your AI pair programmer” (GPT-3). GitHub, Inc.
     https://github.com/features/copilot
 
-# TODO - Fill in later...
+Module that contains custom exceptions for the validate_database module.
+These exceptions are raised when invalid database is provided or not found.
+The raise statements are located in validation/validate_database.py
 """
 
 __author__ = "Mark Van de Streek"

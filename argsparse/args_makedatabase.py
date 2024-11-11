@@ -7,11 +7,14 @@
     “GitHub Copilot: Your AI pair programmer” (GPT-3). GitHub, Inc.
     https://github.com/features/copilot
 
-Simple module that separates the makedatabase subcommand from the main parser.
+This module is responsible for building the makedatabase subcommand for the parser.
+The subcommand is used to create a new reference database.
+The subcommand is added to the main parsing object in the build_parser script.
 """
 
 __author__ = "Mark Van de Streek"
 __data__ = "2024-09-24"
+__all__ = ["build_makedatabase_command"]
 
 
 from argparse import _SubParsersAction
@@ -19,8 +22,8 @@ from argparse import _SubParsersAction
 
 def build_makedatabase_command(subparsers: _SubParsersAction) -> None:
     """
-    Script that builds the makedatabase subcommand for the parser
-    This subcommand is added to the main parsing object in the build_parser script.
+    Function that builds the makedatabase subcommand for the parser
+    This function is called from the build_parser script
     ----------
     Input:
         - subparsers: subparsers object that is used to add the subcommand
