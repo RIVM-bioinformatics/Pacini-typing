@@ -45,6 +45,8 @@ See the README.md file for more information about the pipeline
 ----------
 """
 
+from __future__ import annotations
+
 __author__ = "Mark Van de Streek"
 __data__ = "2024-10-24"
 __all__ = ["PaciniTyping", "main"]
@@ -57,13 +59,13 @@ import shutil
 import sys
 from typing import Any, Tuple
 
-import argsparse.build_parser
-from exceptions.validate_database_exceptions import InvalidDatabaseError
+import preprocessing.argsparse.build_parser
+from preprocessing.exceptions.validate_database_exceptions import InvalidDatabaseError
 from makedatabase import DatabaseBuilder
 from queries.query_runner import QueryRunner
-from validation.determine_input_type import InputFileInspector
-from validation.validate_database import check_for_database_path
-from validation.validating_input_arguments import ArgsValidator
+from preprocessing.validation.determine_input_type import InputFileInspector
+from preprocessing.validation.validate_database import check_for_database_path
+from preprocessing.validation.validating_input_arguments import ArgsValidator
 
 logging.basicConfig(
     level=logging.INFO,
@@ -421,9 +423,9 @@ def main(provided_args: list[str] | None = None) -> None:
     ----------
     """
     if provided_args:
-        args = argsparse.build_parser.main(provided_args)
+        args = preprocessing.argsparse.build_parser.main(provided_args)
     else:
-        args = argsparse.build_parser.main(sys.argv[1:])
+        args = preprocessing.argsparse.build_parser.main(sys.argv[1:])
 
     pacini_typing = PaciniTyping(args)
     pacini_typing.run()

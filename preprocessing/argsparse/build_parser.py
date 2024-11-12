@@ -23,8 +23,8 @@ import sys
 
 import pkg_resources
 
-import argsparse.args_makedatabase
-import argsparse.args_query
+import preprocessing.argsparse.args_makedatabase
+import preprocessing.argsparse.args_query
 
 
 def main(givenargs: list[str]) -> argparse.Namespace:
@@ -68,8 +68,8 @@ def main(givenargs: list[str]) -> argparse.Namespace:
         dest="options",
     )
 
-    argsparse.args_makedatabase.build_makedatabase_command(subparsers)
-    argsparse.args_query.build_query_command(subparsers)
+    preprocessing.argsparse.args_makedatabase.build_makedatabase_command(subparsers)
+    preprocessing.argsparse.args_query.build_query_command(subparsers)
 
     args = parser.parse_args(givenargs)
 

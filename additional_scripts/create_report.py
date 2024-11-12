@@ -116,14 +116,14 @@ def create_external_report():
                 res_file = f"{samples_dir}/{line}/Pacini_run.tsv.tsv"
                 if os.path.isfile(res_file):
                     with open(res_file, "r", encoding="utf-8") as res:
-                        for l in res:
-                            if l.startswith("Template_Name"):
+                        for item in res:
+                            if item.startswith("Template_Name"):
                                 if not header_added:
-                                    report.write(l)
+                                    report.write(item)
                                     header_added = True
                                 continue
                             else:
-                                report.write(line + "\t" + l)
+                                report.write(line + "\t" + item)
 
 
 if __name__ == "__main__":

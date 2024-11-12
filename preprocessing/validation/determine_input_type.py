@@ -29,7 +29,7 @@ __all__ = ["InputFileInspector"]
 import logging
 import re
 
-from exceptions.determine_input_type_exceptions import (
+from preprocessing.exceptions.determine_input_type_exceptions import (
     InvalidFastaOrFastqError,
     InvalidSequenceError,
     InvalidSequencingTypesError,

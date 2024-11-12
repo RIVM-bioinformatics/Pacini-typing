@@ -21,13 +21,13 @@ from unittest import mock
 
 import pytest
 
-from exceptions.validation_exceptions import (
+from preprocessing.exceptions.validation_exceptions import (
     FileNotExistsError,
     InvalidFileExtensionError,
     InvalidPairedError,
     ValidationError,
 )
-from validation.validating_input_arguments import ArgsValidator
+from preprocessing.validation.validating_input_arguments import ArgsValidator
 
 GET_FILE_EXTENSIONS = [
     (["myfile", "txt"], ".txt"),
@@ -53,14 +53,14 @@ VALIDATE_FILE_EXTENSIONS = [
 ]
 
 CHECK_FILE_EXISTENCE_GOOD = [
-    ("argsparse/build_parser.py", True),
+    ("preprocessing/argsparse/build_parser.py", True),
     ("pacini_typing.py", True),
     ("README.md", True),
 ]
 
 CHECK_FILE_EXISTENCE_FAIL = [
-    ("argsparse/build_parser", False),
-    ("argsparse/build_parser.sh", False),
+    ("preprocessing/argsparse/build_parser", False),
+    ("preprocessing/argsparse/build_parser.sh", False),
     ("readme", False),
 ]
 
@@ -268,11 +268,11 @@ def test_check_paired_names_fail(args1, args2):
 
 
 @mock.patch(
-    target="validation.validating_input_arguments.ArgsValidator.check_file_existence",
+    target="preprocessing.validation.validating_input_arguments.ArgsValidator.check_file_existence",
     return_value=False,
 )
 @mock.patch(
-    target="validation.validating_input_arguments.ArgsValidator.validate_file_extensions",
+    target="preprocessing.validation.validating_input_arguments.ArgsValidator.validate_file_extensions",
     return_value=False,
 )
 # pylint: disable=unused-argument

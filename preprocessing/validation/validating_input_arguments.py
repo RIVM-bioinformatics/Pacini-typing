@@ -25,7 +25,7 @@ from typing import Any
 
 import yaml
 
-from exceptions.validation_exceptions import (
+from preprocessing.exceptions.validation_exceptions import (
     FileNotExistsError,
     InvalidFileExtensionError,
     InvalidFilterOptionsError,
