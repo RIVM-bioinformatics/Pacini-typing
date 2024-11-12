@@ -36,11 +36,17 @@ def get_version() -> str:
 setup(
     name="pacini_typing",
     version=get_version(),
+    author="Mark Van de Streek",
+    author_email="ids-bioinformatics@rivm.nl",
     packages=find_packages(),
-    py_modules=["pacini_typing"],
+    long_description=open("README.md", encoding="utf-8").read(),
+    long_description_content_type="text/markdown",
+    include_package_data=True,
+    py_modules=["pacini_typing", "makedatabase", "command_utils"],
     entry_points={
         "console_scripts": [
             "pacini_typing = pacini_typing:main",
+            "Pacini-typing = pacini_typing:main",
         ],
     },
 )

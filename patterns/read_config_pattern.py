@@ -19,9 +19,12 @@ from typing import Any
 
 import yaml
 
-from preprocessing.exceptions import YAMLLoadingError, YAMLStructureError
-from preprocessing.exceptions import InvalidDatabaseError
 from makedatabase import DatabaseBuilder
+from preprocessing.exceptions import (
+    InvalidDatabaseError,
+    YAMLLoadingError,
+    YAMLStructureError,
+)
 from preprocessing.validation import check_for_database_path
 
 REQUIRED_KEYS = ["metadata", "database", "pattern"]
