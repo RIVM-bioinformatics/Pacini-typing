@@ -374,7 +374,7 @@ class PaciniTyping:
             )
             sys.exit(1)
 
-    def check_valid_database_path(self) -> None:
+    def check_valid_database_path(self, database_builder: dict[str, Any]) -> None:
         """
         Function that calls the check_for_database_path function.
         The validation is done based on the following:
@@ -394,18 +394,13 @@ class PaciniTyping:
         ----------
         """
         logging.debug("Checking if the database exists...")
-        check_for_database_builder = {
-            "database_path": self.option["database_path"],
-            "database_name": self.option["database_name"],
-            "file_type": self.option["file_type"],
-        }
-        if not check_for_database_path(arg_options=check_for_database_builder):
+        if not check_for_database_path(arg_options=database_builder):
             raise InvalidDatabaseError(
-                check_for_database_builder["database_path"],
-                check_for_database_builder["database_name"],
+                database_builder["database_path"],
+                database_builder["database_name"],
             )
 
-    def run_query(self) -> Tuple[str, str] | bool:
+    def run_query(self, query_runner_builder: dict[str, Any]) -> Tuple[str, str] | bool:
         """
         Function that runs the query operation.
         This means the QueryRunner of the query_runner.py is called.
@@ -420,7 +415,7 @@ class PaciniTyping:
         ----------
         """
         logging.debug("Running the query operation against database...")
-        runner = QueryRunner(run_options=self.option)
+        runner = QueryRunner(run_options=query_runner_builder)
         result = runner.run()
         logging.info("Query runtime: %s seconds", runner.get_runtime())
 
@@ -451,17 +446,29 @@ class PaciniTyping:
         elif self.option["query"]:
             # Retrieve the file type
             self.get_file_type()
+            
+            # TODO: RE USE THIS WAY FOR CONFIG OPTION AS WELL, NOT ONLY FOR QUERY
+            query_builer = {
+                "file_type": self.option["file_type"],
+                "input_file_list": self.option["input_file_list"],
+                "database_path": self.option["database_path"],
+                "database_name": self.option["database_name"],
+                "output": self.option["query"]["output"],
+            }
+
             # Check if the file type is correct for the input arguments
             self.check_valid_option_with_args()
             # Make sure the database exists
-            self.check_valid_database_path()
+            self.check_valid_database_path(query_builer)
             # Run the query
-            self.run_query()
+            self.run_query(query_builer)
             # result = self.run_query()
             # Parse the results.....
+
         elif self.option["config"]:
             pass
-            # Read the config file
+            # Read config
+            # Parse results
 
 
 def main(provided_args: list[str] | None = None) -> None:

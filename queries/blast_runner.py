@@ -37,7 +37,6 @@ class BLASTn(Enum):
     RUN_OPTION = "blastn"
     # TODO - Move the output format to config file with explanation of the format
     OUTPUT_FORMAT = "6"  # "7 sseqid bitscore evalue slen pident qcovs"
-    IDENTITY = "-perc_identity"
 
     @staticmethod
     def get_query(option: dict[str, Any]) -> list[str]:
@@ -60,9 +59,7 @@ class BLASTn(Enum):
             "-db",
             option["database_path"] + option["database_name"],
             "-out",
-            option["query"]["output"] + ".tsv",
+            option["output"] + ".tsv",
             "-outfmt",
             BLASTn.OUTPUT_FORMAT.value,
-            BLASTn.IDENTITY.value,
-            str(option["query"]["filters"]["identity"]),
         ]

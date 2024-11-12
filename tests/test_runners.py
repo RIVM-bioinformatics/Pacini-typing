@@ -50,11 +50,11 @@ OPTION: Dict[str, Any] = {
     "input_file_list": ["1.fq", "2.fq"],
     "run_path": os.path.abspath(__file__).rsplit(".", 1)[0],
     "file_type": "FASTA",
+    "output": "/dummy/path",
     "makedatabase": None,
     "query": {
         "paired": ["/dummy/path", "/dummy/path"],
         "single": "dummy_file.fastq",
-        "output": "/dummy/path",
         "filters": {
             "identity": 100,
         },
@@ -81,8 +81,6 @@ def test_prepare_query() -> None:
         "-ipe",
         "1.fq",
         "2.fq",
-        "-ID",
-        "100",
         "-tsv",
         "-t_db",
         "./refdir/mydb",
@@ -105,8 +103,6 @@ def test_get_query_different() -> None:
         "-ipe",
         "1.fq",
         "2.fq",
-        "-ID",
-        "100",
         "-tsv",
         "-t_db",
         "./refdir/my_new_db",
@@ -127,8 +123,6 @@ def test_get_query_verbose_false():
         "-ipe",
         "1.fq",
         "2.fq",
-        "-ID",
-        "100",
         "-tsv",
         "-t_db",
         "./refdir/mydb",
@@ -152,8 +146,6 @@ def test_blast_prepare_query():
         "/dummy/path.tsv",
         "-outfmt",
         "6",
-        "-perc_identity",
-        "100",
     ]
 
 
@@ -174,8 +166,6 @@ def test_blast_get_query_different():
         "/dummy/path.tsv",
         "-outfmt",
         "6",
-        "-perc_identity",
-        "100",
     ]
 
 
