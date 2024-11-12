@@ -9,6 +9,7 @@ eggs/
 *.egg-info/
 *.egg
 MANIFEST
+build/
 
 .env
 .venv

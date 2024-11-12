@@ -117,7 +117,7 @@ def setup_teardown() -> Generator[list[str], None, None]:
     args = [
         "--verbose",
         "makedatabase",
-        "--input",
+        "--input_file",
         INPUT_FILE,
         "--database_path",
         DATABASE_PATH,

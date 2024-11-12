@@ -123,8 +123,16 @@ class PaciniTyping:
         """
         logging.debug("Placing all args and necessary information in a dictionary")
         self.option = {
-            "database_path": self.input_args.database_path,
-            "database_name": self.input_args.database_name,
+            "database_path": (
+                self.input_args.database_path
+                if hasattr(self.input_args, "database_path")
+                else None
+            ),
+            "database_name": (
+                self.input_args.database_name
+                if hasattr(self.input_args, "database_name")
+                else None
+            ),
             "option": self.input_args.options,
             "verbose": self.input_args.verbose,
             "run_path": os.path.abspath(__file__).rsplit(".", 1)[0],
@@ -140,11 +148,15 @@ class PaciniTyping:
                     "identity": self.input_args.identity,
                 },
             }
-
         elif self.input_args.options == "makedatabase":
             self.option["makedatabase"] = {
                 "database_type": self.input_args.database_type,
+                "input": self.input_args.input_file,
+            }
+        elif self.input_args.options == None:
+            self.option["config"] = {
                 "input": self.input_args.input,
+                "config_path": self.input_args.config,
             }
 
     def setup_logging(self) -> None:
@@ -183,6 +195,9 @@ class PaciniTyping:
                 input_files_list.extend(self.option["query"]["paired"])
         elif self.option["makedatabase"]:
             input_files_list.append(self.option["makedatabase"]["input"])
+        # Double check if the config option is really the only option
+        elif self.option["config"] and self.option["option"] == None:
+            input_files_list.extend(self.option["config"]["input"])
         self.option["input_file_list"] = input_files_list
 
     def check_for_unzip_files(self) -> None:

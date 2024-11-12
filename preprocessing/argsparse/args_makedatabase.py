@@ -34,8 +34,8 @@ def build_makedatabase_command(subparsers: _SubParsersAction) -> None:
         help="Create a new reference database",
     )
     makedatabase.add_argument(
-        "-i",
-        "--input",
+        "-I",
+        "--input_file",
         type=str,
         required=True,
         metavar="File",

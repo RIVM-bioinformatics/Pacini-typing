@@ -19,12 +19,13 @@ __data__ = "2024-09-24"
 __all__ = ["main"]
 
 import argparse
+from argparse import RawTextHelpFormatter
 import sys
 
 import pkg_resources
 
-import preprocessing.argsparse.args_makedatabase
-import preprocessing.argsparse.args_query
+from preprocessing.argsparse.args_makedatabase import build_makedatabase_command
+from preprocessing.argsparse.args_query import build_query_command
 
 
 def main(givenargs: list[str]) -> argparse.Namespace:
@@ -43,7 +44,15 @@ def main(givenargs: list[str]) -> argparse.Namespace:
     """
     parser = argparse.ArgumentParser(
         prog="Pacini",
-        description="Bacterial Genotyping Tool for RIVM IDS-Bioinformatics",
+        description=(
+            "Bacterial Genotyping Tool for RIVM IDS-Bioinformatics\n\n"
+            "Either pick a subcommand to manually run the tool or\n"
+            "provide a predefined configuration file and your input file(s) (FASTA/FASTQ)\n"
+            "and let Pacini-typing do the work for you.\n\n"
+            "If using a configuration file, both the\n"
+            "--config and --input arguments are required.\n\n"
+        ),
+        formatter_class=RawTextHelpFormatter,
         epilog="See github.com/RIVM-Bioinformatics for more information",
     )
 
@@ -62,21 +71,42 @@ def main(givenargs: list[str]) -> argparse.Namespace:
         version=pkg_resources.get_distribution("pacini_typing").version,
     )
 
+    parser.add_argument(
+        "-c",
+        "--config",
+        type=str,
+        required=False,
+        metavar="File",
+        help="Path to predefined configuration file",
+    )
+
+    parser.add_argument(
+        "-i",
+        "--input",
+        type=str,
+        nargs="+",
+        required=False,
+        metavar="File",
+        help="Path to input file(s). Accepts 1 fasta file or 2 fastq files",
+    )
+
     subparsers = parser.add_subparsers(
         title="operations",
         description="For more information on a specific command, type: Pacini.py <command> -h",
         dest="options",
     )
 
-    preprocessing.argsparse.args_makedatabase.build_makedatabase_command(subparsers)
-    preprocessing.argsparse.args_query.build_query_command(subparsers)
+    build_makedatabase_command(subparsers)
+    build_query_command(subparsers)
 
     args = parser.parse_args(givenargs)
 
-    # A subcommand is required, if not provided, print help and exit
-    # This is done to ensure that the user provides a subcommand
-    if not hasattr(args, "options") or args.options is None:
-        parser.print_help()
-        sys.exit(1)
+    # Custom validation logic
+    if not args.options:
+        if not args.config or not args.input:
+            parser.error("Both --config and --input must be provided if no subcommand is specified.")
+    else:
+        if args.config or args.input:
+            parser.error("--config or --input cannot be used with subcommands.")
 
     return args

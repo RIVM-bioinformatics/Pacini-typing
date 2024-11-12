@@ -20,12 +20,13 @@ from typing import Any
 import yaml
 
 from makedatabase import DatabaseBuilder
-from preprocessing.exceptions import (
-    InvalidDatabaseError,
+from preprocessing.exceptions.parsing_exceptions import (
     YAMLLoadingError,
     YAMLStructureError,
 )
-from preprocessing.validation import check_for_database_path
+
+from preprocessing.exceptions.validate_database_exceptions import InvalidDatabaseError
+from preprocessing.validation.validate_database import check_for_database_path
 
 REQUIRED_KEYS = ["metadata", "database", "pattern"]
 REQUIRED_PATTERN_KEYS = [
@@ -154,14 +155,6 @@ class ReadConfigPattern:
         print(yaml.dump(self.pattern, default_flow_style=False))
         print(json.dumps(self.pattern, indent=4))
 
-    # Necessary?
-    def get_pattern(self):
-        """
-        Return the pattern
-        Fill in later...
-        """
-        return self.pattern
-
     def run_config(self):
         """
         Run the configuration
@@ -177,6 +170,7 @@ class ReadConfigPattern:
 
 if __name__ == "__main__":
     pattern = ReadConfigPattern(
-        "/Users/mvandestreek/Developer/pacini_typing/patterns/O1.yaml", "fasta"
+        "/Users/mvandestreek/Developer/pacini_typing/patterns/O139.yaml",
+        "fasta"
     )
     pattern.run_config()
