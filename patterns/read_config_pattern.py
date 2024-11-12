@@ -24,7 +24,6 @@ from preprocessing.exceptions.parsing_exceptions import (
     YAMLLoadingError,
     YAMLStructureError,
 )
-
 from preprocessing.exceptions.validate_database_exceptions import InvalidDatabaseError
 from preprocessing.validation.validate_database import check_for_database_path
 
@@ -170,7 +169,6 @@ class ReadConfigPattern:
 
 if __name__ == "__main__":
     pattern = ReadConfigPattern(
-        "/Users/mvandestreek/Developer/pacini_typing/patterns/O139.yaml",
-        "fasta"
+        "/Users/mvandestreek/Developer/pacini_typing/patterns/O139.yaml", "fasta"
     )
     pattern.run_config()

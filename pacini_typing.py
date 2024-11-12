@@ -122,6 +122,23 @@ class PaciniTyping:
         self.option is also used to store more information.
         """
         logging.debug("Placing all args and necessary information in a dictionary")
+        self.set_general_attributes()
+        if self.input_args.options == "query":
+            self.set_query_attributes()
+        elif self.input_args.options == "makedatabase":
+            self.set_makedatabase_attributes()
+        elif self.input_args.options is None:
+            self.set_config_attributes()
+
+    def set_general_attributes(self):
+        """
+        Method to set the general attributes.
+        It sets the general attributes of the self.option variable.
+        This means, some general arguments that coming from argparse are
+        stored in the option variable.
+        Other specific arguments are parsed in set_query_attributes and
+        set_makedatabase_attributes.
+        """
         self.option = {
             "database_path": (
                 self.input_args.database_path
@@ -139,25 +156,44 @@ class PaciniTyping:
             "query": None,
             "makedatabase": None,
         }
-        if self.input_args.options == "query":
-            self.option["query"] = {
-                "paired": self.input_args.paired,
-                "single": self.input_args.single,
-                "output": self.input_args.output,
-                "filters": {
-                    "identity": self.input_args.identity,
-                },
-            }
-        elif self.input_args.options == "makedatabase":
-            self.option["makedatabase"] = {
-                "database_type": self.input_args.database_type,
-                "input": self.input_args.input_file,
-            }
-        elif self.input_args.options == None:
-            self.option["config"] = {
-                "input": self.input_args.input,
-                "config_path": self.input_args.config,
-            }
+
+    def set_query_attributes(self):
+        """
+        Function that sets the query related attributes.
+        The query attributes are stored in the self.option variable.
+        These options are used to run the query operation later on.
+        """
+        self.option["query"] = {
+            "paired": self.input_args.paired,
+            "single": self.input_args.single,
+            "output": self.input_args.output,
+            "filters": {
+                "identity": self.input_args.identity,
+            },
+        }
+
+    def set_makedatabase_attributes(self):
+        """
+        This function sets the makedatabase related attributes.
+        The makedatabase attributes are stored in the self.option variable.
+        These options are used to run the makedatabase operation manually later on.
+        """
+        self.option["makedatabase"] = {
+            "database_type": self.input_args.database_type,
+            "input": self.input_args.input_file,
+        }
+
+    def set_config_attributes(self):
+        """
+        This function comes into play when the config option is selected.
+        The config attributes are stored in the self.option variable.
+        These options are used to read the config file later on.
+        From this config file, the input database and name are retrieved.
+        """
+        self.option["config"] = {
+            "input": self.input_args.input,
+            "config_path": self.input_args.config,
+        }
 
     def setup_logging(self) -> None:
         """
@@ -196,7 +232,7 @@ class PaciniTyping:
         elif self.option["makedatabase"]:
             input_files_list.append(self.option["makedatabase"]["input"])
         # Double check if the config option is really the only option
-        elif self.option["config"] and self.option["option"] == None:
+        elif self.option["config"] and self.option["option"] is None:
             input_files_list.extend(self.option["config"]["input"])
         self.option["input_file_list"] = input_files_list
 
@@ -423,6 +459,9 @@ class PaciniTyping:
             self.run_query()
             # result = self.run_query()
             # Parse the results.....
+        elif self.option["config"]:
+            pass
+            # Read the config file
 
 
 def main(provided_args: list[str] | None = None) -> None:

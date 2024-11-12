@@ -20,7 +20,6 @@ __all__ = ["main"]
 
 import argparse
 from argparse import RawTextHelpFormatter
-import sys
 
 import pkg_resources
 
