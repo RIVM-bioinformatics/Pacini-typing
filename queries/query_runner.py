@@ -15,9 +15,11 @@ First, the query is prepared by the respective runner
 class. The runtime of the query is calculated and the result
 is returned to the main script (pacini_typing.py).
 
-The actual shell code is executed by the
+The actual shell code will be executed by the
 execute function of the command_utils.py module.
 """
+
+from __future__ import annotations
 
 __author__ = "Mark Van de Streek"
 __data__ = "2024-09-24"
@@ -74,13 +76,6 @@ class QueryRunner:
         elif self.run_options["file_type"] == "FASTQ":
             self.query = KMA.get_query(option=self.run_options)
 
-    def __str__(self) -> str:
-        """
-        Readable representation of the class.
-        This function is called when the class is printed.
-        """
-        return f"QueryRunner(query={self.query})"
-
     def run(self) -> Tuple[str, str] | bool:
         """
         The query is already prepared in the constructor.
@@ -114,3 +109,58 @@ class QueryRunner:
         """
         logging.debug("Getting the runtime of the query...")
         return round((self.stop_time - self.start_time), 2)
+
+
+# Implement of a possible QueryRunnerBuilder class
+# This class is not used in the current implementation
+# class QueryRunnerBuilder:
+#     """
+#     # TODO - Fill in later...
+#     """
+#
+#     def __init__(self):
+#         """
+#         Fill in later...
+#         """
+#         self.run_options = {}
+#
+#     def set_file_type(self, file_type: str) -> QueryRunnerBuilder:
+#         """
+#         Fill in later...
+#         """
+#         self.run_options["file_type"] = file_type
+#         return self
+#
+#     def set_input_file_list(self, input_file: list[str]) -> QueryRunnerBuilder:
+#         """
+#         Fill in later...
+#         """
+#         self.run_options["input_file_list"] = input_file
+#         return self
+#
+#     def set_database_path(self, database_path: str) -> QueryRunnerBuilder:
+#         """
+#         Fill in later...
+#         """
+#         self.run_options["database_path"] = database_path
+#         return self
+#
+#     def set_database_name(self, database_name: str) -> QueryRunnerBuilder:
+#         """
+#         Fill in later...
+#         """
+#         self.run_options["database_name"] = database_name
+#         return self
+#
+#     def set_output(self, output: str) -> QueryRunnerBuilder:
+#         """
+#         Fill in later...
+#         """
+#         self.run_options["output"] = output
+#         return self
+#
+#     def build(self) -> QueryRunner:
+#         """
+#         Fill in later...
+#         """
+#         return QueryRunner(self.run_options)

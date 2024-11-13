@@ -38,7 +38,7 @@ class KMA(Enum):
     RUN_OPTION = "kma"
     PAIRED_OPTION = "-ipe"
     OUTPUT_FORMAT = "-tsv"
-    
+
     @staticmethod
     def get_query(option: dict[str, Any]) -> list[str]:
         """

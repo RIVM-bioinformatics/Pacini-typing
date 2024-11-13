@@ -27,16 +27,21 @@ class BLASTn(Enum):
     Enum class to store BLAST options and flags.
     With this Enum class, the options are stored in a more structured way
     and could be changed very easily.
+    Another output format could be added, for example:
+    - "7 sseqid bitscore evalue slen pident qcovs"
     ----------
     RUN_OPTION: string that is used in the subprocess.run() method
     OUTPUT_FORMAT: flag for the output format
     IDENTITY: flag for the minimum identity percentage
     ----------
     """
-
     RUN_OPTION = "blastn"
+    QUERY_OPTION = "-query"
+    DATABASE_OPTION = "-db"
+    OUTPUT_OPTION = "-out"
+    OUTPUT_FORMAT_OPTION = "-outfmt"
+    OUTPUT_FORMAT = "6"
     # TODO - Move the output format to config file with explanation of the format
-    OUTPUT_FORMAT = "6"  # "7 sseqid bitscore evalue slen pident qcovs"
 
     @staticmethod
     def get_query(option: dict[str, Any]) -> list[str]:
@@ -54,12 +59,12 @@ class BLASTn(Enum):
         """
         return [
             BLASTn.RUN_OPTION.value,
-            "-query",
+            BLASTn.QUERY_OPTION.value,
             option["input_file_list"][0],
-            "-db",
+            BLASTn.DATABASE_OPTION.value,
             option["database_path"] + option["database_name"],
-            "-out",
+            BLASTn.OUTPUT_OPTION.value,
             option["output"] + ".tsv",
-            "-outfmt",
+            BLASTn.OUTPUT_FORMAT_OPTION.value,
             BLASTn.OUTPUT_FORMAT.value,
         ]
