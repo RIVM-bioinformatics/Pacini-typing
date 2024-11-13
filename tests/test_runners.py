@@ -37,6 +37,7 @@ import time
 from typing import Any, Dict
 
 import pytest
+from unittest import mock
 
 from queries.blast_runner import BLASTn
 from queries.kma_runner import KMA
@@ -50,7 +51,7 @@ OPTION: Dict[str, Any] = {
     "input_file_list": ["1.fq", "2.fq"],
     "run_path": os.path.abspath(__file__).rsplit(".", 1)[0],
     "file_type": "FASTA",
-    "output": "/dummy/path",
+    "output": "./dummy/path",
     "makedatabase": None,
     "query": {
         "paired": ["/dummy/path", "/dummy/path"],
@@ -85,7 +86,7 @@ def test_prepare_query() -> None:
         "-t_db",
         "./refdir/mydb",
         "-o",
-        "/dummy/path",
+        "./dummy/path",
     ]
 
 
@@ -107,7 +108,7 @@ def test_get_query_different() -> None:
         "-t_db",
         "./refdir/my_new_db",
         "-o",
-        "/dummy/path",
+        "./dummy/path",
     ]
 
 
@@ -127,7 +128,7 @@ def test_get_query_verbose_false():
         "-t_db",
         "./refdir/mydb",
         "-o",
-        "/dummy/path",
+        "./dummy/path",
     ]
 
 
@@ -143,7 +144,7 @@ def test_blast_prepare_query():
         "-db",
         "./refdir/mydb",
         "-out",
-        "/dummy/path.tsv",
+        "./dummy/path.tsv",
         "-outfmt",
         "6",
     ]
@@ -163,14 +164,16 @@ def test_blast_get_query_different():
         "-db",
         "./refdir/my_new_db",
         "-out",
-        "/dummy/path.tsv",
+        "./dummy/path.tsv",
         "-outfmt",
         "6",
     ]
 
 
+@mock.patch("os.path.exists", return_value=False)
+@mock.patch("os.makedirs")
 @pytest.mark.parametrize("runtime", RUN_TIMES)
-def test_get_runtime(runtime: float):
+def test_get_runtime(mock, mock1, runtime: float):
     """
     Function that tests the get_runtime() method of the QueryRunner class
     """

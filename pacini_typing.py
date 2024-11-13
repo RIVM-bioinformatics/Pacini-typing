@@ -60,13 +60,21 @@ import sys
 from typing import Any, Tuple
 
 import preprocessing.argsparse.build_parser
-from preprocessing.exceptions.validate_database_exceptions import InvalidDatabaseError
+from preprocessing.exceptions.validate_database_exceptions import (
+    InvalidDatabaseError,
+)
 from makedatabase import DatabaseBuilder
 from queries.query_runner import QueryRunner
-from preprocessing.validation.determine_input_type import InputFileInspector
+from preprocessing.validation.determine_input_type import (
+    InputFileInspector,
+)
 from patterns.read_config_pattern import ReadConfigPattern
-from preprocessing.validation.validate_database import check_for_database_path
-from preprocessing.validation.validating_input_arguments import ArgsValidator
+from preprocessing.validation.validate_database import (
+    check_for_database_path,
+)
+from preprocessing.validation.validating_input_arguments import (
+    ArgsValidator,
+)
 
 logging.basicConfig(
     level=logging.INFO,
@@ -122,7 +130,9 @@ class PaciniTyping:
         require a path to certain files.
         self.option is also used to store more information.
         """
-        logging.debug("Placing all args and necessary information in a dictionary")
+        logging.debug(
+            "Placing all args and necessary information in a dictionary"
+        )
         self.set_general_attributes()
         if self.input_args.options == "query":
             self.set_query_attributes()
@@ -246,7 +256,9 @@ class PaciniTyping:
         """
         logging.debug("Searching for .gz files in the input list")
         gz_files = [
-            file for file in self.option["input_file_list"] if file.endswith(".gz")
+            file
+            for file in self.option["input_file_list"]
+            if file.endswith(".gz")
         ]
         if gz_files:
             logging.info("Found files that need to be unzipped, unzipping...")
@@ -299,7 +311,9 @@ class PaciniTyping:
         logging.debug("Validating the input arguments...")
         argsvalidator = ArgsValidator(self.option)
         if argsvalidator.validate():
-            logging.info("Input arguments have been validated, found no issues.")
+            logging.info(
+                "Input arguments have been validated, found no issues."
+            )
         else:
             logging.error(
                 "Error while validation the input arguments, "
@@ -340,7 +354,10 @@ class PaciniTyping:
         self.option["file_type"] = InputFileInspector(
             self.option["input_file_list"]
         ).get_file_type()
-        logging.info("File type has been determined: %s", self.option["file_type"])
+        logging.info(
+            "File type has been determined: %s",
+            self.option["file_type"],
+        )
 
     def check_valid_option_with_args(self) -> None:
         """
@@ -355,7 +372,9 @@ class PaciniTyping:
             - The program will exit with code 1.
         ----------
         """
-        logging.debug("Checking if the file type is correct for the input arguments...")
+        logging.debug(
+            "Checking if the file type is correct for the input arguments..."
+        )
         if (
             len(self.option["input_file_list"]) == 1
             and self.option["file_type"] == "FASTQ"
@@ -369,7 +388,9 @@ class PaciniTyping:
             )
             sys.exit(1)
 
-    def check_valid_database_path(self, database_builder: dict[str, Any]) -> bool:
+    def check_valid_database_path(
+        self, database_builder: dict[str, Any]
+    ) -> bool:
         """
         Function that calls the check_for_database_path function.
         The validation is done based on the following:
@@ -391,7 +412,9 @@ class PaciniTyping:
         logging.debug("Checking if the database exists...")
         return check_for_database_path(arg_options=database_builder)
 
-    def run_query(self, query_runner_builder: dict[str, Any]) -> Tuple[str, str] | bool:
+    def run_query(
+        self, query_runner_builder: dict[str, Any]
+    ) -> Tuple[str, str] | bool:
         """
         Function that runs the query operation.
         This means the QueryRunner of the query_runner.py is called.
@@ -439,7 +462,7 @@ class PaciniTyping:
                 "input_fasta_file": self.option["makedatabase"]["input"],
             }
             self.run_makedatabase(database_builder)
-        
+
         # TODO - remove deprecated code below...
         # elif self.option["query"]:
         #     # Retrieve the file type
@@ -513,6 +536,16 @@ class PaciniTyping:
                     # Re-use the run_makedatabase() method with right params
                     self.run_makedatabase(pattern.creation_dict)
 
+                # Additionally, the query input and output must be set.
+                # Output as follows: output/fasta_results.tsv
+                pattern.creation_dict["input_file_list"] = self.option[
+                    "config"
+                ]["input"]
+                pattern.creation_dict["output"] = (
+                    pattern.pattern["database"]["run_output"]
+                    + self.option["file_type"]
+                    + "_results.tsv"
+                )
                 # Check if database does exists at this point,
                 # if not, raise an error and exit the program
                 # Otherwise, run the query operation

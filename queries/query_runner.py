@@ -69,12 +69,28 @@ class QueryRunner:
         self.run_options = run_options
         self.start_time = 0.0
         self.stop_time = 0.0
-
+        self.check_output_dir()
         logging.debug("Preparing the query...")
         if self.run_options["file_type"] == "FASTA":
             self.query = BLASTn.get_query(option=self.run_options)
         elif self.run_options["file_type"] == "FASTQ":
             self.query = KMA.get_query(option=self.run_options)
+
+    def check_output_dir(self) -> bool:
+        """
+        Method that checks if the output directory exists.
+        If the directory does not exist, it will be created.
+        ----------
+        Output:
+            - bool: True if the directory exists, False otherwise
+        ----------
+        """
+        logging.debug("Checking if the output directory exists...")
+        output_dir = os.path.dirname(self.run_options["output"])
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+            return False
+        return True
 
     def run(self) -> Tuple[str, str] | bool:
         """
