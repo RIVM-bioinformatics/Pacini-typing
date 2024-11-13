@@ -446,8 +446,11 @@ class PaciniTyping:
         elif self.option["query"]:
             # Retrieve the file type
             self.get_file_type()
-            
-            # TODO: RE USE THIS WAY FOR CONFIG OPTION AS WELL, NOT ONLY FOR QUERY
+            # Check if the file type is correct for the input arguments
+            self.check_valid_option_with_args()
+            # Construct the query params for the query_runner,
+            # We could just pass the whole self.option to the query_runner,
+            # but we want to re-use the query_runner later on with different options
             query_builer = {
                 "file_type": self.option["file_type"],
                 "input_file_list": self.option["input_file_list"],
@@ -455,15 +458,20 @@ class PaciniTyping:
                 "database_name": self.option["database_name"],
                 "output": self.option["query"]["output"],
             }
-
-            # Check if the file type is correct for the input arguments
-            self.check_valid_option_with_args()
-            # Make sure the database exists
             self.check_valid_database_path(query_builer)
             # Run the query
             self.run_query(query_builer)
-            # result = self.run_query()
+            # result = self.run_query(query_builer)
             # Parse the results.....
+
+            # Maybe use a builder pattern for the query_runner:
+            # QueryRunnerBuilder() \
+            #     .set_file_type(self.option["file_type"]) \
+            #     .set_input_file_list(self.option["input_file_list"]) \
+            #     .set_database_path(self.option["database_path"]) \
+            #     .set_database_name(self.option["database_name"]) \
+            #     .set_output(self.option["query"]["output"]) \
+            #     .build().run()
 
         elif self.option["config"]:
             pass
@@ -497,11 +505,6 @@ if __name__ == "__main__":
     main()
 
 ###########################################################################
-
-# TODO - Make the input db arguments required all the time,
-#   so that the database could be created if not found running the query
-
-# TODO: query_runner:__str__ - Is this function necessary?
 
 # TODO: query_runner:run - This return statement is not used anywhere, should it be removed?
 

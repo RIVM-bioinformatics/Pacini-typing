@@ -14,7 +14,6 @@ __author__ = "Mark Van de Streek"
 __data__ = "2024-10-30"
 __all__ = ["ReadConfigPattern"]
 
-import json
 from typing import Any
 
 import yaml
@@ -133,6 +132,18 @@ class ReadConfigPattern:
         DatabaseBuilder(make_database_builder)
         self.check_and_raise_if_missing()
 
+    def __str__(self):
+        """
+        Get the database query
+        Fill in later...
+        """
+        return {
+            "database_path": self.pattern["database"]["path"],
+            "database_name": self.pattern["database"]["name"],
+            "input_fasta_file": self.pattern["database"]["matching_seq_file"],
+            "database_type": "blast" if self.input_file_type == "FASTA" else "kma",
+        }
+
     def check_and_raise_if_missing(self):
         """
         Check and raise if the database is missing
@@ -145,15 +156,6 @@ class ReadConfigPattern:
                 self.pattern["database"]["name"],
             )
 
-    # Remove this function later...
-    def print_pattern(self):
-        """
-        Print the pattern
-        Fill in later...
-        """
-        print(yaml.dump(self.pattern, default_flow_style=False))
-        print(json.dumps(self.pattern, indent=4))
-
     def run_config(self):
         """
         Run the configuration
@@ -163,8 +165,6 @@ class ReadConfigPattern:
         self.validate_config_keys()
         self.validate_pattern_keys()
         self.call_database_builder()
-
-        # self.print_pattern()
 
 
 if __name__ == "__main__":
