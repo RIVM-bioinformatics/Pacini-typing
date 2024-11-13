@@ -35,6 +35,7 @@ class BLASTn(Enum):
     IDENTITY: flag for the minimum identity percentage
     ----------
     """
+
     RUN_OPTION = "blastn"
     QUERY_OPTION = "-query"
     DATABASE_OPTION = "-db"

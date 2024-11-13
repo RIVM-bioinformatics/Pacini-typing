@@ -18,13 +18,10 @@ from typing import Any
 
 import yaml
 
-from makedatabase import DatabaseBuilder
 from preprocessing.exceptions.parsing_exceptions import (
     YAMLLoadingError,
     YAMLStructureError,
 )
-from preprocessing.exceptions.validate_database_exceptions import InvalidDatabaseError
-from preprocessing.validation.validate_database import check_for_database_path
 
 REQUIRED_KEYS = ["metadata", "database", "pattern"]
 REQUIRED_PATTERN_KEYS = [
@@ -52,6 +49,17 @@ class ReadConfigPattern:
         self.config_file = config_file
         self.input_file_type = input_file_type
         self.pattern: dict[Any, Any] = {}
+        # Create a dictionary to store information
+        # This information will be used to:
+        # 1. Check database existence
+        # 2. Create database if it does not exist
+        # 3. Run the query
+        self.creation_dict: dict[str, Any] = {}
+        # Start the process
+        self.read_config()
+        self.validate_config_keys()
+        self.validate_pattern_keys()
+        self.construct_params_dict()
 
     def read_config(self):
         """
@@ -89,31 +97,7 @@ class ReadConfigPattern:
             if key not in self.pattern["pattern"]:
                 raise YAMLStructureError(self.config_file)
 
-    def check_database_existence(self):
-        """
-        Check if the database exists
-        Fill in later...
-        """
-        print("Checking if database exists...")
-        check_for_database_builder: dict[str, str] = {
-            "database_path": self.pattern["database"]["path"],
-            "database_name": self.pattern["database"]["name"],
-            "file_type": self.input_file_type,
-        }
-        return check_for_database_path(check_for_database_builder)
-
-    def call_database_builder(self):
-        """
-        Call the database builder
-        Fill in later...
-        """
-        print("Deciding whether to create database...")
-        if self.check_database_existence():
-            print("Database already exists")
-        else:
-            self.create_database_from_config()
-
-    def create_database_from_config(self):
+    def construct_params_dict(self):
         """
         Create the database from the configuration
         Fill in later...
@@ -123,52 +107,16 @@ class ReadConfigPattern:
         # Check if the database exists
         # If it does not exist, create the database
         # If it does exist, do nothing
-        make_database_builder: dict[str, str] = {
+        self.creation_dict = {
             "database_path": self.pattern["database"]["path"],
             "database_name": self.pattern["database"]["name"],
             "input_fasta_file": self.pattern["database"]["matching_seq_file"],
             "database_type": "blast" if self.input_file_type == "FASTA" else "kma",
+            "file_type": self.input_file_type,
         }
-        DatabaseBuilder(make_database_builder)
-        self.check_and_raise_if_missing()
-
-    def __str__(self):
-        """
-        Get the database query
-        Fill in later...
-        """
-        return {
-            "database_path": self.pattern["database"]["path"],
-            "database_name": self.pattern["database"]["name"],
-            "input_fasta_file": self.pattern["database"]["matching_seq_file"],
-            "database_type": "blast" if self.input_file_type == "FASTA" else "kma",
-        }
-
-    def check_and_raise_if_missing(self):
-        """
-        Check and raise if the database is missing
-        Fill in later...
-        """
-        print("Checking if database was created...")
-        if not self.check_database_existence():
-            raise InvalidDatabaseError(
-                self.pattern["database"]["path"],
-                self.pattern["database"]["name"],
-            )
-
-    def run_config(self):
-        """
-        Run the configuration
-        Fill in later...
-        """
-        self.read_config()
-        self.validate_config_keys()
-        self.validate_pattern_keys()
-        self.call_database_builder()
 
 
 if __name__ == "__main__":
     pattern = ReadConfigPattern(
         "/Users/mvandestreek/Developer/pacini_typing/patterns/O139.yaml", "fasta"
     )
-    pattern.run_config()

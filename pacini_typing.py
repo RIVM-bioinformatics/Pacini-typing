@@ -64,6 +64,7 @@ from preprocessing.exceptions.validate_database_exceptions import InvalidDatabas
 from makedatabase import DatabaseBuilder
 from queries.query_runner import QueryRunner
 from preprocessing.validation.determine_input_type import InputFileInspector
+from patterns.read_config_pattern import ReadConfigPattern
 from preprocessing.validation.validate_database import check_for_database_path
 from preprocessing.validation.validating_input_arguments import ArgsValidator
 
@@ -306,7 +307,7 @@ class PaciniTyping:
             )
             sys.exit(1)
 
-    def run_makedatabase(self) -> None:
+    def run_makedatabase(self, database_creation_args: dict[str, Any]) -> None:
         """
         Function that runs the makedatabase operation.
         This means the DatabaseBuilder of the
@@ -324,13 +325,7 @@ class PaciniTyping:
         see the makedatabase.py file.
         """
         logging.debug("Running the makedatabase operation...")
-        database_builder = {
-            "database_path": self.option["database_path"],
-            "database_name": self.option["database_name"],
-            "database_type": self.option["makedatabase"]["database_type"],
-            "input_fasta_file": self.option["makedatabase"]["input"],
-        }
-        DatabaseBuilder(arg_options=database_builder)
+        DatabaseBuilder(database_creation_args)
 
     def get_file_type(self) -> None:
         """
@@ -374,7 +369,7 @@ class PaciniTyping:
             )
             sys.exit(1)
 
-    def check_valid_database_path(self, database_builder: dict[str, Any]) -> None:
+    def check_valid_database_path(self, database_builder: dict[str, Any]) -> bool:
         """
         Function that calls the check_for_database_path function.
         The validation is done based on the following:
@@ -394,11 +389,7 @@ class PaciniTyping:
         ----------
         """
         logging.debug("Checking if the database exists...")
-        if not check_for_database_path(arg_options=database_builder):
-            raise InvalidDatabaseError(
-                database_builder["database_path"],
-                database_builder["database_name"],
-            )
+        return check_for_database_path(arg_options=database_builder)
 
     def run_query(self, query_runner_builder: dict[str, Any]) -> Tuple[str, str] | bool:
         """
@@ -441,42 +432,100 @@ class PaciniTyping:
 
         if self.option["makedatabase"]:
             # Run with the validated arguments
-            self.run_makedatabase()
-
-        elif self.option["query"]:
-            # Retrieve the file type
-            self.get_file_type()
-            # Check if the file type is correct for the input arguments
-            self.check_valid_option_with_args()
-            # Construct the query params for the query_runner,
-            # We could just pass the whole self.option to the query_runner,
-            # but we want to re-use the query_runner later on with different options
-            query_builer = {
-                "file_type": self.option["file_type"],
-                "input_file_list": self.option["input_file_list"],
+            database_builder = {
                 "database_path": self.option["database_path"],
                 "database_name": self.option["database_name"],
-                "output": self.option["query"]["output"],
+                "database_type": self.option["makedatabase"]["database_type"],
+                "input_fasta_file": self.option["makedatabase"]["input"],
             }
-            self.check_valid_database_path(query_builer)
-            # Run the query
-            self.run_query(query_builer)
-            # result = self.run_query(query_builer)
-            # Parse the results.....
+            self.run_makedatabase(database_builder)
+        
+        # TODO - remove deprecated code below...
+        # elif self.option["query"]:
+        #     # Retrieve the file type
+        #     self.get_file_type()
+        #     # Check if the file type is correct for the input arguments
+        #     self.check_valid_option_with_args()
+        #     # Construct the query params for the query_runner,
+        #     # We could just pass the whole self.option to the query_runner,
+        #     # but we want to re-use the query_runner later on with different options
+        #     query_builer = {
+        #         "file_type": self.option["file_type"],
+        #         "input_file_list": self.option["input_file_list"],
+        #         "database_path": self.option["database_path"],
+        #         "database_name": self.option["database_name"],
+        #         "output": self.option["query"]["output"],
+        #     }
+        #     self.check_valid_database_path(query_builer)
+        #     # Run the query
+        #     self.run_query(query_builer)
+        #     # result = self.run_query(query_builer)
+        #     # Parse the results.....
 
-            # Maybe use a builder pattern for the query_runner:
-            # QueryRunnerBuilder() \
-            #     .set_file_type(self.option["file_type"]) \
-            #     .set_input_file_list(self.option["input_file_list"]) \
-            #     .set_database_path(self.option["database_path"]) \
-            #     .set_database_name(self.option["database_name"]) \
-            #     .set_output(self.option["query"]["output"]) \
-            #     .build().run()
+        #     # Maybe use a builder pattern for the query_runner:
+        #     # QueryRunnerBuilder() \
+        #     #     .set_file_type(self.option["file_type"]) \
+        #     #     .set_input_file_list(self.option["input_file_list"]) \
+        #     #     .set_database_path(self.option["database_path"]) \
+        #     #     .set_database_name(self.option["database_name"]) \
+        #     #     .set_output(self.option["query"]["output"]) \
+        #     #     .build().run()
 
-        elif self.option["config"]:
-            pass
-            # Read config
-            # Parse results
+        else:
+            # Determine the file type and valid options,
+            # both for query and config options
+            self.get_file_type()
+            self.check_valid_option_with_args()
+            # Query option has different requirements than config option
+            # split up the options and check if the database exists
+            if self.option["query"]:
+                # Create the right query builder for the query operation
+                query_builer = {
+                    "file_type": self.option["file_type"],
+                    "input_file_list": self.option["input_file_list"],
+                    "database_path": self.option["database_path"],
+                    "database_name": self.option["database_name"],
+                    "output": self.option["query"]["output"],
+                }
+                # Check if the database exists
+                # If not raise an error because with the query operation,
+                # there is no information to create a database.
+                # Log an error and let the user know it should be
+                # created first or use predefined configuration options.
+                if self.check_valid_database_path(query_builer):
+                    self.run_query(query_builer)
+                else:
+                    raise InvalidDatabaseError(
+                        query_builer["database_name"],
+                        query_builer["file_type"],
+                    )
+            else:
+                # The config option is selected,
+                # read the config file and validate it with
+                # the ReadConfigPattern class
+                pattern = ReadConfigPattern(
+                    self.option["config"]["config_path"],
+                    self.option["file_type"],
+                )
+                # Check if database exists
+                # If not present, create it from the config options
+                if not self.check_valid_database_path(pattern.creation_dict):
+                    # Re-use the run_makedatabase() method with right params
+                    self.run_makedatabase(pattern.creation_dict)
+
+                # Check if database does exists at this point,
+                # if not, raise an error and exit the program
+                # Otherwise, run the query operation
+                if self.check_valid_database_path(pattern.creation_dict):
+                    self.run_query(pattern.creation_dict)
+                else:
+                    # Let the user know the database does not exist,
+                    # if the code reaches here, the run_makedatabase() was
+                    # called without errors, so a bigger issue is present here.
+                    raise InvalidDatabaseError(
+                        pattern.creation_dict["database_name"],
+                        pattern.creation_dict["file_type"],
+                    )
 
 
 def main(provided_args: list[str] | None = None) -> None:
