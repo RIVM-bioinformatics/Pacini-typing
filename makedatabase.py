@@ -19,9 +19,12 @@ __all__ = ["DatabaseBuilder"]
 
 import logging
 import os
-import subprocess
+import sys
+from typing import Any, Tuple
 
-from decorators import decorators
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+from command_utils import execute
 
 
 class DatabaseBuilder:
@@ -36,7 +39,7 @@ class DatabaseBuilder:
     ----------
     """
 
-    def __init__(self, arg_options: dict) -> None:
+    def __init__(self, arg_options: dict[str, Any]) -> None:
         """
         Constructor for the DatabaseBuilder class.
         The constructor initializes the class attributes.
@@ -48,11 +51,11 @@ class DatabaseBuilder:
             - input_fasta_file: str
             - database_type: str
         """
-        self.full_database_path = ""
-        self.database_path = arg_options["database_path"]
-        self.database_name = arg_options["database_name"]
-        self.input_fasta_file = arg_options["makedatabase"]["input"]
-        self.database_type = arg_options["makedatabase"]["database_type"]
+        self.full_database_path: str = ""
+        self.database_path: str = arg_options["database_path"]
+        self.database_name: str = arg_options["database_name"]
+        self.database_type: str = arg_options["database_type"]
+        self.input_fasta_file: str = arg_options["input_fasta_file"]
         self.build_database()
 
     def build_database(self) -> None:
@@ -72,10 +75,13 @@ class DatabaseBuilder:
             self.database_path, self.database_name
         )
         if not os.path.exists(self.full_database_path):
-            if self.database_type == "kma":
+            if self.database_type == "fastq":
                 if not os.path.exists(self.database_path):
                     logging.debug(
-                        "Database path for KMA does not exist, creating path"
+                        """
+                        Database path for FASTQ (KMA) does not exist,
+                        creating path for it automatically
+                        """
                     )
                     os.mkdir(self.database_path)
                 self.create_kma_database()
@@ -84,8 +90,7 @@ class DatabaseBuilder:
         else:
             logging.info("Database already exists in the specified path")
 
-    @decorators.log
-    def create_kma_database(self) -> subprocess.CompletedProcess:
+    def create_kma_database(self) -> Tuple[str, str] | bool:
         """
         kma_index -i input_fasta_file -o path + name
         ----------
@@ -97,7 +102,8 @@ class DatabaseBuilder:
         ----------
         """
         logging.debug("Running KMA subprocess to create database")
-        result = subprocess.run(
+
+        return execute(
             [
                 "kma_index",
                 "-i",
@@ -105,15 +111,10 @@ class DatabaseBuilder:
                 "-o",
                 self.full_database_path,
             ],
-            capture_output=True,
-            text=True,
-            check=True,
+            capture=True,
         )
 
-        return result
-
-    @decorators.log
-    def create_blast_database(self) -> subprocess.CompletedProcess:
+    def create_blast_database(self) -> Tuple[str, str] | bool:
         """
         Method that creates a BLAST database using the makeblastdb command.
         The subprocess.run command is used to execute the command in the terminal.
@@ -128,7 +129,8 @@ class DatabaseBuilder:
         ----------
         """
         logging.debug("Running BLAST subprocess to create database")
-        result = subprocess.run(
+
+        return execute(
             [
                 "makeblastdb",
                 "-in",
@@ -138,9 +140,5 @@ class DatabaseBuilder:
                 "-out",
                 self.full_database_path,
             ],
-            capture_output=True,
-            text=True,
-            check=True,
+            capture=True,
         )
-
-        return result

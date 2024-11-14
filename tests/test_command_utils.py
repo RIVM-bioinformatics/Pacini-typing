@@ -7,12 +7,31 @@
     “GitHub Copilot: Your AI pair programmer” (GPT-3). GitHub, Inc.
     https://github.com/features/copilot
 
-To be filed in later...
+Test module for the command_utils module.
+This module tests the execute function from the command_utils module.
+
+The pytest fixture temp_files is used to
+create temporary files for stdout and stderr.
+
+The tests are divided into the following functions:
+- test_execute_capture_output
+- test_execute_no_capture_output
+- test_execute_with_stdout
+- test_execute_failing_command_allow_fail_false
+- test_execute_failing_command_allow_fail_true
+- pytest_capture_error_file
 """
 
 __author__ = "Mark Van de Streek"
 __data__ = "2024-11-01"
-__all__ = ["test_execute_capture_output", "test_execute_no_capture_output"]
+__all__ = [
+    "test_execute_capture_output",
+    "test_execute_no_capture_output",
+    "test_execute_with_stdout",
+    "test_execute_failing_command_allow_fail_false",
+    "test_execute_failing_command_allow_fail_true",
+    "pytest_capture_error_file",
+]
 
 import os
 import subprocess

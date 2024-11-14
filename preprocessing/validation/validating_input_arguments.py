@@ -7,7 +7,10 @@
     “GitHub Copilot: Your AI pair programmer” (GPT-3). GitHub, Inc.
     https://github.com/features/copilot
 
-Fill in later...
+Module responsible for validating the input arguments.
+The main goal of this module is to provide (basic) validation
+for the input files.
+See class ArgsValidator for more information about specific validation methods.
 """
 
 __author__ = "Mark Van de Streek"
@@ -18,10 +21,11 @@ import hashlib
 import logging
 import os
 import re
+from typing import Any
 
 import yaml
 
-from exceptions.validation_exceptions import (
+from preprocessing.exceptions.validation_exceptions import (
     FileNotExistsError,
     InvalidFileExtensionError,
     InvalidFilterOptionsError,
@@ -42,7 +46,7 @@ class ArgsValidator:
         - check_file_existence: Function that checks if a given file exists and is a file
         - compare_paired_files: Function that checks if the input files are not exactly the same
         - create_sha_hash: Function that creates a SHA256 hash for a given file
-        - check_for_same_name: Function that checks if the input files are not exactly the same
+        - check_for_same_name: Function that checks if the input file names are not the same
         - check_paired_names: Function that checks if the input files are paired
         - validate_filter_arguments: Function that validates the filter arguments
         - run_file_checks: Method runs checks on the input files
@@ -50,7 +54,7 @@ class ArgsValidator:
     ----------
     """
 
-    def __init__(self, option: dict) -> None:
+    def __init__(self, option: dict[str, Any]) -> None:
         """
         Constructor for the ArgsValidator class.
         The main option dictionary is passed to
@@ -61,7 +65,7 @@ class ArgsValidator:
         self.config = None
         self.config = None
         self.get_config_input()
-        self.input_file_list = self.option["input_file_list"]
+        self.input_file_list: list[str] = self.option["input_file_list"]
 
     def validate_file_extensions(self, file: str) -> bool:
         """
@@ -84,10 +88,12 @@ class ArgsValidator:
         if ext in self.config["accepted_input_extensions"]:
             return True
         logging.error("Error in vile extension, Exiting...")
-        raise InvalidFileExtensionError(file, self.config["accepted_input_extensions"])
+        raise InvalidFileExtensionError(
+            file, self.config["accepted_input_extensions"]
+        )
 
     @staticmethod
-    def get_file_extension(file_extension: list) -> str:
+    def get_file_extension(file_extension: list[str]) -> str:
         """
         Function that retrieves the file extension from a file name.
         It handles both single and double file extensions.
@@ -100,7 +106,7 @@ class ArgsValidator:
         ----------
         """
         logging.debug("Retrieving file extension...")
-        if not len(file_extension) > 2:
+        if len(file_extension) <= 2:
             ext = f".{file_extension[-1]}"
         else:
             ext = f".{file_extension[-2]}.{file_extension[-1]}"
@@ -151,11 +157,13 @@ class ArgsValidator:
         the program will exit with an error message.
         """
         logging.debug("Comparing paired input files using hash...")
-        if self.create_sha_hash(self.input_file_list[0]) == self.create_sha_hash(
-            self.input_file_list[1]
-        ):
+        if self.create_sha_hash(
+            self.input_file_list[0]
+        ) == self.create_sha_hash(self.input_file_list[1]):
             logging.error("Paired content is the same, exiting...")
-            raise InvalidPairedError(self.input_file_list[0], self.input_file_list[1])
+            raise InvalidPairedError(
+                self.input_file_list[0], self.input_file_list[1]
+            )
         logging.debug("Input files are not the same, continuing...")
 
     @staticmethod
@@ -187,7 +195,10 @@ class ArgsValidator:
         because the program will exit with an error message.
         """
         logging.debug("Checking if the input file names are not the same...")
-        if self.option["input_file_list"][0] == self.option["input_file_list"][1]:
+        if (
+            self.option["input_file_list"][0]
+            == self.option["input_file_list"][1]
+        ):
             logging.error("Error in validating paired names, exiting...")
             raise InvalidPairedError(
                 self.option["input_file_list"][0],
@@ -250,7 +261,9 @@ class ArgsValidator:
         logging.debug(
             "Checking file existence and valid extension for file: %s...", file
         )
-        if self.check_file_existence(file) and self.validate_file_extensions(file):
+        if self.check_file_existence(file) and self.validate_file_extensions(
+            file
+        ):
             return True
         raise ValidationError()
 
@@ -267,7 +280,9 @@ class ArgsValidator:
         """
         self.validate_filter_arguments()
         if len(self.input_file_list) == 2:
-            if all(self.run_file_checks(file) for file in self.input_file_list):
+            if len(self.input_file_list) == 2 and all(
+                self.run_file_checks(file) for file in self.input_file_list
+            ):
                 self.check_for_same_name()
                 self.compare_paired_files()
                 self.check_paired_names()
