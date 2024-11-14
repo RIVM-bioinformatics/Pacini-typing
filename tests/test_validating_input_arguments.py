@@ -131,6 +131,23 @@ def test_validate_file_extensions(filename, expected):
         assert v.validate_file_extensions(filename) == expected
 
 
+def test_validate_file_extension_fail():
+    """
+    Test the validate_file_extensions() function for failure cases.
+    This function checks if the file extension of the given filename is valid
+    based on predefined criteria. It should raise an InvalidFileExtensionError
+    exception if the file extension is not valid. The test verifies that the
+    function correctly identifies and handles invalid file extensions.
+    """
+    v = ArgsValidator(
+        option={"input_file_list": [], "run_path": "./pacini_typing.py"}
+    )
+
+    with pytest.raises(InvalidFileExtensionError):
+        v.validate_file_extensions("not_a_valid_file_extension")
+        v.validate_file_extensions("")
+
+
 @pytest.mark.parametrize("file, expected", CHECK_FILE_EXISTENCE_GOOD)
 def test_check_file_existence_good(file, expected):
     """
