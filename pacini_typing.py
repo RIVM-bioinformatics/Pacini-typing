@@ -435,6 +435,39 @@ class PaciniTyping:
 
         return result
 
+    def initialize_pattern_with_config(self) -> ReadConfigPattern:
+        """
+        Function that initializes the ReadConfigPattern class.
+        This class is responsible for reading the configuration file
+        It also sets the required information for the makedatabase
+        and query operation.
+        ----------
+        Output:
+            - pattern: ReadConfigPattern object
+        ----------
+        """
+        pattern = ReadConfigPattern(
+            self.option["config"]["config_path"],
+            self.option["file_type"],
+        )
+        # Additionally, the query input and output must be set.
+        # Output as follows: output/fasta_results.tsv
+        pattern.creation_dict["input_file_list"] = self.option["config"][
+            "input"
+        ]
+        pattern.creation_dict["output"] = (
+            pattern.pattern["database"]["run_output"]
+            + self.option["file_type"]
+            + "_results.tsv"
+        )
+
+        pattern.creation_dict["input_fasta_file"] = os.path.join(
+            os.path.dirname(self.option["run_path"]),
+            pattern.creation_dict["input_fasta_file"],
+        )
+
+        return pattern
+
     def run(self) -> None:
         """
         Main start point for the Pacini-Typing pipeline.
@@ -526,26 +559,13 @@ class PaciniTyping:
                 # The config option is selected,
                 # read the config file and validate it with
                 # the ReadConfigPattern class
-                pattern = ReadConfigPattern(
-                    self.option["config"]["config_path"],
-                    self.option["file_type"],
-                )
+                pattern = self.initialize_pattern_with_config()
                 # Check if database exists
                 # If not present, create it from the config options
                 if not self.check_valid_database_path(pattern.creation_dict):
                     # Re-use the run_makedatabase() method with right params
                     self.run_makedatabase(pattern.creation_dict)
 
-                # Additionally, the query input and output must be set.
-                # Output as follows: output/fasta_results.tsv
-                pattern.creation_dict["input_file_list"] = self.option[
-                    "config"
-                ]["input"]
-                pattern.creation_dict["output"] = (
-                    pattern.pattern["database"]["run_output"]
-                    + self.option["file_type"]
-                    + "_results.tsv"
-                )
                 # Check if database does exists at this point,
                 # if not, raise an error and exit the program
                 # Otherwise, run the query operation
