@@ -105,7 +105,9 @@ def test_get_file_extension(file_list, expected):
     The test verifies that the function correctly identifies and
     returns the file extension in various scenarios.
     """
-    v = ArgsValidator(option={"input_file_list": [], "run_path": "./pacini_typing.py"})
+    v = ArgsValidator(
+        option={"input_file_list": [], "run_path": "./pacini_typing.py"}
+    )
     assert v.get_file_extension(file_list) == expected
 
 
@@ -118,7 +120,9 @@ def test_validate_file_extensions(filename, expected):
     The test runs multiple times with different filenames to
     ensure the function behaves as expected.
     """
-    v = ArgsValidator(option={"input_file_list": [], "run_path": "./pacini_typing.py"})
+    v = ArgsValidator(
+        option={"input_file_list": [], "run_path": "./pacini_typing.py"}
+    )
 
     if expected is False:
         with pytest.raises(InvalidFileExtensionError):
@@ -135,7 +139,9 @@ def test_check_file_existence_good(file, expected):
     The test runs multiple times with different file paths to ensure the
     function correctly identifies existing and non-existing files.
     """
-    v = ArgsValidator(option={"input_file_list": [], "run_path": "./pacini_typing.py"})
+    v = ArgsValidator(
+        option={"input_file_list": [], "run_path": "./pacini_typing.py"}
+    )
     assert v.check_file_existence(file) == expected
 
 
@@ -146,7 +152,9 @@ def test_check_file_existence_fail(file, expected):
     This function verifies whether a given file not exists
     and is not a valid file.
     """
-    v = ArgsValidator(option={"input_file_list": [], "run_path": "./pacini_typing.py"})
+    v = ArgsValidator(
+        option={"input_file_list": [], "run_path": "./pacini_typing.py"}
+    )
     with pytest.raises(FileNotExistsError):
         v.check_file_existence(file)
 

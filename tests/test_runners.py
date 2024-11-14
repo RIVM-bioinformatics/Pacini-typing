@@ -35,9 +35,9 @@ __all__ = [
 import os
 import time
 from typing import Any, Dict
+from unittest import mock
 
 import pytest
-from unittest import mock
 
 from queries.blast_runner import BLASTn
 from queries.kma_runner import KMA

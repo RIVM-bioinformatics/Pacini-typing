@@ -108,7 +108,9 @@ class InputFileInspector:
                 ) and self.body[file][4].startswith("@"):
                     self.type[file] = "FASTQ"
                 else:
-                    logging.error("Invalid FASTA or FASTQ file provided. Exiting...")
+                    logging.error(
+                        "Invalid FASTA or FASTQ file provided. Exiting..."
+                    )
                     raise InvalidFastaOrFastqError(file)
 
     def retrieve_body(self) -> None:
@@ -184,7 +186,9 @@ class InputFileInspector:
             if "FASTA" in file_types and len(self.type) == 2:
                 logging.error("Error while comparing the types. Exiting...")
                 raise InvalidSequencingTypesError(self.input_files)
-            logging.debug("All files are valid and the same type, continuing...")
+            logging.debug(
+                "All files are valid and the same type, continuing..."
+            )
         else:
             logging.error("Error while comparing the types. Exiting...")
             raise InvalidSequencingTypesError(self.input_files)

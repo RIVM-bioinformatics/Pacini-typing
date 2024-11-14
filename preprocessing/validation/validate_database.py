@@ -57,7 +57,9 @@ def create_database_file_list(arg_options: dict[str, Any]) -> list[str]:
         - input_file_type: string with the input file type
     ----------
     """
-    logging.debug("Creating a list of database files based on the input file type.")
+    logging.debug(
+        "Creating a list of database files based on the input file type."
+    )
     db_files = []
     if arg_options["file_type"] == "FASTA":
         db_files = [

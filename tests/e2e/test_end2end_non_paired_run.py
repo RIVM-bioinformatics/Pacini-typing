@@ -151,7 +151,9 @@ def cleanup_files(dir_path: str) -> None:
         os.rmdir(dir_path)
 
 
-@pytest.mark.skipif(platform.system() == "Linux", reason="Test not supported on Linux")
+@pytest.mark.skipif(
+    platform.system() == "Linux", reason="Test not supported on Linux"
+)
 def test_single_run(
     setup_teardown_single_input: Generator[list[str], None, None]
 ) -> None:
@@ -171,7 +173,9 @@ def test_single_run(
     assert os.path.exists("test_full_run/myresults.tsv")
 
 
-@pytest.mark.skipif(platform.system() == "Linux", reason="Test not supported on Linux")
+@pytest.mark.skipif(
+    platform.system() == "Linux", reason="Test not supported on Linux"
+)
 def test_single_contents(
     setup_teardown_single_input: Generator[list[str], None, None]
 ) -> None:

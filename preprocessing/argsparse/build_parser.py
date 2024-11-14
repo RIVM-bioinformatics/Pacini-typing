@@ -23,7 +23,9 @@ from argparse import RawTextHelpFormatter
 
 import pkg_resources
 
-from preprocessing.argsparse.args_makedatabase import build_makedatabase_command
+from preprocessing.argsparse.args_makedatabase import (
+    build_makedatabase_command,
+)
 from preprocessing.argsparse.args_query import build_query_command
 
 
@@ -103,9 +105,13 @@ def main(givenargs: list[str]) -> argparse.Namespace:
     # Custom validation logic
     if not args.options:
         if not args.config or not args.input:
-            parser.error("Both --config and --input must be provided if no subcommand is specified.")
+            parser.error(
+                "Both --config and --input must be provided if no subcommand is specified."
+            )
     else:
         if args.config or args.input:
-            parser.error("--config or --input cannot be used with subcommands.")
+            parser.error(
+                "--config or --input cannot be used with subcommands."
+            )
 
     return args

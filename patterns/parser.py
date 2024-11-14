@@ -20,7 +20,9 @@ class Parser:
     Class for parsing files
     """
 
-    def __init__(self, config_options: list[str | int], pre_parse_results: str) -> None:
+    def __init__(
+        self, config_options: list[str | int], pre_parse_results: str
+    ) -> None:
         """
         Constructor
         Fill in later...

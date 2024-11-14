@@ -88,7 +88,9 @@ class ArgsValidator:
         if ext in self.config["accepted_input_extensions"]:
             return True
         logging.error("Error in vile extension, Exiting...")
-        raise InvalidFileExtensionError(file, self.config["accepted_input_extensions"])
+        raise InvalidFileExtensionError(
+            file, self.config["accepted_input_extensions"]
+        )
 
     @staticmethod
     def get_file_extension(file_extension: list[str]) -> str:
@@ -155,11 +157,13 @@ class ArgsValidator:
         the program will exit with an error message.
         """
         logging.debug("Comparing paired input files using hash...")
-        if self.create_sha_hash(self.input_file_list[0]) == self.create_sha_hash(
-            self.input_file_list[1]
-        ):
+        if self.create_sha_hash(
+            self.input_file_list[0]
+        ) == self.create_sha_hash(self.input_file_list[1]):
             logging.error("Paired content is the same, exiting...")
-            raise InvalidPairedError(self.input_file_list[0], self.input_file_list[1])
+            raise InvalidPairedError(
+                self.input_file_list[0], self.input_file_list[1]
+            )
         logging.debug("Input files are not the same, continuing...")
 
     @staticmethod
@@ -191,7 +195,10 @@ class ArgsValidator:
         because the program will exit with an error message.
         """
         logging.debug("Checking if the input file names are not the same...")
-        if self.option["input_file_list"][0] == self.option["input_file_list"][1]:
+        if (
+            self.option["input_file_list"][0]
+            == self.option["input_file_list"][1]
+        ):
             logging.error("Error in validating paired names, exiting...")
             raise InvalidPairedError(
                 self.option["input_file_list"][0],
@@ -254,7 +261,9 @@ class ArgsValidator:
         logging.debug(
             "Checking file existence and valid extension for file: %s...", file
         )
-        if self.check_file_existence(file) and self.validate_file_extensions(file):
+        if self.check_file_existence(file) and self.validate_file_extensions(
+            file
+        ):
             return True
         raise ValidationError()
 

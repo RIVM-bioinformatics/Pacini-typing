@@ -72,7 +72,9 @@ class ReadConfigPattern:
                 self.pattern = yaml.safe_load(file)
         except FileNotFoundError as e:
             print("Config file not found, exiting...")
-            raise FileNotFoundError(f"File {self.config_file} not found") from e
+            raise FileNotFoundError(
+                f"File {self.config_file} not found"
+            ) from e
         except yaml.YAMLError as e:
             print("Error loading YAML file, exiting...")
             raise YAMLLoadingError(self.config_file) from e
@@ -118,5 +120,6 @@ class ReadConfigPattern:
 
 if __name__ == "__main__":
     pattern = ReadConfigPattern(
-        "/Users/mvandestreek/Developer/pacini_typing/patterns/O139.yaml", "fasta"
+        "/Users/mvandestreek/Developer/pacini_typing/patterns/O139.yaml",
+        "fasta",
     )

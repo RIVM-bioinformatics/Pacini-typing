@@ -71,7 +71,9 @@ class DatabaseBuilder:
             - Database in the specified path
         ----------
         """
-        self.full_database_path = os.path.join(self.database_path, self.database_name)
+        self.full_database_path = os.path.join(
+            self.database_path, self.database_name
+        )
         if not os.path.exists(self.full_database_path):
             if self.database_type == "fastq":
                 if not os.path.exists(self.database_path):
