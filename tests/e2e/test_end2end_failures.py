@@ -32,11 +32,11 @@ from preprocessing.exceptions.validation_exceptions import (
     InvalidFileExtensionError,
     FileNotExistsError,
     InvalidPairedError,
-    InvalidInputError,
 )
 from preprocessing.exceptions.determine_input_type_exceptions import (
     InvalidSequenceError,
     InvalidFastaOrFastqError,
+    InvalidSequencingTypesError,
 )
 
 
@@ -228,7 +228,7 @@ def test_wrong_pairing(setup_args: list[str]):
 )
 def test_wrong_fastq_input(setup_args: list[str]):
     """
-    Test if the InvalidInputError is raised when
+    Test if the InvalidSequencingTypesError is raised when
     the wrong amount of input files are provided.
     ----------
     Input:
@@ -236,7 +236,7 @@ def test_wrong_fastq_input(setup_args: list[str]):
     ----------
     """
     setup_args.extend(["test_data/VIB_EA5348AA_AS_1.fq"])
-    with pytest.raises(InvalidInputError):
+    with pytest.raises(InvalidSequencingTypesError):
         main(setup_args)
 
 
@@ -256,4 +256,25 @@ def test_wrong_fasta_input(setup_args: list[str]):
         ["test_data/VIB_EA5348AA_AS.fasta", "test_data/vibrio_genes.fasta"]
     )
     with pytest.raises(InvalidPairedError):
+        main(setup_args)
+
+
+@pytest.mark.skipif(
+    platform.system() == "Linux", reason="Test not supported on Linux"
+)
+def test_wrong_fasta_with_fastq_names(setup_args: list[str]):
+    """
+    Test if the InvalidInputError is raised when
+    the wrong amount of input files are provided.
+
+    In this case, two FASTA files are provided with FASTQ names.
+    ----------
+    Input:
+        setup_args: list[str] -> Arguments for the test
+    ----------
+    """
+    setup_args.extend(
+        ["test_data/wrong_files/VIB_1.fq", "test_data/wrong_files/VIB_2.fq"]
+    )
+    with pytest.raises(InvalidSequencingTypesError):
         main(setup_args)

@@ -75,8 +75,8 @@ from preprocessing.validation.validate_database import (
 from preprocessing.validation.validating_input_arguments import (
     ArgsValidator,
 )
-from preprocessing.exceptions.validation_exceptions import (
-    InvalidInputError,
+from preprocessing.exceptions.determine_input_type_exceptions import (
+    InvalidSequencingTypesError,
 )
 
 logging.basicConfig(
@@ -389,7 +389,7 @@ class PaciniTyping:
                 "Only FASTA files are allowed for single files "
                 "and only FASTQ files are allowed for paired files."
             )
-            raise InvalidInputError(self.option["input_file_list"][0])
+            raise InvalidSequencingTypesError(self.option["input_file_list"])
 
     def check_valid_database_path(
         self, database_builder: dict[str, Any]
