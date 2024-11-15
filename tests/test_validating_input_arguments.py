@@ -82,6 +82,9 @@ CHECK_PAIRED_NAMES_GOOD = [
     ("mysample_R1_is_great.fq", "mysample_R2_is_great.fq"),
     ("mysample_1_is_great.fq", "mysample_2_is_great.fq"),
     ("mysampleR1.fq", "mysampleR2.fq"),
+    ("mysampleR1R2.fq", "mysampleR2R1.fq"),
+    ("mysample_R2R1.fq", "mysample_R1R2.fq"),
+    ("mysam_2ple_1_is_great.fq", "mysam_1le_2_is_great.fq"),
 ]
 
 CHECK_PAIRED_NAMES_FAIL = [
