@@ -1,0 +1,28 @@
+site_name: Pacini-typing
+site_author: Robert A. Petit III
+site_description: Genetic variant typing based on configuration patterns
+
+# site_url: https://to.be.determined...
+# repo_url: https://github.com/RIVM-bioinformatics/Pacini_typing
+repo_url: https://github.com/MarkStreek/MarkStreek
+dev_addr: 0.0.0.0:8000
+
+theme:
+  name: material
+  font:
+    text: Roboto Mono
+  palette:
+    # Dark 
+    - scheme: slate
+      toggle:
+        icon: material/lightbulb-outline
+        name: Dark mode
+      primary: ca005d
+      accent: deep purple
+    # Light
+    - scheme: default
+      toggle:
+        icon: material/lightbulb
+        name: Light mode
+      primary: teal
+      accent: teal
