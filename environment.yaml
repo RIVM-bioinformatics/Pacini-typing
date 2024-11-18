@@ -1,24 +1,18 @@
 name: pacini_typing
 channels:
-  - <unknown>
+  - bioconda
   - bioconda/label/cf201901
   - defaults
+  - conda-forge
 dependencies:
-  - _libgcc_mutex=0.1
-  - _openmp_mutex=5.1
-  - blast=2.5.0
   - boost=1.82.0
   - bzip2=1.0.8
   - ca-certificates=2024.9.24
   - expat=2.6.3
   - icu=73.1
   - kma=1.4.15
-  - ld_impl_linux-64=2.40
   - libboost=1.82.0
   - libffi=3.4.4
-  - libgcc-ng=11.2.0
-  - libgomp=11.2.0
-  - libstdcxx-ng=11.2.0
   - libuuid=1.41.5
   - lz4-c=1.9.4
   - ncurses=6.4
@@ -36,6 +30,5 @@ dependencies:
   - zlib=1.2.13
   - zstd=1.5.6
   - pip:
-      - pacini-typing==1.2.0
       - pyyaml==6.0.2
-prefix: /home/streevdm/.conda/envs/pacini_typing
+      - setuptools==75.1.0
