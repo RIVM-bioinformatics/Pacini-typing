@@ -6,7 +6,7 @@
 [![GitHub latest commit](https://badgen.net/github/last-commit/RIVM-bioinformatics/Pacini-typing)](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/main)
 ![Unit tests](https://github.com/RIVM-bioinformatics/Pacini-typing/actions/workflows/run_unit_tests.yaml/badge.svg)
 
-Pylint output: Your code has been rated at 9.94/10 (previous run: 9.65/10, +0.29)
+Pylint output: Your code has been rated at 9.94/10 (previous run: 9.94/10, +0.00)
 
 <div align="center">
     <h1>Pacini-typing</h1>
@@ -37,17 +37,42 @@ The Pacini project is a software application which can be used to determine gene
 - [Application information](#application-information)
 - [About this project](#about-this-project)
 - [Table of Contents](#table-of-contents)
-- [Prerequisities](#prerequisities)
+- [Prerequisites](#prerequisites)
 - [Installation](#installation)
 - [(very) Brief Overview of Pacini-typing](#very-brief-overview-of-pacini-typing)
 - [Getting Started](#getting-started)
 - [Parameters \& Usage](#parameters--usage)
 - [Example Run of Pacini-typing](#example-run-of-pacini-typing)
 
-## Prerequisities
+## Prerequisites
 
 * Linux-like environment with (mini) conda installed
-* Python 3.7 or higher (developed on 3.12)
+* Python 3.10 or higher (developed on 3.12)
+
+The following Python packages are required:
+
+1. pip=>24.2
+2. PyYAML=>6.0.2
+3. setuptools=>75.1.0
+
+The following Tools are required:
+
+1. blast=>2.5.0
+   1. The makeblastdb must be available as well
+2. kma=>1.4.15
+   1. The kma_index must be available as well
+
+A complete conda environment, containing all the required packages, can be found in the `environment.yaml` file. It is very advised to use this environment to run the application. The environment can be installed by running the following command:
+
+```bash
+conda env create -f environment.yaml -n pacini-typing
+```
+
+And activated by running:
+
+```bash
+conda activate pacini-typing
+```
 
 ## Installation
 
@@ -73,10 +98,10 @@ pip install .
 
 Pacini-typing is now installed on your system. After installation, the application can be run by calling `pacini_typing` or `Pacini-typing` in every directory.
 
-Additionally, the application can be run by calling the `pacini_typing.py` script in the `pacini_typing` directory with the following command:
+Additionally, the application can be run by calling the original `pacini_typing.py` script in the `pacini_typing` directory with the following command:
 
 ```bash
-python pacini_typing.py --help
+python3 directory_to_pacini_typing_clone/pacini_typing.py --help
 ```
 
 [Back to top](#pacini-typing)
@@ -167,11 +192,13 @@ This parsing is done in the parsing module of the application.
 
 ## Getting Started
 
-To get started with the application, you can run the following command:
+To get started with the application, you can run the following command to see the help of the application:
 
 ```bash
 python pacini_typing.py --help
 ```
+
+See the [Parameters & Usage](#parameters--usage) section for more information on how to run the application.
 
 [Back to top](#pacini-typing)
 
@@ -182,7 +209,6 @@ python pacini_typing.py --help
 * ```-h, --help``` Shows the help of the pipeline.
 
 ```bash
-2024-11-14T10:33:22 INFO  51894 : Starting the Pacini-Typing pipeline, parsing arguments...
 usage: Pacini [-h] [-v] {makedatabase,query} ...
 
 Bacterial Genotyping Tool for RIVM IDS-Bioinformatics
