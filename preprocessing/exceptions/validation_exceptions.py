@@ -43,29 +43,6 @@ class InvalidPairedError(Exception):
                 """
 
 
-class InvalidInputError(Exception):
-    """
-    Raised when the wrong amount of input files are provided.
-    """
-
-    def __init__(self, file: str) -> None:
-        self.file = file
-
-    def __str__(self) -> str:
-        return f"""
-        ---------------------------------------------------
-        ERROR: Found only one FASTQ file or two FASTA files
-        ---------------------------------------------------
-        The following file is not paired correctly:
-            - {self.file}
-        ---------------------------------------------------
-        SUGGESTION: follow the format below:
-            - Make sure to provide two fastq files
-            - Otherwise, provide a single fasta file
-        ----------------------------------------------------
-                """
-
-
 class InvalidFileExtensionError(Exception):
     """
     Raised when an invalid file extension is provided.
