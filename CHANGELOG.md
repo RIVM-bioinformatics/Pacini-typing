@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.1](https://github.com/RIVM-bioinformatics/Pacini-typing/compare/v1.3.0...v1.3.1) (2024-11-18)
+
+
+### Documentation
+
+* update README with corrected prerequisites, required packages, and conda environment setup instructions ([c19841e](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/c19841e1456ea2eee86bcfcfbebcfeca121aafe8))
+
 ## [1.3.0](https://github.com/RIVM-bioinformatics/Pacini-typing/compare/v1.2.0...v1.3.0) (2024-11-14)
 
 
