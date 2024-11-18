@@ -7,7 +7,18 @@
     “GitHub Copilot: Your AI pair programmer” (GPT-3). GitHub, Inc.
     https://github.com/features/copilot
 
-To be filed in later...
+This file contains tests for the query_runner module.
+These tests are repsponsible for testing the query_runner module.
+
+The tests are divided into the following functions:
+- test_prepare_query
+- test_get_query_different
+- test_get_query_verbose_false
+- test_blast_prepare_query
+- test_blast_get_query_different
+- test_get_runtime
+
+The OPTION dictionary is a mock dictionary that is used in the tests.
 """
 
 __author__ = "Mark Van de Streek"
@@ -24,6 +35,7 @@ __all__ = [
 import os
 import time
 from typing import Any, Dict
+from unittest import mock
 
 import pytest
 
@@ -39,11 +51,11 @@ OPTION: Dict[str, Any] = {
     "input_file_list": ["1.fq", "2.fq"],
     "run_path": os.path.abspath(__file__).rsplit(".", 1)[0],
     "file_type": "FASTA",
+    "output": "./dummy/path",
     "makedatabase": None,
     "query": {
         "paired": ["/dummy/path", "/dummy/path"],
         "single": "dummy_file.fastq",
-        "output": "/dummy/path",
         "filters": {
             "identity": 100,
         },
@@ -70,13 +82,11 @@ def test_prepare_query() -> None:
         "-ipe",
         "1.fq",
         "2.fq",
-        "-ID",
-        "100",
         "-tsv",
         "-t_db",
         "./refdir/mydb",
         "-o",
-        "/dummy/path",
+        "./dummy/path",
     ]
 
 
@@ -94,13 +104,11 @@ def test_get_query_different() -> None:
         "-ipe",
         "1.fq",
         "2.fq",
-        "-ID",
-        "100",
         "-tsv",
         "-t_db",
         "./refdir/my_new_db",
         "-o",
-        "/dummy/path",
+        "./dummy/path",
     ]
 
 
@@ -116,13 +124,11 @@ def test_get_query_verbose_false():
         "-ipe",
         "1.fq",
         "2.fq",
-        "-ID",
-        "100",
         "-tsv",
         "-t_db",
         "./refdir/mydb",
         "-o",
-        "/dummy/path",
+        "./dummy/path",
     ]
 
 
@@ -138,11 +144,9 @@ def test_blast_prepare_query():
         "-db",
         "./refdir/mydb",
         "-out",
-        "/dummy/path.tsv",
+        "./dummy/path.tsv",
         "-outfmt",
-        "10",
-        "-perc_identity",
-        "100",
+        "6",
     ]
 
 
@@ -160,16 +164,16 @@ def test_blast_get_query_different():
         "-db",
         "./refdir/my_new_db",
         "-out",
-        "/dummy/path.tsv",
+        "./dummy/path.tsv",
         "-outfmt",
-        "10",
-        "-perc_identity",
-        "100",
+        "6",
     ]
 
 
+@mock.patch("os.path.exists", return_value=False)
+@mock.patch("os.makedirs")
 @pytest.mark.parametrize("runtime", RUN_TIMES)
-def test_get_runtime(runtime: float):
+def test_get_runtime(mock, mock1, runtime: float):
     """
     Function that tests the get_runtime() method of the QueryRunner class
     """

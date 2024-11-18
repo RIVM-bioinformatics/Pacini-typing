@@ -7,7 +7,9 @@
     “GitHub Copilot: Your AI pair programmer” (GPT-3). GitHub, Inc.
     https://github.com/features/copilot
 
-Fill in later...
+Module that contains custom exceptions for the validate_database module.
+These exceptions are raised when invalid database is provided or not found.
+The raise statements are located in validation/validate_database.py
 """
 
 __author__ = "Mark Van de Streek"
@@ -34,7 +36,12 @@ class InvalidDatabaseError(Exception):
         ---------------------------------------------------
         SUGGESTION:
             - Make sure the database path is correct
-            - Make sure all database files are present
+            - Make sure all database files are present:
+                - For fasta/blast database:
+                    - *.ndb, *.nhr, *.nin, *.njs,
+                    - *.not, *.nsq, *.ntf, *.nto
+                - For fastq/kma database:
+                    - *.comp.b, *.length.b, *.name, *.seq.b
             - Make a new reference database, help:
             - python3 pacini_typing.py makedatabase -h
         ----------------------------------------------------

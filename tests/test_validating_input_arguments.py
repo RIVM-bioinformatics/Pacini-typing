@@ -11,25 +11,7 @@ This script contains the tests for the validating_input_arguments.py module.
 The tests are used to check the functions that validate the input arguments.
 Both good and bad cases are tested to ensure the functions work as expected.
 
-Parametrized tests are used to test the functions with different input parameters
-
-For example:
-
-@pytest.mark.parametrize("filename, expected", [
-    ("myfile.txt", False),
-    ("myfile.txt.gz", False),
-    ("myfile.fasta", True)])
-def my_good_unit_test(filename, expected):
-    assert my_function(filename) == expected
-
-The above code will run the my_good_unit_test *3* times with the given parameters,
-this is the same as running:
-    assert my_function("myfile.txt") == False
-    assert my_function("myfile.txt.gz") == False
-    assert my_function("myfile.fasta") == True
-
-Good: The function should return the expected value
-Bad: The function should raise an exception or return a different value
+Variables in capital letters are used to store the test data and are used in the tests.
 """
 
 __author__ = "Mark Van de Streek"
@@ -39,13 +21,13 @@ from unittest import mock
 
 import pytest
 
-from exceptions.validation_exceptions import (
+from preprocessing.exceptions.validation_exceptions import (
     FileNotExistsError,
     InvalidFileExtensionError,
     InvalidPairedError,
     ValidationError,
 )
-from validation.validating_input_arguments import ArgsValidator
+from preprocessing.validation.validating_input_arguments import ArgsValidator
 
 GET_FILE_EXTENSIONS = [
     (["myfile", "txt"], ".txt"),
@@ -71,14 +53,14 @@ VALIDATE_FILE_EXTENSIONS = [
 ]
 
 CHECK_FILE_EXISTENCE_GOOD = [
-    ("argsparse/build_parser.py", True),
+    ("preprocessing/argsparse/build_parser.py", True),
     ("pacini_typing.py", True),
     ("README.md", True),
 ]
 
 CHECK_FILE_EXISTENCE_FAIL = [
-    ("argsparse/build_parser", False),
-    ("argsparse/build_parser.sh", False),
+    ("preprocessing/argsparse/build_parser", False),
+    ("preprocessing/argsparse/build_parser.sh", False),
     ("readme", False),
 ]
 
@@ -123,7 +105,9 @@ def test_get_file_extension(file_list, expected):
     The test verifies that the function correctly identifies and
     returns the file extension in various scenarios.
     """
-    v = ArgsValidator(option={"input_file_list": [], "run_path": "./pacini_typing.py"})
+    v = ArgsValidator(
+        option={"input_file_list": [], "run_path": "./pacini_typing.py"}
+    )
     assert v.get_file_extension(file_list) == expected
 
 
@@ -136,7 +120,9 @@ def test_validate_file_extensions(filename, expected):
     The test runs multiple times with different filenames to
     ensure the function behaves as expected.
     """
-    v = ArgsValidator(option={"input_file_list": [], "run_path": "./pacini_typing.py"})
+    v = ArgsValidator(
+        option={"input_file_list": [], "run_path": "./pacini_typing.py"}
+    )
 
     if expected is False:
         with pytest.raises(InvalidFileExtensionError):
@@ -153,7 +139,9 @@ def test_check_file_existence_good(file, expected):
     The test runs multiple times with different file paths to ensure the
     function correctly identifies existing and non-existing files.
     """
-    v = ArgsValidator(option={"input_file_list": [], "run_path": "./pacini_typing.py"})
+    v = ArgsValidator(
+        option={"input_file_list": [], "run_path": "./pacini_typing.py"}
+    )
     assert v.check_file_existence(file) == expected
 
 
@@ -164,7 +152,9 @@ def test_check_file_existence_fail(file, expected):
     This function verifies whether a given file not exists
     and is not a valid file.
     """
-    v = ArgsValidator(option={"input_file_list": [], "run_path": "./pacini_typing.py"})
+    v = ArgsValidator(
+        option={"input_file_list": [], "run_path": "./pacini_typing.py"}
+    )
     with pytest.raises(FileNotExistsError):
         v.check_file_existence(file)
 
@@ -286,11 +276,11 @@ def test_check_paired_names_fail(args1, args2):
 
 
 @mock.patch(
-    target="validation.validating_input_arguments.ArgsValidator.check_file_existence",
+    target="preprocessing.validation.validating_input_arguments.ArgsValidator.check_file_existence",
     return_value=False,
 )
 @mock.patch(
-    target="validation.validating_input_arguments.ArgsValidator.validate_file_extensions",
+    target="preprocessing.validation.validating_input_arguments.ArgsValidator.validate_file_extensions",
     return_value=False,
 )
 # pylint: disable=unused-argument

@@ -7,7 +7,10 @@
     “GitHub Copilot: Your AI pair programmer” (GPT-3). GitHub, Inc.
     https://github.com/features/copilot
 
-Fill in later...
+Module that contains custom exceptions for the validation input arguments module.
+These exceptions are raised for basic validation errors in the input arguments,
+i.e., invalid file extensions, missing files, etc.
+The raise statements can be found in the validation/validate_input_arguments.py module.
 """
 
 __author__ = "Mark Van de Streek"
@@ -50,6 +53,7 @@ class InvalidFileExtensionError(Exception):
         self.all_valid_extensions = all_valid_extensions
 
     def __str__(self) -> str:
+        formatted_extensions: str = "\n\t\t- ".join(self.all_valid_extensions)
         return f"""
         ---------------------------------------------------
         ERROR: Invalid file extension provided
@@ -60,7 +64,7 @@ class InvalidFileExtensionError(Exception):
         SUGGESTION:
             - Make sure the file extension is valid
             - Valid extensions include:
-                - {"\n\t\t- ".join(self.all_valid_extensions)}
+                - {formatted_extensions}
             - All extensions can be found/changed at:
                 -/config/accept_arguments.yaml
         ----------------------------------------------------

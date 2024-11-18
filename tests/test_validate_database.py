@@ -7,7 +7,20 @@
     “GitHub Copilot: Your AI pair programmer” (GPT-3). GitHub, Inc.
     https://github.com/features/copilot
 
-To be filed in later...
+Test module for the validate_database module.
+This module tests the functions from the validate_database module.
+In other words, the functions that check the existence of the database files.
+
+The tests are divided into the following functions:
+- test_create_database_file_list_fasta
+- test_create_database_file_list_fastq
+- test_check_for_database_existence
+- test_check_for_database_existence_missing_file
+- test_check_for_database_path_valid
+- test_check_for_database_path_invalid
+
+The fixtures fasta_options and fastq_options are used
+to provide options for the tests.
 """
 
 __author__ = "Mark Van de Streek"
@@ -29,8 +42,7 @@ from unittest import mock
 
 import pytest
 
-from exceptions.validate_database_exceptions import InvalidDatabaseError
-from validation.validate_database import (
+from preprocessing.validation.validate_database import (
     check_for_database_existence,
     check_for_database_path,
     create_database_file_list,
@@ -61,7 +73,9 @@ def fastq_options():
     }
 
 
-@pytest.mark.skipif(platform.system() == "Linux", reason="Test not supported on Linux")
+@pytest.mark.skipif(
+    platform.system() == "Linux", reason="Test not supported on Linux"
+)
 def test_create_database_file_list_fasta(fasta_options):
     """
     Test that the function returns the correct list of database files for FASTA files.
@@ -79,7 +93,9 @@ def test_create_database_file_list_fasta(fasta_options):
     assert create_database_file_list(fasta_options) == expected_files
 
 
-@pytest.mark.skipif(platform.system() == "Linux", reason="Test not supported on Linux")
+@pytest.mark.skipif(
+    platform.system() == "Linux", reason="Test not supported on Linux"
+)
 def test_create_database_file_list_fastq(fastq_options):
     """
     Test that the function returns the correct list of database files for FASTQ files.
@@ -93,7 +109,9 @@ def test_create_database_file_list_fastq(fastq_options):
     assert create_database_file_list(fastq_options) == expected_files
 
 
-@pytest.mark.skipif(platform.system() == "Linux", reason="Test not supported on Linux")
+@pytest.mark.skipif(
+    platform.system() == "Linux", reason="Test not supported on Linux"
+)
 @mock.patch("os.path.exists", return_value=True)
 def test_check_for_database_existence(options):
     """
@@ -102,7 +120,9 @@ def test_check_for_database_existence(options):
     assert check_for_database_existence(options) is True
 
 
-@pytest.mark.skipif(platform.system() == "Linux", reason="Test not supported on Linux")
+@pytest.mark.skipif(
+    platform.system() == "Linux", reason="Test not supported on Linux"
+)
 @mock.patch("os.path.exists")
 def test_check_for_database_existence_missing_file(mock_exists, fasta_options):
     """
@@ -116,11 +136,12 @@ def test_check_for_database_existence_missing_file(mock_exists, fasta_options):
 
     mock_exists.side_effect = mock_exists_side_effect
 
-    with pytest.raises(InvalidDatabaseError):
-        check_for_database_existence(fasta_options)
+    assert check_for_database_existence(fasta_options) is False
 
 
-@pytest.mark.skipif(platform.system() == "Linux", reason="Test not supported on Linux")
+@pytest.mark.skipif(
+    platform.system() == "Linux", reason="Test not supported on Linux"
+)
 @mock.patch("os.path.exists", return_value=True)
 def test_check_for_database_path_valid(fasta_options):
     """
@@ -129,17 +150,20 @@ def test_check_for_database_path_valid(fasta_options):
     assert check_for_database_path(fasta_options) is True
 
 
-@pytest.mark.skipif(platform.system() == "Linux", reason="Test not supported on Linux")
+@pytest.mark.skipif(
+    platform.system() == "Linux", reason="Test not supported on Linux"
+)
 @mock.patch("os.path.exists", return_value=False)
 def test_check_for_database_path_invalid(fasta_options):
     """
     Test that the function raises a SystemExit when the database path is invalid.
     """
-    with pytest.raises(InvalidDatabaseError):
-        check_for_database_path(fasta_options)
+    assert check_for_database_path(fasta_options) is False
 
 
-@pytest.mark.skipif(platform.system() == "Linux", reason="Test not supported on Linux")
+@pytest.mark.skipif(
+    platform.system() == "Linux", reason="Test not supported on Linux"
+)
 @mock.patch("os.path.exists", return_value=True)
 def test_check_for_database_path_append_slash(mock, fasta_options):
     """

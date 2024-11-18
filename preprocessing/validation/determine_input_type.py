@@ -7,7 +7,10 @@
     “GitHub Copilot: Your AI pair programmer” (GPT-3). GitHub, Inc.
     https://github.com/features/copilot
 
-FASTA and FASTQ file validator.
+This script is responsible for determining the input file type.
+Additionally, it checks if the input files are valid FASTA or FASTQ.
+The type is also checked if the input files are of the same type.
+
 Example FASTA File:
     >MY Sequence
     ATCGTACGATCGATCGATCGATCGATCGATCG
@@ -21,26 +24,37 @@ Example FASTQ File:
 
 __author__ = "Mark Van de Streek"
 __date__ = "2024-09-24"
-__all__ = ["FileValidator"]
+__all__ = ["InputFileInspector"]
 
 import logging
 import re
 
-from exceptions.determine_input_type_exceptions import (
+from preprocessing.exceptions.determine_input_type_exceptions import (
     InvalidFastaOrFastqError,
     InvalidSequenceError,
     InvalidSequencingTypesError,
 )
 
 
-class FileValidator:
+class InputFileInspector:
     """
-    Class that is responsible for validation the input file.
-    It takes a file as input and checks if the file is a valid FASTA or FASTQ file.
+    Class that is responsible for determining and
+    validating the input file.
+    It takes a file as input and checks if the
+    file is a valid FASTA or FASTQ file.
     The determined file is returned by the class.
+    ----------
+    Methods:
+        - __init__: Constructor for the InputFileInspector class
+        - determine_file_type: Method that determines the file type
+        - retrieve_body: Method that retrieves the body of the input file
+        - check_valid_sequence: Method that checks if the sequence is valid
+        - compare_types: Method that compares the types of input files
+        - get_file_type: Method that returns the file type
+    ----------
     """
 
-    def __init__(self, input_files: list) -> None:
+    def __init__(self, input_files: list[str]) -> None:
         """
         Constructor of the class. It initializes the class with the input files.
         Additionally, it initializes the body and type dictionaries.
@@ -94,7 +108,9 @@ class FileValidator:
                 ) and self.body[file][4].startswith("@"):
                     self.type[file] = "FASTQ"
                 else:
-                    logging.error("Invalid FASTA or FASTQ file provided. Exiting...")
+                    logging.error(
+                        "Invalid FASTA or FASTQ file provided. Exiting..."
+                    )
                     raise InvalidFastaOrFastqError(file)
 
     def retrieve_body(self) -> None:
@@ -170,7 +186,9 @@ class FileValidator:
             if "FASTA" in file_types and len(self.type) == 2:
                 logging.error("Error while comparing the types. Exiting...")
                 raise InvalidSequencingTypesError(self.input_files)
-            logging.debug("All files are valid and the same type, continuing...")
+            logging.debug(
+                "All files are valid and the same type, continuing..."
+            )
         else:
             logging.error("Error while comparing the types. Exiting...")
             raise InvalidSequencingTypesError(self.input_files)
@@ -180,7 +198,7 @@ class FileValidator:
         Simple getter function to retrieve the file type in string format
         ----------
         Output:
-            - string: with the file type
+            - string: file type
         ----------
         """
         logging.debug("Getting the file type...")

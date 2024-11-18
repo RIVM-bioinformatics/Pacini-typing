@@ -7,7 +7,11 @@
     “GitHub Copilot: Your AI pair programmer” (GPT-3). GitHub, Inc.
     https://github.com/features/copilot
 
-To be filed in later...
+Enum class to store all KMA-related options and flags.
+This class is used to create the right query for the KMA run.
+
+The get_query() method prepares the query for the KMA run
+and returns it to the (main) QueryRunner class.
 """
 
 __author__ = "Mark Van de Streek"
@@ -34,7 +38,6 @@ class KMA(Enum):
     RUN_OPTION = "kma"
     PAIRED_OPTION = "-ipe"
     OUTPUT_FORMAT = "-tsv"
-    IDENTITY = "-ID"
 
     @staticmethod
     def get_query(option: dict[str, Any]) -> list[str]:
@@ -43,9 +46,8 @@ class KMA(Enum):
         This query is passed to the super class QueryRunner
         ----------
         Input:
-            - input_file: list with the input files
-            - database: str
-            - output_file: str
+            - dictionary with the input files,
+                database, and output file
         Output:
             - list with the query to run KMA
         ----------
@@ -55,11 +57,9 @@ class KMA(Enum):
             KMA.PAIRED_OPTION.value,
             option["input_file_list"][0],
             option["input_file_list"][1],
-            KMA.IDENTITY.value,
-            str(option["query"]["filters"]["identity"]),
             KMA.OUTPUT_FORMAT.value,
             "-t_db",
             option["database_path"] + option["database_name"],
             "-o",
-            option["query"]["output"],
+            option["output"],
         ]

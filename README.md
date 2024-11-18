@@ -6,7 +6,9 @@
 [![GitHub latest commit](https://badgen.net/github/last-commit/RIVM-bioinformatics/Pacini-typing)](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/main)
 ![Unit tests](https://github.com/RIVM-bioinformatics/Pacini-typing/actions/workflows/run_unit_tests.yaml/badge.svg)
 
-Pylint output: Your code has been rated at 9.94/10 (previous run: 9.94/10, +0.00)
+<!-- [![CodeFactor](https://www.codefactor.io/repository/github/rivm-bioinformatics/Pacini-typing/badge)](https://www.codefactor.io/repository/github/rivm-bioinformatics/Pacini-typing)   -->
+
+Pylint output: Your code has been rated at 9.40/10 (previous run: 9.40/10, +0.00)
 
 <div align="center">
     <h1>Pacini-typing</h1>

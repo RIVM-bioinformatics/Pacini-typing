@@ -7,20 +7,24 @@
     “GitHub Copilot: Your AI pair programmer” (GPT-3). GitHub, Inc.
     https://github.com/features/copilot
 
-To be filed in later...
+Module that validates the existence of the database.
+Based on the input type, the methods will check if the specific files exist.
 """
 
 __author__ = "Mark Van de Streek"
 __date__ = "2024-09-24"
-__all__ = ["check_for_database_path"]
+__all__ = [
+    "check_for_database_existence",
+    "create_database_file_list",
+    "check_for_database_path",
+]
 
 import logging
 import os
+from typing import Any
 
-from exceptions.validate_database_exceptions import InvalidDatabaseError
 
-
-def check_for_database_existence(arg_options: dict) -> bool:
+def check_for_database_existence(arg_options: dict[str, Any]) -> bool:
     """
     Function that checks if the database exists.
     Based on the input type, the method will check if the files exist:
@@ -39,14 +43,12 @@ def check_for_database_existence(arg_options: dict) -> bool:
     db_files = create_database_file_list(arg_options)
     for db_file in db_files:
         if not os.path.exists(arg_options["database_path"] + db_file):
-            logging.error("Database does not exist, exiting...")
-            raise InvalidDatabaseError(
-                arg_options["database_path"], arg_options["database_name"]
-            )
+            logging.error("Database does not exist")
+            return False
     return True
 
 
-def create_database_file_list(arg_options: dict) -> list:
+def create_database_file_list(arg_options: dict[str, Any]) -> list[str]:
     """
     Function that creates a list of database files based on the input file type.
     ----------
@@ -55,7 +57,9 @@ def create_database_file_list(arg_options: dict) -> list:
         - input_file_type: string with the input file type
     ----------
     """
-    logging.debug("Creating a list of database files based on the input file type.")
+    logging.debug(
+        "Creating a list of database files based on the input file type."
+    )
     db_files = []
     if arg_options["file_type"] == "FASTA":
         db_files = [
@@ -71,7 +75,7 @@ def create_database_file_list(arg_options: dict) -> list:
     return db_files
 
 
-def check_for_database_path(arg_options: dict) -> bool:
+def check_for_database_path(arg_options: dict[str, Any]) -> bool:
     """
     Function that checks if the database path exists.
     If not, the program will exit with an error message.
@@ -87,8 +91,6 @@ def check_for_database_path(arg_options: dict) -> bool:
         )
         arg_options["database_path"] += "/"
     if not os.path.exists(arg_options["database_path"]):
-        logging.error("Database does not exist, exiting...")
-        raise InvalidDatabaseError(
-            arg_options["database_path"], arg_options["database_name"]
-        )
+        logging.error("Database does not exist")
+        return False
     return check_for_database_existence(arg_options)
