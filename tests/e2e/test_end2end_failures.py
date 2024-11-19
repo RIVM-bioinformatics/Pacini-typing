@@ -215,7 +215,7 @@ def test_wrong_fastq_input(setup_args: list[str]):
         setup_args: list[str] -> Arguments for the test
     ----------
     """
-    setup_args.extend(["test_data/VIB_EA5348AA_AS_1.fq"])
+    setup_args.extend(["test_data/wrong_files/VIB_EA5348AA_AS_1.fq"])
     with pytest.raises(InvalidSequencingTypesError):
         main(setup_args)
 
