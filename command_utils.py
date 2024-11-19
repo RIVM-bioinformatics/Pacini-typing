@@ -38,6 +38,7 @@ import logging
 import subprocess
 from pathlib import Path
 from typing import Tuple
+from abc import ABC, abstractmethod
 
 # TODO: Implement a design pattern for the execute function
 
@@ -100,3 +101,105 @@ def execute(
         if not allow_fail:
             raise
         return False
+
+
+###############
+
+# Implementation of command design pattern
+
+
+class Command(ABC):
+    """
+    Abstract base class for command
+    """
+
+    @abstractmethod
+    def execute(self) -> Tuple[str, str] | bool:
+        """
+        Abstract method to execute the command
+        """
+
+    @abstractmethod
+    def undo(self):
+        pass
+
+
+class ShellCommand(Command):
+    """
+    Concrete class for shell command
+    """
+
+    def __init__(
+        self,
+        cmd: list[str] | str,
+        directory: Path = Path.cwd(),
+        capture: bool = False,
+        stdout_file: str | None = None,
+        stderr_file: str | None = None,
+        allow_fail: bool = False,
+    ) -> None:
+        """
+        Constructor for ShellCommand
+        """
+        self.cmd = cmd
+        self.directory = directory
+        self.capture = capture
+        self.stdout_file = stdout_file
+        self.stderr_file = stderr_file
+        self.allow_fail = allow_fail
+
+    def execute(self) -> Tuple[str, str] | bool:
+        """
+        Executes the shell command
+        """
+        try:
+            logging.info("running command: %s", " ".join(self.cmd))
+            result = subprocess.run(
+                " ".join(self.cmd) if isinstance(self.cmd, list) else self.cmd,
+                shell=True,
+                cwd=self.directory,
+                stdout=(
+                    self.stdout_file
+                    if self.stdout_file
+                    else (subprocess.PIPE if self.capture else None)
+                ),
+                stderr=(
+                    self.stderr_file
+                    if self.stderr_file
+                    else (subprocess.PIPE if self.capture else None)
+                ),
+                text=True,
+                check=True,
+            )
+
+            if self.capture:
+                return result.stdout, result.stderr
+            return result.returncode == 0
+        except subprocess.CalledProcessError as e:
+            logging.error(
+                "Command failed with return code %d:\n%s\n%s",
+                e.returncode,
+                e.cmd,
+                e.stderr,
+            )
+            if not self.allow_fail:
+                raise
+            return False
+
+
+class CommandInvoker:
+    """
+    Invoker class for command pattern
+    """
+
+    def __init__(self, command: Command) -> None:
+        """
+        Constructor for CommandInvoker
+        """
+        self.command = command
+
+    def execute(self) -> Tuple[str, str] | bool:
+        """
+        Executes the command
+        """
+        return self.command.execute()
