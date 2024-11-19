@@ -20,6 +20,7 @@ jobs:
         pip install setuptools
         pip install pytest-mock
         pip install pyyaml
+        pip install .
     - name: Run tests
       run: |
         pytest -v
