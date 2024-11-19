@@ -96,7 +96,12 @@ def test_wrong_extension(setup_args: list[str]):
         setup_args: list[str] -> Arguments for the test
     ----------
     """
-    setup_args.extend(["test_data/sample_1.ff", "test_data/sample_2.ff"])
+    setup_args.extend(
+        [
+            "test_data/wrong_files/sample_1.ff",
+            "test_data/wrong_files/sample_2.ff",
+        ]
+    )
     with pytest.raises(InvalidFileExtensionError):
         main(setup_args)
         setup_args[-1] = "test_data/sample_3.fq"
@@ -192,7 +197,10 @@ def test_wrong_pairing(setup_args: list[str]):
     ----------
     """
     setup_args.extend(
-        ["test_data/VIB_EA5348AA_AS.fasta", "test_data/VIB_EA5348AA_AS_1.fq"]
+        [
+            "test_data/wrong_files/VIB_EA5348AA_AS.fasta",
+            "test_data/wrong_files/VIB_EA5348AA_AS_1.fq",
+        ]
     )
     with pytest.raises(InvalidPairedError):
         main(setup_args)
@@ -222,7 +230,10 @@ def test_wrong_fasta_input(setup_args: list[str]):
     ----------
     """
     setup_args.extend(
-        ["test_data/VIB_EA5348AA_AS.fasta", "test_data/vibrio_genes.fasta"]
+        [
+            "test_data/wrong_files/VIB_EA5348AA_AS.fasta",
+            "test_data/wrong_files/vibrio_genes.fasta",
+        ]
     )
     with pytest.raises(InvalidPairedError):
         main(setup_args)
