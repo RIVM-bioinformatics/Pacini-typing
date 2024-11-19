@@ -21,7 +21,6 @@ __all__ = [
 ]
 
 import os
-import platform
 import shutil
 from typing import Generator
 
@@ -54,9 +53,6 @@ def setup_args() -> Generator[list[str], None, None]:
         args: list[str] -> List of arguments for the test
     ----------
     """
-    if platform.system() == "Linux":
-        pytest.skip("Test not supported on Linux")
-
     args = [
         "--config",
         "patterns/O1.yaml",
@@ -91,9 +87,6 @@ def cleanup_files(dir_path: str) -> None:
         os.rmdir(dir_path)
 
 
-@pytest.mark.skipif(
-    platform.system() == "Linux", reason="Test not supported on Linux"
-)
 def test_wrong_extension(setup_args: list[str]):
     """
     Test if the InvalidFileExtensionError is raised when
@@ -110,9 +103,6 @@ def test_wrong_extension(setup_args: list[str]):
         main(setup_args)
 
 
-@pytest.mark.skipif(
-    platform.system() == "Linux", reason="Test not supported on Linux"
-)
 def test_not_existing_file(setup_args: list[str]):
     """
     Test if the FileNotExistsError is raised when
@@ -127,9 +117,6 @@ def test_not_existing_file(setup_args: list[str]):
         main(setup_args)
 
 
-@pytest.mark.skipif(
-    platform.system() == "Linux", reason="Test not supported on Linux"
-)
 def test_wrong_sequence(setup_args: list[str]):
     """
     Test if the InvalidSequenceError is raised when
@@ -146,9 +133,6 @@ def test_wrong_sequence(setup_args: list[str]):
         main(setup_args)
 
 
-@pytest.mark.skipif(
-    platform.system() == "Linux", reason="Test not supported on Linux"
-)
 def test_wrong_fasta_construction(setup_args: list[str]):
     """
     Test if the InvalidFastaOrFastqError is raised when
@@ -165,9 +149,6 @@ def test_wrong_fasta_construction(setup_args: list[str]):
         main(setup_args)
 
 
-@pytest.mark.skipif(
-    platform.system() == "Linux", reason="Test not supported on Linux"
-)
 def test_wrong_fastq_construction(setup_args: list[str]):
     """
     Test if the InvalidFastaOrFastqError is raised when
@@ -184,9 +165,6 @@ def test_wrong_fastq_construction(setup_args: list[str]):
         main(setup_args)
 
 
-@pytest.mark.skipif(
-    platform.system() == "Linux", reason="Test not supported on Linux"
-)
 def test_wrong_fastq_construction_2(setup_args: list[str]):
     """
     Test if the InvalidFastaOrFastqError is raised when
@@ -204,9 +182,6 @@ def test_wrong_fastq_construction_2(setup_args: list[str]):
         main(setup_args)
 
 
-@pytest.mark.skipif(
-    platform.system() == "Linux", reason="Test not supported on Linux"
-)
 def test_wrong_pairing(setup_args: list[str]):
     """
     Test if the InvalidPairedError is raised when
@@ -223,9 +198,6 @@ def test_wrong_pairing(setup_args: list[str]):
         main(setup_args)
 
 
-@pytest.mark.skipif(
-    platform.system() == "Linux", reason="Test not supported on Linux"
-)
 def test_wrong_fastq_input(setup_args: list[str]):
     """
     Test if the InvalidSequencingTypesError is raised when
@@ -240,9 +212,6 @@ def test_wrong_fastq_input(setup_args: list[str]):
         main(setup_args)
 
 
-@pytest.mark.skipif(
-    platform.system() == "Linux", reason="Test not supported on Linux"
-)
 def test_wrong_fasta_input(setup_args: list[str]):
     """
     Test if the InvalidPairedError is raised when
@@ -259,9 +228,6 @@ def test_wrong_fasta_input(setup_args: list[str]):
         main(setup_args)
 
 
-@pytest.mark.skipif(
-    platform.system() == "Linux", reason="Test not supported on Linux"
-)
 def test_wrong_fasta_with_fastq_names(setup_args: list[str]):
     """
     Test if the InvalidInputError is raised when
