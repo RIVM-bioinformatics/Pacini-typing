@@ -45,6 +45,10 @@ The Pacini project is a software application which can be used to determine gene
 - [Getting Started](#getting-started)
 - [Parameters \& Usage](#parameters--usage)
 - [Example Run of Pacini-typing](#example-run-of-pacini-typing)
+- [Issues](#issues)
+- [Future Ideas](#future-ideas)
+- [License](#license)
+- [Contact](#contact)
 
 ## Prerequisites
 
@@ -328,5 +332,28 @@ O139,rfbV,0.0,0.0,
 ```
 
 2. Still have to fill in here...
+
+[Back to top](#pacini-typing)
+
+## Issues
+
+If encoutering any issues:
+
+* Any issues can be reported in the [Issues](https://github.com/RIVM-bioinformatics/Pacini-typing/issues) section of this repository
+* Contact the author(s) of the application
+
+## Future Ideas
+
+* Add more optional parameters
+* Negatively search for genetic variants; search for the absence of genes
+
+## License
+
+This pipeline is licensed with a AGPL3 license. Detailed information can be found inside the 'LICENSE' file in this repository.
+
+## Contact
+
+* **Contact person:**       Mark van de Streek
+* **Email**                 <mark.van.de.streek@rivm.nl>;<m.van.de.streek@st.hanze.nl>
 
 [Back to top](#pacini-typing)
