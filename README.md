@@ -8,7 +8,7 @@
 
 <!-- [![CodeFactor](https://www.codefactor.io/repository/github/rivm-bioinformatics/Pacini-typing/badge)](https://www.codefactor.io/repository/github/rivm-bioinformatics/Pacini-typing)   -->
 
-Pylint output: Your code has been rated at 9.67/10 (previous run: 9.44/10, +0.23)
+Pylint output: Your code has been rated at 9.71/10 (previous run: 9.44/10, +0.27)
 
 <div align="center">
     <h1>Pacini-typing</h1>

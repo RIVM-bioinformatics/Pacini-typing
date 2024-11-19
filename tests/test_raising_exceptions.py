@@ -7,7 +7,11 @@
     “GitHub Copilot: Your AI pair programmer” (GPT-3). GitHub, Inc.
     https://github.com/features/copilot
 
-
+This module contains tests for testing some of the failure cases
+There are already smaller unit tests that test the individual functions,
+but these tests are used to test the entire pipeline with the wrong input
+It only tests the cases where the input is wrong, so it's not a complete
+end-to-end test setup.
 """
 
 __author__ = "Mark Van de Streek"
