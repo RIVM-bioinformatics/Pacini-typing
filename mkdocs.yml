@@ -1,5 +1,12 @@
 site_name: Pacini-typing
-site_author: Robert A. Petit III
+nav:
+  - Home: index.md
+  - Prerequisites: prerequisites.md
+  - Installation: installation.md
+  - Parameters: parameters.md
+  - Usage: usage.md
+  - Example Run: example_run.md
+site_author: Mark van de Streek
 site_description: Genetic variant typing based on configuration patterns
 
 # site_url: https://to.be.determined...
@@ -9,6 +16,13 @@ dev_addr: 0.0.0.0:8000
 
 theme:
   name: material
+  navigation_mode: tabs
+  features:
+    - content.code.copy
+    - navigation.tabs
+    - navigation.expand
+    - navigation.top
+
   font:
     text: Roboto Mono
   palette:
