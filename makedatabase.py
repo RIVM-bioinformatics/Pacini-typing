@@ -19,10 +19,7 @@ __all__ = ["DatabaseBuilder"]
 
 import logging
 import os
-import sys
 from typing import Any, Tuple
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from command_utils import execute
 

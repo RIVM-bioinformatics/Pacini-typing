@@ -31,15 +31,15 @@ from typing import Generator
 import pytest
 
 from pacini_typing import main
-from preprocessing.exceptions.validation_exceptions import (
-    InvalidFileExtensionError,
-    FileNotExistsError,
-    InvalidPairedError,
-)
 from preprocessing.exceptions.determine_input_type_exceptions import (
-    InvalidSequenceError,
     InvalidFastaOrFastqError,
+    InvalidSequenceError,
     InvalidSequencingTypesError,
+)
+from preprocessing.exceptions.validation_exceptions import (
+    FileNotExistsError,
+    InvalidFileExtensionError,
+    InvalidPairedError,
 )
 
 

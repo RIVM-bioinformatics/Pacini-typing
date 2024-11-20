@@ -36,9 +36,9 @@ __all__ = ["execute"]
 
 import logging
 import subprocess
+from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Tuple
-from abc import ABC, abstractmethod
 
 # TODO: Implement a design pattern for the execute function
 

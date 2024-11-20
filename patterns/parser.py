@@ -104,7 +104,7 @@ class Parser:
         else:
             self.set_FASTQ_options()
 
-    def set_FASTA_options(self):
+    def set_fasta_options(self):
         """
         Set the options for parsing FASTA files
         Fill in later...
@@ -112,7 +112,7 @@ class Parser:
         self.data_frame.columns = BLAST_COLUMNS
         self.data_frame["pident"] = self.data_frame["pident"].astype(float)
 
-    def set_FASTQ_options(self):
+    def set_fastq_options(self):
         """
         Set the options for parsing FASTQ files
         Fill in later...
