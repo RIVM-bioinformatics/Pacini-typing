@@ -40,7 +40,7 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Tuple
 
-# TODO: Implement a design pattern for the execute function
+# TODO: Make the implementation of the command pattern concrete with all docstrings filled in
 
 
 def execute(
@@ -118,10 +118,6 @@ class Command(ABC):
         """
         Abstract method to execute the command
         """
-
-    @abstractmethod
-    def undo(self):
-        pass
 
 
 class ShellCommand(Command):
@@ -203,3 +199,13 @@ class CommandInvoker:
         Executes the command
         """
         return self.command.execute()
+
+
+if __name__ == "__main__":
+    # Example usage of the command pattern
+    command = ShellCommand(
+        cmd="ls -la", capture=True, directory=Path("/Users/mvandestreek")
+    )
+    invoker = CommandInvoker(command).execute()
+    for i in invoker:
+        print(i)
