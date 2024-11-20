@@ -20,6 +20,7 @@ jobs:
         pip install setuptools
         pip install pytest-mock
         pip install pyyaml
+        pip install pandas
         pip install .
     - name: Run tests
       run: |
