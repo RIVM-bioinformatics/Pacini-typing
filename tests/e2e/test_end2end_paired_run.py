@@ -33,18 +33,12 @@ __all__ = [
     "setup_teardown_paired_input",
     "cleanup_files",
     "test_paired_run",
-    "test_paired_contents",
-    "validate_header_columns",
-    "extract_rows_and_validate",
-    "check_template_identity_bounds",
-    "check_fields_non_empty",
 ]
 
-import csv
 import os
 import platform
 import shutil
-from typing import Generator, Iterator
+from typing import Generator
 
 import pandas as pd
 import pytest
@@ -188,7 +182,9 @@ def test_paired_run(
 
 def check_file_contents() -> None:
     """
-    Function to check the contents of the output files
+    File that checks the contents of the tsv output file
+    with the expected output file
+    It uses the pandas library to read the files and compare them
     """
     run_output = pd.read_csv(f"{RUN_OUTPUT}.tsv", sep="\t")
     expected_output = pd.read_csv(EXPECTED_FILES[0], sep="\t")
@@ -200,7 +196,12 @@ def check_file_contents() -> None:
 
 def compare_additional_files() -> None:
     """
-    Fill in...
+    Function to compare the additional output files
+    The function compares the hash of the output files with the expected
+    hash of the expected files
+
+    For this hash comparison, the create_sha_hash function of the
+    ArgsValidator class is used.
     """
     for output_file, expected_file in zip(
         [
