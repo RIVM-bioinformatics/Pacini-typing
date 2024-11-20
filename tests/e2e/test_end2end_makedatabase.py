@@ -36,6 +36,7 @@ from typing import Generator
 import pytest
 
 from pacini_typing import main
+from preprocessing.validation import validating_input_arguments
 
 INPUT_FILE = "test_data/vibrio_genes.fasta"
 DATABASE_PATH = "./refdir/"
@@ -128,7 +129,8 @@ def setup_teardown() -> Generator[list[str], None, None]:
     ]
 
     dir_path = "test_full_run/"
-    os.mkdir(dir_path)
+    if not os.path.exists(dir_path):
+        os.mkdir(dir_path)
 
     yield args
     cleanup_files(dir_path)
@@ -172,6 +174,28 @@ def test_make_kma_database(setup_teardown: list[str]) -> None:
     main(setup_teardown)
     for kma_extension in KMA_EXTENSIONS:
         assert os.path.exists(f"{DATABASE_PATH}{DATABASE_NAME}{kma_extension}")
+    compare_result_with_expected_files(KMA_EXTENSIONS, "fastq")
+
+
+def compare_result_with_expected_files(
+    extensions: list[str], database_type: str
+) -> None:
+    """
+    Function to compare the files created by KMA with the expected files
+    It checks if the files are created successfully
+    ----------
+    Input:
+        iiiii
+    ----------
+    """
+    for extension in extensions:
+        expected_file = f"test_data/expected_databases/expected_{database_type}_db{extension}"
+        output_file = f"{DATABASE_PATH}{DATABASE_NAME}{extension}"
+        assert validating_input_arguments.ArgsValidator.create_sha_hash(
+            expected_file
+        ) == validating_input_arguments.ArgsValidator.create_sha_hash(
+            output_file
+        )
 
 
 @pytest.mark.skipif(
@@ -183,6 +207,10 @@ def test_make_blast_database(setup_teardown: list[str]) -> None:
     It runs the main function of Pacini_typing with the setup_teardown fixture
     After the test is run,
     it checks if the database files are created successfully
+
+    At the moment, the files of blast database can't be compared
+    with excpeted output, because the binary files are slightly
+    different every run.
     ----------
     Input:
         setup_teardown: list[str] -> Arguments for the test
