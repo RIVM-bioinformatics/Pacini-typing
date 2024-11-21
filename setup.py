@@ -17,6 +17,8 @@ __author__ = "Mark Van de Streek"
 __data__ = "2024-11-01"
 __all__ = ["get_version"]
 
+import platform
+
 from setuptools import find_packages, setup
 
 from command_utils import execute
@@ -27,6 +29,10 @@ def get_version() -> str:
     Get the version of the package from git tags.
     If there are no tags, return "0.0.0".
     """
+    # skip this function if the platform is Linux
+    if platform.system() == "Linux":
+        return "1.2.0"
+
     result = execute(["git", "describe", "--tags"], capture=True)
     if isinstance(result, tuple):
         return result[0].strip().split("-")[0]

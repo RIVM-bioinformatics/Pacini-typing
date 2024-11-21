@@ -60,21 +60,18 @@ import sys
 from typing import Any, Tuple
 
 import preprocessing.argsparse.build_parser
+from makedatabase import DatabaseBuilder
+from patterns.read_config_pattern import ReadConfigPattern
+from preprocessing.exceptions.determine_input_type_exceptions import (
+    InvalidSequencingTypesError,
+)
 from preprocessing.exceptions.validate_database_exceptions import (
     InvalidDatabaseError,
 )
-from makedatabase import DatabaseBuilder
+from preprocessing.validation.determine_input_type import InputFileInspector
+from preprocessing.validation.validate_database import check_for_database_path
+from preprocessing.validation.validating_input_arguments import ArgsValidator
 from queries.query_runner import QueryRunner
-from preprocessing.validation.determine_input_type import (
-    InputFileInspector,
-)
-from patterns.read_config_pattern import ReadConfigPattern
-from preprocessing.validation.validate_database import (
-    check_for_database_path,
-)
-from preprocessing.validation.validating_input_arguments import (
-    ArgsValidator,
-)
 
 logging.basicConfig(
     level=logging.INFO,
@@ -386,7 +383,7 @@ class PaciniTyping:
                 "Only FASTA files are allowed for single files "
                 "and only FASTQ files are allowed for paired files."
             )
-            sys.exit(1)
+            raise InvalidSequencingTypesError(self.option["input_file_list"])
 
     def check_valid_database_path(
         self, database_builder: dict[str, Any]
@@ -435,6 +432,39 @@ class PaciniTyping:
 
         return result
 
+    def initialize_pattern_with_config(self) -> ReadConfigPattern:
+        """
+        Function that initializes the ReadConfigPattern class.
+        This class is responsible for reading the configuration file
+        It also sets the required information for the makedatabase
+        and query operation.
+        ----------
+        Output:
+            - pattern: ReadConfigPattern object
+        ----------
+        """
+        pattern = ReadConfigPattern(
+            self.option["config"]["config_path"],
+            self.option["file_type"],
+        )
+        # Additionally, the query input and output must be set.
+        # Output as follows: output/fasta_results.tsv
+        pattern.creation_dict["input_file_list"] = self.option["config"][
+            "input"
+        ]
+        pattern.creation_dict["output"] = (
+            pattern.pattern["database"]["run_output"]
+            + self.option["file_type"]
+            + "_results.tsv"
+        )
+
+        pattern.creation_dict["input_fasta_file"] = os.path.join(
+            os.path.dirname(self.option["run_path"]),
+            pattern.creation_dict["input_fasta_file"],
+        )
+
+        return pattern
+
     def run(self) -> None:
         """
         Main start point for the Pacini-Typing pipeline.
@@ -462,37 +492,6 @@ class PaciniTyping:
                 "input_fasta_file": self.option["makedatabase"]["input"],
             }
             self.run_makedatabase(database_builder)
-
-        # TODO - remove deprecated code below...
-        # elif self.option["query"]:
-        #     # Retrieve the file type
-        #     self.get_file_type()
-        #     # Check if the file type is correct for the input arguments
-        #     self.check_valid_option_with_args()
-        #     # Construct the query params for the query_runner,
-        #     # We could just pass the whole self.option to the query_runner,
-        #     # but we want to re-use the query_runner later on with different options
-        #     query_builer = {
-        #         "file_type": self.option["file_type"],
-        #         "input_file_list": self.option["input_file_list"],
-        #         "database_path": self.option["database_path"],
-        #         "database_name": self.option["database_name"],
-        #         "output": self.option["query"]["output"],
-        #     }
-        #     self.check_valid_database_path(query_builer)
-        #     # Run the query
-        #     self.run_query(query_builer)
-        #     # result = self.run_query(query_builer)
-        #     # Parse the results.....
-
-        #     # Maybe use a builder pattern for the query_runner:
-        #     # QueryRunnerBuilder() \
-        #     #     .set_file_type(self.option["file_type"]) \
-        #     #     .set_input_file_list(self.option["input_file_list"]) \
-        #     #     .set_database_path(self.option["database_path"]) \
-        #     #     .set_database_name(self.option["database_name"]) \
-        #     #     .set_output(self.option["query"]["output"]) \
-        #     #     .build().run()
 
         else:
             # Determine the file type and valid options,
@@ -526,26 +525,13 @@ class PaciniTyping:
                 # The config option is selected,
                 # read the config file and validate it with
                 # the ReadConfigPattern class
-                pattern = ReadConfigPattern(
-                    self.option["config"]["config_path"],
-                    self.option["file_type"],
-                )
+                pattern = self.initialize_pattern_with_config()
                 # Check if database exists
                 # If not present, create it from the config options
                 if not self.check_valid_database_path(pattern.creation_dict):
                     # Re-use the run_makedatabase() method with right params
                     self.run_makedatabase(pattern.creation_dict)
 
-                # Additionally, the query input and output must be set.
-                # Output as follows: output/fasta_results.tsv
-                pattern.creation_dict["input_file_list"] = self.option[
-                    "config"
-                ]["input"]
-                pattern.creation_dict["output"] = (
-                    pattern.pattern["database"]["run_output"]
-                    + self.option["file_type"]
-                    + "_results.tsv"
-                )
                 # Check if database does exists at this point,
                 # if not, raise an error and exit the program
                 # Otherwise, run the query operation
@@ -587,6 +573,7 @@ if __name__ == "__main__":
     main()
 
 ###########################################################################
+###########################################################################
 
 # TODO: query_runner:run - This return statement is not used anywhere, should it be removed?
 
@@ -600,4 +587,5 @@ if __name__ == "__main__":
 #  Or: kma -i data/VIB_AA4147AA_AS_2.fna -t_db refdir/mykma -t 4 -ID 70 -mrc 0.7 -o
 # temp_output && cut -f 1,5 temp_output.res && rm temp_output.*
 
+###########################################################################
 ###########################################################################

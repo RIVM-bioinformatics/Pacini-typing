@@ -34,4 +34,5 @@ refdir/
 *.csv
 *coverage*
 test_data/
+.pylintrc
 .vscode/

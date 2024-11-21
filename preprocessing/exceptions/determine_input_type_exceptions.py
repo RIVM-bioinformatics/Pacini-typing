@@ -65,20 +65,20 @@ class InvalidSequenceError(Exception):
 
 class InvalidSequencingTypesError(Exception):
     """
-    Raised when two different sequencing types are provided.
+    Raised when invalid sequencing types are provided.
     """
 
     def __init__(self, files: list[str]) -> None:
         self.files = files
 
     def __str__(self) -> str:
+        files_list: str = "\n\t\t- ".join(self.files)
         return f"""
         ---------------------------------------------------
         ERROR: Wrong sequencing types detected
         ---------------------------------------------------
         The following files cannot be used together:
-            - {self.files[0]}
-            - {self.files[1]}
+            - {files_list}
         ---------------------------------------------------
         SUGGESTION: Make sure you provide:
             - TWO fastq files
