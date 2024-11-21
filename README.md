@@ -32,7 +32,7 @@ The Pacini project is a software application which can be used to determine gene
 1. Presence or absence of certain genes
 2. Single nucleotide polymorphisms (SNPs)
 
-*Based on these variants, the application can calculate the change of pathogenicity of the given bacteria.*
+*Based on these variants, the application can calculate the change of pathogenicity of the given bacteria. (This is still under development...)*
 
 ## Table of Contents
 
@@ -40,11 +40,16 @@ The Pacini project is a software application which can be used to determine gene
 - [About this project](#about-this-project)
 - [Table of Contents](#table-of-contents)
 - [Prerequisites](#prerequisites)
+- [Complete list of required packages](#complete-list-of-required-packages)
 - [Installation](#installation)
 - [(very) Brief Overview of Pacini-typing](#very-brief-overview-of-pacini-typing)
 - [Getting Started](#getting-started)
 - [Parameters \& Usage](#parameters--usage)
 - [Example Run of Pacini-typing](#example-run-of-pacini-typing)
+- [Issues](#issues)
+- [Future Ideas](#future-ideas)
+- [License](#license)
+- [Contact](#contact)
 
 ## Prerequisites
 
@@ -54,27 +59,73 @@ The Pacini project is a software application which can be used to determine gene
 The following Python packages are required:
 
 1. pip=>24.2
-2. PyYAML=>6.0.2
+2. pyyaml=>6.0.2
 3. setuptools=>75.1.0
 
 The following Tools are required:
 
-1. blast=>2.5.0
-   1. The makeblastdb must be available as well
+1. blast=>2.16.0
+   1. The makeblastdb subcommand of BLAST must be available as well
 2. kma=>1.4.15
-   1. The kma_index must be available as well
+   1. The kma_index subcommand of KMA must be available as well
 
-A complete conda environment, containing all the required packages, can be found in the `environment.yaml` file. It is very advised to use this environment to run the application. The environment can be installed by running the following command:
+### Automatic installation of the required packages
+
+For both macOS and Linux users, a complete conda environment, containing all the required packages, can be found in the root of the repository. For macOS users, some additional steps are required to install the required tools. Below are the steps for both macOS and Linux users.
+
+#### Linux users
+
+Linux does not require any additional steps to install the required tools. The conda environment can be created by running the following command:
 
 ```bash
-conda env create -f environment.yaml -n pacini-typing
+conda env create -f linux-environment.yaml -n pacini-typing
 ```
 
-And activated by running:
+Activate the environment by running:
 
 ```bash
 conda activate pacini-typing
 ```
+
+#### Mac users
+
+Pacini-typing is heavily dependent on the BLAST and KMA tools. Unfortunately, BLAST is not available for conda installation on Apple Silicon Macs. There is a conda environment without BLAST available in the root of the repository. This environment can be created by running the following command:
+
+```bash
+conda env create -f mac-environment.yaml -n pacini-typing
+```
+
+Make sure to activate the environment by running:
+
+```bash
+conda activate pacini-typing
+```
+
+After activating the environment, BLAST must be installed manually. The most easy way to install BLAST is by using Homebrew:
+
+```bash
+brew install blast
+```
+
+Test if the installation was successful by running the following command:
+
+```bash
+blastn -version
+```
+
+* Install [Homebrew](https://brew.sh) if it is not installed on your system.
+* Install BLAST manually via the official [BLAST website](https://blast.ncbi.nlm.nih.gov/doc/blast-help/downloadblastdata.html).
+
+## Complete list of required packages
+
+| Package    | Version |
+|------------|---------|
+| pip        | >=24.2  |
+| pyyaml     | >=6.0.2 |
+| setuptools | >=75.1.0|
+| pandas     | >=2.2.3 |
+| blast      | >=2.16.0|
+| kma        | >=1.4.15|
 
 ## Installation
 
@@ -92,7 +143,7 @@ git clone https://github.com/RIVM-bioinformatics/Pacini-typing.git
 cd Pacini-typing
 ```
 
-3. Install the package.
+1. Install the package.
 
 ```bash
 pip install .
@@ -233,8 +284,9 @@ See github.com/RIVM-Bioinformatics for more information
 
 Pacini-typing can be used at two different ways. This could either be:
 
->* Manually running Pacini-typing, this consists of running `pacini_typing` with an additional subcommand
 >* Using a pre-defined configuration file to run the application
+
+>* Manually running Pacini-typing, this consists of running `pacini_typing` with an additional subcommands `makedatabase` or `query`.
 
 One of these two methods must be used to run the application.
 
@@ -250,11 +302,17 @@ pacini_typing --input file_1.ext file_2.ext
 
 #### Manually creating database required parameters
 
-* ```makedatabase -h``` Shows the help for the makedatabase command
+* ```-h, --help``` Shows the help for the makedatabase command
 * ```-db_path, --database_path``` path to the database directory
 * ```-db_name, --database_name``` name of the database
-* ```-i, --input``` path to the database file
+* ```-I, --input_file``` path to the database file
 * ```-db_type, --database_type``` type of the database, choose between `fasta` or `fastq`
+
+To run the above options, don't forget to add the `makedatabase` subcommand at the beginning of the command:
+
+```bash
+pacini_typing makedatabase -db_path [path_to_database_directory] -db_name [name_of_database] -I [path_to_input_file.ext] -db_type [fasta/fastq]
+```
 
 #### Manually running query required parameters
 
@@ -266,6 +324,12 @@ pacini_typing --input file_1.ext file_2.ext
 * ```-o, --output``` path to the output directory and prefix of the output files
 
 **Note:** The `-p` and `-s` parameters are mutually exclusive. Only one of these parameters can be used at a time.
+
+To run the above options, don't forget to add the `query` subcommand at the beginning of the command:
+
+```bash
+pacini_typing query -db_path [path_to_database_directory] -db_name [name_of_database] -p [path_to_paired_files.ext] -o [path_to_output_directory]
+```
 
 ### Optional parameters
 
@@ -308,14 +372,16 @@ CCCFFFFFHHHGHJJJJJJIJJJJJHIJJJJJC1:FHIIIIIJJIIJFIJGHIJJJJJJJIGIJJJJIJJ
 ### Run
 
 ```bash
-pacini_typing \\
-  --i input_file.ext \\ # 1 FASTA file OR 2 FASTQ files
+pacini_typing \
+  --i input_file.ext \ # 1 FASTA file OR 2 FASTQ files
   --config path_to_config_file.yaml
 ```
 
 ### Output
 
-Output consists of three files:
+*This section is still in development...*
+
+But, the output of the application consists of three files:
 
 1. `{prefix}.csv`: CSV file containing the results of the genetic detection
 
@@ -327,6 +393,29 @@ O139,wbfZ,98.0,95.0,150:C>T
 O139,rfbV,0.0,0.0,
 ```
 
-2. Still have to fill in here...
+The rest of the output files are still under construction...
+
+[Back to top](#pacini-typing)
+
+## Issues
+
+If encoutering any issues:
+
+* Any issues can be reported in the [Issues](https://github.com/RIVM-bioinformatics/Pacini-typing/issues) section of this repository
+* Contact the author(s) of the application
+
+## Future Ideas
+
+* Add more optional parameters
+* Negatively search for genetic variants; search for the absence of genes
+
+## License
+
+This pipeline is licensed with a AGPL3 license. Detailed information can be found inside the 'LICENSE' file in this repository.
+
+## Contact
+
+* **Contact person:**       Mark van de Streek
+* **Email**                 <mark.van.de.streek@rivm.nl> or <m.van.de.streek@st.hanze.nl>
 
 [Back to top](#pacini-typing)

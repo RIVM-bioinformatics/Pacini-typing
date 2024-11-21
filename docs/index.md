@@ -1,4 +1,11 @@
-# What is Pacini-typing?
+---
+title: Welcome to Pacini-typing
+description: Pacini-typing documentation homepage
+hide:
+    - navigation
+---
+
+# Pacini-typing
 
 For full documentation visit [mkdocs.org](https://www.mkdocs.org).
 
