@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.4.0](https://github.com/RIVM-bioinformatics/Pacini-typing/compare/v1.3.1...v1.4.0) (2024-11-21)
+
+
+### Features
+
+* add FASTA files for VIB-O1 and VIB-O139 patterns ([e295e28](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/e295e28810bbf1cbf1e7ee642d00d59a9c3a6f42))
+
+
+### Bug Fixes
+
+* fixed a bug whith package dependenies in the linux env ([a758b6c](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/a758b6cf3d3e937dcfb4e82bff1aa9bd013e90ca))
+
 ## [1.3.1](https://github.com/RIVM-bioinformatics/Pacini-typing/compare/v1.3.0...v1.3.1) (2024-11-18)
 
 
