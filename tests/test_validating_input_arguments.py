@@ -82,6 +82,9 @@ CHECK_PAIRED_NAMES_GOOD = [
     ("mysample_R1_is_great.fq", "mysample_R2_is_great.fq"),
     ("mysample_1_is_great.fq", "mysample_2_is_great.fq"),
     ("mysampleR1.fq", "mysampleR2.fq"),
+    ("mysampleR1R2.fq", "mysampleR2R1.fq"),
+    ("mysample_R2R1.fq", "mysample_R1R2.fq"),
+    ("mysam_2ple_1_is_great.fq", "mysam_1le_2_is_great.fq"),
 ]
 
 CHECK_PAIRED_NAMES_FAIL = [
@@ -129,6 +132,23 @@ def test_validate_file_extensions(filename, expected):
             v.validate_file_extensions(filename)
     else:
         assert v.validate_file_extensions(filename) == expected
+
+
+def test_validate_file_extension_fail():
+    """
+    Test the validate_file_extensions() function for failure cases.
+    This function checks if the file extension of the given filename is valid
+    based on predefined criteria. It should raise an InvalidFileExtensionError
+    exception if the file extension is not valid. The test verifies that the
+    function correctly identifies and handles invalid file extensions.
+    """
+    v = ArgsValidator(
+        option={"input_file_list": [], "run_path": "./pacini_typing.py"}
+    )
+
+    with pytest.raises(InvalidFileExtensionError):
+        v.validate_file_extensions("not_a_valid_file_extension")
+        v.validate_file_extensions("")
 
 
 @pytest.mark.parametrize("file, expected", CHECK_FILE_EXISTENCE_GOOD)

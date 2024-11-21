@@ -63,12 +63,12 @@ def create_database_file_list(arg_options: dict[str, Any]) -> list[str]:
     db_files = []
     if arg_options["file_type"] == "FASTA":
         db_files = [
-            f"{arg_options['database_name']}.{ext}"
+            f"{arg_options["database_name"]}.{ext}"
             for ext in ["ndb", "nhr", "nin", "njs", "not", "nsq", "ntf", "nto"]
         ]
     elif arg_options["file_type"] == "FASTQ":
         db_files = [
-            f"{arg_options['database_name']}.{ext}"
+            f"{arg_options["database_name"]}.{ext}"
             for ext in ["comp.b", "length.b", "name", "seq.b"]
         ]
 

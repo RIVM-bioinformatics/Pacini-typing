@@ -27,16 +27,12 @@ __all__ = ["QueryRunner"]
 
 import logging
 import os
-import sys
 import time
 from typing import Any, Tuple
 
+from command_utils import execute
 from queries.blast_runner import BLASTn
 from queries.kma_runner import KMA
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-
-from command_utils import execute
 
 
 class QueryRunner:

@@ -33,47 +33,27 @@ __all__ = [
     "setup_teardown_paired_input",
     "cleanup_files",
     "test_paired_run",
-    "test_paired_contents",
-    "validate_header_columns",
-    "extract_rows_and_validate",
-    "check_template_identity_bounds",
-    "check_fields_non_empty",
 ]
 
-import csv
 import os
 import platform
 import shutil
-from typing import Generator, Iterator
+from typing import Generator
 
+import pandas as pd
 import pytest
 
 from pacini_typing import main
+from preprocessing.validation import validating_input_arguments
 
 RUN_OUTPUT = "test_full_run/myresults"
-FASTQ_FILE_1 = "test_data/VIB_EA5348AA_AS_1.fq"
-FASTQ_FILE_2 = "test_data/VIB_EA5348AA_AS_2.fq"
-KMA_DATABASE_NAME = "mykma"
-DATABASE_PATH = "./refdir/"
-IDENTITY = 90
 
-KMA_COLUMNS = [
-    "Template_Name",
-    "Template_Length",
-    "Template_Identity",
-    "Template_Coverage",
-    "Template_Depth",
-    "Query_Identity",
-    "Query_Coverage",
-    "Query_Depth",
-    "Read_Count_Map",
-    "Read_Count_Aln",
-    "Score",
-    "Expected",
-    "q_value",
-    "p_value",
-    "ConClave_Score",
-    "ConClave_Quality",
+EXPECTED_FILES = [
+    "test_data/expected_output/expected_paired_VIB_EA5348AA.tsv",
+    "test_data/expected_output/expected_paired_VIB_EA5348AA.aln",
+    "test_data/expected_output/expected_paired_VIB_EA5348AA.fsa",
+    "test_data/expected_output/expected_paired_VIB_EA5348AA.frag.gz",
+    "test_data/expected_output/expected_paired_VIB_EA5348AA.res",
 ]
 
 
@@ -135,16 +115,16 @@ def setup_teardown_paired_input() -> Generator[list[str], None, None]:
         "--verbose",
         "query",
         "--paired",
-        FASTQ_FILE_1,
-        FASTQ_FILE_2,
+        "test_data/VIB_EA5348AA_AS_1.fq",
+        "test_data/VIB_EA5348AA_AS_2.fq",
         "--output",
         RUN_OUTPUT,
         "--database_path",
-        DATABASE_PATH,
+        "./refdir/",
         "--database_name",
-        KMA_DATABASE_NAME,
+        "mykma",
         "--identity",
-        str(IDENTITY),
+        "90",
     ]
     # Make the directory for the test
     dir_path = "test_full_run/"
@@ -197,86 +177,43 @@ def test_paired_run(
     assert os.path.exists(f"{RUN_OUTPUT}.res")
     assert os.path.exists(f"{RUN_OUTPUT}.frag.gz")
     assert os.path.exists(f"{RUN_OUTPUT}.aln")
+    check_file_contents()
 
 
-@pytest.mark.skipif(
-    platform.system() == "Linux", reason="Test not supported on Linux"
-)
-def test_paired_contents(
-    setup_teardown_paired_input: Generator[list[str], None, None]
-) -> None:
+def check_file_contents() -> None:
     """
-    Test the contents of the output file for the paired input...
-    Add more information later...
+    File that checks the contents of the tsv output file
+    with the expected output file
+    It uses the pandas library to read the files and compare them
     """
-    main(setup_teardown_paired_input)
-    if not os.path.exists(f"{RUN_OUTPUT}.tsv"):
-        pytest.fail("Output file was not created")
-    else:
-        # Mypy is not happy with the code below, but it is correct
-        with open(f"{RUN_OUTPUT}.tsv", "r", encoding="utf-8") as f:
-            reader = csv.reader(f, delimiter="\t")
-            # Validate the header of the output file
-            validate_header_columns(reader)
-            # Extract the rows from the output file
-            rows = extract_rows_and_validate(reader)
-            # Validate the template identity bounds
-            check_template_identity_bounds(rows)
-            # Validate the fields are non-empty
-            check_fields_non_empty(rows)
+    run_output = pd.read_csv(f"{RUN_OUTPUT}.tsv", sep="\t")
+    expected_output = pd.read_csv(EXPECTED_FILES[0], sep="\t")
+
+    # Use the equals function of the pandas DataFrame to compare the files
+    assert run_output.equals(expected_output)
+    compare_additional_files()
 
 
-def validate_header_columns(reader: Iterator[list[str]]) -> None:
+def compare_additional_files() -> None:
     """
-    Function to validate the header columns of the output file
-    The header columns should be the same as the KMA_COLUMNS
-    ----------
-    Input:
-        reader: csv.reader -> Reader object for the output file
-    ----------
-    """
-    header = next(reader)
-    assert header == KMA_COLUMNS
+    Function to compare the additional output files
+    The function compares the hash of the output files with the expected
+    hash of the expected files
 
-
-def extract_rows_and_validate(reader: Iterator[list[str]]) -> list[list[str]]:
+    For this hash comparison, the create_sha_hash function of the
+    ArgsValidator class is used.
     """
-    Function to extract the rows from the output file and returns them
-    This for further validation of the contents in other functions
-    ----------
-    Input:
-        reader: csv.reader -> Reader object for the output file
-    Output:
-        rows: list[list[str]] -> List of rows from the output file
-    ----------
-    """
-    rows = list(reader)
-    assert len(rows) >= 4
-    return rows
-
-
-def check_template_identity_bounds(rows: list[list[str]]) -> None:
-    """
-    Function to check if the Template_Identity is in the correct range
-    The Template_Identity should be between 95 and 100
-    ----------
-    Input:
-        rows: list[list[str]] -> List of rows from the output file
-    ----------
-    """
-    for row in rows:
-        template_identity = float(row[KMA_COLUMNS.index("Template_Identity")])
-        assert 95 <= template_identity <= 100
-
-
-def check_fields_non_empty(rows: list[list[str]]) -> None:
-    """
-    Basic function to check if all fields in the rows are non-empty
-    This is done by checking if all fields are non-empty
-    ----------
-    Input:
-        rows: list[list[str]] -> List of rows from the output file
-    ----------
-    """
-    for row in rows:
-        assert all(row)
+    for output_file, expected_file in zip(
+        [
+            f"{RUN_OUTPUT}.aln",
+            f"{RUN_OUTPUT}.fsa",
+            f"{RUN_OUTPUT}.frag.gz",
+            f"{RUN_OUTPUT}.res",
+        ],
+        EXPECTED_FILES[1:],
+    ):
+        assert validating_input_arguments.ArgsValidator.create_sha_hash(
+            output_file
+        ) == validating_input_arguments.ArgsValidator.create_sha_hash(
+            expected_file
+        )
