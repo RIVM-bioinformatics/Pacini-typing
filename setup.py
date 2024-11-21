@@ -21,7 +21,7 @@ import platform
 
 from setuptools import find_packages, setup
 
-from command_utils import execute
+from command_utils import ShellCommand, CommandInvoker
 
 
 def get_version() -> str:
@@ -29,11 +29,14 @@ def get_version() -> str:
     Get the version of the package from git tags.
     If there are no tags, return "0.0.0".
     """
-    # skip this function if the platform is Linux
+    # skip this function if the platform is Linux,
+    # because of the GitHub Actions workflow
     if platform.system() == "Linux":
-        return "1.2.0"
+        return "1.4.0"
 
-    result = execute(["git", "describe", "--tags"], capture=True)
+    result = CommandInvoker(
+        ShellCommand(["git", "describe", "--tags"], capture=True)
+    ).execute()
     if isinstance(result, tuple):
         return result[0].strip().split("-")[0]
     return "0.0.0"
