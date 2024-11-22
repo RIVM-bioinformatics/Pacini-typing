@@ -10,11 +10,16 @@
 To be filed in later...
 """
 
-__author__ = "Mark Van de Streek"
-__data__ = "2024-10-30"
+__author__ = "Mark van de Streek"
+__data__ = "2024-11-22"
 __all__ = ["Parser"]
 
 from typing import Any
+from filter import Filter
+from name_filter import GeneNameFilter
+from identity_filter import PercentageIdentityFilter
+
+# FIXME: Add the right import statements in sub-files of filtering
 
 import pandas as pd
 
@@ -71,8 +76,20 @@ class Parser:
         self.config_options = config_options
         self.run_output_filename = run_output_filename
         self.parse_type = parse_type
-        self.pre_parse_results: list[dict[str, Any]] = []
         self.data_frame: pd.DataFrame = pd.DataFrame()
+        self.filters: list[Filter] = []
+
+    def add_filter(self, filter: Filter) -> None:
+        """
+        Function to add a filter to the list of filters
+        the list of filters is present as class variable
+        The incoming object is an implementation of the Filter class
+        ----------
+        Input:
+            - filter: Filter object
+        ----------
+        """
+        self.filters.append(filter)
 
     def read_run_output(self):
         """
@@ -100,9 +117,9 @@ class Parser:
             header=None if self.parse_type == "FASTA" else 0,
         )
         if self.parse_type == "FASTA":
-            self.set_FASTA_options()
+            self.set_fasta_options()
         else:
-            self.set_FASTQ_options()
+            self.set_fastq_options()
 
     def set_fasta_options(self):
         """
@@ -123,40 +140,16 @@ class Parser:
             "Template_Identity"
         ].astype(float)
 
-    def rule_perc_identity(self) -> pd.DataFrame:
-        """
-        Rule to filter the results based on the percentage identity
-        Fill in later...
-        """
-        if self.parse_type == "FASTA":
-            return self.data_frame["pident"] > 99
-        return self.data_frame["Template_Identity"] > 99
-
-    def rule_gene_filter(self, gene_name: str) -> pd.DataFrame:
-        """
-        Rule to filter the results based on the gene name
-        """
-        if self.parse_type == "FASTA":
-            # Filter op basis van 'sseqid'
-            return self.data_frame["sseqid"].str.contains(
-                gene_name, case=False, na=False
-            )
-        return self.data_frame["Template_Name"].str.contains(
-            gene_name, case=False, na=False
-        )
-
     def parse(self):
         """
         Parse the file
         Fill in later...
         """
         self.read_run_output()
-        print(
-            self.data_frame[
-                (self.rule_perc_identity())
-                & (self.rule_gene_filter("rfbV_O1"))
-            ]
-        )
+        for filtering in self.filters:
+            self.data_frame = filtering.apply(self.data_frame)
+        print(self.data_frame)
+        # Go further from here....
 
 
 def main():
@@ -164,16 +157,11 @@ def main():
     Test the read_run_output method
     """
     file = "/Users/mvandestreek/Desktop/PaciniTestRun/output/FASTA_results.tsv.tsv"
-
     parser = Parser({"config": "config", "options": "options"}, file, "FASTA")
+
+    parser.add_filter(PercentageIdentityFilter(99, "FASTA"))
+    parser.add_filter(GeneNameFilter(["rfbV_O1", "fimA"], "FASTA"))
     parser.parse()
-
-    file2 = "/Users/mvandestreek/Desktop/PaciniTestRun/output/FASTQ_results.tsv.tsv"
-
-    parser2 = Parser(
-        {"config": "config", "options": "options"}, file2, "FASTQ"
-    )
-    parser2.parse()
 
 
 if __name__ == "__main__":
