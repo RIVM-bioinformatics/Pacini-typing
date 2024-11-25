@@ -15,13 +15,14 @@ __data__ = "2024-11-22"
 __all__ = ["Parser"]
 
 from typing import Any
+
+import pandas as pd
 from filter import Filter
-from name_filter import GeneNameFilter
 from identity_filter import PercentageIdentityFilter
+from name_filter import GeneNameFilter
 
 # FIXME: Add the right import statements in sub-files of filtering
 
-import pandas as pd
 
 KMA_COLUMNS = [
     "Template_Name",

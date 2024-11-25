@@ -14,8 +14,9 @@ __author__ = "Mark van de Streek"
 __data__ = "2024-11-22"
 __all__ = ["Filter"]
 
-import pandas as pd
 from abc import ABC, abstractmethod
+
+import pandas as pd
 
 
 class Filter(ABC):

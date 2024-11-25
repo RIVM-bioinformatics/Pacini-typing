@@ -14,8 +14,8 @@ __author__ = "Mark van de Streek"
 __data__ = "2024-11-22"
 __all__ = ["GeneNameFilter"]
 
-from filter import Filter
 import pandas as pd
+from filter import Filter
 
 
 class GeneNameFilter(Filter):
