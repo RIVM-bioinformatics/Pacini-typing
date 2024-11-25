@@ -123,3 +123,4 @@ if __name__ == "__main__":
         "/Users/mvandestreek/Developer/pacini_typing/patterns/O139.yaml",
         "fasta",
     )
+    print(pattern.pattern)
