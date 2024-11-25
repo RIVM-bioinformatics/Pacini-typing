@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.0](https://github.com/RIVM-bioinformatics/Pacini-typing/compare/v1.4.0...v1.5.0) (2024-11-22)
+
+
+### Features
+
+* usage of the command design pattern for executing commands in Pacini-typing ([f276115](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/f27611567b0401a3292ab6ec2065675fca602f59))
+
 ## [1.4.0](https://github.com/RIVM-bioinformatics/Pacini-typing/compare/v1.3.1...v1.4.0) (2024-11-21)
 
 
