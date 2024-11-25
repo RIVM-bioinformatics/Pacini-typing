@@ -1,0 +1,32 @@
+%YAML 1.2
+---
+metadata:
+  id: "VIB-O1"
+  name: "O1 Gene group"
+  description: "Genetic pattern run config file for Vibrio cholerae O1 serogroup"
+  date_created: "2024-11-06"
+
+database:
+  name: "VIB-O1"
+  path: "databases"
+  matching_seq_file: "patterns/VIB-O1.fasta"
+  run_output: "output/"
+
+perc_ident: 95.0
+perc_cov: 90.0
+e_value: 0
+p_value: 0.05
+genes:
+  - gene_name: "rfbV"
+    presence: true
+    pident: 98.0
+    pcoverage: 95.0
+snps: null
+    
+    # Example of snp entry:
+    # - snp_name: "name"
+    #   position: 150
+    #   mutation: "C>T"
+    #   confidence: "p-value: 0.01"
+    # Uncomment the above lines to add SNPs to the pattern
+
