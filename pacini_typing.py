@@ -47,7 +47,7 @@ See the README.md file for more information about the pipeline
 
 from __future__ import annotations
 
-__author__ = "Mark Van de Streek"
+__author__ = "Mark van de Streek"
 __data__ = "2024-10-24"
 __all__ = ["PaciniTyping", "main"]
 
@@ -68,7 +68,9 @@ from patterns.read_config_pattern import ReadConfigPattern
 from preprocessing.exceptions.determine_input_type_exceptions import (
     InvalidSequencingTypesError,
 )
-from preprocessing.exceptions.validate_database_exceptions import InvalidDatabaseError
+from preprocessing.exceptions.validate_database_exceptions import (
+    InvalidDatabaseError,
+)
 from preprocessing.validation.determine_input_type import InputFileInspector
 from preprocessing.validation.validate_database import check_for_database_path
 from preprocessing.validation.validating_input_arguments import ArgsValidator
@@ -119,6 +121,8 @@ class PaciniTyping:
         """
         self.input_args = input_args
         self.option: dict[str, Any] = {}
+        self.sample_name: str = ""
+        self.file_type: str = ""
 
     def parse_all_args(self) -> None:
         """
@@ -245,6 +249,19 @@ class PaciniTyping:
             input_files_list.extend(self.option["config"]["input"])
         self.option["input_file_list"] = input_files_list
 
+    def retrieve_sample_name(self) -> None:
+        """
+        Function that retrieves the sample name from the input file.
+        The sample name is the first part of the filename.
+        """
+        self.sample_name = (
+            self.option["input_file_list"][0]
+            .split("/")[-1]
+            .split(".")[0]
+            .replace("_1", "")
+            .replace("_pR1", "")
+        )
+
     def check_for_unzip_files(self) -> None:
         """
         Small function that checks the input files for .gz files.
@@ -349,12 +366,12 @@ class PaciniTyping:
         See validation/determine_input_type.py for more information.
         """
         logging.debug("Determining the file type of the input file(s)...")
-        self.option["file_type"] = InputFileInspector(
+        self.file_type = InputFileInspector(
             self.option["input_file_list"]
         ).get_file_type()
         logging.info(
             "File type has been determined: %s",
-            self.option["file_type"],
+            self.file_type,
         )
 
     def check_valid_option_with_args(self) -> None:
@@ -375,10 +392,10 @@ class PaciniTyping:
         )
         if (
             len(self.option["input_file_list"]) == 1
-            and self.option["file_type"] == "FASTQ"
+            and self.file_type == "FASTQ"
         ) or (
             len(self.option["input_file_list"]) == 2
-            and self.option["file_type"] == "FASTA"
+            and self.file_type == "FASTA"
         ):
             logging.error(
                 "Only FASTA files are allowed for single files "
@@ -433,19 +450,6 @@ class PaciniTyping:
 
         return result
 
-    def retrieve_sample_name(self) -> None:
-        """
-        Function that retrieves the sample name from the input file.
-        The sample name is the first part of the filename.
-        """
-        self.sample_name = (
-            self.option["input_file_list"][0]
-            .split("/")[-1]
-            .split(".")[0]
-            .replace("_1", "")
-            .replace("_pR1", "")
-        )
-
     def initialize_pattern_with_config(self) -> ReadConfigPattern:
         """
         Function that initializes the ReadConfigPattern class.
@@ -460,13 +464,13 @@ class PaciniTyping:
         logging.debug("Initializing the ReadConfigPattern class...")
         pattern = ReadConfigPattern(
             self.option["config"]["config_path"],
-            self.option["file_type"],
+            self.file_type,
         )
         # Additionally, the query input and output must be set.
         # The output is not specified by the user, because
         # this is based on the input files. Therefore,
         # the sample name is retrieved from the input file.
-        self.retrieve_sample_name()
+        # This is done in the function retrieve_sample_name().
         pattern.creation_dict["input_file_list"] = self.option["config"][
             "input"
         ]
@@ -481,6 +485,30 @@ class PaciniTyping:
 
         return pattern
 
+    def parse_results(self, pattern: ReadConfigPattern) -> None:
+        """
+        Function that calls the parsing of the query results.
+        The calling of the Parser class is done here.
+        This calling constists of creating a Parser object,
+        adding filters and parsing the results.
+        """
+        logging.debug("Parsing the results of the query operation...")
+        parser = Parser(
+            pattern.pattern,
+            pattern.creation_dict["output"],
+            self.file_type,
+            self.sample_name,
+        )
+        logging.debug("Adding filters to the parser...")
+        # TODO: Filters should be added based on the config file
+        parser.add_filter(PercentageIdentityFilter(99, self.file_type))
+        parser.add_filter(
+            GeneNameFilter(
+                ["rfbV_O1", "ctxA", "ctxB", "wbfZ_O139"], self.file_type
+            )
+        )
+        parser.parse()
+
     def run(self) -> None:
         """
         Main start point for the Pacini-Typing pipeline.
@@ -492,15 +520,18 @@ class PaciniTyping:
         self.parse_all_args()
         # Setup up the logging, i.e., level and format
         self.setup_logging()
-        # Get the input files
+        # Get the input files and retrieve the sample name
         self.get_input_filenames()
+        self.retrieve_sample_name()
         # Check if they may need to be unzipped
         self.check_for_unzip_files()
         # Validate all input arguments
         self.validate_file_arguments()
 
         if self.option["makedatabase"]:
-            # Run with the validated arguments
+            # Define the required database args here,
+            # so the run_makedatabase() method can be re-used by
+            # other modules later on.
             database_builder = {
                 "database_path": self.option["database_path"],
                 "database_name": self.option["database_name"],
@@ -508,18 +539,18 @@ class PaciniTyping:
                 "input_fasta_file": self.option["makedatabase"]["input"],
             }
             self.run_makedatabase(database_builder)
-
         else:
-            # Determine the file type and valid options,
-            # both for query and config options
+            # The input option is not makedatabase,
+            # so it must be query or config.
+            # Determine the file type and valid options
             self.get_file_type()
             self.check_valid_option_with_args()
             # Query option has different requirements than config option
             # split up the options and check if the database exists
             if self.option["query"]:
                 # Create the right query builder for the query operation
-                query_builer = {
-                    "file_type": self.option["file_type"],
+                query_builder: dict[str, Any] = {
+                    "file_type": self.file_type,
                     "input_file_list": self.option["input_file_list"],
                     "database_path": self.option["database_path"],
                     "database_name": self.option["database_name"],
@@ -530,24 +561,25 @@ class PaciniTyping:
                 # there is no information to create a database.
                 # Log an error and let the user know it should be
                 # created first or use predefined configuration options.
-                if self.check_valid_database_path(query_builer):
-                    self.run_query(query_builer)
+                if self.check_valid_database_path(query_builder):
+                    self.run_query(query_builder)
                 else:
                     raise InvalidDatabaseError(
-                        query_builer["database_name"],
-                        query_builer["file_type"],
+                        query_builder["database_name"],
+                        query_builder["file_type"],
                     )
             else:
                 # The config option is selected,
                 # read the config file and validate it with
                 # the ReadConfigPattern class
-                pattern = self.initialize_pattern_with_config()
+                pattern: ReadConfigPattern = (
+                    self.initialize_pattern_with_config()
+                )
                 # Check if database exists
                 # If not present, create it from the config options
                 if not self.check_valid_database_path(pattern.creation_dict):
                     # Re-use the run_makedatabase() method with right params
                     self.run_makedatabase(pattern.creation_dict)
-
                 # Check if database does exists at this point,
                 # if not, raise an error and exit the program
                 # Otherwise, run the query operation
@@ -561,24 +593,8 @@ class PaciniTyping:
                     )
                 else:
                     self.run_query(pattern.creation_dict)
-
-                    #  Parsing operations
-                    # TODO - Move this to a separate function
-                    parser = Parser(
-                        pattern.pattern,
-                        pattern.creation_dict["output"],
-                        self.option["file_type"],
-                        self.sample_name,
-                    )
-                    parser.add_filter(
-                        PercentageIdentityFilter(99, self.option["file_type"])
-                    )
-                    parser.add_filter(
-                        GeneNameFilter(
-                            ["rfbV_O1", "fimA"], self.option["file_type"]
-                        )
-                    )
-                    parser.parse()
+                    # Parsing operations
+                    self.parse_results(pattern)
 
 
 def main(provided_args: list[str] | None = None) -> None:
