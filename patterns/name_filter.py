@@ -15,7 +15,7 @@ __data__ = "2024-11-22"
 __all__ = ["GeneNameFilter"]
 
 import pandas as pd
-from filter import Filter
+from filter_pattern import Filter
 
 
 class GeneNameFilter(Filter):
@@ -42,7 +42,5 @@ class GeneNameFilter(Filter):
                 )
             ]
         return data_frame[
-            data_frame["Template_Name"].str.contains(
-                pattern, case=False, na=False
-            )
+            data_frame["Template"].str.contains(pattern, case=False, na=False)
         ]

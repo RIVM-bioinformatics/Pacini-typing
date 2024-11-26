@@ -15,7 +15,7 @@ __data__ = "2024-11-22"
 __all__ = ["PercentageIdentityFilter"]
 
 import pandas as pd
-from filter import Filter
+from filter_pattern import Filter
 
 
 class PercentageIdentityFilter(Filter):
