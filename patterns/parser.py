@@ -14,18 +14,12 @@ __author__ = "Mark van de Streek"
 __data__ = "2024-11-22"
 __all__ = ["Parser"]
 
+import logging
 from typing import Any
 
 import pandas as pd
 
 from patterns.filter_pattern import Filter
-from patterns.identity_filter import PercentageIdentityFilter
-from patterns.name_filter import GeneNameFilter
-
-# FIXME: Add the right import statements in sub-files of filtering
-
-# TODO - Check for empty data_frame before creating the output report
-
 
 KMA_COLUMNS = [
     "Template",
@@ -80,7 +74,7 @@ class Parser:
         self.data_frame: pd.DataFrame = pd.DataFrame()
         self.filters: list[Filter] = []
 
-    def add_filter(self, filter: Filter) -> None:
+    def add_filter(self, filter_pattern: Filter) -> None:
         """
         Function to add a filter to the list of filters
         the list of filters is present as class variable
@@ -90,7 +84,7 @@ class Parser:
             - filter: Filter object
         ----------
         """
-        self.filters.append(filter)
+        self.filters.append(filter_pattern)
 
     def read_run_output(self):
         """
@@ -146,27 +140,50 @@ class Parser:
             "Template_Identity"
         ].astype(float)
 
-    def create_output_report(self):
+    def construct_report_record(
+        self, report_id: int, item: str
+    ) -> dict[str, Any]:
+        """
+        Function that constructs a record for the output report
+        Every line in the output report is a dictionary
+        This function constructs the dictionary.
+        In the create_output_report function, the dictionary is
+        appended to a list of all records.
+        ----------
+        Input:
+            - report_id: int
+            - item: str
+        Output:
+            - dict[str, Any]
+        ----------
+        """
+        return {
+            "ID": report_id + 1,
+            "Input": self.input_sequence_sample,
+            "Configuration": self.config_options["metadata"]["filename"],
+            "Type/Genes": self.config_options["metadata"]["type"],
+            "Hits": item.split(":")[0],
+        }
+
+    def create_output_report(self) -> pd.DataFrame:
         """
         Function that creates a filtered output report
         Fill in later...
+        ----------
+        Output:
+            - pd.DataFrame
+        --------
         """
-        lines_in_output_report = []
+        output_records = []
         for report_id, item in enumerate(
             self.data_frame[
                 "sseqid" if self.parse_type == "FASTA" else "Template"
             ].values.tolist()
         ):
-            line = {
-                "ID": report_id + 1,
-                "Input": self.input_sequence_sample,
-                "Configuration": self.config_options["metadata"]["filename"],
-                "Type/Genes": self.config_options["metadata"]["type"],
-                "Hits": item.split(":")[0],
-            }
-            lines_in_output_report.append(line)
-
-        return pd.DataFrame(lines_in_output_report)
+            output_records.append(
+                self.construct_report_record(report_id, item)
+            )
+        return pd.DataFrame(output_records)
 
     def write_output_report(self):
         """
@@ -185,55 +202,22 @@ class Parser:
         Parse the file
         Fill in later...
         """
-        self.read_run_output()
+        try:
+            self.read_run_output()
+        except FileNotFoundError:
+            logging.error(
+                "File containing query results not found, exiting..."
+            )
+        except pd.errors.EmptyDataError:
+            logging.warning(
+                "No content in the query file, found no hits "
+                "in the input files"
+            )
         for filtering in self.filters:
             self.data_frame = filtering.apply(self.data_frame)
-        self.write_output_report()
-
-
-def main():
-    """
-    Test the read_run_output method
-    """
-    # file = "/Users/mvandestreek/Desktop/PaciniTestRun/MYRESULTS.res"
-    file2 = "/Users/mvandestreek/Desktop/PaciniTestRun/output/FASTA_results.tsv.tsv"
-
-    config_options: dict[str, Any] = {
-        "metadata": {
-            "filename": "O1.yaml",
-            "id": "VIB-O1",
-            "type": "V. cholerae O1 Genes",
-            "description": "Genetic pattern run config file for Vibrio cholerae O1 serogroup",
-            "date_created": "2024-11-06",
-        },
-        "database": {
-            "name": "VIB-O1",
-            "path": "databases",
-            "matching_seq_file": "patterns/VIB-O1.fasta",
-            "run_output": "output/",
-        },
-        "pattern": {
-            "perc_ident": 95,
-            "perc_cov": 90,
-            "e_value": 0,
-            "p_value": 0.05,
-            "genes": [
-                {
-                    "gene_name": "rfbV",
-                    "presence": True,
-                    "pident": 98,
-                    "pcoverage": 95,
-                }
-            ],
-            "snps": None,
-        },
-    }
-    TYPE = "FASTA"
-    parser = Parser(config_options, file2, TYPE, "EA545")
-    parser.add_filter(PercentageIdentityFilter(99, TYPE))
-    parser.add_filter(GeneNameFilter(["rfbV_O1", "fimA"], TYPE))
-    parser.parse()
-
-
-if __name__ == "__main__":
-    main()
+        if not self.data_frame.empty:
+            self.write_output_report()
+        else:
+            logging.warning(
+                "Data frame is empty after filtering, no report created"
+            )
