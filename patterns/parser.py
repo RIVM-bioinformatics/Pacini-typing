@@ -17,30 +17,28 @@ __all__ = ["Parser"]
 from typing import Any
 
 import pandas as pd
-from filter import Filter
-from identity_filter import PercentageIdentityFilter
-from name_filter import GeneNameFilter
+
+from patterns.filter_pattern import Filter
+from patterns.identity_filter import PercentageIdentityFilter
+from patterns.name_filter import GeneNameFilter
 
 # FIXME: Add the right import statements in sub-files of filtering
 
+# TODO - Check for empty data_frame before creating the output report
+
 
 KMA_COLUMNS = [
-    "Template_Name",
-    "Template_Length",
-    "Template_Identity",
-    "Template_Coverage",
-    "Template_Depth",
-    "Query_Identity",
-    "Query_Coverage",
-    "Query_Depth",
-    "Read_Count_Map",
-    "Read_Count_Aln",
+    "Template",
     "Score",
     "Expected",
+    "Template_length",
+    "Template_Identity",
+    "Template_Coverage",
+    "Query_Identity",
+    "Query_Coverage",
+    "Depth",
     "q_value",
     "p_value",
-    "ConClave_Score",
-    "ConClave_Quality",
 ]
 
 BLAST_COLUMNS = [
@@ -69,6 +67,7 @@ class Parser:
         config_options: dict[str, Any],
         run_output_filename: str,
         parse_type: str,
+        input_sequence_sample: str = "",
     ) -> None:
         """
         Constructor
@@ -77,6 +76,7 @@ class Parser:
         self.config_options = config_options
         self.run_output_filename = run_output_filename
         self.parse_type = parse_type
+        self.input_sequence_sample = input_sequence_sample
         self.data_frame: pd.DataFrame = pd.DataFrame()
         self.filters: list[Filter] = []
 
@@ -112,14 +112,19 @@ class Parser:
             },]
         ----------
         """
-        self.data_frame = pd.read_csv(
-            self.run_output_filename,
-            sep="\t",
-            header=None if self.parse_type == "FASTA" else 0,
-        )
         if self.parse_type == "FASTA":
+            self.data_frame = pd.read_csv(
+                self.run_output_filename + ".tsv",
+                sep="\t",
+                header=None,
+            )
             self.set_fasta_options()
         else:
+            self.data_frame = pd.read_csv(
+                self.run_output_filename + ".res",
+                sep="\t",
+                header=0,
+            )
             self.set_fastq_options()
 
     def set_fasta_options(self):
@@ -141,6 +146,40 @@ class Parser:
             "Template_Identity"
         ].astype(float)
 
+    def create_output_report(self):
+        """
+        Function that creates a filtered output report
+        Fill in later...
+        """
+        lines_in_output_report = []
+        for report_id, item in enumerate(
+            self.data_frame[
+                "sseqid" if self.parse_type == "FASTA" else "Template"
+            ].values.tolist()
+        ):
+            line = {
+                "ID": report_id + 1,
+                "Input": self.input_sequence_sample,
+                "Configuration": self.config_options["metadata"]["filename"],
+                "Type/Genes": self.config_options["metadata"]["type"],
+                "Hits": item.split(":")[0],
+            }
+            lines_in_output_report.append(line)
+
+        return pd.DataFrame(lines_in_output_report)
+
+    def write_output_report(self):
+        """
+        Function that writes the filtered pandas dataframe
+        to a csv file. Not the whole dataframe is written,
+        only: "ID", "Input", "Schema", "Template", "Hits".
+        """
+        self.create_output_report().to_csv(
+            f"{self.input_sequence_sample}_report.csv",
+            sep=",",
+            index=False,
+        )
+
     def parse(self):
         """
         Parse the file
@@ -149,19 +188,50 @@ class Parser:
         self.read_run_output()
         for filtering in self.filters:
             self.data_frame = filtering.apply(self.data_frame)
-        print(self.data_frame)
-        # Go further from here....
+        self.write_output_report()
 
 
 def main():
     """
     Test the read_run_output method
     """
-    file = "/Users/mvandestreek/Desktop/PaciniTestRun/output/FASTA_results.tsv.tsv"
-    parser = Parser({"config": "config", "options": "options"}, file, "FASTA")
+    # file = "/Users/mvandestreek/Desktop/PaciniTestRun/MYRESULTS.res"
+    file2 = "/Users/mvandestreek/Desktop/PaciniTestRun/output/FASTA_results.tsv.tsv"
 
-    parser.add_filter(PercentageIdentityFilter(99, "FASTA"))
-    parser.add_filter(GeneNameFilter(["rfbV_O1", "fimA"], "FASTA"))
+    config_options: dict[str, Any] = {
+        "metadata": {
+            "filename": "O1.yaml",
+            "id": "VIB-O1",
+            "type": "V. cholerae O1 Genes",
+            "description": "Genetic pattern run config file for Vibrio cholerae O1 serogroup",
+            "date_created": "2024-11-06",
+        },
+        "database": {
+            "name": "VIB-O1",
+            "path": "databases",
+            "matching_seq_file": "patterns/VIB-O1.fasta",
+            "run_output": "output/",
+        },
+        "pattern": {
+            "perc_ident": 95,
+            "perc_cov": 90,
+            "e_value": 0,
+            "p_value": 0.05,
+            "genes": [
+                {
+                    "gene_name": "rfbV",
+                    "presence": True,
+                    "pident": 98,
+                    "pcoverage": 95,
+                }
+            ],
+            "snps": None,
+        },
+    }
+    TYPE = "FASTA"
+    parser = Parser(config_options, file2, TYPE, "EA545")
+    parser.add_filter(PercentageIdentityFilter(99, TYPE))
+    parser.add_filter(GeneNameFilter(["rfbV_O1", "fimA"], TYPE))
     parser.parse()
 
 

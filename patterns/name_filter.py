@@ -15,7 +15,8 @@ __data__ = "2024-11-22"
 __all__ = ["GeneNameFilter"]
 
 import pandas as pd
-from filter_pattern import Filter
+
+from patterns.filter_pattern import Filter
 
 
 class GeneNameFilter(Filter):
