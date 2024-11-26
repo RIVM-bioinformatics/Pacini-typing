@@ -25,7 +25,7 @@ import json
 
 import pytest
 
-from patterns import read_config_pattern
+from parsing import read_config_pattern
 from preprocessing.exceptions.parsing_exceptions import (
     YAMLLoadingError,
     YAMLStructureError,
@@ -41,10 +41,10 @@ def test_read_config_good():
     same as in the expected file.
     The file /test_data/expected_output/expected_O1_config.json
     contains the expected output of the pattern read from the
-    configuration file patterns/O1.yaml
+    configuration file parsing/O1.yaml
     """
     config = read_config_pattern.ReadConfigPattern(
-        "patterns/O139.yaml", "fasta"
+        "parsing/O139.yaml", "fasta"
     )
     assert len(config.pattern) > 1
     with open(
@@ -61,7 +61,7 @@ def test_read_config_file_error():
     The reading function of the class should raise a FileNotFoundError
     """
     with pytest.raises(FileNotFoundError):
-        read_config_pattern.ReadConfigPattern("patterns/O100.yaml", "fasta")
+        read_config_pattern.ReadConfigPattern("parsing/O100.yaml", "fasta")
 
 
 def test_read_config_wrong_structure_yaml():
@@ -133,7 +133,7 @@ def test_construct_params_dict():
     fasta or fastq are already checked in earlier code
     ----------
     """
-    config = read_config_pattern.ReadConfigPattern("patterns/O1.yaml", "fastq")
+    config = read_config_pattern.ReadConfigPattern("parsing/O1.yaml", "fastq")
     assert (
         config.pattern["database"]["path"]
         == config.creation_dict["database_path"]

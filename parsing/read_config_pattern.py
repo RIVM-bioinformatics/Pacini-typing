@@ -148,7 +148,7 @@ class ReadConfigPattern:
 
 if __name__ == "__main__":
     pattern = ReadConfigPattern(
-        "/Users/mvandestreek/Developer/pacini_typing/patterns/O139.yaml",
+        "/parsing/O139.yaml",
         "fasta",
     )
     print(pattern.pattern)

@@ -19,7 +19,7 @@ from typing import Any
 
 import pandas as pd
 
-from patterns.filter_pattern import Filter
+from parsing.filter_pattern import Filter
 
 KMA_COLUMNS = [
     "Template",

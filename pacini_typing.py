@@ -61,10 +61,10 @@ from typing import Any, Tuple
 
 import preprocessing.argsparse.build_parser
 from makedatabase import DatabaseBuilder
-from patterns.identity_filter import PercentageIdentityFilter
-from patterns.name_filter import GeneNameFilter
-from patterns.parser import Parser
-from patterns.read_config_pattern import ReadConfigPattern
+from parsing.identity_filter import PercentageIdentityFilter
+from parsing.name_filter import GeneNameFilter
+from parsing.parser import Parser
+from parsing.read_config_pattern import ReadConfigPattern
 from preprocessing.exceptions.determine_input_type_exceptions import (
     InvalidSequencingTypesError,
 )

@@ -12,29 +12,36 @@
 
 __author__ = "Mark van de Streek"
 __data__ = "2024-11-22"
-__all__ = ["PercentageIdentityFilter"]
+__all__ = ["GeneNameFilter"]
 
 import pandas as pd
 
-from patterns.filter_pattern import Filter
+from parsing.filter_pattern import Filter
 
 
-class PercentageIdentityFilter(Filter):
+class GeneNameFilter(Filter):
     """
     #TODO : To be filed in later...
     """
 
-    def __init__(self, threshold: float, parse_type: str):
+    def __init__(self, gene_names: list[str], parse_type: str):
         """
         #TODO : To be filed in later...
         """
-        self.threshold = threshold
+        self.gene_names = gene_names
         self.parse_type = parse_type
 
     def apply(self, data_frame: pd.DataFrame) -> pd.DataFrame:
         """
         #TODO : To be filed in later...
         """
+        pattern = "|".join(self.gene_names)
         if self.parse_type == "FASTA":
-            return data_frame[data_frame["pident"] > 99]
-        return data_frame[data_frame["Template_Identity"] > 99]
+            return data_frame[
+                data_frame["sseqid"].str.contains(
+                    pattern, case=False, na=False
+                )
+            ]
+        return data_frame[
+            data_frame["Template"].str.contains(pattern, case=False, na=False)
+        ]

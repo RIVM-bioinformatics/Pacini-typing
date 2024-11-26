@@ -10,7 +10,7 @@ metadata:
 database:
   name: "VIB-O1"
   path: "databases"
-  matching_seq_file: "patterns/VIB-O1.fasta"
+  matching_seq_file: "parsing/VIB-O1.fasta"
   run_output: "output/"
 
 pattern:

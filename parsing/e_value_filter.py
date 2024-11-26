@@ -12,36 +12,28 @@
 
 __author__ = "Mark van de Streek"
 __data__ = "2024-11-22"
-__all__ = ["GeneNameFilter"]
+__all__ = ["EValueFilter"]
 
 import pandas as pd
 
-from patterns.filter_pattern import Filter
+from parsing.filter_pattern import Filter
 
 
-class GeneNameFilter(Filter):
+class EValueFilter(Filter):
     """
     #TODO : To be filed in later...
     """
 
-    def __init__(self, gene_names: list[str], parse_type: str):
+    def __init__(self, e_value: float, parse_type: str):
         """
         #TODO : To be filed in later...
         """
-        self.gene_names = gene_names
-        self.parse_type = parse_type
+        self.e_vlaue = e_value
 
     def apply(self, data_frame: pd.DataFrame) -> pd.DataFrame:
         """
         #TODO : To be filed in later...
         """
-        pattern = "|".join(self.gene_names)
         if self.parse_type == "FASTA":
-            return data_frame[
-                data_frame["sseqid"].str.contains(
-                    pattern, case=False, na=False
-                )
-            ]
-        return data_frame[
-            data_frame["Template"].str.contains(pattern, case=False, na=False)
-        ]
+            return data_frame[data_frame["evalue"] <= self.e_value]
+        return data_frame[data_frame["e_value"] <= self.e_value]

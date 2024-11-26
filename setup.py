@@ -21,7 +21,7 @@ import platform
 
 from setuptools import find_packages, setup
 
-from command_utils import ShellCommand, CommandInvoker
+from command_utils import CommandInvoker, ShellCommand
 
 
 def get_version() -> str:
