@@ -49,11 +49,10 @@ from preprocessing.validation import validating_input_arguments
 RUN_OUTPUT = "test_full_run/myresults"
 
 EXPECTED_FILES = [
-    "test_data/expected_output/expected_paired_VIB_EA5348AA.tsv",
+    "test_data/expected_output/expected_paired_VIB_EA5348AA.res",
     "test_data/expected_output/expected_paired_VIB_EA5348AA.aln",
     "test_data/expected_output/expected_paired_VIB_EA5348AA.fsa",
     "test_data/expected_output/expected_paired_VIB_EA5348AA.frag.gz",
-    "test_data/expected_output/expected_paired_VIB_EA5348AA.res",
 ]
 
 
@@ -172,7 +171,6 @@ def test_paired_run(
     ----------
     """
     main(setup_teardown_paired_input)
-    assert os.path.exists(f"{RUN_OUTPUT}.tsv")
     assert os.path.exists(f"{RUN_OUTPUT}.fsa")
     assert os.path.exists(f"{RUN_OUTPUT}.res")
     assert os.path.exists(f"{RUN_OUTPUT}.frag.gz")
@@ -186,7 +184,7 @@ def check_file_contents() -> None:
     with the expected output file
     It uses the pandas library to read the files and compare them
     """
-    run_output = pd.read_csv(f"{RUN_OUTPUT}.tsv", sep="\t")
+    run_output = pd.read_csv(f"{RUN_OUTPUT}.res", sep="\t")
     expected_output = pd.read_csv(EXPECTED_FILES[0], sep="\t")
 
     # Use the equals function of the pandas DataFrame to compare the files
@@ -208,7 +206,6 @@ def compare_additional_files() -> None:
             f"{RUN_OUTPUT}.aln",
             f"{RUN_OUTPUT}.fsa",
             f"{RUN_OUTPUT}.frag.gz",
-            f"{RUN_OUTPUT}.res",
         ],
         EXPECTED_FILES[1:],
     ):
