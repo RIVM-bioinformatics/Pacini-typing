@@ -84,6 +84,7 @@ class Parser:
             - filter: Filter object
         ----------
         """
+        logging.debug("Adding filter: %s", filter_pattern.__class__.__name__)
         self.filters.append(filter_pattern)
 
     def read_run_output(self):
@@ -191,17 +192,20 @@ class Parser:
         to a csv file. Not the whole dataframe is written,
         only: "ID", "Input", "Schema", "Template", "Hits".
         """
+        logging.debug("Writing the output report...")
         self.create_output_report().to_csv(
             f"{self.input_sequence_sample}_report.csv",
             sep=",",
             index=False,
         )
+        logging.info("Successfully craeted the output report")
 
     def parse(self):
         """
         Parse the file
         Fill in later...
         """
+        logging.info("Parsing the query results...")
         try:
             self.read_run_output()
         except FileNotFoundError:
@@ -213,6 +217,7 @@ class Parser:
                 "No content in the query file, found no hits "
                 "in the input files"
             )
+        logging.debug("Results were read successfully, filtering...")
         for filtering in self.filters:
             self.data_frame = filtering.apply(self.data_frame)
         if not self.data_frame.empty:

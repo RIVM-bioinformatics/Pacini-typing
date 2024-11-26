@@ -327,7 +327,7 @@ class PaciniTyping:
         argsvalidator = ArgsValidator(self.option)
         if argsvalidator.validate():
             logging.info(
-                "Input arguments have been validated, found no issues."
+                "Input arguments have been validated, found no issues..."
             )
         else:
             logging.error(
@@ -353,7 +353,7 @@ class PaciniTyping:
         For more information about the DatabaseBuilder,
         see the makedatabase.py file.
         """
-        logging.debug("Running the makedatabase operation...")
+        logging.info("Creating the refernece database...")
         DatabaseBuilder(database_creation_args)
 
     def get_file_type(self) -> None:
@@ -370,7 +370,7 @@ class PaciniTyping:
             self.option["input_file_list"]
         ).get_file_type()
         logging.info(
-            "File type has been determined: %s",
+            "The input file type has been determined: %s",
             self.file_type,
         )
 
@@ -443,10 +443,10 @@ class PaciniTyping:
             - result: Tuple with the result of the query
         ----------
         """
-        logging.debug("Running the query operation against database...")
+        logging.info("Running the input query against reference database...")
         runner = QueryRunner(run_options=query_runner_builder)
         result = runner.run()
-        logging.info("Query runtime: %s seconds", runner.get_runtime())
+        logging.info("Query finished in: %s seconds", runner.get_runtime())
 
         return result
 
@@ -485,6 +485,14 @@ class PaciniTyping:
 
         return pattern
 
+    def get_config_gene_names(self, pattern: ReadConfigPattern) -> list[str]:
+        """
+        Fill in later...
+        """
+        return [
+            item["gene_name"] for item in pattern.pattern["pattern"]["genes"]
+        ]
+
     def parse_results(self, pattern: ReadConfigPattern) -> None:
         """
         Function that calls the parsing of the query results.
@@ -492,7 +500,7 @@ class PaciniTyping:
         This calling constists of creating a Parser object,
         adding filters and parsing the results.
         """
-        logging.debug("Parsing the results of the query operation...")
+        logging.debug("Calling the parsing module...")
         parser = Parser(
             pattern.pattern,
             pattern.creation_dict["output"],
