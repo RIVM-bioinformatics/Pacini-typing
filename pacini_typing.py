@@ -432,6 +432,18 @@ class PaciniTyping:
 
         return result
 
+    def retrieve_sample_name(self) -> str:
+        """
+        Function that retrieves the sample name from the input file.
+        The sample name is the first part of the filename.
+        """
+        return (
+            self.option["input_file_list"][0]
+            .split(".")[0]
+            .replace("_1", "")
+            .replace("_pR1", "")
+        )
+
     def initialize_pattern_with_config(self) -> ReadConfigPattern:
         """
         Function that initializes the ReadConfigPattern class.
@@ -443,6 +455,7 @@ class PaciniTyping:
             - pattern: ReadConfigPattern object
         ----------
         """
+        logging.debug("Initializing the ReadConfigPattern class...")
         pattern = ReadConfigPattern(
             self.option["config"]["config_path"],
             self.option["file_type"],
@@ -455,7 +468,7 @@ class PaciniTyping:
         pattern.creation_dict["output"] = (
             pattern.pattern["database"]["run_output"]
             + self.option["file_type"]
-            + "_results.tsv"
+            + "_results"
         )
 
         pattern.creation_dict["input_fasta_file"] = os.path.join(
