@@ -61,13 +61,14 @@ from typing import Any, Tuple
 
 import preprocessing.argsparse.build_parser
 from makedatabase import DatabaseBuilder
+from patterns.identity_filter import PercentageIdentityFilter
+from patterns.name_filter import GeneNameFilter
+from patterns.parser import Parser
 from patterns.read_config_pattern import ReadConfigPattern
 from preprocessing.exceptions.determine_input_type_exceptions import (
     InvalidSequencingTypesError,
 )
-from preprocessing.exceptions.validate_database_exceptions import (
-    InvalidDatabaseError,
-)
+from preprocessing.exceptions.validate_database_exceptions import InvalidDatabaseError
 from preprocessing.validation.determine_input_type import InputFileInspector
 from preprocessing.validation.validate_database import check_for_database_path
 from preprocessing.validation.validating_input_arguments import ArgsValidator
@@ -432,13 +433,14 @@ class PaciniTyping:
 
         return result
 
-    def retrieve_sample_name(self) -> str:
+    def retrieve_sample_name(self) -> None:
         """
         Function that retrieves the sample name from the input file.
         The sample name is the first part of the filename.
         """
-        return (
+        self.sample_name = (
             self.option["input_file_list"][0]
+            .split("/")[-1]
             .split(".")[0]
             .replace("_1", "")
             .replace("_pR1", "")
@@ -461,14 +463,15 @@ class PaciniTyping:
             self.option["file_type"],
         )
         # Additionally, the query input and output must be set.
-        # Output as follows: output/fasta_results.tsv
+        # The output is not specified by the user, because
+        # this is based on the input files. Therefore,
+        # the sample name is retrieved from the input file.
+        self.retrieve_sample_name()
         pattern.creation_dict["input_file_list"] = self.option["config"][
             "input"
         ]
         pattern.creation_dict["output"] = (
-            pattern.pattern["database"]["run_output"]
-            + self.option["file_type"]
-            + "_results"
+            pattern.pattern["database"]["run_output"] + self.sample_name
         )
 
         pattern.creation_dict["input_fasta_file"] = os.path.join(
@@ -548,9 +551,7 @@ class PaciniTyping:
                 # Check if database does exists at this point,
                 # if not, raise an error and exit the program
                 # Otherwise, run the query operation
-                if self.check_valid_database_path(pattern.creation_dict):
-                    self.run_query(pattern.creation_dict)
-                else:
+                if not self.check_valid_database_path(pattern.creation_dict):
                     # Let the user know the database does not exist,
                     # if the code reaches here, the run_makedatabase() was
                     # called without errors, so a bigger issue is present here.
@@ -558,6 +559,26 @@ class PaciniTyping:
                         pattern.creation_dict["database_name"],
                         pattern.creation_dict["file_type"],
                     )
+                else:
+                    self.run_query(pattern.creation_dict)
+
+                    #  Parsing operations
+                    # TODO - Move this to a separate function
+                    parser = Parser(
+                        pattern.pattern,
+                        pattern.creation_dict["output"],
+                        self.option["file_type"],
+                        self.sample_name,
+                    )
+                    parser.add_filter(
+                        PercentageIdentityFilter(99, self.option["file_type"])
+                    )
+                    parser.add_filter(
+                        GeneNameFilter(
+                            ["rfbV_O1", "fimA"], self.option["file_type"]
+                        )
+                    )
+                    parser.parse()
 
 
 def main(provided_args: list[str] | None = None) -> None:
