@@ -7,7 +7,9 @@
     “GitHub Copilot: Your AI pair programmer” (GPT-3). GitHub, Inc.
     https://github.com/features/copilot
 
-#TODO : To be filed in later...
+Implementation of a filter for the gene names of the query results.
+This filter is implementing the Filter interface.
+See the filter_pattern.py file for more information about the Filter interface.
 """
 
 __author__ = "Mark van de Streek"
@@ -21,19 +23,34 @@ from parsing.filter_pattern import Filter
 
 class GeneNameFilter(Filter):
     """
-    #TODO : To be filed in later...
+    GeneNameFilter class that implements the Filter interface.
+    The implementation is especially for the gene names of the query results.
+    This means, dataframe is filtered only for the found gene names.
     """
 
     def __init__(self, gene_names: list[str], parse_type: str):
         """
-        #TODO : To be filed in later...
+        Constructor to initialize the gene names and parse type.
+        ----------
+        Input:
+            - gene_names: list[str]: the list of gene names to filter for
+            - parse_type: str: the type of the parser (FASTA or FASTQ)
+        ----------
         """
         self.gene_names = gene_names
         self.parse_type = parse_type
 
     def apply(self, data_frame: pd.DataFrame) -> pd.DataFrame:
         """
-        #TODO : To be filed in later...
+        Method that holds the logic to filter the dataframe.
+        The gene names are placed in a pattern and checked for the
+        presence in the dataframe.
+        ----------
+        Input:
+            - data_frame: pd.DataFrame: the dataframe that needs to be filtered
+        Output:
+            - pd.DataFrame: the filtered dataframe
+        ----------
         """
         pattern = "|".join(self.gene_names)
         if self.parse_type == "FASTA":
