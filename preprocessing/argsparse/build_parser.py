@@ -98,6 +98,13 @@ def main(givenargs: list[str]) -> argparse.Namespace:
         help="Save intermediate files of the run",
     )
 
+    parser.add_argument(
+        "--log-file",
+        action="store_true",
+        default=False,
+        help="Save log file of the run",
+    )
+
     subparsers = parser.add_subparsers(
         title="operations",
         description="For more information on a specific command, type: Pacini.py <command> -h",
