@@ -63,6 +63,7 @@ import preprocessing.argsparse.build_parser
 from makedatabase import DatabaseBuilder
 from parsing.identity_filter import PercentageIdentityFilter
 from parsing.name_filter import GeneNameFilter
+from parsing.coverage_filter import CoverageFilter
 from parsing.parser import Parser
 from parsing.read_config_pattern import ReadConfigPattern
 from preprocessing.exceptions.determine_input_type_exceptions import (
@@ -515,7 +516,27 @@ class PaciniTyping:
                 ["rfbV_O1", "ctxA", "ctxB", "wbfZ_O139"], self.file_type
             )
         )
+        parser.add_filter(CoverageFilter(80, self.file_type))
         parser.parse()
+
+    def save_intermediates(self) -> None:
+        """
+        # TODO: save_intermediates - Fill in later...
+        """
+        logging.info("Saving intermediate files in a zip archive...")
+        os.makedirs(f"{self.sample_name}_intermediates", exist_ok=True)
+        shutil.move("databases", f"{self.sample_name}_intermediates")
+        shutil.move("output", f"{self.sample_name}_intermediates")
+        shutil.make_archive(f"{self.sample_name}_intermediates", "tar")
+        shutil.rmtree(f"{self.sample_name}_intermediates")
+
+    def delete_intermediates(self) -> None:
+        """
+        # TODO: delete_intermediates - Fill in later...
+        """
+        logging.info("Deleting intermediate files...")
+        shutil.rmtree("databases")
+        shutil.rmtree("output")
 
     def run(self) -> None:
         """
@@ -604,6 +625,15 @@ class PaciniTyping:
                     # Parsing operations
                     self.parse_results(pattern)
 
+                    #
+                    # Save or delete intermediate files
+                    # This code should be moved to a separate function
+                    #
+                    if self.input_args.save_intermediates:
+                        self.save_intermediates()
+                    else:
+                        self.delete_intermediates()
+
 
 def main(provided_args: list[str] | None = None) -> None:
     """
@@ -638,12 +668,6 @@ if __name__ == "__main__":
 # TODO : validating_input_arguments - Store certain values from main OPTION as class variable
 
 # TODO : validating_input_arguments - Compare if two files really are paired
-
-# TODO : Don't use a output file but take the output as a string:
-#  zcat/cat data/vibrio_genes.fasta | blastn -query data/VIB_AA4147AA_AS_2.fna
-# -subject - -outfmt '6 qseqid sseqid pident qcovs' -perc_identity 70
-#  Or: kma -i data/VIB_AA4147AA_AS_2.fna -t_db refdir/mykma -t 4 -ID 70 -mrc 0.7 -o
-# temp_output && cut -f 1,5 temp_output.res && rm temp_output.*
 
 ###########################################################################
 ###########################################################################

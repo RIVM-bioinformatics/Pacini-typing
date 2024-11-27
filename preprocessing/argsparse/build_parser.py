@@ -23,7 +23,9 @@ from argparse import RawTextHelpFormatter
 
 import pkg_resources
 
-from preprocessing.argsparse.args_makedatabase import build_makedatabase_command
+from preprocessing.argsparse.args_makedatabase import (
+    build_makedatabase_command,
+)
 from preprocessing.argsparse.args_query import build_query_command
 
 
@@ -87,6 +89,13 @@ def main(givenargs: list[str]) -> argparse.Namespace:
         required=False,
         metavar="File",
         help="Path to input file(s). Accepts 1 fasta file or 2 fastq files",
+    )
+
+    parser.add_argument(
+        "--save-intermediates",
+        action="store_true",
+        default=False,
+        help="Save intermediate files of the run",
     )
 
     subparsers = parser.add_subparsers(
