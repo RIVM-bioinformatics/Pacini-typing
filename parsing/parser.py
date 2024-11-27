@@ -19,7 +19,6 @@ __all__ = ["Parser"]
 
 import logging
 from typing import Any
-import json
 
 import pandas as pd
 
@@ -241,10 +240,14 @@ class Parser:
         """
         return {
             "ID": report_id + 1,
-            "hit": item[columns.index("hit")].split(":")[0],
-            "percentage Identity": item[columns.index("percentage identity")],
-            "percentage Coverage": item[columns.index("percentage coverage")],
-            significance_type: item[value_column],
+            "hit": item.iloc[columns.index("hit")].split(":")[0],
+            "percentage Identity": item.iloc[
+                columns.index("percentage identity")
+            ],
+            "percentage Coverage": item.iloc[
+                columns.index("percentage coverage")
+            ],
+            significance_type: item.iloc[value_column],
         }
 
     def create_hits_report(self):
@@ -270,7 +273,21 @@ class Parser:
                     columns, significance_type, value_column, report_id, item
                 )
             )
-        # TODO: write the output to a csv file
+        return pd.DataFrame(output_records)
+
+    def write_hits_report(self):
+        """
+        Function that writes the created
+        hits report to a csv file.
+        ...
+        """
+        logging.debug("Writing the hits report...")
+        self.create_hits_report().to_csv(
+            f"{self.input_sequence_sample}_hits_report.csv",
+            sep=",",
+            index=False,
+        )
+        logging.info("Successfully craeted the hits report")
 
     def parse(self):
         """
@@ -301,4 +318,4 @@ class Parser:
             )
         else:
             self.write_output_report()
-            # self.create_hits_report()
+            self.write_hits_report()
