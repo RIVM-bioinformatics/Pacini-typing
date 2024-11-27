@@ -241,21 +241,30 @@ class Parser:
         return {
             "ID": report_id + 1,
             "hit": item.iloc[columns.index("hit")].split(":")[0],
-            "percentage Identity": item.iloc[
+            "percentage identity": item.iloc[
                 columns.index("percentage identity")
             ],
-            "percentage Coverage": item.iloc[
+            "percentage coverage": item.iloc[
                 columns.index("percentage coverage")
             ],
             significance_type: item.iloc[value_column],
         }
 
-    def create_hits_report(self):
+    def create_hits_report(self) -> pd.DataFrame:
         """
         Function that creates a csv file with
         all information about the hits.
         Where the report only holds the hit names,
         this report holds all information about the hits.
+        Output example:
+        ID,hit,percentage identity,percentage coverage,e/p-value
+        1,rfbV,100.0,100.0,0.0
+        2,ctxA,99.3,99.0,0.0
+        3,ctxB,96.3,87.0,0.05
+        ----------
+        Output:
+            - pd.DataFrame: hits report
+        --------
         """
         output_records: list[dict[str, Any]] = []
         if self.parse_type == "FASTA":
@@ -277,9 +286,9 @@ class Parser:
 
     def write_hits_report(self):
         """
-        Function that writes the created
-        hits report to a csv file.
-        ...
+        Function that writes the hits
+        report to a csv file.
+        The filename is based on the input sequence sample.
         """
         logging.debug("Writing the hits report...")
         self.create_hits_report().to_csv(
