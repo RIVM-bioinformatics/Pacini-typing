@@ -143,7 +143,7 @@ def test_blast_prepare_query():
         "-out",
         "./dummy/path.tsv",
         "-outfmt",
-        "6",
+        f"'6 {" ".join(BLASTn.FORMATS.value)}'",
     ]
 
 
@@ -163,7 +163,7 @@ def test_blast_get_query_different():
         "-out",
         "./dummy/path.tsv",
         "-outfmt",
-        "6",
+        f"'6 {" ".join(BLASTn.FORMATS.value)}'",
     ]
 
 

@@ -192,7 +192,7 @@ def test_single_contents(
         for line in f:
             columns = line.strip().split("\t")
             check_non_empty_content(columns)
-            assert len(columns) == 12
+            assert len(columns) == 13
             validate_float_columns(columns)
             validate_thresholds(columns)
 
