@@ -222,10 +222,12 @@ class PaciniTyping:
         if self.input_args.log_file:
             file_handler = logging.FileHandler("pacini_typing.log")
             file_handler.setLevel(logging.DEBUG)
-            file_handler.setFormatter(logging.Formatter(
-                "%(asctime)s %(levelname)-5s %(process)d : %(message)s",
-                datefmt="%Y-%m-%dT%H:%M:%S"
-            ))
+            file_handler.setFormatter(
+                logging.Formatter(
+                    "%(asctime)s %(levelname)-5s %(process)d : %(message)s",
+                    datefmt="%Y-%m-%dT%H:%M:%S",
+                )
+            )
             logging.getLogger().addHandler(file_handler)
 
     def get_input_filenames(self) -> None:
