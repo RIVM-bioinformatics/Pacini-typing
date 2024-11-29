@@ -8,7 +8,7 @@
 
 <!-- [![CodeFactor](https://www.codefactor.io/repository/github/rivm-bioinformatics/Pacini-typing/badge)](https://www.codefactor.io/repository/github/rivm-bioinformatics/Pacini-typing)   -->
 
-Pylint output: Your code has been rated at 9.93/10
+Pylint output: Your code has been rated at 9.91/10 (previous run: 7.68/10, +2.23)
 
 <div align="center">
     <h1>Pacini-typing</h1>
@@ -53,6 +53,8 @@ The Pacini project is a software application which can be used to determine gene
 
 ## Prerequisites
 
+>All of the above packages are available in a pre-defined conda environment. Steps to install this environment can be found in the [Automatic installation of the required packages](#automatic-installation-of-the-required-packages) section.
+
 * Linux-like environment with (mini) conda installed
 * Python 3.10 or higher (developed on 3.12)
 
@@ -68,53 +70,6 @@ The following Tools are required:
    1. The makeblastdb subcommand of BLAST must be available as well
 2. kma=>1.4.15
    1. The kma_index subcommand of KMA must be available as well
-
-### Automatic installation of the required packages
-
-For both macOS and Linux users, a complete conda environment, containing all the required packages, can be found in the root of the repository. For macOS users, some additional steps are required to install the required tools. Below are the steps for both macOS and Linux users.
-
-#### Linux users
-
-Linux does not require any additional steps to install the required tools. The conda environment can be created by running the following command:
-
-```bash
-conda env create -f linux-environment.yaml -n pacini-typing
-```
-
-Activate the environment by running:
-
-```bash
-conda activate pacini-typing
-```
-
-#### Mac users
-
-Pacini-typing is heavily dependent on the BLAST and KMA tools. Unfortunately, BLAST is not available for conda installation on Apple Silicon Macs. There is a conda environment without BLAST available in the root of the repository. This environment can be created by running the following command:
-
-```bash
-conda env create -f mac-environment.yaml -n pacini-typing
-```
-
-Make sure to activate the environment by running:
-
-```bash
-conda activate pacini-typing
-```
-
-After activating the environment, BLAST must be installed manually. The most easy way to install BLAST is by using Homebrew:
-
-```bash
-brew install blast
-```
-
-Test if the installation was successful by running the following command:
-
-```bash
-blastn -version
-```
-
-* Install [Homebrew](https://brew.sh) if it is not installed on your system.
-* Install BLAST manually via the official [BLAST website](https://blast.ncbi.nlm.nih.gov/doc/blast-help/downloadblastdata.html).
 
 ## Complete list of required packages
 
@@ -155,6 +110,25 @@ Additionally, the application can be run by calling the original `pacini_typing.
 
 ```bash
 python3 directory_to_pacini_typing_clone/pacini_typing.py --help
+```
+
+### Automatic installation of the required packages
+
+For both macOS and Linux users, a complete conda environment, containing all the required packages, can be found in the root of the repository.
+
+To install the environment, run the following command:
+
+```bash
+# For Linux users:
+conda env create -f linux-environment.yaml -n pacini-typing
+# or for macOS users:
+conda env create -f mac-environment.yaml -n pacini-typing
+```
+
+After the environment is installed, activate the environment by running:
+
+```bash
+conda activate pacini-typing
 ```
 
 [Back to top](#pacini-typing)
@@ -262,13 +236,29 @@ See the [Parameters & Usage](#parameters--usage) section for more information on
 * ```-h, --help``` Shows the help of the pipeline.
 
 ```bash
-usage: Pacini [-h] [-v] {makedatabase,query} ...
+pacini_typing -h
+usage: pacini_typing [-h] [-v] [-V] [-c File] [-i File [File ...]] [--save-intermediates] [--log-file]
+              {makedatabase,query} ...
 
 Bacterial Genotyping Tool for RIVM IDS-Bioinformatics
+
+Either pick a subcommand to manually run the tool or
+provide a predefined configuration file and your input file(s) (FASTA/FASTQ)
+and let Pacini-typing do the work for you.
+
+If using a configuration file, both the
+--config and --input arguments are required.
 
 options:
   -h, --help            show this help message and exit
   -v, --verbose         Increase output verbosity
+  -V, --version         show program's version number and exit
+  -c File, --config File
+                        Path to predefined configuration file
+  -i File [File ...], --input File [File ...]
+                        Path to input file(s). Accepts 1 fasta file or 2 fastq files
+  --save-intermediates  Save intermediate files of the run
+  --log-file            Save log file of the run
 
 operations:
   For more information on a specific command, type: Pacini.py <command> -h
@@ -383,17 +373,29 @@ pacini_typing \
 
 But, the output of the application consists of three files:
 
-1. `{prefix}.csv`: CSV file containing the results of the genetic detection
+1. `{prefix}_report.csv`: CSV file containing the report
 
 Example:
 
 ```csv
-gene_group,genes,identity_percentage,coverage_percentage,snps
-O139,wbfZ,98.0,95.0,150:C>T
-O139,rfbV,0.0,0.0,
+ID,Input,Schema,Type/Gene,Hits
+1,ERR976461,O1-scheme.yaml,V. cholerae O1 related genes,rfbV
+2,ERR976461,O1-scheme.yaml,V. cholerae O1 related genes,ctxA
 ```
 
-The rest of the output files are still under construction...
+2. `{prefix}_hits_report.csv`: CSV file containing information about the hits
+
+Example:
+
+```csv
+ID,hit,percentage identity,percentage coverage,p-value
+1,rfbV_O1,100.0,100.0,1e-26
+2,ctxA,100.0,100.0,1e-26
+```
+
+3. (optional with --log-file) `pacini_typing.log`: Log file containing information about the run
+
+*Further output is still in development...*
 
 [Back to top](#pacini-typing)
 
