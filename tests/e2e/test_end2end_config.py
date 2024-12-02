@@ -30,6 +30,8 @@ from pacini_typing import main
 from command_utils import ShellCommand, CommandInvoker
 
 FASTA_FILE = "test_data/VIB_EA5348AA_AS.fasta"
+FASTQ_1 = "test_data/VIB_EA5348AA_AS_1.fq"
+FASTQ_2 = "test_data/VIB_EA5348AA_AS_2.fq"
 DIR_PATH = "test_full_run/"
 OUTPUT = [
     "VIB_EA5348AA_AS_hits_report.csv",
@@ -124,4 +126,29 @@ def check_file_contents(file: str) -> None:
     )
     run_output: pd.DataFrame = pd.read_csv(f"{DIR_PATH}{file}", sep="\t")
 
+    # Ignore the last column, beacuse of the difference:
+    # BLAST outputs a e-value, while KMA outputs a p-value
+    # These values aren't been taking into account into the making
+    # Of the report, so skip it for the test
+    expected_output = expected_output.iloc[:, :-1]
+    run_output = run_output.iloc[:, :-1]
+
     pd.testing.assert_frame_equal(run_output, expected_output)
+
+
+def test_config_paired_run(
+    setup_teardown_config_input: Generator[list[str], None, None]
+) -> None:
+    """
+    ...
+    """
+    setup_teardown_config_input[-1] = FASTQ_1
+    setup_teardown_config_input.append(FASTQ_2)
+    main(setup_teardown_config_input)
+    CommandInvoker(
+        ShellCommand(["mv", "VIB_EA5348AA_AS_*.csv", DIR_PATH], capture=True)
+    ).execute()
+
+    for output_file in OUTPUT:
+        assert os.path.exists(f"{DIR_PATH}{output_file}")
+        check_file_contents(output_file)
