@@ -57,5 +57,5 @@ class CoverageFilter(Filter):
         ----------
         """
         if self.parse_type == "FASTA":
-            return data_frame[data_frame["qcovs"] >= self.coverage]
+            return data_frame[data_frame["qcovs"] >= (self.coverage / 100)]
         return data_frame[data_frame["Template_Coverage"] >= self.coverage]
