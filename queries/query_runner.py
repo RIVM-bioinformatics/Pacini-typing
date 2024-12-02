@@ -30,7 +30,7 @@ import os
 import time
 from typing import Any, Tuple
 
-from command_utils import execute
+from command_utils import CommandInvoker, ShellCommand
 from queries.blast_runner import BLASTn
 from queries.kma_runner import KMA
 
@@ -104,7 +104,8 @@ class QueryRunner:
         logging.debug("Running query...")
         self.start_time = time.time()
         # Use the execute function from command_utils
-        result = execute(self.query, capture=True)
+        command = ShellCommand(cmd=self.query, capture=True)
+        result = CommandInvoker(command).execute()
         self.stop_time = time.time()
 
         return result

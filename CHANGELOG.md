@@ -1,5 +1,43 @@
 # Changelog
 
+## [1.5.0](https://github.com/RIVM-bioinformatics/Pacini-typing/compare/v1.4.0...v1.5.0) (2024-11-22)
+
+
+### Features
+
+* usage of the command design pattern for executing commands in Pacini-typing ([f276115](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/f27611567b0401a3292ab6ec2065675fca602f59))
+
+## [1.4.0](https://github.com/RIVM-bioinformatics/Pacini-typing/compare/v1.3.1...v1.4.0) (2024-11-21)
+
+
+### Features
+
+* add FASTA files for VIB-O1 and VIB-O139 patterns ([e295e28](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/e295e28810bbf1cbf1e7ee642d00d59a9c3a6f42))
+
+
+### Bug Fixes
+
+* fixed a bug whith package dependenies in the linux env ([a758b6c](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/a758b6cf3d3e937dcfb4e82bff1aa9bd013e90ca))
+
+
+### Documentation
+
+* add new documentation files for installation, prerequisites, parameters, usage, and example run ([80680cc](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/80680cc2032dfe04ffcdac3e409c4a8af76fa298))
+* add sections for Issues, Future Ideas, License, and Contact in README ([bbf1e4f](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/bbf1e4fa44213bc135ef493f63e4f7bc867ce539))
+* update README with additional installation instructions, package requirements, and usage commands ([668a725](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/668a725c6108e9d73802c252d2720c8a02a41c75))
+
+## [1.4.0](https://github.com/RIVM-bioinformatics/Pacini-typing/compare/v1.3.1...v1.4.0) (2024-11-21)
+
+
+### Features
+
+* add FASTA files for VIB-O1 and VIB-O139 patterns ([e295e28](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/e295e28810bbf1cbf1e7ee642d00d59a9c3a6f42))
+
+
+### Bug Fixes
+
+* fixed a bug whith package dependenies in the linux env ([a758b6c](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/a758b6cf3d3e937dcfb4e82bff1aa9bd013e90ca))
+
 ## [1.3.1](https://github.com/RIVM-bioinformatics/Pacini-typing/compare/v1.3.0...v1.3.1) (2024-11-18)
 
 

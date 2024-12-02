@@ -34,14 +34,11 @@ __all__ = [
 ]
 
 import os
-import subprocess
-import sys
 
 import pytest
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-
-from command_utils import execute
+from command_utils import CommandInvoker, ShellCommand
+from preprocessing.exceptions.command_utils_exceptions import SubprocessError
 
 
 @pytest.fixture
@@ -66,7 +63,8 @@ def test_execute_capture_output():
     The output is placed in a tuple with stdout and stderr,
     no files are used in this operation.
     """
-    result = execute(["echo", "Hello World"], capture=True)
+    cmd = ShellCommand(cmd=["echo", "Hello World"], capture=True)
+    result = CommandInvoker(cmd).execute()
     assert isinstance(result, tuple), "Expected a tuple but got a boolean"
     assert result[0].strip() == "Hello World"
     assert result[1].strip() == ""
@@ -76,7 +74,10 @@ def test_execute_no_capture_output():
     """
     Test the execute function without capturing the output.
     """
-    result = execute(["echo", "Hello World"], capture=False)
+    result = CommandInvoker(
+        ShellCommand(cmd=["echo", "Hello World"], capture=False)
+    ).execute()
+
     assert result is True
 
 
@@ -86,12 +87,14 @@ def test_execute_with_stdout(temp_files):
     The fixture creates temporary files for stdout and stderr.
     """
     stdout_f, stderr_f = temp_files
-    execute(
-        ["echo", "Hello World"],
-        stdout_file=stdout_f,
-        stderr_file=stderr_f,
-        capture=False,
-    )
+    CommandInvoker(
+        ShellCommand(
+            cmd=["echo", "Hello World"],
+            capture=False,
+            stdout_file=stdout_f,
+            stderr_file=stderr_f,
+        )
+    ).execute()
 
     with open("test_stdout.txt", "r", encoding="utf-8") as stdout_f:
         stdout_content = stdout_f.read().strip()
@@ -104,8 +107,10 @@ def test_execute_failing_command_allow_fail_false():
     Test the execute function with a failing command.
     The function makes sure that the command fails and raises an exception.
     """
-    with pytest.raises(subprocess.CalledProcessError):
-        execute(["ls", "xyz"], allow_fail=False)
+    with pytest.raises(SubprocessError):
+        CommandInvoker(
+            ShellCommand(cmd=["ls", "xyz"], allow_fail=False)
+        ).execute()
 
 
 def test_execute_failing_command_allow_fail_true():
@@ -113,7 +118,9 @@ def test_execute_failing_command_allow_fail_true():
     Test the execute function with a failing command
     and allow_fail=True.
     """
-    result = execute(["false"], allow_fail=True)
+    result = CommandInvoker(
+        ShellCommand(cmd=["false"], allow_fail=True)
+    ).execute()
     assert result is False
 
 
@@ -123,13 +130,15 @@ def pytest_capture_error_file(temp_files):
     and capturing the output in a file.
     """
     stdout_f, stderr_f = temp_files
-    with pytest.raises(subprocess.CalledProcessError):
-        execute(
-            ["ls", "xyz"],
-            stdout_file=stdout_f,
-            stderr_file=stderr_f,
-            allow_fail=False,
-        )
+    with pytest.raises(SubprocessError):
+        CommandInvoker(
+            ShellCommand(
+                cmd=["ls", "xyz"],
+                stdout_file=stdout_f,
+                stderr_file=stderr_f,
+                allow_fail=False,
+            )
+        ).execute()
 
     with open("test_stderr.txt", "r", encoding="utf-8") as stderr_f:
         stderr_content = stderr_f.read().strip()

@@ -21,7 +21,7 @@ import logging
 import os
 from typing import Any, Tuple
 
-from command_utils import execute
+from command_utils import CommandInvoker, ShellCommand
 
 
 class DatabaseBuilder:
@@ -100,16 +100,18 @@ class DatabaseBuilder:
         """
         logging.debug("Running KMA subprocess to create database")
 
-        return execute(
-            [
-                "kma_index",
-                "-i",
-                os.path.join(self.input_fasta_file),
-                "-o",
-                self.full_database_path,
-            ],
-            capture=True,
-        )
+        return CommandInvoker(
+            ShellCommand(
+                cmd=[
+                    "kma_index",
+                    "-i",
+                    os.path.join(self.input_fasta_file),
+                    "-o",
+                    self.full_database_path,
+                ],
+                capture=True,
+            )
+        ).execute()
 
     def create_blast_database(self) -> Tuple[str, str] | bool:
         """
@@ -126,16 +128,17 @@ class DatabaseBuilder:
         ----------
         """
         logging.debug("Running BLAST subprocess to create database")
-
-        return execute(
-            [
-                "makeblastdb",
-                "-in",
-                os.path.join(self.input_fasta_file),
-                "-dbtype",
-                "nucl",
-                "-out",
-                self.full_database_path,
-            ],
-            capture=True,
-        )
+        return CommandInvoker(
+            ShellCommand(
+                cmd=[
+                    "makeblastdb",
+                    "-in",
+                    os.path.join(self.input_fasta_file),
+                    "-dbtype",
+                    "nucl",
+                    "-out",
+                    self.full_database_path,
+                ],
+                capture=True,
+            )
+        ).execute()
