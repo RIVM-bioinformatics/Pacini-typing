@@ -188,7 +188,7 @@ def check_file_contents() -> None:
     expected_output = pd.read_csv(EXPECTED_FILES[0], sep="\t")
 
     # Use the equals function of the pandas DataFrame to compare the files
-    assert run_output.equals(expected_output)
+    pd.testing.assert_frame_equal(run_output, expected_output)
     compare_additional_files()
 
 
