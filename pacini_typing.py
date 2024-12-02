@@ -61,10 +61,7 @@ from typing import Any, Tuple
 
 import preprocessing.argsparse.build_parser
 from makedatabase import DatabaseBuilder
-from parsing.identity_filter import PercentageIdentityFilter
-from parsing.name_filter import GeneNameFilter
-from parsing.coverage_filter import CoverageFilter
-from parsing.parser import Parser
+from parsing.config_manager import ParsingManager
 from parsing.read_config_pattern import ReadConfigPattern
 from preprocessing.exceptions.determine_input_type_exceptions import (
     InvalidSequencingTypesError,
@@ -461,7 +458,7 @@ class PaciniTyping:
 
         return result
 
-    def initialize_pattern_with_config(self) -> ReadConfigPattern:
+    def initialize_config_pattern(self) -> ReadConfigPattern:
         """
         Function that initializes the ReadConfigPattern class.
         This class is responsible for reading the configuration file
@@ -495,39 +492,6 @@ class PaciniTyping:
         )
 
         return pattern
-
-    def get_config_gene_names(self, pattern: ReadConfigPattern) -> list[str]:
-        """
-        Fill in later...
-        """
-        return [
-            item["gene_name"] for item in pattern.pattern["pattern"]["genes"]
-        ]
-
-    def parse_results(self, pattern: ReadConfigPattern) -> None:
-        """
-        Function that calls the parsing of the query results.
-        The calling of the Parser class is done here.
-        This calling constists of creating a Parser object,
-        adding filters and parsing the results.
-        """
-        logging.debug("Calling the parsing module...")
-        parser = Parser(
-            pattern.pattern,
-            pattern.creation_dict["output"],
-            self.file_type,
-            self.sample_name,
-        )
-        logging.debug("Adding filters to the parser...")
-        # TODO: Filters should be added based on the config file
-        parser.add_filter(PercentageIdentityFilter(99, self.file_type))
-        parser.add_filter(
-            GeneNameFilter(
-                ["rfbV_O1", "ctxA", "ctxB", "wbfZ_O139"], self.file_type
-            )
-        )
-        parser.add_filter(CoverageFilter(80, self.file_type))
-        parser.parse()
 
     def save_intermediates(self) -> None:
         """
@@ -612,7 +576,7 @@ class PaciniTyping:
                 # read the config file and validate it with
                 # the ReadConfigPattern class
                 pattern: ReadConfigPattern = (
-                    self.initialize_pattern_with_config()
+                    self.initialize_config_pattern()
                 )
                 # Check if database exists
                 # If not present, create it from the config options
@@ -633,8 +597,11 @@ class PaciniTyping:
                 else:
                     self.run_query(pattern.creation_dict)
                     # Parsing operations
-                    self.parse_results(pattern)
-
+                    ParsingManager(
+                        pattern,
+                        self.file_type,
+                        self.sample_name,
+                    )
                     #
                     # Save or delete intermediate files
                     # This code should be moved to a separate function
