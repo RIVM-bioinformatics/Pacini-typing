@@ -36,20 +36,20 @@ The Pacini project is a software application which can be used to determine gene
 
 ## Table of Contents
 
-- [Application information](#application-information)
-- [About this project](#about-this-project)
-- [Table of Contents](#table-of-contents)
-- [Prerequisites](#prerequisites)
-- [Complete list of required packages](#complete-list-of-required-packages)
-- [Installation](#installation)
-- [(very) Brief Overview of Pacini-typing](#very-brief-overview-of-pacini-typing)
-- [Getting Started](#getting-started)
-- [Parameters \& Usage](#parameters--usage)
-- [Example Run of Pacini-typing](#example-run-of-pacini-typing)
-- [Issues](#issues)
-- [Future Ideas](#future-ideas)
-- [License](#license)
-- [Contact](#contact)
+* [Application information](#application-information)
+* [About this project](#about-this-project)
+* [Table of Contents](#table-of-contents)
+* [Prerequisites](#prerequisites)
+* [Complete list of required packages](#complete-list-of-required-packages)
+* [Installation](#installation)
+* [(very) Brief Overview of Pacini-typing](#very-brief-overview-of-pacini-typing)
+* [Getting Started](#getting-started)
+* [Parameters \& Usage](#parameters--usage)
+* [Example Run of Pacini-typing](#example-run-of-pacini-typing)
+* [Issues](#issues)
+* [Future Ideas](#future-ideas)
+* [License](#license)
+* [Contact](#contact)
 
 ## Prerequisites
 
@@ -168,18 +168,27 @@ Example of a YAML configuration file with gene group, this file defines the gene
 ```yaml
 %YAML 1.2
 ---
+# The metadata must always be present, exactly as shown below.
+# The fields are used in the final output reports.
 metadata:
   id: "VIB-O139"
   name: "O139 Gene group"
   description: "Genetic pattern run config file for Vibrio cholerae O139 serogroup"
   date_created: "2024-11-06"
 
+# The database section is used to define the database to be used in the run.
+# You can specify a matching sequence file to be used in the run.
+# The matching sequence file should contain the sequences of the genes you want to detect.
+# Format in Multi-FASTA format.
+# The run_output field is used to specify the output directory for the intermediate files.
 database:
   name: "VIB-O139"
   path: "databases"
   matching_seq_file: "patterns/VIB-O139.fasta"
   run_output: "output/"
 
+# This section is most important in creating filters for the genes.
+# The perc_ident and perc_cov fields are used for all genes in the 'genes' section.
 pattern:
   perc_ident: 95.0
   perc_cov: 90.0
@@ -187,13 +196,7 @@ pattern:
   p_value: 0.05
   genes:
     - gene_name: "wbfZ"
-      presence: true
-      pident: 98.0
-      pcoverage: 95.0
-    - gene_name: "wbfY"
-      presence: true
-      pident: 98.0
-      pcoverage: null
+    - gene_name: "ctxB"
 ```
 
 [Back to top](#pacini-typing)
