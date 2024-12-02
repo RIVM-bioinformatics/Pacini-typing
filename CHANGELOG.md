@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.5.1](https://github.com/RIVM-bioinformatics/Pacini-typing/compare/v1.5.0...v1.5.1) (2024-12-02)
+
+
+### Documentation
+
+* reshuffled the environment section and added more information about the output files ([623d767](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/623d76766c805e6a4eabfa7bb4b5991319feeeae))
+* update README with improved YAML configuration details ([88a9f6c](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/88a9f6c0279fd5f81919874c26b34ef73d027c67))
+
 ## [1.5.0](https://github.com/RIVM-bioinformatics/Pacini-typing/compare/v1.4.0...v1.5.0) (2024-11-22)
 
 
