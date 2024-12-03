@@ -55,6 +55,7 @@ import argparse
 import gzip
 import logging
 import os
+import tarfile
 import shutil
 import sys
 from typing import Any, Tuple
@@ -495,21 +496,26 @@ class PaciniTyping:
 
     def save_intermediates(self) -> None:
         """
-        # TODO: save_intermediates - Fill in later...
+        Function that saves intermediate files in a zip archive.
+        The zip archive is named after the sample name.
+        The zip format is .tar.gz.
         """
         logging.info("Saving intermediate files in a zip archive...")
-        os.makedirs(f"{self.sample_name}_intermediates", exist_ok=True)
-        shutil.move("databases", f"{self.sample_name}_intermediates")
-        shutil.move("output", f"{self.sample_name}_intermediates")
-        shutil.make_archive(f"{self.sample_name}_intermediates", "tar")
-        shutil.rmtree(f"{self.sample_name}_intermediates")
+        with tarfile.open(
+            f"{self.sample_name}_intermediates.tar.gz", "w:gz"
+        ) as tar:
+            tar.add("output", arcname=os.path.basename("output"))
+        # Call the delete_intermediates function to
+        # remove the original output directory
+        self.delete_intermediates()
 
     def delete_intermediates(self) -> None:
         """
-        # TODO: delete_intermediates - Fill in later...
+        Function that removes the intermediate files of the application.
+        The directory is used to store genetic variation information,
+        and is simply removed by shutil.rmtree.
         """
         logging.info("Deleting intermediate files...")
-        shutil.rmtree("databases")
         shutil.rmtree("output")
 
     def run(self) -> None:
@@ -575,9 +581,7 @@ class PaciniTyping:
                 # The config option is selected,
                 # read the config file and validate it with
                 # the ReadConfigPattern class
-                pattern: ReadConfigPattern = (
-                    self.initialize_config_pattern()
-                )
+                pattern: ReadConfigPattern = self.initialize_config_pattern()
                 # Check if database exists
                 # If not present, create it from the config options
                 if not self.check_valid_database_path(pattern.creation_dict):
@@ -602,10 +606,7 @@ class PaciniTyping:
                         self.file_type,
                         self.sample_name,
                     )
-                    #
-                    # Save or delete intermediate files
-                    # This code should be moved to a separate function
-                    #
+                    # Save or delete intermediate files based on user input
                     if self.input_args.save_intermediates:
                         self.save_intermediates()
                     else:
