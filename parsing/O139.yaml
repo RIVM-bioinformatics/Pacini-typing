@@ -9,7 +9,7 @@ metadata:
 
 database:
   name: "VIB-O139"
-  path: "databases"
+  path: "databases/VIB-O139"
   matching_seq_file: "parsing/VIB-O139.fasta"
   run_output: "output/"
 
