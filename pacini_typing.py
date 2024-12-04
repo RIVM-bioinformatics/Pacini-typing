@@ -504,7 +504,7 @@ class PaciniTyping:
         with tarfile.open(
             f"{self.sample_name}_intermediates.tar.gz", "w:gz"
         ) as tar:
-            tar.add("output", arcname=os.path.basename("output"))
+            tar.add(self.output_dir, arcname=os.path.basename(self.output_dir))
         # Call the delete_intermediates function to
         # remove the original output directory
         self.delete_intermediates()
@@ -516,7 +516,7 @@ class PaciniTyping:
         and is simply removed by shutil.rmtree.
         """
         logging.info("Deleting intermediate files...")
-        shutil.rmtree("output")
+        shutil.rmtree(self.output_dir)
 
     def run(self) -> None:
         """
@@ -607,6 +607,7 @@ class PaciniTyping:
                         self.sample_name,
                     )
                     # Save or delete intermediate files based on user input
+                    self.output_dir = pattern.pattern["database"]["run_output"]
                     if self.input_args.save_intermediates:
                         self.save_intermediates()
                     else:
