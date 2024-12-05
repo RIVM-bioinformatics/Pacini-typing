@@ -78,7 +78,7 @@ class DatabaseBuilder:
                         "Database path for FASTQ (KMA) does not exist,"
                         "creating path for it automatically"
                     )
-                    os.mkdir(self.database_path)
+                    os.makedirs(self.database_path, exist_ok=True)
                 self.create_kma_database()
             else:
                 self.create_blast_database()
