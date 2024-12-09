@@ -141,7 +141,7 @@ class ReadConfigPattern:
             "database_path": self.pattern["database"]["path"],
             "database_name": self.pattern["database"]["name"],
             "input_fasta_file": self.pattern["database"]["matching_seq_file"],
-            "database_type": self.input_file_type.lower(),
+            "database_type": self.input_file_type.upper(),
             "file_type": self.input_file_type,
         }
 

@@ -72,7 +72,7 @@ class DatabaseBuilder:
             self.database_path, self.database_name
         )
         if not os.path.exists(self.full_database_path):
-            if self.database_type == "fastq":
+            if self.database_type == "FASTQ":
                 if not os.path.exists(self.database_path):
                     logging.debug(
                         "Database path for FASTQ (KMA) does not exist,"
