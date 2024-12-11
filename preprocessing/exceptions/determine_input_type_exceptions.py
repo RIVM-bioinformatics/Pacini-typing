@@ -77,7 +77,8 @@ class InvalidSequencingTypesError(Exception):
         ---------------------------------------------------
         ERROR: Wrong sequencing types detected
         ---------------------------------------------------
-        The following files cannot be used together:
+        The following files cannot be used together
+            due to different sequencing types:
             - {files_list}
         ---------------------------------------------------
         SUGGESTION: Make sure you provide:
