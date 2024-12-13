@@ -80,12 +80,12 @@ def build_query_command(subparsers: _SubParsersAction) -> None:
         help="Output file to store the results. Specify an output file: -o output",
     )
 
-    query.add_argument(
-        "-id",
-        "--identity",
-        required=False,
-        type=int,
-        metavar="Min. identity",
-        help="Minimum identity percentage for the query",
-        default=95,
-    )
+    # query.add_argument(
+    #     "-id",
+    #     "--identity",
+    #     required=False,
+    #     type=int,
+    #     metavar="Min. identity",
+    #     help="Minimum identity percentage for the query",
+    #     default=95,
+    # )

@@ -122,8 +122,6 @@ def setup_teardown_paired_input() -> Generator[list[str], None, None]:
         "./refdir/",
         "--database_name",
         "mykma",
-        "--identity",
-        "90",
     ]
     # Make the directory for the test
     dir_path = "test_full_run/"

@@ -28,7 +28,6 @@ import yaml
 from preprocessing.exceptions.validation_exceptions import (
     FileNotExistsError,
     InvalidFileExtensionError,
-    InvalidFilterOptionsError,
     InvalidPairedError,
     ValidationError,
 )
@@ -224,24 +223,6 @@ class ArgsValidator:
                 self.option["input_file_list"][1],
             )
 
-    def validate_filter_arguments(self) -> None:
-        """
-        Method that validates the filter arguments.
-        For example, the identity should be between 0 and 100.
-        This method makes sure the program can continue with the correct arguments.
-        Errors will be logged and the program will exit.
-        """
-        logging.debug("Validating filter arguments...")
-        if self.option["query"]:
-            if (
-                self.option["query"]["filters"]["identity"] < 0
-                or self.option["query"]["filters"]["identity"] > 100
-            ):
-                logging.error("Error in filter arguments, exiting...")
-                raise InvalidFilterOptionsError(
-                    self.option["query"]["filters"]["identity"]
-                )
-
     def run_file_checks(self, file: str) -> bool:
         """
         Method runs checks on the input files.
@@ -278,7 +259,6 @@ class ArgsValidator:
             - False: if the files are not valid
         ----------
         """
-        self.validate_filter_arguments()
         if len(self.input_file_list) == 2:
             if len(self.input_file_list) == 2 and all(
                 self.run_file_checks(file) for file in self.input_file_list

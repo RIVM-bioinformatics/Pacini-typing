@@ -49,7 +49,6 @@ FASTA_FILE = "test_data/VIB_EA5348AA_AS.fasta"
 RUN_OUTPUT = "test_full_run/myresults"
 DATABASE_PATH = "./refdir/"
 DATABASE_NAME = "my_blast_db"
-IDENTITY = 90
 
 
 @pytest.fixture(scope="module", autouse=True)
@@ -117,8 +116,6 @@ def setup_teardown_single_input() -> Generator[list[str], None, None]:
         DATABASE_PATH,
         "--database_name",
         DATABASE_NAME,
-        "--identity",
-        str(IDENTITY),
     ]
     # Make the directory for the test
     dir_path = "test_full_run/"

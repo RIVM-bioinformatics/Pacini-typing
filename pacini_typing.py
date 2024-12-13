@@ -179,9 +179,6 @@ class PaciniTyping:
             "paired": self.input_args.paired,
             "single": self.input_args.single,
             "output": self.input_args.output,
-            "filters": {
-                "identity": self.input_args.identity,
-            },
         }
 
     def set_makedatabase_attributes(self):
