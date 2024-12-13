@@ -60,4 +60,6 @@ class KMA(Enum):
             option["database_path"] + option["database_name"],
             "-o",
             option["output"],
+            "-t",
+            str(option["threads"]),
         ]

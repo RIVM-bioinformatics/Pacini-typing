@@ -43,24 +43,35 @@ from queries.blast_runner import BLASTn
 from queries.kma_runner import KMA
 from queries.query_runner import QueryRunner
 
-OPTION: Dict[str, Any] = {
-    "database_path": "./refdir/",
-    "database_name": "mydb",
-    "option": "query",
-    "verbose": True,
-    "input_file_list": ["1.fq", "2.fq"],
-    "run_path": os.path.abspath(__file__).rsplit(".", 1)[0],
-    "file_type": "FASTA",
-    "output": "./dummy/path",
-    "makedatabase": None,
-    "query": {
-        "paired": ["/dummy/path", "/dummy/path"],
-        "single": "dummy_file.fastq",
-        "filters": {
-            "identity": 100,
+
+@pytest.fixture()
+def setup_query_input() -> Dict[str, Any]:
+    """
+    Pytest fixture that sets up the input options for the query test
+
+    Returns a dictionary of test configuration options
+    ----------
+    Output:
+        OPTION: Dict[str, Any] -> Dictionary of test configuration options
+    ----------
+    """
+    return {
+        "database_path": "./refdir/",
+        "database_name": "mydb",
+        "option": "query",
+        "verbose": True,
+        "input_file_list": ["1.fq", "2.fq"],
+        "run_path": os.path.abspath(__file__).rsplit(".", 1)[0],
+        "file_type": "FASTA",
+        "output": "./dummy/path",
+        "makedatabase": None,
+        "query": {
+            "paired": ["/dummy/path", "/dummy/path"],
+            "single": "dummy_file.fastq",
         },
-    },
-}
+        "threads": 6,
+    }
+
 
 RUN_TIMES = [
     0.1,
@@ -72,11 +83,11 @@ RUN_TIMES = [
 ]
 
 
-def test_prepare_query() -> None:
+def test_prepare_query(setup_query_input: Dict[str, Any]) -> None:
     """
     Function that tests the prepare_query() function(s) of the enums
     """
-    query: list[str] = KMA.get_query(OPTION)
+    query: list[str] = KMA.get_query(setup_query_input)
     assert query == [
         "kma",
         "-ipe",
@@ -86,16 +97,18 @@ def test_prepare_query() -> None:
         "./refdir/mydb",
         "-o",
         "./dummy/path",
+        "-t",
+        "6",
     ]
 
 
-def test_get_query_different() -> None:
+def test_get_query_different(setup_query_input: Dict[str, Any]) -> None:
     """
     Function that tests the prepare_query() function(s) of the enums
     It uses a different database name by simply copying the
     OPTION dictionary and changing the database name
     """
-    sub_option = OPTION.copy()
+    sub_option = setup_query_input.copy()
     sub_option["database_name"] = "my_new_db"
     query: list[str] = KMA.get_query(sub_option)
     assert query == [
@@ -107,14 +120,16 @@ def test_get_query_different() -> None:
         "./refdir/my_new_db",
         "-o",
         "./dummy/path",
+        "-t",
+        "6",
     ]
 
 
-def test_get_query_verbose_false():
+def test_get_query_verbose_false(setup_query_input: Dict[str, Any]):
     """
     Function that tests the prepare_query() function(s) of the enums with verbose set to False
     """
-    sub_option = OPTION.copy()
+    sub_option = setup_query_input.copy()
     sub_option["verbose"] = False
     query = KMA.get_query(sub_option)
     assert query == [
@@ -126,14 +141,16 @@ def test_get_query_verbose_false():
         "./refdir/mydb",
         "-o",
         "./dummy/path",
+        "-t",
+        "6",
     ]
 
 
-def test_blast_prepare_query():
+def test_blast_prepare_query(setup_query_input: Dict[str, Any]):
     """
     Function that tests the prepare_query() function(s) of the enums
     """
-    query = BLASTn.get_query(OPTION)
+    query = BLASTn.get_query(setup_query_input)
     assert query == [
         "blastn",
         "-query",
@@ -144,14 +161,16 @@ def test_blast_prepare_query():
         "./dummy/path.tsv",
         "-outfmt",
         f"'6 {" ".join(BLASTn.FORMATS.value)}'",
+        "-num_threads",
+        "6",
     ]
 
 
-def test_blast_get_query_different():
+def test_blast_get_query_different(setup_query_input: Dict[str, Any]):
     """
     Function that tests the prepare_query() function(s) of the enums
     """
-    sub_option = OPTION.copy()
+    sub_option = setup_query_input.copy()
     sub_option["database_name"] = "my_new_db"
     query = BLASTn.get_query(sub_option)
     assert query == [
@@ -164,17 +183,21 @@ def test_blast_get_query_different():
         "./dummy/path.tsv",
         "-outfmt",
         f"'6 {" ".join(BLASTn.FORMATS.value)}'",
+        "-num_threads",
+        "6",
     ]
 
 
 @mock.patch("os.path.exists", return_value=False)
 @mock.patch("os.makedirs")
 @pytest.mark.parametrize("runtime", RUN_TIMES)
-def test_get_runtime(mock, mock1, runtime: float):
+def test_get_runtime(
+    mock, mock1, runtime: float, setup_query_input: Dict[str, Any]
+) -> None:
     """
     Function that tests the get_runtime() method of the QueryRunner class
     """
-    runner = QueryRunner(OPTION)
+    runner = QueryRunner(setup_query_input)
     runner.start_time = time.time()
     time.sleep(runtime)
     runner.stop_time = time.time()

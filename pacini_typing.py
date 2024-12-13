@@ -122,6 +122,7 @@ class PaciniTyping:
         self.option: dict[str, Any] = {}
         self.sample_name: str = ""
         self.file_type: str = ""
+        self.threads: int = self.input_args.threads
 
     def parse_all_args(self) -> None:
         """
@@ -489,6 +490,8 @@ class PaciniTyping:
             pattern.creation_dict["input_fasta_file"],
         )
 
+        pattern.creation_dict["threads"] = self.threads
+
         return pattern
 
     def save_intermediates(self) -> None:
@@ -561,6 +564,7 @@ class PaciniTyping:
                     "database_path": self.option["database_path"],
                     "database_name": self.option["database_name"],
                     "output": self.option["query"]["output"],
+                    "threads": self.threads,
                 }
                 # Check if the database exists
                 # If not raise an error because with the query operation,
