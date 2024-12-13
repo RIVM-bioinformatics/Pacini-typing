@@ -35,6 +35,14 @@ class InvalidFastaOrFastqError(Exception):
         SUGGESTION:
             - Make sure the file is in FASTA or FASTQ format
             - Check the file extension
+            - If the file is FASTA, make sure it contains:
+                >Header
+                Sequence
+            - If the file is FASTQ, make sure it contains:
+                @Header
+                Sequence
+                +
+                Quality Scores
         ----------------------------------------------------
                 """
 
