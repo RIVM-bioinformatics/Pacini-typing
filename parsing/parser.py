@@ -23,51 +23,25 @@ from typing import Any
 import pandas as pd
 
 from parsing.filter_pattern import Filter
-
-KMA_COLUMNS = {
-    "Template": "hit",
-    "Score": "score",
-    "Expected": "expected",
-    "Template_length: ": "align. length",
-    "Template_Identity": "percentage identity",
-    "Template_Coverage": "percentage coverage",
-    "Query_Identity": "query identity",
-    "Query_Coverage": "query coverage",
-    "Depth": "depth",
-    "q_value": "q-value",
-    "p_value": "p-value",
-}
-
-BLAST_COLUMNS = {
-    "qseqid": "query ID",
-    "sseqid": "hit",
-    "pident": "percentage identity",
-    "length": "align. length",
-    "mismatch": "number of mismatches",
-    "gapopen": "number of gap openings",
-    "qstart": "start of alignment in query",
-    "qend": "end of alignment in query",
-    "sstart": "start of alignment in hit",
-    "send": "end of alignment in hit",
-    "evalue": "e-value",
-    "bitscore": "bit score",
-    "qcovs": "percentage coverage",
-}
+from parsing.parsing_strategy import ParserStrategy
 
 
 class Parser:
     """
     Parser class that is responsible for the parsing
+    The class is using a strategy pattern to read and
+    process the data.
     ----------
     Methods:
-        - __init__: Constructor
+        - __init__: Constructor of the class
         - add_filter: Function to add a filter to the list of filters
-        - read_run_output: Function that reads the run output file
-        - set_fasta_options: Set the options for parsing FASTA files
-        - set_fastq_options: Set the options for parsing FASTQ files
-        - construct_report_record: Function that constructs a record for the output report
-        - create_output_report: Function that creates a filtered output report
-        - write_output_report: Function that writes the filtered pandas dataframe to a csv file
+        - apply_filters: Applies all filters to the DataFrame
+        - read_run_output: Reads the output data using the strategy
+        - construct_report_record: Constructs a record for the output report
+        - create_output_report: Creates a filtered output report
+        - write_report: Writes the report to a csv file
+        - construct_list_of_genes: Constructs the list of genes/templates from the DataFrame
+        - write_FASTA_out: Writes the FASTA output
         - parse: Main method to parse the file
     ----------
     """
@@ -75,10 +49,10 @@ class Parser:
     def __init__(
         self,
         config_options: dict[str, Any],
+        strategy: ParserStrategy,
         query_run_filename: str,
-        parse_type: str,
         input_sequence_sample: str = "",
-    ) -> None:
+    ):
         """
         Constructor for the Parser class
         The incoming variables are stored as class variables
@@ -86,16 +60,16 @@ class Parser:
         ----------
         Input:
             - config_options: options from the configuration file
+            - strategy: ParserStrategy object
             - query_run_filename: str (filename of the query results)
-            - parse_type: str (FASTA or FASTQ)
             - input_sequence_sample: sample name of the input sequence
         ----------
         """
         self.config_options = config_options
+        self.strategy = strategy
         self.query_run_filename = query_run_filename
-        self.parse_type = parse_type
         self.input_sequence_sample = input_sequence_sample
-        self.data_frame: pd.DataFrame = pd.DataFrame()
+        self.data_frame = pd.DataFrame()
         self.filters: list[Filter] = []
 
     def add_filter(self, filter_pattern: Filter) -> None:
@@ -111,54 +85,23 @@ class Parser:
         logging.debug("Adding filter: %s", filter_pattern.__class__.__name__)
         self.filters.append(filter_pattern)
 
+    def apply_filters(self):
+        """
+        Function that applies all filters to the DataFrame
+        It loops over the list of filters and applies them.
+        The implementation of the filters is done in the Filter class.
+        """
+        for filter_pattern in self.filters:
+            self.data_frame = filter_pattern.apply(self.data_frame)
+
     def read_run_output(self):
         """
-        Function that reads the run output of the query.
-        The file is read into a pandas dataframe.
-        Based on the type of the run, the options are either
-        being set for FASTA or FASTQ files.
+        Function that handles the reading the run output of the query.
+        It's not acutually being read here, but the strategy pattern
+        is used to read the output file.
         """
-        if self.parse_type == "FASTA":
-            self.data_frame = pd.read_csv(
-                self.query_run_filename + ".tsv",
-                sep="\t",
-                header=None,
-            )
-            self.set_fasta_options()
-        else:
-            self.data_frame = pd.read_csv(
-                self.query_run_filename + ".res",
-                sep="\t",
-                header=0,
-            )
-            self.set_fastq_options()
-
-    def set_fasta_options(self):
-        """
-        Function that sets the specific options
-        for parsing FASTA files.
-        This means that the columns are set and
-        the columns that should be converted to float
-        are converted.
-        """
-        self.data_frame.columns = list(BLAST_COLUMNS.keys())
-        self.data_frame["pident"] = self.data_frame["pident"].astype(float)
-        self.data_frame["qcovs"] = self.data_frame["qcovs"].astype(float)
-
-    def set_fastq_options(self):
-        """
-        Function that sets the specific options
-        for parsing FASTQ files.
-        This means that the columns are set and
-        the columns that should be converted to float
-        """
-        self.data_frame.columns = list(KMA_COLUMNS.keys())
-        self.data_frame["Template_Identity"] = self.data_frame[
-            "Template_Identity"
-        ].astype(float)
-        self.data_frame["Template_Coverage"] = self.data_frame[
-            "Template_Coverage"
-        ].astype(float)
+        self.data_frame = self.strategy.read_output(self.query_run_filename)
+        logging.info("Run output read successfully.")
 
     def construct_report_record(
         self, report_id: int, item: str
@@ -205,27 +148,13 @@ class Parser:
         output_records = []
         for report_id, item in enumerate(
             self.data_frame[
-                "sseqid" if self.parse_type == "FASTA" else "Template"
+                self.strategy.get_gene_column_name()
             ].values.tolist()
         ):
             output_records.append(
                 self.construct_report_record(report_id, item)
             )
         return pd.DataFrame(output_records)
-
-    def write_output_report(self):
-        """
-        Function that writes the created
-        output report to a csv file.
-        The filename is based on the input sequence sample.
-        """
-        logging.debug("Writing the output report...")
-        self.create_output_report().to_csv(
-            f"{self.input_sequence_sample}_report.csv",
-            sep=",",
-            index=False,
-        )
-        logging.info("Successfully craeted the output report")
 
     def construct_hit_csv_record(
         self,
@@ -236,7 +165,21 @@ class Parser:
         item: list[str],
     ) -> dict[str, Any]:
         """
-        # TODO: Add docstring
+        Function that constructs a record for the hits report
+        Every line in the hits report is a dictionary
+        This function constructs the dictionary.
+        In the create_hits_report function, the dictionary is
+        appended to a list of all records.
+        ----------
+        Input:
+            - columns: dict[str, Any]: columns of the DataFrame
+            - significance_type: str: type of significance value
+            - value_column: str: value of the significance
+            - report_id: int: id of the record
+            - item: list[str]: incoming item from the dataframe
+        Output:
+            - dict[str, Any]: dictionary with the record
+        ----------
         """
         return {
             "ID": report_id + 1,
@@ -267,15 +210,9 @@ class Parser:
         --------
         """
         output_records: list[dict[str, Any]] = []
-        if self.parse_type == "FASTA":
-            columns = list(BLAST_COLUMNS.values())
-            significance_type = "e-value"
-            value_column = columns.index(significance_type)
-        else:
-            columns = list(KMA_COLUMNS.values())
-            significance_type = "p-value"
-            value_column = columns.index(significance_type)
-
+        columns, significance_type, value_column = (
+            self.strategy.get_hits_report_info()
+        )
         for report_id, item in self.data_frame.iterrows():
             output_records.append(
                 self.construct_hit_csv_record(
@@ -284,21 +221,55 @@ class Parser:
             )
         return pd.DataFrame(output_records)
 
-    def write_hits_report(self):
+    def write_report(self, report: pd.DataFrame, suffix: str):
         """
-        Function that writes the hits
-        report to a csv file.
-        The filename is based on the input sequence sample.
+        Function that writes a given DataFrame to a csv file.
+        The pandas DataFrame is created by other methods,
+        and passed to this method to write it to a file.
+        ----------
+        Input:
+            - report: the DataFrame to write
+            - suffix: suffix to add to the filename
+        ----------
         """
-        logging.debug("Writing the hits report...")
-        self.create_hits_report().to_csv(
-            f"{self.input_sequence_sample}_hits_report.csv",
+        logging.debug("Writing the %s...", suffix)
+        report.to_csv(
+            f"{self.input_sequence_sample}_{suffix}.csv",
             sep=",",
             index=False,
         )
-        logging.info("Successfully craeted the hits report")
+        logging.info("Successfully wrote the report")
 
-    def parse(self):
+    def construct_list_of_genes(self) -> list[str]:
+        """
+        Function that constructs the list of genes
+        from the filtered DataFrame.
+        This option is used to write the FASTA output.
+        The list of genes is used to extract the sequence from
+        alignment file of KMA.
+        ! This function is not returning a list of genes
+        that are searched for, but the actual hits !
+        ----------
+        Output:
+            - list[str]: The list of genes after filtering
+        --------
+        """
+        return self.strategy.extract_gene_list(self.data_frame)
+
+    def write_fasta_out(self) -> None:
+        """
+        Function that is being called if the --fasta-out option
+        is set to true by the user.
+        The function is using the strategy pattern to write the
+        found sequences to a FASTA file.
+        """
+        self.strategy.write_fasta_out(
+            config_options=self.config_options,
+            input_sequence_sample=self.input_sequence_sample,
+            list_of_genes=self.construct_list_of_genes(),
+        )
+
+    def parse(self) -> None:
         """
         Main method of the parsing class
         This method is called after initializing all
@@ -319,12 +290,16 @@ class Parser:
                 "in the input files"
             )
         logging.debug("Results were read successfully, filtering...")
-        for filtering in self.filters:
-            self.data_frame = filtering.apply(self.data_frame)
-        if self.data_frame.empty:
+        if not self.data_frame.empty:
+            self.apply_filters()
+
+        if not self.data_frame.empty:
+            self.write_report(self.create_output_report(), "report")
+            self.write_report(self.create_hits_report(), "hits_report")
+
+            if self.config_options.get("fasta_out", False):
+                self.write_fasta_out()
+        else:
             logging.warning(
                 "Data frame is empty after filtering, no report created"
             )
-        else:
-            self.write_output_report()
-            self.write_hits_report()
