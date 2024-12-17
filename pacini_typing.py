@@ -203,6 +203,7 @@ class PaciniTyping:
         self.option["config"] = {
             "input": self.input_args.input,
             "config_path": self.input_args.config,
+            "fasta_out": self.input_args.fasta_out,
         }
 
     def setup_logging(self) -> None:
@@ -490,7 +491,10 @@ class PaciniTyping:
             pattern.creation_dict["input_fasta_file"],
         )
 
+        # Set threads for creation operations (makeblastdb/query)
         pattern.creation_dict["threads"] = self.threads
+        # Store the fasta-output option in the pattern object
+        pattern.pattern["fasta_out"] = self.option["config"]["fasta_out"]
 
         return pattern
 
@@ -646,8 +650,6 @@ if __name__ == "__main__":
 # TODO: query_runner:run - This return statement is not used anywhere, should it be removed?
 
 # TODO : validating_input_arguments - Store certain values from main OPTION as class variable
-
-# TODO : validating_input_arguments - Compare if two files really are paired
 
 ###########################################################################
 ###########################################################################

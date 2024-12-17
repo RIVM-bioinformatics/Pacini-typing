@@ -115,6 +115,14 @@ def main(givenargs: list[str]) -> argparse.Namespace:
         help="Number of threads to use (rounded to the nearest integer)",
     )
 
+    parser.add_argument(
+        "-f",
+        "--fasta-out",
+        action="store_true",
+        default=False,
+        help="Write found sequences to a FASTA output file",
+    )
+
     subparsers = parser.add_subparsers(
         title="operations",
         description="For more information on a specific command, type: Pacini.py <command> -h",

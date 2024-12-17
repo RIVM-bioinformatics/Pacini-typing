@@ -16,11 +16,13 @@ __author__ = "Mark van de Streek"
 __data__ = "2024-12-02"
 __all__ = ["ParsingManager"]
 
-from parsing.read_config_pattern import ReadConfigPattern
-from parsing.parser import Parser
+from parsing.coverage_filter import CoverageFilter
+from parsing.fasta_parser import FASTAParser
+from parsing.fastq_parser import FASTQParser
 from parsing.identity_filter import PercentageIdentityFilter
 from parsing.name_filter import GeneNameFilter
-from parsing.coverage_filter import CoverageFilter
+from parsing.parser import Parser
+from parsing.read_config_pattern import ReadConfigPattern
 
 
 class ParsingManager:
@@ -68,8 +70,8 @@ class ParsingManager:
         """
         self.parser = Parser(
             self.pattern.pattern,
+            FASTAParser() if self.file_type == "FASTA" else FASTQParser(),
             self.pattern.creation_dict["output"],
-            self.file_type,
             self.sample_name,
         )
 
