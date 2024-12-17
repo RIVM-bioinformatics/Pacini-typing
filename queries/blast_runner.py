@@ -57,6 +57,7 @@ class BLASTn(Enum):
         "evalue",
         "bitscore",
         "qcovhsp",
+        "qseq",
     ]
 
     @staticmethod

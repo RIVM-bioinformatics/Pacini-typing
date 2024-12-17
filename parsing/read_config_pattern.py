@@ -144,11 +144,3 @@ class ReadConfigPattern:
             "database_type": self.input_file_type.upper(),
             "file_type": self.input_file_type,
         }
-
-
-if __name__ == "__main__":
-    pattern = ReadConfigPattern(
-        "/parsing/O139.yaml",
-        "fasta",
-    )
-    print(pattern.pattern)

@@ -35,6 +35,7 @@ BLAST_COLUMNS = {
     "evalue": "e-value",
     "bitscore": "bit score",
     "qcovs": "percentage coverage",
+    "qseq": "alignment sequence in query",
 }
 
 
@@ -122,8 +123,29 @@ class FASTAParser(ParserStrategy):
         list_of_genes: list[str],
     ) -> None:
         """
-        #TODO: Implement the writing of the FASTA output.
+        Function that writes the hits to a FASTA output
+        file for further analysis.
+        ----------
+        Input:
+            - config_options: dict[str, Any]: the configuration options
+            - input_sequence_sample: str: the input sequence sample
+            - list_of_genes: list[str]: the list of genes
+            - data_frame: pd.DataFrame: the data frame with the BLAST results
+        ----------
         """
-        # implement blast output later
-        # AlignmentExtractor.write_fasta(f"file.fasta", {"ctxB": "ACAT"})
         pass
+        # if data_frame is not None:
+        #     query_sequences: dict[str, str] = {
+        #         row["sseqid"]: row["qseq"] for _, row in data_frame.iterrows()
+        #     }
+        # else:
+        #     raise EmptySequenceError()
+        # if query_sequences:
+        #     AlignmentExtractor.write_fasta(
+        #         output_file=f"{input_sequence_sample}_sequences.fasta",
+        #         query_sequences=query_sequences,
+        #     )
+        # # Handle unused arguments
+        # print(json.dumps(config_options, indent=4))
+        # _ = config_options
+        # _ = list_of_genes

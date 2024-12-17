@@ -38,13 +38,13 @@ __author__ = "Mark van de Streek"
 __date__ = "2024-12-17"
 __all__ = ["AlignmentExtractor"]
 
-import json
 import os
 import re
 
 from preprocessing.exceptions.alignment_exceptions import (
     AlignmentFileNotFoundError,
 )
+from preprocessing.exceptions.parsing_exceptions import EmptySequenceError
 
 
 class AlignmentExtractor:
@@ -202,7 +202,6 @@ class AlignmentExtractor:
             - query_sequences: sequences to write to the file
         ----------
         """
-        print(json.dumps(query_sequences, indent=4))
         with open(output_file, "w", encoding="utf-8") as fasta_out:
             for gene, sequence in query_sequences.items():
                 fasta_out.write(f">{gene}\n")
@@ -217,4 +216,7 @@ class AlignmentExtractor:
         """
         self.parse_alignment_file()
         self.filter_genes()
-        self.write_fasta(self.output_file, self.query_sequences)
+        if self.query_sequences:
+            self.write_fasta(self.output_file, self.query_sequences)
+        else:
+            raise EmptySequenceError()
