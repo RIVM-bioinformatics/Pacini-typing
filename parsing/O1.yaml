@@ -20,9 +20,6 @@ pattern:
   p_value: 0.05
   genes:
     - gene_name: "rfbV"
-      presence: true
-      pident: 98.0
-      pcoverage: 95.0
   snps: null
     
     # Example of snp entry:
@@ -31,4 +28,3 @@ pattern:
     #   mutation: "C>T"
     #   confidence: "p-value: 0.01"
     # Uncomment the above lines to add SNPs to the pattern
-
