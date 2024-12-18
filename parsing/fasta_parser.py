@@ -19,7 +19,7 @@ from typing import Any, Optional
 
 import pandas as pd
 
-from parsing.alignment_extracter import AlignmentExtractor
+from parsing.alignment_extractor import AlignmentExtractor
 from parsing.parsing_strategy import ParserStrategy
 from preprocessing.exceptions.parsing_exceptions import EmptySequenceError
 

@@ -19,7 +19,7 @@ from typing import Any, Optional
 
 import pandas as pd
 
-from parsing.alignment_extracter import AlignmentExtractor
+from parsing.alignment_extractor import AlignmentExtractor
 from parsing.parsing_strategy import ParserStrategy
 
 KMA_COLUMNS = {
@@ -148,9 +148,9 @@ class FASTQParser(ParserStrategy):
             - list_of_genes: list[str]: The list of genes.
         ----------
         """
-        extracter = AlignmentExtractor(
+        extractor = AlignmentExtractor(
             alignment_file=f"{config_options["database"]["run_output"]}{input_sequence_sample}.aln",
             genes_list=list_of_genes,
             output_file=f"{input_sequence_sample}_sequences.fasta",
         )
-        extracter.run()
+        extractor.run()
