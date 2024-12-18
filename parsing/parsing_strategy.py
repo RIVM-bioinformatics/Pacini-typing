@@ -17,7 +17,7 @@ __data__ = "2024-12-17"
 __all__ = ["ParserStrategy"]
 
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Any, Optional
 
 import pandas as pd
 
@@ -90,11 +90,27 @@ class ParserStrategy(ABC):
         pass
 
     @abstractmethod
+    def requires_dataframe(self) -> bool:
+        """
+        Helper method to determine if the parser requires a data frame.
+        The write_fasta_out method is quite different between the parsers.
+        And to not make the code too duplicate in the main Parser class,
+        this methods helps to determine if a data frame is required to send
+        to the write_fasta_out method.
+        ----------
+        Output:
+            - bool: True if a data frame is required, False otherwise
+        ----------
+        """
+        pass
+
+    @abstractmethod
     def write_fasta_out(
         self,
         config_options: dict[str, Any],
         input_sequence_sample: str,
         list_of_genes: list[str],
+        data_frame: Optional[pd.DataFrame] = None,
     ) -> None:
         """
         Function that should be responsible for writing the found
@@ -104,6 +120,7 @@ class ParserStrategy(ABC):
             - config_options: The configuration options
             - input_sequence_sample: The input sequence sample
             - list_of_genes: The list of genes
+            - data_frame: The data frame containing the results
         ----------
         """
         pass

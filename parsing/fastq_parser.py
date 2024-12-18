@@ -15,7 +15,7 @@ __author__ = "Mark van de Streek"
 __data__ = "2024-12-17"
 __all__ = ["FASTQParser"]
 
-from typing import Any
+from typing import Any, Optional
 
 import pandas as pd
 
@@ -117,11 +117,24 @@ class FASTQParser(ParserStrategy):
         """
         return "Template"
 
+    def requires_dataframe(self) -> bool:
+        """
+        Helper function to determine if the parser requires a data frame.
+        The KMA/FASTQ parser does not require a data frame.
+        For more specific information, see the ParserStrategy class.
+        ----------
+        Output:
+            - bool: False
+        ----------
+        """
+        return False
+
     def write_fasta_out(
         self,
         config_options: dict[str, Any],
         input_sequence_sample: str,
         list_of_genes: list[str],
+        data_frame: Optional[pd.DataFrame] = None,
     ) -> None:
         """
         Function that writes the hits sequences to a FASTA file.

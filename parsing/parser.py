@@ -267,6 +267,9 @@ class Parser:
             config_options=self.config_options,
             input_sequence_sample=self.input_sequence_sample,
             list_of_genes=self.construct_list_of_genes(),
+            data_frame=(
+                self.data_frame if self.strategy.requires_dataframe() else None
+            ),
         )
 
     def parse(self) -> None:

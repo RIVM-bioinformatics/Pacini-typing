@@ -15,11 +15,13 @@ __author__ = "Mark van de Streek"
 __data__ = "2024-12-17"
 __all__ = ["FASTAParser"]
 
-from typing import Any
+from typing import Any, Optional
 
 import pandas as pd
 
+from parsing.alignment_extracter import AlignmentExtractor
 from parsing.parsing_strategy import ParserStrategy
+from preprocessing.exceptions.parsing_exceptions import EmptySequenceError
 
 BLAST_COLUMNS = {
     "qseqid": "query ID",
@@ -116,11 +118,24 @@ class FASTAParser(ParserStrategy):
         """
         return "sseqid"
 
+    def requires_dataframe(self) -> bool:
+        """
+        Helper function to determine if the parser requires a data frame.
+        The BLAST/FASTA parser does require a data frame.
+        For more specific information, see the ParserStrategy class.
+        ----------
+        Output:
+            - bool: False
+        ----------
+        """
+        return True
+
     def write_fasta_out(
         self,
         config_options: dict[str, Any],
         input_sequence_sample: str,
         list_of_genes: list[str],
+        data_frame: Optional[pd.DataFrame] = None,
     ) -> None:
         """
         Function that writes the hits to a FASTA output
@@ -133,19 +148,14 @@ class FASTAParser(ParserStrategy):
             - data_frame: pd.DataFrame: the data frame with the BLAST results
         ----------
         """
-        pass
-        # if data_frame is not None:
-        #     query_sequences: dict[str, str] = {
-        #         row["sseqid"]: row["qseq"] for _, row in data_frame.iterrows()
-        #     }
-        # else:
-        #     raise EmptySequenceError()
-        # if query_sequences:
-        #     AlignmentExtractor.write_fasta(
-        #         output_file=f"{input_sequence_sample}_sequences.fasta",
-        #         query_sequences=query_sequences,
-        #     )
-        # # Handle unused arguments
-        # print(json.dumps(config_options, indent=4))
-        # _ = config_options
-        # _ = list_of_genes
+        if data_frame is not None:
+            query_sequences: dict[str, str] = {
+                row["sseqid"]: row["qseq"] for _, row in data_frame.iterrows()
+            }
+        else:
+            raise EmptySequenceError()
+        if query_sequences:
+            AlignmentExtractor.write_fasta(
+                output_file=f"{input_sequence_sample}_sequences.fasta",
+                query_sequences=query_sequences,
+            )
