@@ -119,17 +119,28 @@ class InputFileInspector:
         ----------
         """
         sequence: list[str] = []
+        has_header = False  # Track if any header is found
+
         for line in file_handle:
             line = line.strip()
             if not line:
                 continue
             if line.startswith(">"):
+                has_header = True
                 # If we had a previous sequence, validate it
                 if sequence:
                     self.validate_sequence("".join(sequence), file)
                     sequence = []
             else:
                 sequence.append(line)
+
+        if not has_header:
+            logging.error("No headers found in FASTA file: %s", file)
+            raise InvalidFastaOrFastqError(
+                f"No headers found in FASTA file: {file}"
+            )
+
+        # Validate the last sequence
         if sequence:
             self.validate_sequence("".join(sequence), file)
 
