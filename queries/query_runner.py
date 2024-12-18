@@ -28,7 +28,7 @@ __all__ = ["QueryRunner"]
 import logging
 import os
 import time
-from typing import Any, Tuple
+from typing import Any
 
 from command_utils import CommandInvoker, ShellCommand
 from queries.blast_runner import BLASTn
@@ -88,27 +88,22 @@ class QueryRunner:
             return False
         return True
 
-    def run(self) -> Tuple[str, str] | bool:
+    def run(self) -> None:
         """
         The query is already prepared in the constructor.
         This function runs the query.
         The runtime is started and stopped to calculate the runtime.
+        (calculation is done in the get_runtime method)
         The decorated log function logs the query command,
             see the ./decorators/decorators.py file for more information.
             This decorator also checks if the query was successful.
-        ----------
-        Output:
-            - Result of the subprocess.run
-        ----------
         """
         logging.debug("Running query...")
         self.start_time = time.time()
-        # Use the execute function from command_utils
+        # Use the execute function of command_utils
         command = ShellCommand(cmd=self.query, capture=True)
-        result = CommandInvoker(command).execute()
+        CommandInvoker(command).execute()
         self.stop_time = time.time()
-
-        return result
 
     def get_runtime(self) -> float:
         """
