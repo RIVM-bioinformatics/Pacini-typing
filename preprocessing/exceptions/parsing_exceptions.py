@@ -63,3 +63,29 @@ class YAMLStructureError(Exception):
             - Make sure the keys are correctly aligned
         ---------------------------------------------------
                 """
+
+
+class EmptySequenceError(Exception):
+    """
+    Raised when an empty sequence is found in the data frame.
+    """
+
+    def __init__(self) -> None:
+        pass
+
+    def __str__(self) -> str:
+        return """
+        ---------------------------------------------------
+        ERROR: Empty sequence found in filtered data frame
+        ---------------------------------------------------
+        There were no sequences found in the data frame
+        after filtering the found hits.
+        Probably caused by the extraction of the sequences
+        out of the filtered data frame.
+        ---------------------------------------------------
+        SUGGESTION:
+            - Make sure the BLAST output format has 'qseq'
+                column included at last index.
+            - Check the extraction method for errors
+        ---------------------------------------------------
+                """

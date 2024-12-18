@@ -32,7 +32,7 @@ README.md.bak
 pylint_output.txt
 refdir/
 *.csv
-*coverage*
 test_data/
 .pylintrc
 .vscode/
+.coverage*

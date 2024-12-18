@@ -7,7 +7,7 @@ nav:
   - Usage: usage.md
   - Example Run: example_run.md
 site_author: Mark van de Streek
-site_description: Genetic variant typing based on configuration patterns
+site_description: Genetic variant typing based on configuration parsing
 
 # site_url: https://to.be.determined...
 # repo_url: https://github.com/RIVM-bioinformatics/Pacini_typing

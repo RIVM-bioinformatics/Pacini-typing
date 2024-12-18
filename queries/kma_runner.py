@@ -37,7 +37,6 @@ class KMA(Enum):
 
     RUN_OPTION = "kma"
     PAIRED_OPTION = "-ipe"
-    OUTPUT_FORMAT = "-tsv"
 
     @staticmethod
     def get_query(option: dict[str, Any]) -> list[str]:
@@ -57,9 +56,10 @@ class KMA(Enum):
             KMA.PAIRED_OPTION.value,
             option["input_file_list"][0],
             option["input_file_list"][1],
-            KMA.OUTPUT_FORMAT.value,
             "-t_db",
             option["database_path"] + option["database_name"],
             "-o",
             option["output"],
+            "-t",
+            str(option["threads"]),
         ]

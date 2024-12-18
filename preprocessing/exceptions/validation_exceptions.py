@@ -94,29 +94,6 @@ class FileNotExistsError(Exception):
                 """
 
 
-class InvalidFilterOptionsError(Exception):
-    """
-    Raised when an invalid filter option is provided.
-    """
-
-    def __init__(self, filter_option: str) -> None:
-        self.filter_option = filter_option
-
-    def __str__(self) -> str:
-        return f"""
-        ---------------------------------------------------
-        ERROR: Invalid filter option provided
-        ---------------------------------------------------
-        The following filter value is invalid:
-            - {self.filter_option}
-        ---------------------------------------------------
-        SUGGESTION:
-            - Make sure the filter option is valid
-            - Provide plausible filter options (i.e., id between 0-100)
-        ----------------------------------------------------
-                """
-
-
 class ValidationError(Exception):
     """
     Raised when a validation error occurs.

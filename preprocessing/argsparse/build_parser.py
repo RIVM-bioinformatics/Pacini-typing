@@ -91,6 +91,38 @@ def main(givenargs: list[str]) -> argparse.Namespace:
         help="Path to input file(s). Accepts 1 fasta file or 2 fastq files",
     )
 
+    parser.add_argument(
+        "--save-intermediates",
+        action="store_true",
+        default=False,
+        help="Save intermediate files of the run",
+    )
+
+    parser.add_argument(
+        "--log-file",
+        action="store_true",
+        default=False,
+        help="Save log file of the run",
+    )
+
+    parser.add_argument(
+        "-t",
+        "--threads",
+        required=False,
+        default=1,
+        type=lambda x: int(float(x)),
+        metavar="Threads",
+        help="Number of threads to use (rounded to the nearest integer)",
+    )
+
+    parser.add_argument(
+        "-f",
+        "--fasta-out",
+        action="store_true",
+        default=False,
+        help="Write found sequences to a FASTA output file",
+    )
+
     subparsers = parser.add_subparsers(
         title="operations",
         description="For more information on a specific command, type: Pacini.py <command> -h",

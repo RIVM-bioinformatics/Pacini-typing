@@ -35,6 +35,14 @@ class InvalidFastaOrFastqError(Exception):
         SUGGESTION:
             - Make sure the file is in FASTA or FASTQ format
             - Check the file extension
+            - If the file is FASTA, make sure it contains:
+                >Header
+                Sequence
+            - If the file is FASTQ, make sure it contains:
+                @Header
+                Sequence
+                +
+                Quality Scores
         ----------------------------------------------------
                 """
 
@@ -77,7 +85,8 @@ class InvalidSequencingTypesError(Exception):
         ---------------------------------------------------
         ERROR: Wrong sequencing types detected
         ---------------------------------------------------
-        The following files cannot be used together:
+        The following files cannot be used together
+            due to different sequencing types:
             - {files_list}
         ---------------------------------------------------
         SUGGESTION: Make sure you provide:

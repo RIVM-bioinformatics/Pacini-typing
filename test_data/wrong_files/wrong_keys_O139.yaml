@@ -1,15 +1,15 @@
 %YAML 1.2
 ---
-metadata:
-  id: "VIB-O1"
-  name: "O1 Gene group"
-  description: "Genetic pattern run config file for Vibrio cholerae O1 serogroup"
+metadatas:
+  id: "VIB-O139"
+  name: "O139 Gene group"
+  description: "Genetic pattern run config file for Vibrio cholerae O139 serogroup"
   date_created: "2024-11-06"
 
 database:
-  name: "VIB-O1"
+  name: "VIB-O139"
   path: "databases"
-  matching_seq_file: "patterns/VIB-O1.fasta"
+  matching_seq_file: "parsing/VIB-O139.fasta"
   run_output: "output/"
 
 pattern:
@@ -18,10 +18,14 @@ pattern:
   e_value: 0
   p_value: 0.05
   genes:
-    - gene_name: "rfbV"
+    - gene_name: "wbfZ"
       presence: true
       pident: 98.0
       pcoverage: 95.0
+    - gene_name: "wbfY"
+      presence: true
+      pident: 98.0
+      pcoverage: null
   snps: null
     
     # Example of snp entry:

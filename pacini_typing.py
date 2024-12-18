@@ -47,7 +47,7 @@ See the README.md file for more information about the pipeline
 
 from __future__ import annotations
 
-__author__ = "Mark Van de Streek"
+__author__ = "Mark van de Streek"
 __data__ = "2024-10-24"
 __all__ = ["PaciniTyping", "main"]
 
@@ -55,13 +55,15 @@ import argparse
 import gzip
 import logging
 import os
+import tarfile
 import shutil
 import sys
 from typing import Any, Tuple
 
 import preprocessing.argsparse.build_parser
 from makedatabase import DatabaseBuilder
-from patterns.read_config_pattern import ReadConfigPattern
+from parsing.config_manager import ParsingManager
+from parsing.read_config_pattern import ReadConfigPattern
 from preprocessing.exceptions.determine_input_type_exceptions import (
     InvalidSequencingTypesError,
 )
@@ -118,6 +120,9 @@ class PaciniTyping:
         """
         self.input_args = input_args
         self.option: dict[str, Any] = {}
+        self.sample_name: str = ""
+        self.file_type: str = ""
+        self.threads: int = self.input_args.threads
 
     def parse_all_args(self) -> None:
         """
@@ -175,9 +180,6 @@ class PaciniTyping:
             "paired": self.input_args.paired,
             "single": self.input_args.single,
             "output": self.input_args.output,
-            "filters": {
-                "identity": self.input_args.identity,
-            },
         }
 
     def set_makedatabase_attributes(self):
@@ -201,6 +203,7 @@ class PaciniTyping:
         self.option["config"] = {
             "input": self.input_args.input,
             "config_path": self.input_args.config,
+            "fasta_out": self.input_args.fasta_out,
         }
 
     def setup_logging(self) -> None:
@@ -213,6 +216,16 @@ class PaciniTyping:
         logging.getLogger().setLevel(
             self.option["verbose"] and logging.DEBUG or logging.INFO
         )
+        if self.input_args.log_file:
+            file_handler = logging.FileHandler("pacini_typing.log")
+            file_handler.setLevel(logging.DEBUG)
+            file_handler.setFormatter(
+                logging.Formatter(
+                    "%(asctime)s %(levelname)-5s %(process)d : %(message)s",
+                    datefmt="%Y-%m-%dT%H:%M:%S",
+                )
+            )
+            logging.getLogger().addHandler(file_handler)
 
     def get_input_filenames(self) -> None:
         """
@@ -243,6 +256,19 @@ class PaciniTyping:
         elif self.option["config"] and self.option["option"] is None:
             input_files_list.extend(self.option["config"]["input"])
         self.option["input_file_list"] = input_files_list
+
+    def retrieve_sample_name(self) -> None:
+        """
+        Function that retrieves the sample name from the input file.
+        The sample name is the first part of the filename.
+        """
+        self.sample_name = (
+            self.option["input_file_list"][0]
+            .split("/")[-1]
+            .split(".")[0]
+            .replace("_1", "")
+            .replace("_pR1", "")
+        )
 
     def check_for_unzip_files(self) -> None:
         """
@@ -309,7 +335,7 @@ class PaciniTyping:
         argsvalidator = ArgsValidator(self.option)
         if argsvalidator.validate():
             logging.info(
-                "Input arguments have been validated, found no issues."
+                "Input arguments have been validated, found no issues..."
             )
         else:
             logging.error(
@@ -335,7 +361,7 @@ class PaciniTyping:
         For more information about the DatabaseBuilder,
         see the makedatabase.py file.
         """
-        logging.debug("Running the makedatabase operation...")
+        logging.info("Creating the refernece database...")
         DatabaseBuilder(database_creation_args)
 
     def get_file_type(self) -> None:
@@ -348,12 +374,12 @@ class PaciniTyping:
         See validation/determine_input_type.py for more information.
         """
         logging.debug("Determining the file type of the input file(s)...")
-        self.option["file_type"] = InputFileInspector(
+        self.file_type = InputFileInspector(
             self.option["input_file_list"]
         ).get_file_type()
         logging.info(
-            "File type has been determined: %s",
-            self.option["file_type"],
+            "The input file type has been determined: %s",
+            self.file_type,
         )
 
     def check_valid_option_with_args(self) -> None:
@@ -374,10 +400,10 @@ class PaciniTyping:
         )
         if (
             len(self.option["input_file_list"]) == 1
-            and self.option["file_type"] == "FASTQ"
+            and self.file_type == "FASTQ"
         ) or (
             len(self.option["input_file_list"]) == 2
-            and self.option["file_type"] == "FASTA"
+            and self.file_type == "FASTA"
         ):
             logging.error(
                 "Only FASTA files are allowed for single files "
@@ -425,14 +451,14 @@ class PaciniTyping:
             - result: Tuple with the result of the query
         ----------
         """
-        logging.debug("Running the query operation against database...")
+        logging.info("Running the input query against reference database...")
         runner = QueryRunner(run_options=query_runner_builder)
         result = runner.run()
-        logging.info("Query runtime: %s seconds", runner.get_runtime())
+        logging.info("Query finished in: %s seconds", runner.get_runtime())
 
         return result
 
-    def initialize_pattern_with_config(self) -> ReadConfigPattern:
+    def initialize_config_pattern(self) -> ReadConfigPattern:
         """
         Function that initializes the ReadConfigPattern class.
         This class is responsible for reading the configuration file
@@ -443,19 +469,21 @@ class PaciniTyping:
             - pattern: ReadConfigPattern object
         ----------
         """
+        logging.debug("Initializing the ReadConfigPattern class...")
         pattern = ReadConfigPattern(
             self.option["config"]["config_path"],
-            self.option["file_type"],
+            self.file_type,
         )
         # Additionally, the query input and output must be set.
-        # Output as follows: output/fasta_results.tsv
+        # The output is not specified by the user, because
+        # this is based on the input files. Therefore,
+        # the sample name is retrieved from the input file.
+        # This is done in the function retrieve_sample_name().
         pattern.creation_dict["input_file_list"] = self.option["config"][
             "input"
         ]
         pattern.creation_dict["output"] = (
-            pattern.pattern["database"]["run_output"]
-            + self.option["file_type"]
-            + "_results.tsv"
+            pattern.pattern["database"]["run_output"] + self.sample_name
         )
 
         pattern.creation_dict["input_fasta_file"] = os.path.join(
@@ -463,7 +491,36 @@ class PaciniTyping:
             pattern.creation_dict["input_fasta_file"],
         )
 
+        # Set threads for creation operations (makeblastdb/query)
+        pattern.creation_dict["threads"] = self.threads
+        # Store the fasta-output option in the pattern object
+        pattern.pattern["fasta_out"] = self.option["config"]["fasta_out"]
+
         return pattern
+
+    def save_intermediates(self) -> None:
+        """
+        Function that saves intermediate files in a zip archive.
+        The zip archive is named after the sample name.
+        The zip format is .tar.gz.
+        """
+        logging.info("Saving intermediate files in a zip archive...")
+        with tarfile.open(
+            f"{self.sample_name}_intermediates.tar.gz", "w:gz"
+        ) as tar:
+            tar.add(self.output_dir, arcname=os.path.basename(self.output_dir))
+        # Call the delete_intermediates function to
+        # remove the original output directory
+        self.delete_intermediates()
+
+    def delete_intermediates(self) -> None:
+        """
+        Function that removes the intermediate files of the application.
+        The directory is used to store genetic variation information,
+        and is simply removed by shutil.rmtree.
+        """
+        logging.info("Deleting intermediate files...")
+        shutil.rmtree(self.output_dir)
 
     def run(self) -> None:
         """
@@ -476,15 +533,18 @@ class PaciniTyping:
         self.parse_all_args()
         # Setup up the logging, i.e., level and format
         self.setup_logging()
-        # Get the input files
+        # Get the input files and retrieve the sample name
         self.get_input_filenames()
+        self.retrieve_sample_name()
         # Check if they may need to be unzipped
         self.check_for_unzip_files()
         # Validate all input arguments
         self.validate_file_arguments()
 
         if self.option["makedatabase"]:
-            # Run with the validated arguments
+            # Define the required database args here,
+            # so the run_makedatabase() method can be re-used by
+            # other modules later on.
             database_builder = {
                 "database_path": self.option["database_path"],
                 "database_name": self.option["database_name"],
@@ -492,52 +552,50 @@ class PaciniTyping:
                 "input_fasta_file": self.option["makedatabase"]["input"],
             }
             self.run_makedatabase(database_builder)
-
         else:
-            # Determine the file type and valid options,
-            # both for query and config options
+            # The input option is not makedatabase,
+            # so it must be query or config.
+            # Determine the file type and valid options
             self.get_file_type()
             self.check_valid_option_with_args()
             # Query option has different requirements than config option
             # split up the options and check if the database exists
             if self.option["query"]:
                 # Create the right query builder for the query operation
-                query_builer = {
-                    "file_type": self.option["file_type"],
+                query_builder: dict[str, Any] = {
+                    "file_type": self.file_type,
                     "input_file_list": self.option["input_file_list"],
                     "database_path": self.option["database_path"],
                     "database_name": self.option["database_name"],
                     "output": self.option["query"]["output"],
+                    "threads": self.threads,
                 }
                 # Check if the database exists
                 # If not raise an error because with the query operation,
                 # there is no information to create a database.
                 # Log an error and let the user know it should be
                 # created first or use predefined configuration options.
-                if self.check_valid_database_path(query_builer):
-                    self.run_query(query_builer)
+                if self.check_valid_database_path(query_builder):
+                    self.run_query(query_builder)
                 else:
                     raise InvalidDatabaseError(
-                        query_builer["database_name"],
-                        query_builer["file_type"],
+                        query_builder["database_name"],
+                        query_builder["file_type"],
                     )
             else:
                 # The config option is selected,
                 # read the config file and validate it with
                 # the ReadConfigPattern class
-                pattern = self.initialize_pattern_with_config()
+                pattern: ReadConfigPattern = self.initialize_config_pattern()
                 # Check if database exists
                 # If not present, create it from the config options
                 if not self.check_valid_database_path(pattern.creation_dict):
                     # Re-use the run_makedatabase() method with right params
                     self.run_makedatabase(pattern.creation_dict)
-
                 # Check if database does exists at this point,
                 # if not, raise an error and exit the program
                 # Otherwise, run the query operation
-                if self.check_valid_database_path(pattern.creation_dict):
-                    self.run_query(pattern.creation_dict)
-                else:
+                if not self.check_valid_database_path(pattern.creation_dict):
                     # Let the user know the database does not exist,
                     # if the code reaches here, the run_makedatabase() was
                     # called without errors, so a bigger issue is present here.
@@ -545,6 +603,20 @@ class PaciniTyping:
                         pattern.creation_dict["database_name"],
                         pattern.creation_dict["file_type"],
                     )
+                else:
+                    self.run_query(pattern.creation_dict)
+                    # Parsing operations
+                    ParsingManager(
+                        pattern,
+                        self.file_type,
+                        self.sample_name,
+                    )
+                    # Save or delete intermediate files based on user input
+                    self.output_dir = pattern.pattern["database"]["run_output"]
+                    if self.input_args.save_intermediates:
+                        self.save_intermediates()
+                    else:
+                        self.delete_intermediates()
 
 
 def main(provided_args: list[str] | None = None) -> None:
@@ -578,14 +650,6 @@ if __name__ == "__main__":
 # TODO: query_runner:run - This return statement is not used anywhere, should it be removed?
 
 # TODO : validating_input_arguments - Store certain values from main OPTION as class variable
-
-# TODO : validating_input_arguments - Compare if two files really are paired
-
-# TODO : Don't use a output file but take the output as a string:
-#  zcat/cat data/vibrio_genes.fasta | blastn -query data/VIB_AA4147AA_AS_2.fna
-# -subject - -outfmt '6 qseqid sseqid pident qcovs' -perc_identity 70
-#  Or: kma -i data/VIB_AA4147AA_AS_2.fna -t_db refdir/mykma -t 4 -ID 70 -mrc 0.7 -o
-# temp_output && cut -f 1,5 temp_output.res && rm temp_output.*
 
 ###########################################################################
 ###########################################################################

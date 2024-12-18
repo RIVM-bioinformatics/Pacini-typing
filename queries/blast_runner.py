@@ -43,6 +43,22 @@ class BLASTn(Enum):
     OUTPUT_FORMAT_OPTION = "-outfmt"
     OUTPUT_FORMAT = "6"
     # TODO - Move the output format to config file with explanation of the format
+    FORMATS = [
+        "qseqid",
+        "sseqid",
+        "pident",
+        "length",
+        "mismatch",
+        "gapopen",
+        "qstart",
+        "qend",
+        "sstart",
+        "send",
+        "evalue",
+        "bitscore",
+        "qcovhsp",
+        "qseq",
+    ]
 
     @staticmethod
     def get_query(option: dict[str, Any]) -> list[str]:
@@ -67,5 +83,7 @@ class BLASTn(Enum):
             BLASTn.OUTPUT_OPTION.value,
             option["output"] + ".tsv",
             BLASTn.OUTPUT_FORMAT_OPTION.value,
-            BLASTn.OUTPUT_FORMAT.value,
+            f"'{BLASTn.OUTPUT_FORMAT.value} {" ".join(BLASTn.FORMATS.value)}'",
+            "-num_threads",
+            str(option["threads"]),
         ]

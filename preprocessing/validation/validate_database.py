@@ -43,7 +43,10 @@ def check_for_database_existence(arg_options: dict[str, Any]) -> bool:
     db_files = create_database_file_list(arg_options)
     for db_file in db_files:
         if not os.path.exists(arg_options["database_path"] + db_file):
-            logging.error("Database does not exist")
+            logging.warning(
+                "Database does not exist, "
+                "the program will try to create it or exit..."
+            )
             return False
     return True
 
@@ -91,6 +94,9 @@ def check_for_database_path(arg_options: dict[str, Any]) -> bool:
         )
         arg_options["database_path"] += "/"
     if not os.path.exists(arg_options["database_path"]):
-        logging.error("Database does not exist")
+        logging.warning(
+            "Database does not exist, "
+            "the program will try to create it or exit..."
+        )
         return False
     return check_for_database_existence(arg_options)
