@@ -8,12 +8,13 @@
 
 <!-- [![CodeFactor](https://www.codefactor.io/repository/github/rivm-bioinformatics/Pacini-typing/badge)](https://www.codefactor.io/repository/github/rivm-bioinformatics/Pacini-typing)   -->
 
-Pylint output: Your code has been rated at 9.91/10 (previous run: 7.68/10, +2.23)
+Pylint output: Your code has been rated at 9.93/10 (previous run: 7.68/10, +2.25)
 
 <div align="center">
     <h1>Pacini-typing</h1>
     <br />
-    <img src="https://via.placeholder.com/150" alt="pipeline logo">
+    <!--<img src="https://via.placeholder.com/150" alt="pipeline logo"> -->
+    <img src="docs/pacini_typing_logo.png" alt="pipeline logo">
     <h3>Directly go to <a href="#installation">Installation</a> or <a href="#getting-started">Getting Started</a></h2>
 </div>
 
@@ -27,33 +28,33 @@ Pylint output: Your code has been rated at 9.91/10 (previous run: 7.68/10, +2.23
 
 ## About this project
 
-The Pacini project is a software application which can be used to determine genetic variants in bacteria. These variants are:
+The Pacini project is a software application which can be used to detect genetic sequences in bacteria using a configuration schema.
 
-1. Presence or absence of certain genes
-2. Single nucleotide polymorphisms (SNPs)
+With these genetic sequences, the application can determine whether the sequence is actually present in the bacteria and create a simple (CSV) report of the findings
 
-*Based on these variants, the application can calculate the change of pathogenicity of the given bacteria. (This is still under development...)*
+>_Pacini-typing was mainly build around the detection of genetic sequences in **Vibrio cholerae**_
 
 ## Table of Contents
 
-* [Application information](#application-information)
-* [About this project](#about-this-project)
-* [Table of Contents](#table-of-contents)
-* [Prerequisites](#prerequisites)
-* [Complete list of required packages](#complete-list-of-required-packages)
-* [Installation](#installation)
-* [(very) Brief Overview of Pacini-typing](#very-brief-overview-of-pacini-typing)
-* [Getting Started](#getting-started)
-* [Parameters \& Usage](#parameters--usage)
-* [Example Run of Pacini-typing](#example-run-of-pacini-typing)
-* [Issues](#issues)
-* [Future Ideas](#future-ideas)
-* [License](#license)
-* [Contact](#contact)
+- [Application information](#application-information)
+- [About this project](#about-this-project)
+- [Table of Contents](#table-of-contents)
+- [Prerequisites](#prerequisites)
+- [Complete list of required packages](#complete-list-of-required-packages)
+- [Installation](#installation)
+- [(very) Brief Overview of Pacini-typing](#very-brief-overview-of-pacini-typing)
+- [Getting Started](#getting-started)
+- [Parameters \& Usage](#parameters--usage)
+- [Output](#output)
+- [Example Run of Pacini-typing](#example-run-of-pacini-typing)
+- [Issues](#issues)
+- [Future Ideas](#future-ideas)
+- [License](#license)
+- [Contact](#contact)
 
 ## Prerequisites
 
->All of the above packages are available in a pre-defined conda environment. Steps to install this environment can be found in the [Automatic installation of the required packages](#automatic-installation-of-the-required-packages) section.
+>All required packages are available in a pre-defined conda environment. Steps to install this environment can be found in the [Automatic installation of the required packages](#automatic-installation-of-the-required-packages) section.
 
 * Linux-like environment with (mini) conda installed
 * Python 3.10 or higher (developed on 3.12)
@@ -98,7 +99,9 @@ git clone https://github.com/RIVM-bioinformatics/Pacini-typing.git
 cd Pacini-typing
 ```
 
-1. Install the package.
+At this point, the repository is cloned to your system. It is advised to install the required packages.[Automatic installation of the required packages](#automatic-installation-of-the-required-packages)
+
+3. Install the package.
 
 ```bash
 pip install .
@@ -153,17 +156,9 @@ This application stands out from a series of similar applications because geneti
 
 The application if therefore well suited for the detection of genetic variants in bacteria for which no other software is available.
 
-> **Important note**: The application was build around two bacterial species: *Vibrio cholerae* and *Bordetella pertussis*. The application is not limited to these species, but the application is mainly focused on these species.
+> **Important note**: The application was build around _Vibrio cholerae_. The application is not limited to this bacteria, but the application is mainly focused on this.
 
-The genetic patterns are split up in gene groups. Each gene group has certain criteria which must be met in order to be considered a pathogen. The overarching criteria are:
-
-1. Presence or Absence of complete genes
-2. Presence or Absence of Single Nucleotide Polymorphisms (SNPs)
-3. Percentage identity of the gene
-4. Percentage coverage of the gene
-5. Statistical significance values (different values used for different application methods)
-
-Example of a YAML configuration file with gene group, this file defines the genetic pattern for the O139 serogroup of *Vibrio cholerae*:
+Example of a YAML configuration file with gene group, this file defines the genetic pattern for the O139 serogroup of _Vibrio cholerae_:
 
 ```yaml
 %YAML 1.2
@@ -208,7 +203,7 @@ Pacini-typing can accept different types of input data. This data can be used to
 1. **Assembled FASTA files**
 2. **Raw paired FASTQ files**
 
-Assembled FASTA files can directly be used by *BLAST* to determine given genes. Paired FASTQ files are processed by a tool called *K-mer Alignment (KMA)*. These tool generate almost the same output, but via different names and formats. Both tool require different calls to the application as well.
+Assembled FASTA files can directly be used by _BLAST_ to determine given genes. Paired FASTQ files are processed by a tool called _K-mer Alignment (KMA)_. These tool generate almost the same output, but via different names and formats. Both tool require different calls to the application as well.
 
 Method for detecting SNP's still have to be filled in here...
 
@@ -239,8 +234,8 @@ See the [Parameters & Usage](#parameters--usage) section for more information on
 * ```-h, --help``` Shows the help of the pipeline.
 
 ```bash
-pacini_typing -h
-usage: pacini_typing [-h] [-v] [-V] [-c File] [-i File [File ...]] [--save-intermediates] [--log-file]
+usage: pacini_typing [-h] [-v] [-V] [-c File] [-i File [File ...]] [--save-intermediates]
+              [--log-file] [-t Threads] [-f]
               {makedatabase,query} ...
 
 Bacterial Genotyping Tool for RIVM IDS-Bioinformatics
@@ -262,6 +257,9 @@ options:
                         Path to input file(s). Accepts 1 fasta file or 2 fastq files
   --save-intermediates  Save intermediate files of the run
   --log-file            Save log file of the run
+  -t Threads, --threads Threads
+                        Number of threads to use (rounded to the nearest integer)
+  -f, --fasta-out       Write found sequences to a FASTA output file
 
 operations:
   For more information on a specific command, type: Pacini.py <command> -h
@@ -279,9 +277,11 @@ Pacini-typing can be used at two different ways. This could either be:
 
 >* Using a pre-defined configuration file to run the application
 
->* Manually running Pacini-typing, this consists of running `pacini_typing` with an additional subcommands `makedatabase` or `query`.
+>* Manually creating a reference database and manually search for genetic variations, this consists of running `pacini_typing` with an additional subcommands `makedatabase` or `query`.
 
 One of these two methods must be used to run the application.
+
+> Note: Manually searching for genetic variations does not result in parsing and creating output reports. This is only possible when using a pre-defined configuration file.
 
 #### Pre-defined configuration file required parameters
 
@@ -327,25 +327,79 @@ pacini_typing query -db_path [path_to_database_directory] -db_name [name_of_data
 ### Optional parameters
 
 * ```-v, --verbose``` Increase output verbosity
-* Add more optional parameters here...
+* ```-V, --version``` Show program's version number and exit
+* ```--save-intermediates``` Save intermediate files of the run
+* ```--log-file``` Save log file of the run, named `pacini_typing.log`
+* ```-t, --threads``` Number of threads to use
+* ```-f, --fasta-out``` Write found sequences (hits) to a FASTA output file, named `{prefix}_sequences.fasta`
 
 ### The base command to run this program
 
-```
+```python
 pacini_typing --config [path_to_config_file.yaml] --input [path_to_input_file.ext]
 ```
+
+## Output
+
+The output of Pacini-typing consists of three files:
+
+1. `{prefix}_report.csv`: report of found genetic variations
+
+Example:
+
+```csv
+ID,Input,Schema,Type/Gene,Hits
+1,ERR976461,O1-scheme.yaml,V. cholerae O1 related genes,rfbV
+2,ERR976461,O1-scheme.yaml,V. cholerae O1 related genes,ctxA
+```
+
+All hits in this report are filtered based on the values in the configuration file. Every line in the report represents a hit.
+
+2. `{prefix}_hits_report.csv`: CSV file containing information about the hits
+
+Example:
+
+```csv
+ID,hit,percentage identity,percentage coverage,p-value
+1,rfbV_O1,100.0,100.0,1e-26
+2,ctxA,100.0,100.0,1e-26
+```
+
+The hits report also contains hits there are filed based on the values in the configuration file. Every line in the main report represents a line in the hits report.
+
+3. (optional with --log-file) `pacini_typing.log`: Log file containing information about the run
+
+This optional log file contains the output of the application. This file can be used to debug the application.
+
+4. (optional with --fasta-out) `{prefix}_sequences.fasta`: FASTA file containing the found sequences
+
+This file contains the found sequences of the hits in the input file. So not the sequence of search, but the actual sequence that was found in the input file. The sequences are written in FASTA format.
+
+Example:
+
+```text
+>rfbV
+ATGCCATGGAAGACCTACTCACGGAACTTGATGTATGCTGTCATAACTTTGATGTTGAATGTATTAAGCG
+AATTTTACTTGATGCACCTACGGGTTATTCGCCACAAAAATGAGAATAAAATGAAAGTATTGCATGTATA
+>ctxA
+ATGCCATGGAAGACCTACTCACGGAACTTGATGTATGCTGTCATAACTTTGATGTTGAATGTATTAAGCG
+AATTTTACTTGATGCACCTACGGGTTATTCGCCACAAAAATGAGAATAAAATGAAAGTATTGCATGTATA
+```
+
+> **Note**: The prefix of the output files is the same as the prefix of the input file.
+
+[Back to top](#pacini-typing)
 
 ## Example Run of Pacini-typing
 
 * Input
 * Run
-* Output
 
 ### Input
 
-Input is **either** *1* Assembled FASTA file **OR** *2* Paired FASTQ files.
+Input is **either** _1_ Assembled FASTA file **OR** _2_ Paired FASTQ files.
 
-Example of an Assembled FASTA file containing the `rfbV` gene of the O1 serotype of *Vibrio cholerae*:
+Example of an Assembled FASTA file containing the `rfbV` gene of the O1 serotype of _Vibrio cholerae_:
 
 ```fasta
 >rfbV_O1:1:AE003852
@@ -353,7 +407,7 @@ ATGCCATGGAAGACCTACTCACGGAACTTGATGTATGCTGTCATAACTTTGATGTTGAATGTATTAAGCG
 AATTTTACTTGATGCACCTACGGGTTATTCGCCACAAAAATGAGAATAAAATGAAAGTATTGCATGTATA
 ```
 
-Example of a *1* Paired FASTQ file *Vibrio cholerae*:
+Example of a _1_ Paired FASTQ file _Vibrio cholerae_:
 
 ```fastq
 @ERR976461.1 1 length=100
@@ -369,38 +423,6 @@ pacini_typing \
   --i input_file.ext \ # 1 FASTA file OR 2 FASTQ files
   --config path_to_config_file.yaml
 ```
-
-### Output
-
-*This section is still in development...*
-
-But, the output of the application consists of three files:
-
-1. `{prefix}_report.csv`: CSV file containing the report
-
-Example:
-
-```csv
-ID,Input,Schema,Type/Gene,Hits
-1,ERR976461,O1-scheme.yaml,V. cholerae O1 related genes,rfbV
-2,ERR976461,O1-scheme.yaml,V. cholerae O1 related genes,ctxA
-```
-
-2. `{prefix}_hits_report.csv`: CSV file containing information about the hits
-
-Example:
-
-```csv
-ID,hit,percentage identity,percentage coverage,p-value
-1,rfbV_O1,100.0,100.0,1e-26
-2,ctxA,100.0,100.0,1e-26
-```
-
-3. (optional with --log-file) `pacini_typing.log`: Log file containing information about the run
-
-*Further output is still in development...*
-
-[Back to top](#pacini-typing)
 
 ## Issues
 
