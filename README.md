@@ -8,7 +8,7 @@
 
 <!-- [![CodeFactor](https://www.codefactor.io/repository/github/rivm-bioinformatics/Pacini-typing/badge)](https://www.codefactor.io/repository/github/rivm-bioinformatics/Pacini-typing)   -->
 
-Pylint output: Your code has been rated at 9.94/10
+Pylint output: Your code has been rated at 9.93/10 (previous run: 7.68/10, +2.25)
 Pylint output: Your code has been rated at 9.93/10 (previous run: 7.68/10, +2.25)
 
 <div align="center">
@@ -37,21 +37,21 @@ With these genetic sequences, the application can determine whether the sequence
 
 ## Table of Contents
 
-- [Application information](#application-information)
-- [About this project](#about-this-project)
-- [Table of Contents](#table-of-contents)
-- [Prerequisites](#prerequisites)
-- [Complete list of required packages](#complete-list-of-required-packages)
-- [Installation](#installation)
-- [(very) Brief Overview of Pacini-typing](#very-brief-overview-of-pacini-typing)
-- [Getting Started](#getting-started)
-- [Parameters \& Usage](#parameters--usage)
-- [Output](#output)
-- [Example Run of Pacini-typing](#example-run-of-pacini-typing)
-- [Issues](#issues)
-- [Future Ideas](#future-ideas)
-- [License](#license)
-- [Contact](#contact)
+* [Application information](#application-information)
+* [About this project](#about-this-project)
+* [Table of Contents](#table-of-contents)
+* [Prerequisites](#prerequisites)
+* [Complete list of required packages](#complete-list-of-required-packages)
+* [Installation](#installation)
+* [(very) Brief Overview of Pacini-typing](#very-brief-overview-of-pacini-typing)
+* [Getting Started](#getting-started)
+* [Parameters \& Usage](#parameters--usage)
+* [Output](#output)
+* [Example Run of Pacini-typing](#example-run-of-pacini-typing)
+* [Issues](#issues)
+* [Future Ideas](#future-ideas)
+* [License](#license)
+* [Contact](#contact)
 
 ## Prerequisites
 
@@ -149,8 +149,6 @@ We hope to provide a brief overview of the Pacini-typing application.
 
 The methods are shortly described in the following sections.
 
-> **Full documentation can be found at https://...**
-
 ### Genetic Patterns
 
 This application stands out from a series of similar applications because genetic detection is defined in a set of rules in a configuration file. This allows the user to define their own rules for genetic detection.
@@ -169,6 +167,7 @@ Example of a YAML configuration file with gene group, this file defines the gene
 metadata:
   id: "VIB-O139"
   name: "O139 Gene group"
+  type: "V. cholerae O139 Genes"
   description: "Genetic pattern run config file for Vibrio cholerae O139 serogroup"
   date_created: "2024-11-06"
 
