@@ -36,6 +36,7 @@ DIR_PATH = "test_full_run/"
 OUTPUT = [
     "VIB_EA5348AA_AS_hits_report.csv",
     "VIB_EA5348AA_AS_report.csv",
+    "VIB_EA5348AA_AS_sequences.fasta",
 ]
 
 
@@ -61,6 +62,7 @@ def setup_teardown_config_input() -> Generator[list[str], None, None]:
         "--verbose",
         "--config",
         "test_data/test_O1.yaml",
+        "--fasta-out",
         "--input",
         FASTA_FILE,
     ]
@@ -108,7 +110,7 @@ def test_config_run(
     """
     main(setup_teardown_config_input)
     CommandInvoker(
-        ShellCommand(["mv", "VIB_EA5348AA_AS_*.csv", DIR_PATH], capture=True)
+        ShellCommand(["mv", "VIB_EA5348AA_AS_*", DIR_PATH], capture=True)
     ).execute()
 
     for output_file in OUTPUT:
@@ -140,13 +142,19 @@ def test_config_paired_run(
     setup_teardown_config_input: Generator[list[str], None, None]
 ) -> None:
     """
-    ...
+    Function that tests the main function with paired input
+    it runs the main function of pacini_typing with the paired input arguments
+    and checks if the output files are successfully created.
+    ----------
+    Input:
+        setup_teardown_config_input: fixture for the paired input test
+    ----------
     """
     setup_teardown_config_input[-1] = FASTQ_1
     setup_teardown_config_input.append(FASTQ_2)
     main(setup_teardown_config_input)
     CommandInvoker(
-        ShellCommand(["mv", "VIB_EA5348AA_AS_*.csv", DIR_PATH], capture=True)
+        ShellCommand(["mv", "VIB_EA5348AA_AS_*", DIR_PATH], capture=True)
     ).execute()
 
     for output_file in OUTPUT:
