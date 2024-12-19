@@ -18,9 +18,9 @@ __author__ = "Mark Van de Streek"
 __data__ = "2024-09-24"
 __all__ = ["KMA"]
 
+import logging
 from enum import Enum
 from typing import Any
-import logging
 
 
 class KMA(Enum):

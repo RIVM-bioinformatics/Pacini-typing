@@ -37,20 +37,20 @@ __all__ = [
 ]
 
 
+import argparse
 import platform
 from unittest import mock
 
 import pytest
-import argparse
 
 from pacini_typing import PaciniTyping
+from preprocessing.exceptions.validate_database_exceptions import (
+    InvalidDatabaseError,
+)
 from preprocessing.validation.validate_database import (
     check_for_database_existence,
     check_for_database_path,
     create_database_file_list,
-)
-from preprocessing.exceptions.validate_database_exceptions import (
-    InvalidDatabaseError,
 )
 
 

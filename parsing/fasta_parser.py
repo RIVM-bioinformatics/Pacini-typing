@@ -15,6 +15,7 @@ __author__ = "Mark van de Streek"
 __data__ = "2024-12-17"
 __all__ = ["FASTAParser"]
 
+import logging
 from typing import Any, Optional
 
 import pandas as pd
@@ -68,10 +69,12 @@ class FASTAParser(ParserStrategy):
             - data_frame: pd.DataFrame: the data frame with the BLAST results
         ----------
         """
+        logging.debug(f"Reading BLAST output file: {filename}...")
         data_frame = pd.read_csv(filename + ".tsv", sep="\t", header=None)
         data_frame.columns = list(BLAST_COLUMNS.keys())
         data_frame["pident"] = data_frame["pident"].astype(float)
         data_frame["qcovs"] = data_frame["qcovs"].astype(float)
+
         return data_frame
 
     def extract_gene_list(self, data_frame: pd.DataFrame) -> list[str]:
@@ -148,14 +151,19 @@ class FASTAParser(ParserStrategy):
             - data_frame: pd.DataFrame: the data frame with the BLAST results
         ----------
         """
+        logging.info("Extracting sequences from BLAST output...")
         if data_frame is not None:
             query_sequences: dict[str, str] = {
                 row["sseqid"]: row["qseq"] for _, row in data_frame.iterrows()
             }
         else:
+            logging.error("No data frame found in FASTA parser, exiting...")
             raise EmptySequenceError()
+        output_file = f"{input_sequence_sample}_sequences.fasta"
         if query_sequences:
+            logging.debug("Sequences have been extracted, writing to file...")
             AlignmentExtractor.write_fasta(
-                output_file=f"{input_sequence_sample}_sequences.fasta",
+                output_file=output_file,
                 query_sequences=query_sequences,
             )
+        logging.info("FASTA output successfully written to %s", output_file)

@@ -16,6 +16,8 @@ __author__ = "Mark van de Streek"
 __data__ = "2024-12-02"
 __all__ = ["ParsingManager"]
 
+import logging
+
 from parsing.coverage_filter import CoverageFilter
 from parsing.fasta_parser import FASTAParser
 from parsing.fastq_parser import FASTQParser
@@ -56,6 +58,7 @@ class ParsingManager:
             - file_type: str: the type of the parser (FASTA or FASTQ)
             - sample_name: str: the name of the sample
         """
+        logging.info("Preparing parsing process...")
         self.pattern = pattern
         self.file_type = file_type
         self.sample_name = sample_name
@@ -68,6 +71,7 @@ class ParsingManager:
         Function that initializes the parser object.
         The incoming arguments are used to initialize the parser.
         """
+        logging.debug("Setting up parser object...")
         self.parser = Parser(
             self.pattern.pattern,
             FASTAParser() if self.file_type == "FASTA" else FASTQParser(),
@@ -119,6 +123,7 @@ class ParsingManager:
         These specific filter are retrieved by smaller
         getter functions.
         """
+        logging.info("Adding filters to parser object...")
         self.parser.add_filter(
             GeneNameFilter(self.get_config_gene_names(), self.file_type)
         )
@@ -130,3 +135,4 @@ class ParsingManager:
         self.parser.add_filter(
             CoverageFilter(self.get_config_coverage(), self.file_type)
         )
+        logging.debug("Filters: %s successfully added", self.parser.filters)

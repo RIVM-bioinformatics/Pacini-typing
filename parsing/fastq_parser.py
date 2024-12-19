@@ -15,6 +15,7 @@ __author__ = "Mark van de Streek"
 __data__ = "2024-12-17"
 __all__ = ["FASTQParser"]
 
+import logging
 from typing import Any, Optional
 
 import pandas as pd
@@ -63,6 +64,7 @@ class FASTQParser(ParserStrategy):
             - data_frame: data frame with the results of the KMA search.
         ----------
         """
+        logging.debug(f"Reading KMA output file: {filename}...")
         data_frame = pd.read_csv(filename + ".res", sep="\t", header=0)
         data_frame.columns = list(KMA_COLUMNS.keys())
         data_frame["Template_Identity"] = data_frame[
@@ -148,9 +150,12 @@ class FASTQParser(ParserStrategy):
             - list_of_genes: list[str]: The list of genes.
         ----------
         """
+        logging.info("Extracting found sequences from alignment file...")
+        output_file = f"{input_sequence_sample}_sequences.fasta"
         extractor = AlignmentExtractor(
             alignment_file=f"{config_options["database"]["run_output"]}{input_sequence_sample}.aln",
             genes_list=list_of_genes,
-            output_file=f"{input_sequence_sample}_sequences.fasta",
+            output_file=output_file,
         )
         extractor.run()
+        logging.info("FASTA output successfully written to %s", output_file)

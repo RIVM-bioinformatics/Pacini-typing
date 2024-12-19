@@ -38,6 +38,7 @@ __author__ = "Mark van de Streek"
 __date__ = "2024-12-17"
 __all__ = ["AlignmentExtractor"]
 
+import logging
 import os
 import re
 
@@ -94,6 +95,9 @@ class AlignmentExtractor:
         --------
         """
         if not os.path.exists(self.alignment_file):
+            logging.error(
+                f"Alignment file not found: {self.alignment_file}, exiting..."
+            )
             raise AlignmentFileNotFoundError(self.alignment_file)
 
     def parse_alignment_file(self) -> None:
@@ -106,6 +110,7 @@ class AlignmentExtractor:
         If the line starts with query:, the sequence is extracted.
         Lastly, the last gene's sequence is saved.
         """
+        logging.info("Parsing alignment file...")
         current_query_sequence: list[str] = []
         current_gene = None
         with open(self.alignment_file, "r", encoding="utf-8") as file:
@@ -148,6 +153,7 @@ class AlignmentExtractor:
             - tuple of the current gene and query sequence
         ----------
         """
+        logging.debug("Updating found query sequences...")
         if current_gene and current_query_sequence:
             self.query_sequences[current_gene] = "".join(
                 current_query_sequence
@@ -167,6 +173,7 @@ class AlignmentExtractor:
             - list of the current query sequence and the gene
         ----------
         """
+        logging.debug("Getting gene match of alignment file...")
         current_query_sequence: list[str] = []
         current_gene = None
         match = re.match(r"#\s*([\w:]+)", line)
@@ -202,6 +209,7 @@ class AlignmentExtractor:
             - query_sequences: sequences to write to the file
         ----------
         """
+        logging.info("Writing found sequences to fasta file...")
         with open(output_file, "w", encoding="utf-8") as fasta_out:
             for gene, sequence in query_sequences.items():
                 fasta_out.write(f">{gene}\n")
@@ -219,4 +227,5 @@ class AlignmentExtractor:
         if self.query_sequences:
             self.write_fasta(self.output_file, self.query_sequences)
         else:
+            logging.error("No sequences found in alignment file, exiting...")
             raise EmptySequenceError()

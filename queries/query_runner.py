@@ -26,8 +26,8 @@ __data__ = "2024-09-24"
 __all__ = ["QueryRunner"]
 
 import logging
-import re
 import os
+import re
 import time
 from typing import Any
 
@@ -118,7 +118,9 @@ class QueryRunner:
         The method calls the get_version_command method
         from the respective runner.
         """
-        stdout, stderr = CommandInvoker(ShellCommand(cmd=self.version_command, capture=True)).execute()
+        stdout, stderr = CommandInvoker(
+            ShellCommand(cmd=self.version_command, capture=True)
+        ).execute()
         version = self.extract_version_number(stdout)
         logging.info("Version tool: %s", version)
 

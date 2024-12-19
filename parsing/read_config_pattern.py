@@ -89,7 +89,7 @@ class ReadConfigPattern:
         If the config file is loaded correctly,
         the pattern is stored in the pattern variable
         """
-        logging.debug("Reading configuration file...")
+        logging.info("Reading configuration file...")
         try:
             with open(self.config_file, "r", encoding="utf-8") as file:
                 self.pattern = yaml.safe_load(file)
