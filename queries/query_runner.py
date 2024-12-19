@@ -68,7 +68,6 @@ class QueryRunner:
         self.start_time: float = 0.0
         self.stop_time: float = 0.0
         self.check_output_dir()
-        logging.debug("Preparing the query...")
         if self.run_options["file_type"] == "FASTA":
             self.query = BLASTn.get_query(option=self.run_options)
             logging.info("Getting the BLAST version...")
@@ -117,6 +116,7 @@ class QueryRunner:
         Method that logs the version of the tool used.
         The method calls the get_version_command method
         from the respective runner.
+        This logging functionality was developed at RIVM's request
         """
         stdout, stderr = CommandInvoker(
             ShellCommand(cmd=self.version_command, capture=True)

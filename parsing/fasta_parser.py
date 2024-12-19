@@ -151,7 +151,7 @@ class FASTAParser(ParserStrategy):
             - data_frame: pd.DataFrame: the data frame with the BLAST results
         ----------
         """
-        logging.info("Extracting sequences from BLAST output...")
+        logging.debug("Extracting sequences from BLAST output...")
         if data_frame is not None:
             query_sequences: dict[str, str] = {
                 row["sseqid"]: row["qseq"] for _, row in data_frame.iterrows()

@@ -64,8 +64,9 @@ class FASTQParser(ParserStrategy):
             - data_frame: data frame with the results of the KMA search.
         ----------
         """
+        filename += ".res"
         logging.debug(f"Reading KMA output file: {filename}...")
-        data_frame = pd.read_csv(filename + ".res", sep="\t", header=0)
+        data_frame = pd.read_csv(filename, sep="\t", header=0)
         data_frame.columns = list(KMA_COLUMNS.keys())
         data_frame["Template_Identity"] = data_frame[
             "Template_Identity"

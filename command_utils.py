@@ -139,7 +139,7 @@ class ShellCommand(Command):
         ----------
         """
         try:
-            logging.debug("running command: %s", " ".join(self.cmd))
+            logging.info("running command: '%s'", " ".join(self.cmd))
             result = subprocess.run(
                 " ".join(self.cmd) if isinstance(self.cmd, list) else self.cmd,
                 shell=True,

@@ -58,7 +58,7 @@ class ParsingManager:
             - file_type: str: the type of the parser (FASTA or FASTQ)
             - sample_name: str: the name of the sample
         """
-        logging.info("Preparing parsing process...")
+        logging.debug("Preparing parsing process...")
         self.pattern = pattern
         self.file_type = file_type
         self.sample_name = sample_name
@@ -123,7 +123,7 @@ class ParsingManager:
         These specific filter are retrieved by smaller
         getter functions.
         """
-        logging.info("Adding filters to parser object...")
+        logging.info("Adding filters to Parser object...")
         self.parser.add_filter(
             GeneNameFilter(self.get_config_gene_names(), self.file_type)
         )

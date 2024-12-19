@@ -102,7 +102,6 @@ class Parser:
         is used to read the output file.
         """
         self.data_frame = self.strategy.read_output(self.query_run_filename)
-        logging.info("Run output read successfully.")
 
     def construct_report_record(
         self, report_id: int, item: str
@@ -146,7 +145,7 @@ class Parser:
             - pd.DataFrame: output report
         --------
         """
-        logging.info("Creating the output report...")
+        logging.debug("Creating the output report...")
         output_records = []
         for report_id, item in enumerate(
             self.data_frame[
@@ -211,7 +210,7 @@ class Parser:
             - pd.DataFrame: hits report
         --------
         """
-        logging.info("Creating the hits report...")
+        logging.debug("Creating the hits report...")
         output_records: list[dict[str, Any]] = []
         columns, significance_type, value_column = (
             self.strategy.get_hits_report_info()
@@ -236,12 +235,13 @@ class Parser:
         ----------
         """
         logging.debug("Writing the %s...", suffix)
+        file_name = f"{self.input_sequence_sample}_{suffix}.csv"
         report.to_csv(
-            f"{self.input_sequence_sample}_{suffix}.csv",
+            file_name,
             sep=",",
             index=False,
         )
-        logging.info("Successfully wrote the report...")
+        logging.info("Successfully wrote %s...", file_name)
 
     def construct_list_of_genes(self) -> list[str]:
         """
@@ -308,5 +308,5 @@ class Parser:
                 self.write_fasta_out()
         else:
             logging.warning(
-                "Data frame is empty after filtering, no report created"
+                "There were no hits left after filtering, no reports were created..."
             )

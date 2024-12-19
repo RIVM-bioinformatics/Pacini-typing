@@ -130,9 +130,7 @@ class PaciniTyping:
         require a path to certain files.
         self.option is also used to store more information.
         """
-        logging.debug(
-            "Parsing all args and necessary information..."
-        )
+        logging.debug("Parsing all args and necessary information...")
         self.set_general_attributes()
         if self.input_args.options == "query":
             self.set_query_attributes()
@@ -258,7 +256,7 @@ class PaciniTyping:
         # Double check if the config option is really the only option
         elif self.option["config"] and self.option["option"] is None:
             input_files_list.extend(self.option["config"]["input"])
-        logging.info("Input files have been retrieved: %s", input_files_list)
+        logging.debug("Input files have been retrieved: %s", input_files_list)
         logging.debug("Adding input files to the args variable...")
         self.option["input_file_list"] = input_files_list
 
@@ -283,7 +281,7 @@ class PaciniTyping:
         This list is then passed to the unzip_gz_files function.
         See the unzip_gz_files function for more information.
         """
-        logging.debug("Checking for .gz files in the input list")
+        logging.debug("Checking for .gz files in the input list...")
         gz_files = [
             file
             for file in self.option["input_file_list"]
@@ -451,10 +449,13 @@ class PaciniTyping:
         For more information about the QueryRunner,
         See queries/query_runner.py
         """
-        logging.info("Running the input query against reference database...")
+        logging.info("Starting the query running related options...")
         runner = QueryRunner(query_runner_builder)
         runner.run()
-        logging.info("Query finished in: %s seconds", runner.get_runtime())
+        logging.info(
+            "Command raised no errors, runtime: %s seconds",
+            runner.get_runtime(),
+        )
 
     def initialize_config_pattern(self) -> ReadConfigPattern:
         """
@@ -467,7 +468,7 @@ class PaciniTyping:
             - pattern: ReadConfigPattern object
         ----------
         """
-        logging.info("Initializing the configuration file...")
+        logging.debug("Initializing the configuration file...")
         pattern = ReadConfigPattern(
             self.option["config"]["config_path"],
             self.file_type,
@@ -477,7 +478,9 @@ class PaciniTyping:
         # this is based on the input files. Therefore,
         # the sample name is retrieved from the input file.
         # This is done in the function retrieve_sample_name().
-        logging.debug("Setting additional information for the configuration...")
+        logging.debug(
+            "Setting additional information for the configuration..."
+        )
         pattern.creation_dict["input_file_list"] = self.option["config"][
             "input"
         ]
@@ -510,7 +513,7 @@ class PaciniTyping:
             tar.add(self.output_dir, arcname=os.path.basename(self.output_dir))
         # Call the delete_intermediates function to
         # remove the original output directory
-        logging.debug("Saved intermediate files in a zip named %s", self.sample_name)
+        logging.debug("Saved intermediate files in a zip...")
         self.delete_intermediates()
 
     def delete_intermediates(self) -> None:
@@ -519,7 +522,7 @@ class PaciniTyping:
         The directory is used to store genetic variation information,
         and is simply removed by shutil.rmtree.
         """
-        logging.info("Deleting intermediate files...")
+        logging.debug("Deleting intermediate files...")
         shutil.rmtree(self.output_dir)
 
     def handle_makedatabase_option(self):
@@ -530,7 +533,9 @@ class PaciniTyping:
         The run_makedatabase() method is re-used by other modules later on,
         that's why this pattern is defined in this helper function.
         """
-        logging.info("Defining all necessary information for the database creation...")
+        logging.info(
+            "Defining all necessary information for the database creation..."
+        )
         database_builder = {
             "database_path": self.option["database_path"],
             "database_name": self.option["database_name"],
@@ -552,7 +557,9 @@ class PaciniTyping:
         else:
             # The query option is not selected,
             # which means the config is selected.
-            logging.info("Config option selected, starting the configuration...")
+            logging.info(
+                "Config option selected, starting the configuration..."
+            )
             self.handle_config_option()
 
     def handle_config_option(self):
@@ -580,7 +587,7 @@ class PaciniTyping:
                 pattern.creation_dict["file_type"],
             )
         else:
-            logging.info("Database exists, starting the query operation...")
+            logging.debug("Database exists, starting the query operation...")
             self.handle_config_option_parse_query(pattern)
 
     def handle_config_option_parse_query(self, pattern: ReadConfigPattern):
@@ -624,7 +631,9 @@ class PaciniTyping:
             - InvalidDatabaseError: Database existence check failed
         ----------
         """
-        logging.debug("Defining all necessary information for the query operation...")
+        logging.debug(
+            "Defining all necessary information for the query operation..."
+        )
         query_builder: dict[str, Any] = {
             "file_type": self.file_type,
             "input_file_list": self.option["input_file_list"],
@@ -633,7 +642,6 @@ class PaciniTyping:
             "output": self.option["query"]["output"],
             "threads": self.threads,
         }
-        logging.debug("Checking if the database exists...")
         if self.check_valid_database_path(query_builder):
             self.run_query(query_builder)
         else:
@@ -688,10 +696,11 @@ def main(provided_args: list[str] | None = None) -> None:
 
     pacini_typing = PaciniTyping(args)
     pacini_typing.run()
+    logging.info("Pacini-typing pipeline has finished successfully!")
 
 
 if __name__ == "__main__":
-    logging.info("Starting the Pacini-Typing pipeline, parsing arguments...")
+    logging.info("Starting Pacini-typing, parsing arguments...")
     main()
 
 ###########################################################################

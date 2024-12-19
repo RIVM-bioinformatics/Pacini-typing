@@ -39,8 +39,8 @@ def check_for_database_existence(arg_options: dict[str, Any]) -> bool:
         - input_file_type: string with the input file type
     ----------
     """
-    logging.debug("Checking if the database exists.")
     db_files = create_database_file_list(arg_options)
+    logging.debug("Checking if all required database files are present...")
     for db_file in db_files:
         if not os.path.exists(arg_options["database_path"] + db_file):
             logging.warning(
@@ -60,9 +60,7 @@ def create_database_file_list(arg_options: dict[str, Any]) -> list[str]:
         - input_file_type: string with the input file type
     ----------
     """
-    logging.debug(
-        "Creating a list of database files based on the input file type."
-    )
+    logging.debug("Creating list of required database files...")
     db_files = []
     if arg_options["file_type"] == "FASTA":
         db_files = [

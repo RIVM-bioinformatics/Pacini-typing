@@ -8,7 +8,7 @@
     https://github.com/features/copilot
 
 This module is responsible for extracting sequences from an alignment file.
-KMA is outputting a alingment file with the following format:
+KMA is outputting an alingment file with the following format:
 
 # rfbV_O1:1:AE003852
 template: 	ATGCCATGGAAGACCTACTCACGGAACTTGATGTATGCTGTCATAACTTTGATGTTGAAT
@@ -153,7 +153,6 @@ class AlignmentExtractor:
             - tuple of the current gene and query sequence
         ----------
         """
-        logging.debug("Updating found query sequences...")
         if current_gene and current_query_sequence:
             self.query_sequences[current_gene] = "".join(
                 current_query_sequence
@@ -173,7 +172,6 @@ class AlignmentExtractor:
             - list of the current query sequence and the gene
         ----------
         """
-        logging.debug("Getting gene match of alignment file...")
         current_query_sequence: list[str] = []
         current_gene = None
         match = re.match(r"#\s*([\w:]+)", line)
