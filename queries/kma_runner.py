@@ -20,6 +20,7 @@ __all__ = ["KMA"]
 
 from enum import Enum
 from typing import Any
+import logging
 
 
 class KMA(Enum):
@@ -51,6 +52,7 @@ class KMA(Enum):
             - list with the query to run KMA
         ----------
         """
+        logging.debug("Preparing KMA query...")
         return [
             KMA.RUN_OPTION.value,
             KMA.PAIRED_OPTION.value,
@@ -63,3 +65,14 @@ class KMA(Enum):
             "-t",
             str(option["threads"]),
         ]
+
+    @staticmethod
+    def get_version_command() -> list[str]:
+        """
+        Method that returns the version command for KMA
+        ----------
+        Output:
+            - list with the version command
+        ----------
+        """
+        return [KMA.RUN_OPTION.value, "-v"]

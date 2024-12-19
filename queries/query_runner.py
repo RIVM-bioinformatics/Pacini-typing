@@ -26,6 +26,7 @@ __data__ = "2024-09-24"
 __all__ = ["QueryRunner"]
 
 import logging
+import re
 import os
 import time
 from typing import Any
@@ -63,14 +64,20 @@ class QueryRunner:
         ----------
         """
         self.run_options = run_options
-        self.start_time = 0.0
-        self.stop_time = 0.0
+        self.version_command: str = ""
+        self.start_time: float = 0.0
+        self.stop_time: float = 0.0
         self.check_output_dir()
         logging.debug("Preparing the query...")
         if self.run_options["file_type"] == "FASTA":
             self.query = BLASTn.get_query(option=self.run_options)
+            logging.info("Getting the BLAST version...")
+            self.version_command = BLASTn.get_version_command()
         elif self.run_options["file_type"] == "FASTQ":
             self.query = KMA.get_query(option=self.run_options)
+            logging.info("Getting the KMA version...")
+            self.version_command = KMA.get_version_command()
+        self.log_tool_version()
 
     def check_output_dir(self) -> bool:
         """
@@ -88,6 +95,33 @@ class QueryRunner:
             return False
         return True
 
+    @staticmethod
+    def extract_version_number(stdout: str) -> str:
+        """
+        Method that extracts the version number from the tool output.
+        The method uses a regular expression to extract the version number.
+        ----------
+        Input:
+            - stdout: str: the output of the tool
+        Output:
+            - str: the version number of the tool
+        ----------
+        """
+        version_pattern = r"(\d+\.\d+\.\d+)"
+        match = re.search(version_pattern, stdout)
+
+        return match.group(1) if match else None
+
+    def log_tool_version(self) -> None:
+        """
+        Method that logs the version of the tool used.
+        The method calls the get_version_command method
+        from the respective runner.
+        """
+        stdout, stderr = CommandInvoker(ShellCommand(cmd=self.version_command, capture=True)).execute()
+        version = self.extract_version_number(stdout)
+        logging.info("Version tool: %s", version)
+
     def run(self) -> None:
         """
         The query is already prepared in the constructor.
@@ -98,7 +132,7 @@ class QueryRunner:
             see the ./decorators/decorators.py file for more information.
             This decorator also checks if the query was successful.
         """
-        logging.debug("Running query...")
+        logging.debug("Starting the query operation...")
         self.start_time = time.time()
         # Use the execute function of command_utils
         command = ShellCommand(cmd=self.query, capture=True)
