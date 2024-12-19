@@ -33,6 +33,7 @@ import pytest
 from pacini_typing import main
 from preprocessing.exceptions.determine_input_type_exceptions import (
     InvalidFastaOrFastqError,
+    InvalidSequenceError,
     InvalidSequencingTypesError,
 )
 from preprocessing.exceptions.validation_exceptions import (
@@ -137,7 +138,7 @@ def test_wrong_sequence(setup_args: list[str]):
     ----------
     """
     setup_args.extend(["test_data/wrong_files/wrong_sequence.fasta"])
-    with pytest.raises(InvalidFastaOrFastqError):
+    with pytest.raises(InvalidSequenceError):
         main(setup_args)
 
 
@@ -256,5 +257,5 @@ def test_wrong_fasta_with_fastq_names(setup_args: list[str]):
     setup_args.extend(
         ["test_data/wrong_files/VIB_1.fq", "test_data/wrong_files/VIB_2.fq"]
     )
-    with pytest.raises(InvalidFastaOrFastqError):
+    with pytest.raises(InvalidSequencingTypesError):
         main(setup_args)

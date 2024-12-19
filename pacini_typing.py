@@ -62,7 +62,7 @@ from typing import Any
 
 import preprocessing.argsparse.build_parser
 from makedatabase import DatabaseBuilder
-from parsing.config_manager import ParsingManager
+from parsing.parsing_manager import ParsingManager
 from parsing.read_config_pattern import ReadConfigPattern
 from preprocessing.exceptions.determine_input_type_exceptions import (
     InvalidSequencingTypesError,
