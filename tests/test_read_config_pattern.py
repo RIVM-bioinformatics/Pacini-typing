@@ -11,7 +11,7 @@
 """
 
 __author__ = "Mark van de Streek"
-__data__ = "2024-11-25"
+__date__ = "2024-11-25"
 __all__ = [
     "test_read_config_good",
     "test_read_config_file_error",
@@ -43,9 +43,7 @@ def test_read_config_good():
     contains the expected output of the pattern read from the
     configuration file parsing/O1.yaml
     """
-    config = read_config_pattern.ReadConfigPattern(
-        "config/O139.yaml", "fasta"
-    )
+    config = read_config_pattern.ReadConfigPattern("config/O139.yaml", "fasta")
     assert len(config.pattern) > 1
     with open(
         "test_data/expected_output/expected_O139_config.json",

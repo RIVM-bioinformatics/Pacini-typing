@@ -20,7 +20,7 @@ It is very easy to add new filters in the future.
 """
 
 __author__ = "Mark van de Streek"
-__data__ = "2024-11-22"
+__date__ = "2024-11-22"
 __all__ = ["Filter"]
 
 from abc import ABC, abstractmethod

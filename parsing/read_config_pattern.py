@@ -17,8 +17,8 @@ validates the keys, and constructs a dictionary with
 parameters required for the database creation and the query operation.
 """
 
-__author__ = "Mark Van de Streek"
-__data__ = "2024-10-30"
+__author__ = "Mark van de Streek"
+__date__ = "2024-10-30"
 __all__ = ["ReadConfigPattern"]
 
 import logging

@@ -19,8 +19,8 @@ simulate file objects. But also real files are used,
 and bigger datasets with larger sequences.
 """
 
-__author__ = "Mark Van de Streek"
-__data__ = "2024-09-24"
+__author__ = "Mark van de Streek"
+__date__ = "2024-09-24"
 __all__ = [
     "setup_valid_data",
     "test_validate_fasta_valid",

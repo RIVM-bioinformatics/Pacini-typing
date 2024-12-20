@@ -12,8 +12,8 @@ The subcommand is used to create a new reference database.
 The subcommand is added to the main parsing object in the build_parser script.
 """
 
-__author__ = "Mark Van de Streek"
-__data__ = "2024-09-24"
+__author__ = "Mark van de Streek"
+__date__ = "2024-09-24"
 __all__ = ["build_makedatabase_command"]
 
 

@@ -21,8 +21,8 @@ It creates a directory for the test and yields the arguments for the test.
 After the test is run, it cleans up the files created during the test.
 """
 
-__author__ = "Mark Van de Streek"
-__data__ = "2024-10-30"
+__author__ = "Mark van de Streek"
+__date__ = "2024-10-30"
 __all__ = [
     "setup_teardown",
     "cleanup_files",

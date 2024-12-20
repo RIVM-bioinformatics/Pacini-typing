@@ -7,7 +7,7 @@
     “GitHub Copilot: Your AI pair programmer” (GPT-3). GitHub, Inc.
     https://github.com/features/copilot
 
-Module that is responsible for running the
+This module is responsible for running the
 right query against the reference database.
 
 First, the query is prepared by the respective runner
@@ -21,8 +21,8 @@ execute function of the command_utils.py module.
 
 from __future__ import annotations
 
-__author__ = "Mark Van de Streek"
-__data__ = "2024-09-24"
+__author__ = "Mark van de Streek"
+__date__ = "2024-09-24"
 __all__ = ["QueryRunner"]
 
 import logging

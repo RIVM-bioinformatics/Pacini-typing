@@ -48,7 +48,7 @@ See the README.md file for more information about the pipeline
 from __future__ import annotations
 
 __author__ = "Mark van de Streek"
-__data__ = "2024-10-24"
+__date__ = "2024-10-24"
 __all__ = ["PaciniTyping", "main"]
 
 import argparse

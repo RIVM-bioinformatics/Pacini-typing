@@ -23,8 +23,8 @@ The fixtures fasta_options and fastq_options are used
 to provide options for the tests.
 """
 
-__author__ = "Mark Van de Streek"
-__data__ = "2024-09-24"
+__author__ = "Mark van de Streek"
+__date__ = "2024-09-24"
 __all__ = [
     "fasta_options",
     "fastq_options",

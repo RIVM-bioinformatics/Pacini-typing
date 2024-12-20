@@ -13,8 +13,8 @@ i.e., invalid file extensions, missing files, etc.
 The raise statements can be found in the validation/validate_input_arguments.py module.
 """
 
-__author__ = "Mark Van de Streek"
-__data__ = "2024-10-22"
+__author__ = "Mark van de Streek"
+__date__ = "2024-10-22"
 
 
 class InvalidPairedError(Exception):

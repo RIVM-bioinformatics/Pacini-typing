@@ -24,8 +24,8 @@ VIB_EA5348AA_AS_NODE_19_length_64079_cov_13.745954	ctxA:1:CP001235	100.000	777	0
 VIB_EA5348AA_AS_NODE_19_length_64079_cov_13.745954	ctxB:1:KJ437653	96.532	346	12	0	53994	54339	346	1	4.79e-165	573
 """
 
-__author__ = "Mark Van de Streek"
-__data__ = "2024-09-24"
+__author__ = "Mark van de Streek"
+__date__ = "2024-09-24"
 __all__ = [
     "check_tools",
     "is_tool",

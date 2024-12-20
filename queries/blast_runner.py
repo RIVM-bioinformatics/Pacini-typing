@@ -14,8 +14,8 @@ The get_query() method prepares the query for the BLAST run
 and returns it to the (main) QueryRunner class.
 """
 
-__author__ = "Mark Van de Streek"
-__data__ = "2024-09-24"
+__author__ = "Mark van de Streek"
+__date__ = "2024-09-24"
 __all__ = ["BLASTn"]
 
 import logging

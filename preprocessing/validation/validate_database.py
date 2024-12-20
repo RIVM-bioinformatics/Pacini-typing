@@ -11,7 +11,7 @@ Module that validates the existence of the database.
 Based on the input type, the methods will check if the specific files exist.
 """
 
-__author__ = "Mark Van de Streek"
+__author__ = "Mark van de Streek"
 __date__ = "2024-09-24"
 __all__ = [
     "check_for_database_existence",

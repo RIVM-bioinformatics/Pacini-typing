@@ -13,7 +13,7 @@ and starts the parsing process.
 """
 
 __author__ = "Mark van de Streek"
-__data__ = "2024-12-02"
+__date__ = "2024-12-02"
 __all__ = ["ParsingManager"]
 
 import logging

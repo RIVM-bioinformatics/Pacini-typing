@@ -22,7 +22,7 @@ Example FASTQ File:
     B@@FDFFFHHGHHJIJJIIJJJJIJIJIIJJI
 """
 
-__author__ = "Mark Van de Streek"
+__author__ = "Mark van de Streek"
 __date__ = "2024-09-24"
 __all__ = ["InputFileInspector"]
 

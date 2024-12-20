@@ -14,8 +14,8 @@ The parser is being set up with the necessary arguments and subcommands
 The subcommands are built in separate scripts and added to the main parser object.
 """
 
-__author__ = "Mark Van de Streek"
-__data__ = "2024-09-24"
+__author__ = "Mark van de Streek"
+__date__ = "2024-09-24"
 __all__ = ["main"]
 
 import argparse
@@ -44,7 +44,7 @@ def main(givenargs: list[str]) -> argparse.Namespace:
     ----------
     """
     parser = argparse.ArgumentParser(
-        prog="Pacini",
+        prog="Pacini-typing",
         description=(
             "Bacterial Genotyping Tool for RIVM IDS-Bioinformatics\n\n"
             "Either pick a subcommand to manually run the tool or\n"

@@ -12,7 +12,7 @@ This module is responsible for parsing the output of the BLAST search.
 """
 
 __author__ = "Mark van de Streek"
-__data__ = "2024-12-17"
+__date__ = "2024-12-17"
 __all__ = ["FASTAParser"]
 
 import logging

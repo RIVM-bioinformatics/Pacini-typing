@@ -11,8 +11,8 @@ End-to-end test for the main function of pacini_typing.
 This file tests full runs of the program with config option.
 """
 
-__author__ = "Mark Van de Streek"
-__data__ = "2024-09-24"
+__author__ = "Mark van de Streek"
+__date__ = "2024-09-24"
 __all__ = [
     "setup_teardown_config_input",
     "cleanup_files",

@@ -14,7 +14,7 @@ After filtering, the results are written to multiple output files.
 """
 
 __author__ = "Mark van de Streek"
-__data__ = "2024-11-22"
+__date__ = "2024-11-22"
 __all__ = ["Parser"]
 
 import logging

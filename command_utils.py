@@ -36,8 +36,8 @@ Or capture output in a file:
                     )).execute()
 """
 
-__author__ = "Mark Van de Streek"
-__data__ = "2024-11-01"
+__author__ = "Mark van de Streek"
+__date__ = "2024-11-01"
 __all__ = ["ShellCommand", "CommandInvoker", "Command"]
 
 import logging

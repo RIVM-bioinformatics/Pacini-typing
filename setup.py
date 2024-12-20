@@ -13,8 +13,8 @@ Debugging and logging are easier with this way of executing shell commands.
 See docstring for more explicit information about functions and their parameters.
 """
 
-__author__ = "Mark Van de Streek"
-__data__ = "2024-11-01"
+__author__ = "Mark van de Streek"
+__date__ = "2024-11-01"
 __all__ = ["get_version"]
 
 import platform

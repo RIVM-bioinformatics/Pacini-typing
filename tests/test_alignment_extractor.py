@@ -15,8 +15,8 @@ The tests are applied by using a test alignment file that was created
 for his purpose. The file contains a three genes and their (shorter) sequences.
 """
 
-__author__ = "Mark Van de Streek"
-__data__ = "2024-09-24"
+__author__ = "Mark van de Streek"
+__date__ = "2024-09-24"
 __all__ = [
     "test_check_alignment_file_not_found",
     "test_parse_alignment_file",

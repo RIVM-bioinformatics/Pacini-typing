@@ -13,8 +13,8 @@ for the input files.
 See class ArgsValidator for more information about specific validation methods.
 """
 
-__author__ = "Mark Van de Streek"
-__data__ = "2024-09-24"
+__author__ = "Mark van de Streek"
+__date__ = "2024-09-24"
 __all__ = ["ArgsValidator"]
 
 import hashlib
