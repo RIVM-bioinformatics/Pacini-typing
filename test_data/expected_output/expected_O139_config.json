@@ -9,7 +9,7 @@
   "database": {
     "name": "VIB-O139",
     "path": "databases/VIB-O139",
-    "matching_seq_file": "config/VIB-O139.fasta",
+    "target_genes_file": "config/VIB-O139.fasta",
     "run_output": "output/"
   },
   "pattern": {

@@ -41,7 +41,7 @@ def test_read_config_good():
     same as in the expected file.
     The file /test_data/expected_output/expected_O1_config.json
     contains the expected output of the pattern read from the
-    configuration file parsing/O1.yaml
+    configuration file config/O1.yaml
     """
     config = read_config_pattern.ReadConfigPattern("config/O139.yaml", "fasta")
     assert len(config.pattern) > 1

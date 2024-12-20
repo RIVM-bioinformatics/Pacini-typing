@@ -59,7 +59,7 @@ def setup_args() -> Generator[list[str], None, None]:
     """
     args = [
         "--config",
-        "parsing/O1.yaml",
+        "config/O1.yaml",
         "--input",
     ]
 

@@ -203,7 +203,7 @@ metadata:
 database:
   name: "VIB-O139"
   path: "databases"
-  matching_seq_file: "parsing/VIB-O139.fasta"
+  target_genes_file: "parsing/VIB-O139.fasta"
   run_output: "output/"
 
 pattern:
