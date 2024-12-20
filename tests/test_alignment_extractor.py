@@ -55,14 +55,14 @@ def test_parse_alignment_file():
     """
     extractor = AlignmentExtractor(
         "test_data/expected_output/example_alignment.aln",
-        ["rfbV_O1", "wbfZ_O139"],
+        ["rfbV_O1:1:AE003852", "wbfZ_O139:1:AB012956"],
         "output.fasta",
     )
     extractor.run()
-    check_file_output("output.fasta", "rfbV_O1")
+    check_file_output("output.fasta", "rfbV_O1:1:AE003852")
 
-    assert "rfbV_O1" in extractor.query_sequences
-    assert "wbfZ_O139" in extractor.query_sequences
+    assert "rfbV_O1:1:AE003852" in extractor.query_sequences
+    assert "wbfZ_O139:1:AB012956" in extractor.query_sequences
 
 
 @pytest.mark.skipif(

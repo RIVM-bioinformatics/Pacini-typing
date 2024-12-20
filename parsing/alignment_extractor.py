@@ -40,7 +40,6 @@ __all__ = ["AlignmentExtractor"]
 
 import logging
 import os
-import re
 
 from preprocessing.exceptions.alignment_exceptions import (
     AlignmentFileNotFoundError,
@@ -174,9 +173,10 @@ class AlignmentExtractor:
         """
         current_query_sequence: list[str] = []
         current_gene = None
-        match = re.match(r"#\s*([\w:]+)", line)
-        if match:
-            current_gene = match.group(1).split(":")[0]
+        line = line.split()[1]
+
+        if line in self.genes_list:
+            current_gene = line
             current_query_sequence = []
 
         return current_gene, current_query_sequence

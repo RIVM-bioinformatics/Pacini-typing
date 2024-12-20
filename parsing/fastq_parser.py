@@ -88,10 +88,7 @@ class FASTQParser(ParserStrategy):
         Output:
             - list[str]: List with gene names.
         """
-        return [
-            gene.split(":")[0]
-            for gene in data_frame["Template"].values.tolist()
-        ]
+        return [gene for gene in data_frame["Template"].values.tolist()]
 
     def get_hits_report_info(self) -> tuple[list[str], str, Any]:
         """
