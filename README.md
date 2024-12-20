@@ -172,8 +172,8 @@ metadata:
   date_created: "2024-11-06"
 
 # The database section is used to define the database to be used in the run.
-# You can specify a matching sequence file to be used in the run.
-# The matching sequence file should contain the sequences of the genes you want to detect.
+# You can specify a target genes file to be used in the run.
+# The target genes file should contain the sequences of the genes you want to detect.
 # Format in Multi-FASTA format.
 # The run_output field is used to specify the output directory for the intermediate files.
 database:
@@ -185,12 +185,13 @@ database:
 # This section is most important in creating filters for the genes.
 # The perc_ident and perc_cov fields are used for all genes in the 'genes' section.
 pattern:
-  perc_ident: 95.0
-  perc_cov: 90.0
+  perc_ident: 99.8
+  perc_cov: 100.0
   e_value: 0
   p_value: 0.05
   genes:
     - gene_name: "wbfZ"
+    - gene_name: "ctxA"
     - gene_name: "ctxB"
 ```
 
