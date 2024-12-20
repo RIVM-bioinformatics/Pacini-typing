@@ -89,9 +89,12 @@ class QueryRunner:
         """
         logging.debug("Checking if the output directory exists...")
         output_dir = os.path.dirname(self.run_options["output"])
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
-            return False
+        if output_dir:
+            if not os.path.exists(output_dir):
+                os.makedirs(output_dir)
+                logging.debug("New output directory created: %s", output_dir)
+                return False
+        logging.debug("Output directory exists...")
         return True
 
     @staticmethod
