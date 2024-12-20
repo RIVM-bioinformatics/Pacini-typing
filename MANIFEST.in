@@ -1,3 +1,2 @@
-include parsing/*.yaml
-include parsing/*.fasta
 include config/*.yaml
+include config/*.fasta

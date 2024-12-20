@@ -38,7 +38,6 @@ REQUIRED_PATTERN_KEYS = [
     "e_value",
     "p_value",
     "genes",
-    "snps",
 ]
 
 

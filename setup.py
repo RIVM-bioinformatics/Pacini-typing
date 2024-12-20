@@ -32,7 +32,7 @@ def get_version() -> str:
     # skip this function if the platform is Linux,
     # because of the GitHub Actions workflow
     if platform.system() == "Linux":
-        return "1.4.0"
+        return "0.0.0"
 
     result = CommandInvoker(
         ShellCommand(["git", "describe", "--tags"], capture=True)
@@ -45,7 +45,7 @@ def get_version() -> str:
 setup(
     name="pacini_typing",
     version=get_version(),
-    author="Mark Van de Streek",
+    author="Mark van de Streek",
     author_email="ids-bioinformatics@rivm.nl",
     packages=find_packages(),
     long_description=open("README.md", encoding="utf-8").read(),

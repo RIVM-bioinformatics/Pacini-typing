@@ -44,7 +44,7 @@ def test_read_config_good():
     configuration file parsing/O1.yaml
     """
     config = read_config_pattern.ReadConfigPattern(
-        "parsing/O139.yaml", "fasta"
+        "config/O139.yaml", "fasta"
     )
     assert len(config.pattern) > 1
     with open(
@@ -133,7 +133,7 @@ def test_construct_params_dict():
     fasta or fastq are already checked in earlier code
     ----------
     """
-    config = read_config_pattern.ReadConfigPattern("parsing/O1.yaml", "fastq")
+    config = read_config_pattern.ReadConfigPattern("config/O1.yaml", "fastq")
     assert (
         config.pattern["database"]["path"]
         == config.creation_dict["database_path"]
