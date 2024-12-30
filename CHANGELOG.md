@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.1](https://github.com/RIVM-bioinformatics/Pacini-typing/compare/v1.6.0...v1.6.1) (2024-12-30)
+
+
+### Bug Fixes
+
+* bug fix where a non-existing path was causing an error in query option ([7ec633d](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/7ec633d34f747a0f29b20345e75ad5249e81a4f2))
+
 ## [1.6.0](https://github.com/RIVM-bioinformatics/Pacini-typing/compare/v1.5.1...v1.6.0) (2024-12-18)
 
 
