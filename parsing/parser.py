@@ -14,7 +14,7 @@ After filtering, the results are written to multiple output files.
 """
 
 __author__ = "Mark van de Streek"
-__data__ = "2024-11-22"
+__date__ = "2024-11-22"
 __all__ = ["Parser"]
 
 import logging
@@ -91,6 +91,7 @@ class Parser:
         It loops over the list of filters and applies them.
         The implementation of the filters is done in the Filter class.
         """
+        logging.debug("Applying filters to the data frame...")
         for filter_pattern in self.filters:
             self.data_frame = filter_pattern.apply(self.data_frame)
 
@@ -101,7 +102,6 @@ class Parser:
         is used to read the output file.
         """
         self.data_frame = self.strategy.read_output(self.query_run_filename)
-        logging.info("Run output read successfully.")
 
     def construct_report_record(
         self, report_id: int, item: str
@@ -145,6 +145,7 @@ class Parser:
             - pd.DataFrame: output report
         --------
         """
+        logging.debug("Creating the output report...")
         output_records = []
         for report_id, item in enumerate(
             self.data_frame[
@@ -209,6 +210,7 @@ class Parser:
             - pd.DataFrame: hits report
         --------
         """
+        logging.debug("Creating the hits report...")
         output_records: list[dict[str, Any]] = []
         columns, significance_type, value_column = (
             self.strategy.get_hits_report_info()
@@ -233,12 +235,13 @@ class Parser:
         ----------
         """
         logging.debug("Writing the %s...", suffix)
+        file_name = f"{self.input_sequence_sample}_{suffix}.csv"
         report.to_csv(
-            f"{self.input_sequence_sample}_{suffix}.csv",
+            file_name,
             sep=",",
             index=False,
         )
-        logging.info("Successfully wrote the report")
+        logging.info("Successfully wrote %s...", file_name)
 
     def construct_list_of_genes(self) -> list[str]:
         """
@@ -263,6 +266,7 @@ class Parser:
         The function is using the strategy pattern to write the
         found sequences to a FASTA file.
         """
+        logging.info("--fasta-out options selected, writing FASTA output...")
         self.strategy.write_fasta_out(
             config_options=self.config_options,
             input_sequence_sample=self.input_sequence_sample,
@@ -304,5 +308,5 @@ class Parser:
                 self.write_fasta_out()
         else:
             logging.warning(
-                "Data frame is empty after filtering, no report created"
+                "There were no hits left after filtering, no reports were created..."
             )

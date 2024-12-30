@@ -21,8 +21,8 @@ The tests are divided into the following functions:
 The OPTION dictionary is a mock dictionary that is used in the tests.
 """
 
-__author__ = "Mark Van de Streek"
-__data__ = "2024-10-17"
+__author__ = "Mark van de Streek"
+__date__ = "2024-10-17"
 __all__ = [
     "test_prepare_query",
     "test_get_query_different",

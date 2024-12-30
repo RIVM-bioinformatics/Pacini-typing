@@ -12,7 +12,7 @@ These exceptions are raised when invalid args or options are found.
 The raise statements are located in xxx module. # TODO: Update this line
 """
 
-__author__ = "Mark Van de Streek"
+__author__ = "Mark van de Streek"
 __date__ = "2024-10-28"
 
 

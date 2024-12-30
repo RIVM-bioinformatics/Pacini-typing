@@ -22,7 +22,7 @@ Example FASTQ File:
     B@@FDFFFHHGHHJIJJIIJJJJIJIJIIJJI
 """
 
-__author__ = "Mark Van de Streek"
+__author__ = "Mark van de Streek"
 __date__ = "2024-09-24"
 __all__ = ["InputFileInspector"]
 
@@ -92,17 +92,19 @@ class InputFileInspector:
             - InvalidFastaOrFastqError: If the file is not a valid
         ----------
         """
-        logging.debug("Determining the file type of the input files...")
+        logging.debug("Walking through input filename(s) and reading them...")
         for file in self.input_files:
             with open(file, "r", encoding="utf-8") as f:
                 first_line = f.readline().strip()
                 if first_line.startswith(">"):
                     # FASTA file validation
                     self.type[file] = "FASTA"
+                    f.seek(0)
                     self.validate_fasta(f, file)
                 elif first_line.startswith("@"):
                     # FASTQ file validation
                     self.type[file] = "FASTQ"
+                    f.seek(0)
                     self.validate_fastq(f, file)
                 else:
                     logging.error("Invalid file format found. Exiting...")
@@ -253,9 +255,7 @@ class InputFileInspector:
             if "FASTA" in file_types and len(self.type) == 2:
                 logging.error("Error while comparing the types. Exiting...")
                 raise InvalidSequencingTypesError(self.input_files)
-            logging.debug(
-                "All files are valid and the same type, continuing..."
-            )
+            logging.debug("Input files are of the same type, continuing...")
         else:
             logging.error("Error while comparing the types. Exiting...")
             raise InvalidSequencingTypesError(self.input_files)

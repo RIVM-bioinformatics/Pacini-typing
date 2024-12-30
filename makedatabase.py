@@ -13,8 +13,8 @@ For both methods, a subprocess.run command is used to execute the command in the
 See the methods for more information.
 """
 
-__author__ = "Mark Van de Streek"
-__data__ = "2024-09-24"
+__author__ = "Mark van de Streek"
+__date__ = "2024-09-24"
 __all__ = ["DatabaseBuilder"]
 
 import logging

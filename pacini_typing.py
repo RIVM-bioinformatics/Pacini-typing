@@ -48,21 +48,21 @@ See the README.md file for more information about the pipeline
 from __future__ import annotations
 
 __author__ = "Mark van de Streek"
-__data__ = "2024-10-24"
+__date__ = "2024-10-24"
 __all__ = ["PaciniTyping", "main"]
 
 import argparse
 import gzip
 import logging
 import os
-import tarfile
 import shutil
 import sys
-from typing import Any, Tuple
+import tarfile
+from typing import Any
 
 import preprocessing.argsparse.build_parser
 from makedatabase import DatabaseBuilder
-from parsing.config_manager import ParsingManager
+from parsing.parsing_manager import ParsingManager
 from parsing.read_config_pattern import ReadConfigPattern
 from preprocessing.exceptions.determine_input_type_exceptions import (
     InvalidSequencingTypesError,
@@ -85,11 +85,8 @@ logging.basicConfig(
 class PaciniTyping:
     """
     Main class for the Pacini-Typing pipeline.
-    This class is respsonsible for calling operations in the correct order.
+    This class is responsible for calling operations in the correct order.
     ----------
-    Input:
-        - input_args: argparse.Namespace object with parsed arguments
-
     Methods:
         - parse_all_args: Parse all arguments into a dictionary
         - setup_logging: Setup logging format and level
@@ -108,9 +105,9 @@ class PaciniTyping:
     def __init__(self, input_args: argparse.Namespace) -> None:
         """
         Constructor for the PaciniTyping class.
-        The contstructor accepts the parsed input arguments from argparse.
+        The constructor accepts the parsed input arguments from argparse.
         The input arguments are stored in the input_args attribute.
-        All arguments and aditional information are
+        All arguments and additional information are
         stored in the self.option variable.
         The run method is responsible for calling all other methods.
         ----------
@@ -123,6 +120,7 @@ class PaciniTyping:
         self.sample_name: str = ""
         self.file_type: str = ""
         self.threads: int = self.input_args.threads
+        self.output_dir = None
 
     def parse_all_args(self) -> None:
         """
@@ -132,9 +130,7 @@ class PaciniTyping:
         require a path to certain files.
         self.option is also used to store more information.
         """
-        logging.debug(
-            "Placing all args and necessary information in a dictionary"
-        )
+        logging.debug("Parsing all args and necessary information...")
         self.set_general_attributes()
         if self.input_args.options == "query":
             self.set_query_attributes()
@@ -152,6 +148,7 @@ class PaciniTyping:
         Other specific arguments are parsed in set_query_attributes and
         set_makedatabase_attributes.
         """
+        logging.debug("Parsing general attributes...")
         self.option = {
             "database_path": (
                 self.input_args.database_path
@@ -176,6 +173,7 @@ class PaciniTyping:
         The query attributes are stored in the self.option variable.
         These options are used to run the query operation later on.
         """
+        logging.debug("Parsing query-related attributes...")
         self.option["query"] = {
             "paired": self.input_args.paired,
             "single": self.input_args.single,
@@ -188,6 +186,7 @@ class PaciniTyping:
         The makedatabase attributes are stored in the self.option variable.
         These options are used to run the makedatabase operation manually later on.
         """
+        logging.debug("Parsing makedatabase-related attributes...")
         self.option["makedatabase"] = {
             "database_type": self.input_args.database_type,
             "input": self.input_args.input_file,
@@ -200,6 +199,7 @@ class PaciniTyping:
         These options are used to read the config file later on.
         From this config file, the input database and name are retrieved.
         """
+        logging.debug("Parsing config-related attributes...")
         self.option["config"] = {
             "input": self.input_args.input,
             "config_path": self.input_args.config,
@@ -217,6 +217,7 @@ class PaciniTyping:
             self.option["verbose"] and logging.DEBUG or logging.INFO
         )
         if self.input_args.log_file:
+            logging.debug("--log-file option selected, setting up log file...")
             file_handler = logging.FileHandler("pacini_typing.log")
             file_handler.setLevel(logging.DEBUG)
             file_handler.setFormatter(
@@ -243,7 +244,7 @@ class PaciniTyping:
         Therefore, the input files are once stored in a list,
         which is stored in the self.option variable.
         """
-        logging.debug("Retrieving input files and placing them in a list")
+        logging.debug("Retrieving input filenames from selected option...")
         input_files_list: list[str] = []
         if self.option["query"]:
             if self.option["query"]["single"]:
@@ -255,6 +256,8 @@ class PaciniTyping:
         # Double check if the config option is really the only option
         elif self.option["config"] and self.option["option"] is None:
             input_files_list.extend(self.option["config"]["input"])
+        logging.debug("Input files have been retrieved: %s", input_files_list)
+        logging.debug("Adding input files to the args variable...")
         self.option["input_file_list"] = input_files_list
 
     def retrieve_sample_name(self) -> None:
@@ -262,6 +265,7 @@ class PaciniTyping:
         Function that retrieves the sample name from the input file.
         The sample name is the first part of the filename.
         """
+        logging.debug("Retrieving the sample name from the input file...")
         self.sample_name = (
             self.option["input_file_list"][0]
             .split("/")[-1]
@@ -277,7 +281,7 @@ class PaciniTyping:
         This list is then passed to the unzip_gz_files function.
         See the unzip_gz_files function for more information.
         """
-        logging.debug("Searching for .gz files in the input list")
+        logging.debug("Checking for .gz files in the input list...")
         gz_files = [
             file
             for file in self.option["input_file_list"]
@@ -361,7 +365,7 @@ class PaciniTyping:
         For more information about the DatabaseBuilder,
         see the makedatabase.py file.
         """
-        logging.info("Creating the refernece database...")
+        logging.info("Creating the reference database...")
         DatabaseBuilder(database_creation_args)
 
     def get_file_type(self) -> None:
@@ -422,7 +426,7 @@ class PaciniTyping:
         - file_type: type of the database (fasta/fastq)
 
         The check_for_database_builder variable is needed because
-        of the generic re-use of the this function later on.
+        of the generic re-use of the function later on.
 
         FASTQ and FASTA require different databases,
         more information can be found in
@@ -433,11 +437,9 @@ class PaciniTyping:
         ----------
         """
         logging.debug("Checking if the database exists...")
-        return check_for_database_path(arg_options=database_builder)
+        return check_for_database_path(database_builder)
 
-    def run_query(
-        self, query_runner_builder: dict[str, Any]
-    ) -> Tuple[str, str] | bool:
+    def run_query(self, query_runner_builder: dict[str, Any]) -> None:
         """
         Function that runs the query operation.
         This means the QueryRunner of the query_runner.py is called.
@@ -446,17 +448,14 @@ class PaciniTyping:
         The QueryRunner class is responsible for running the query operation.
         For more information about the QueryRunner,
         See queries/query_runner.py
-        ----------
-        Returns:
-            - result: Tuple with the result of the query
-        ----------
         """
-        logging.info("Running the input query against reference database...")
-        runner = QueryRunner(run_options=query_runner_builder)
-        result = runner.run()
-        logging.info("Query finished in: %s seconds", runner.get_runtime())
-
-        return result
+        logging.info("Starting the query running related options...")
+        runner = QueryRunner(query_runner_builder)
+        runner.run()
+        logging.info(
+            "Command raised no errors, runtime: %s seconds",
+            runner.get_runtime(),
+        )
 
     def initialize_config_pattern(self) -> ReadConfigPattern:
         """
@@ -469,7 +468,7 @@ class PaciniTyping:
             - pattern: ReadConfigPattern object
         ----------
         """
-        logging.debug("Initializing the ReadConfigPattern class...")
+        logging.debug("Initializing the configuration file...")
         pattern = ReadConfigPattern(
             self.option["config"]["config_path"],
             self.file_type,
@@ -479,6 +478,9 @@ class PaciniTyping:
         # this is based on the input files. Therefore,
         # the sample name is retrieved from the input file.
         # This is done in the function retrieve_sample_name().
+        logging.debug(
+            "Setting additional information for the configuration..."
+        )
         pattern.creation_dict["input_file_list"] = self.option["config"][
             "input"
         ]
@@ -511,6 +513,7 @@ class PaciniTyping:
             tar.add(self.output_dir, arcname=os.path.basename(self.output_dir))
         # Call the delete_intermediates function to
         # remove the original output directory
+        logging.debug("Saved intermediate files in a zip...")
         self.delete_intermediates()
 
     def delete_intermediates(self) -> None:
@@ -519,104 +522,159 @@ class PaciniTyping:
         The directory is used to store genetic variation information,
         and is simply removed by shutil.rmtree.
         """
-        logging.info("Deleting intermediate files...")
+        logging.debug("Deleting intermediate files...")
         shutil.rmtree(self.output_dir)
+
+    def handle_makedatabase_option(self):
+        """
+        Little helper function to split up functionality.
+        This function simply defines the database_builder dictionary
+        and runs the run_makedatabase() method (which creates the database).
+        The run_makedatabase() method is re-used by other modules later on,
+        that's why this pattern is defined in this helper function.
+        """
+        logging.info(
+            "Defining all necessary information for the database creation..."
+        )
+        database_builder = {
+            "database_path": self.option["database_path"],
+            "database_name": self.option["database_name"],
+            "database_type": self.option["makedatabase"]["database_type"],
+            "input_fasta_file": self.option["makedatabase"]["input"],
+        }
+        self.run_makedatabase(database_builder)
+
+    def handle_config_or_query_option(self):
+        """
+        Function that handles the config or query option.
+        It decides which operation to run based on the input arguments.
+        If the query option is selected, the handle_query_option() is called.
+        Otherwise, the handle_config_option() is called.
+        """
+        if self.option["query"]:
+            logging.info("Query option selected, starting query operation...")
+            self.handle_query_option()
+        else:
+            # The query option is not selected,
+            # which means the config is selected.
+            logging.info(
+                "Config option selected, starting the configuration..."
+            )
+            self.handle_config_option()
+
+    def handle_config_option(self):
+        """
+        Function that handles all the config related operations.
+        This method is handling all these operations.
+        Actual operations are run in different methods
+        of this PaciniTyping class.
+
+        The config file is being read and database is checked,
+        right before the query searching is called.
+        If the database does not exist, the method is trying to create it.
+        Finally, the database is checked again and the query operation is started.
+        This query operation starting is done in the handle_config_option_parse_query() method.
+        """
+        pattern: ReadConfigPattern = self.initialize_config_pattern()
+        if not self.check_valid_database_path(pattern.creation_dict):
+            # Re-use the run_makedatabase() method with right params
+            logging.debug("Database does not exist, creating the database...")
+            self.run_makedatabase(pattern.creation_dict)
+        logging.debug("Checking if the database was successfully created...")
+        if not self.check_valid_database_path(pattern.creation_dict):
+            raise InvalidDatabaseError(
+                pattern.creation_dict["database_name"],
+                pattern.creation_dict["file_type"],
+            )
+        else:
+            logging.debug("Database exists, starting the query operation...")
+            self.handle_config_option_parse_query(pattern)
+
+    def handle_config_option_parse_query(self, pattern: ReadConfigPattern):
+        """
+        Function that is responsible for parsing the query operation.
+        This query operation is based on the config option (not query option).
+
+        At this point, the config file has been read and the database has been checked.
+        This function firstly runs the run_query() method and then starts the parsing operation.
+        ----------
+        Input:
+            - pattern: The configuration file options
+        ----------
+        """
+        self.run_query(pattern.creation_dict)
+        logging.info("Starting the parsing operation...")
+        ParsingManager(
+            pattern,
+            self.file_type,
+            self.sample_name,
+        )
+        # Define the output directory for further usage
+        self.output_dir = pattern.pattern["database"]["run_output"]
+        if self.input_args.save_intermediates:
+            self.save_intermediates()
+        else:
+            self.delete_intermediates()
+
+    def handle_query_option(self):
+        """
+        Method that handles all query related operations.
+        The right options are set and options are checked.
+        Actual operations are run in different methods,
+        this is why this function is called 'handle'.
+
+        The function checks if the database exists,
+        right before the query searching called.
+        If the database does not exist, the program will exit.
+        ----------
+        Raises:
+            - InvalidDatabaseError: Database existence check failed
+        ----------
+        """
+        logging.debug(
+            "Defining all necessary information for the query operation..."
+        )
+        query_builder: dict[str, Any] = {
+            "file_type": self.file_type,
+            "input_file_list": self.option["input_file_list"],
+            "database_path": self.option["database_path"],
+            "database_name": self.option["database_name"],
+            "output": self.option["query"]["output"],
+            "threads": self.threads,
+        }
+        if self.check_valid_database_path(query_builder):
+            self.run_query(query_builder)
+        else:
+            raise InvalidDatabaseError(
+                query_builder["database_name"],
+                query_builder["file_type"],
+            )
 
     def run(self) -> None:
         """
         Main start point for the Pacini-Typing pipeline.
         This method calls all other methods in the correct order.
-        The order is defined in top-module docstring.
+        For more specific information about the methods,
+        navigate to the method itself and read the docstring.
+
+        After all preprocessing actions are done,
+        this function will split if the makedatabase option is selected.
+        Otherwise, the config or query option is selected.
         """
-        # Retrieve the args object, arguments have been parsed at this point
-        # Place all arguments in a dictionary
         self.parse_all_args()
-        # Setup up the logging, i.e., level and format
         self.setup_logging()
-        # Get the input files and retrieve the sample name
+        # Input files are retrieved based on query/makedatabase/config option
         self.get_input_filenames()
         self.retrieve_sample_name()
-        # Check if they may need to be unzipped
         self.check_for_unzip_files()
-        # Validate all input arguments
         self.validate_file_arguments()
 
         if self.option["makedatabase"]:
-            # Define the required database args here,
-            # so the run_makedatabase() method can be re-used by
-            # other modules later on.
-            database_builder = {
-                "database_path": self.option["database_path"],
-                "database_name": self.option["database_name"],
-                "database_type": self.option["makedatabase"]["database_type"],
-                "input_fasta_file": self.option["makedatabase"]["input"],
-            }
-            self.run_makedatabase(database_builder)
+            self.handle_makedatabase_option()
         else:
-            # The input option is not makedatabase,
-            # so it must be query or config.
-            # Determine the file type and valid options
             self.get_file_type()
             self.check_valid_option_with_args()
-            # Query option has different requirements than config option
-            # split up the options and check if the database exists
-            if self.option["query"]:
-                # Create the right query builder for the query operation
-                query_builder: dict[str, Any] = {
-                    "file_type": self.file_type,
-                    "input_file_list": self.option["input_file_list"],
-                    "database_path": self.option["database_path"],
-                    "database_name": self.option["database_name"],
-                    "output": self.option["query"]["output"],
-                    "threads": self.threads,
-                }
-                # Check if the database exists
-                # If not raise an error because with the query operation,
-                # there is no information to create a database.
-                # Log an error and let the user know it should be
-                # created first or use predefined configuration options.
-                if self.check_valid_database_path(query_builder):
-                    self.run_query(query_builder)
-                else:
-                    raise InvalidDatabaseError(
-                        query_builder["database_name"],
-                        query_builder["file_type"],
-                    )
-            else:
-                # The config option is selected,
-                # read the config file and validate it with
-                # the ReadConfigPattern class
-                pattern: ReadConfigPattern = self.initialize_config_pattern()
-                # Check if database exists
-                # If not present, create it from the config options
-                if not self.check_valid_database_path(pattern.creation_dict):
-                    # Re-use the run_makedatabase() method with right params
-                    self.run_makedatabase(pattern.creation_dict)
-                # Check if database does exists at this point,
-                # if not, raise an error and exit the program
-                # Otherwise, run the query operation
-                if not self.check_valid_database_path(pattern.creation_dict):
-                    # Let the user know the database does not exist,
-                    # if the code reaches here, the run_makedatabase() was
-                    # called without errors, so a bigger issue is present here.
-                    raise InvalidDatabaseError(
-                        pattern.creation_dict["database_name"],
-                        pattern.creation_dict["file_type"],
-                    )
-                else:
-                    self.run_query(pattern.creation_dict)
-                    # Parsing operations
-                    ParsingManager(
-                        pattern,
-                        self.file_type,
-                        self.sample_name,
-                    )
-                    # Save or delete intermediate files based on user input
-                    self.output_dir = pattern.pattern["database"]["run_output"]
-                    if self.input_args.save_intermediates:
-                        self.save_intermediates()
-                    else:
-                        self.delete_intermediates()
+            self.handle_config_or_query_option()
 
 
 def main(provided_args: list[str] | None = None) -> None:
@@ -638,10 +696,11 @@ def main(provided_args: list[str] | None = None) -> None:
 
     pacini_typing = PaciniTyping(args)
     pacini_typing.run()
+    logging.info("Pacini-typing pipeline has finished successfully!")
 
 
 if __name__ == "__main__":
-    logging.info("Starting the Pacini-Typing pipeline, parsing arguments...")
+    logging.info("Starting Pacini-typing, parsing arguments...")
     main()
 
 ###########################################################################

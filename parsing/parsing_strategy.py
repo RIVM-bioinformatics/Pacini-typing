@@ -13,7 +13,7 @@ This is done because of the different file formats that need to be parsed.
 """
 
 __author__ = "Mark van de Streek"
-__data__ = "2024-12-17"
+__date__ = "2024-12-17"
 __all__ = ["ParserStrategy"]
 
 from abc import ABC, abstractmethod

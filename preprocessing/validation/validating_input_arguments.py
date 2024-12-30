@@ -13,8 +13,8 @@ for the input files.
 See class ArgsValidator for more information about specific validation methods.
 """
 
-__author__ = "Mark Van de Streek"
-__data__ = "2024-09-24"
+__author__ = "Mark van de Streek"
+__date__ = "2024-09-24"
 __all__ = ["ArgsValidator"]
 
 import hashlib
@@ -80,7 +80,7 @@ class ArgsValidator:
             - False: if the extension is not in the accepted list
         ----------
         """
-        logging.debug("Validating file extension for file: %s...", file)
+        logging.debug("Validating file extension for file: %s", file)
         file_name = os.path.basename(file)
         ext = self.get_file_extension(file_name.split(".")).lower()
         assert self.config is not None
@@ -141,7 +141,7 @@ class ArgsValidator:
             - False: if the file does not
         ----------
         """
-        logging.debug("Checking if file %s exists...", file)
+        logging.debug("Checking if file %s exists", file)
         if os.path.exists(file) and os.path.isfile(file):
             return True
         logging.error("File not found, exiting...")
@@ -155,7 +155,7 @@ class ArgsValidator:
         The hash is then compared, if they are the same,
         the program will exit with an error message.
         """
-        logging.debug("Comparing paired input files using hash...")
+        logging.debug("Comparing paired input files using a hash...")
         if self.create_sha_hash(
             self.input_file_list[0]
         ) == self.create_sha_hash(self.input_file_list[1]):
@@ -163,7 +163,7 @@ class ArgsValidator:
             raise InvalidPairedError(
                 self.input_file_list[0], self.input_file_list[1]
             )
-        logging.debug("Input files are not the same, continuing...")
+        logging.debug("Files Hashes are not identical, continuing...")
 
     @staticmethod
     def create_sha_hash(file: str) -> str:
@@ -193,7 +193,7 @@ class ArgsValidator:
         Therefore, no big operations are done before this check,
         because the program will exit with an error message.
         """
-        logging.debug("Checking if the input file names are not the same...")
+        logging.debug("Paired files supplied, checking similarity...")
         if (
             self.option["input_file_list"][0]
             == self.option["input_file_list"][1]
@@ -240,7 +240,7 @@ class ArgsValidator:
         ----------
         """
         logging.debug(
-            "Checking file existence and valid extension for file: %s...", file
+            "Checking file existence and valid extension for file: %s", file
         )
         if self.check_file_existence(file) and self.validate_file_extensions(
             file

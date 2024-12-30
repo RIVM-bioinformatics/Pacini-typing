@@ -12,7 +12,7 @@ These exceptions are raised when invalid database is provided or not found.
 The raise statements are located in validation/validate_database.py
 """
 
-__author__ = "Mark Van de Streek"
+__author__ = "Mark van de Streek"
 __date__ = "2024-10-28"
 
 

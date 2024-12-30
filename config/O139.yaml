@@ -1,15 +1,16 @@
 %YAML 1.2
 ---
 metadata:
+  filename: "O139.yaml"
   id: "VIB-O139"
-  name: "O139 Gene group"
+  type: "V. cholerae O139 Genes"
   description: "Genetic pattern run config file for Vibrio cholerae O139 serogroup"
   date_created: "2024-11-06"
 
 database:
   name: "VIB-O139"
-  path: "databases"
-target_genes_file: "parsing/VIB-O139.fasta"
+  path: "databases/VIB-O139"
+  target_genes_file: "config/VIB-O139.fasta"
   run_output: "output/"
 
 pattern:

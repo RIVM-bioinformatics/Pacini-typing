@@ -9,7 +9,7 @@ metadata:
 database:
   name: "VIB-O1"
   - path: "databases"
-  matching_seq_file: "parsing/VIB-O1.fasta"
+  target_genes_file: "parsing/VIB-O1.fasta"
   run_output: "output/"
 
 pattern:
@@ -22,12 +22,3 @@ pattern:
       presence: true
       pident: 98.0
       pcoverage: 95.0
-  snps: null
-    
-    # Example of snp entry:
-    # - snp_name: "name"
-    #   position: 150
-    #   mutation: "C>T"
-    #   confidence: "p-value: 0.01"
-    # Uncomment the above lines to add SNPs to the pattern
-

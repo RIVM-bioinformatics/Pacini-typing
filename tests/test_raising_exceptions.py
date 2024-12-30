@@ -14,8 +14,8 @@ It only tests the cases where the input is wrong, so it's not a complete
 end-to-end test setup.
 """
 
-__author__ = "Mark Van de Streek"
-__data__ = "2024-10-30"
+__author__ = "Mark van de Streek"
+__date__ = "2024-10-30"
 __all__ = [
     "setup_args",
     "test_wrong_extension",
@@ -33,6 +33,7 @@ import pytest
 from pacini_typing import main
 from preprocessing.exceptions.determine_input_type_exceptions import (
     InvalidFastaOrFastqError,
+    InvalidSequenceError,
     InvalidSequencingTypesError,
 )
 from preprocessing.exceptions.validation_exceptions import (
@@ -58,7 +59,7 @@ def setup_args() -> Generator[list[str], None, None]:
     """
     args = [
         "--config",
-        "parsing/O1.yaml",
+        "config/O1.yaml",
         "--input",
     ]
 
@@ -137,7 +138,7 @@ def test_wrong_sequence(setup_args: list[str]):
     ----------
     """
     setup_args.extend(["test_data/wrong_files/wrong_sequence.fasta"])
-    with pytest.raises(InvalidFastaOrFastqError):
+    with pytest.raises(InvalidSequenceError):
         main(setup_args)
 
 
@@ -256,5 +257,5 @@ def test_wrong_fasta_with_fastq_names(setup_args: list[str]):
     setup_args.extend(
         ["test_data/wrong_files/VIB_1.fq", "test_data/wrong_files/VIB_2.fq"]
     )
-    with pytest.raises(InvalidFastaOrFastqError):
+    with pytest.raises(InvalidSequencingTypesError):
         main(setup_args)

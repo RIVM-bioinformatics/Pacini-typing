@@ -13,8 +13,8 @@ All the arguments needed for the query subcommand are defined here.
 This subcommand is added to the main parsing object in the build_parser script.
 """
 
-__author__ = "Mark Van de Streek"
-__data__ = "2024-09-24"
+__author__ = "Mark van de Streek"
+__date__ = "2024-09-24"
 __all__ = ["build_query_command"]
 
 

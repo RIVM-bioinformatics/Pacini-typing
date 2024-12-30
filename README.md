@@ -8,7 +8,7 @@
 
 <!-- [![CodeFactor](https://www.codefactor.io/repository/github/rivm-bioinformatics/Pacini-typing/badge)](https://www.codefactor.io/repository/github/rivm-bioinformatics/Pacini-typing)   -->
 
-Pylint output: Your code has been rated at 9.95/10 (previous run: 7.68/10, +2.27)
+Pylint output: Your code has been rated at 9.93/10 (previous run: 7.68/10, +2.25)
 
 <div align="center">
     <h1>Pacini-typing</h1>
@@ -184,7 +184,7 @@ metadata:
 database:
   name: "VIB-O139"
   path: "databases"
-  matching_seq_file: "parsing/VIB-O139.fasta"
+  target_genes_file: "parsing/VIB-O139.fasta"
   run_output: "output/"
 
 # This section is most important in creating filters for the genes.

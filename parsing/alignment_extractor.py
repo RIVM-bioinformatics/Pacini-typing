@@ -8,7 +8,7 @@
     https://github.com/features/copilot
 
 This module is responsible for extracting sequences from an alignment file.
-KMA is outputting a alingment file with the following format:
+KMA is outputting an alingment file with the following format:
 
 # rfbV_O1:1:AE003852
 template: 	ATGCCATGGAAGACCTACTCACGGAACTTGATGTATGCTGTCATAACTTTGATGTTGAAT
@@ -38,8 +38,8 @@ __author__ = "Mark van de Streek"
 __date__ = "2024-12-17"
 __all__ = ["AlignmentExtractor"]
 
+import logging
 import os
-import re
 
 from preprocessing.exceptions.alignment_exceptions import (
     AlignmentFileNotFoundError,
@@ -94,6 +94,9 @@ class AlignmentExtractor:
         --------
         """
         if not os.path.exists(self.alignment_file):
+            logging.error(
+                f"Alignment file not found: {self.alignment_file}, exiting..."
+            )
             raise AlignmentFileNotFoundError(self.alignment_file)
 
     def parse_alignment_file(self) -> None:
@@ -106,6 +109,7 @@ class AlignmentExtractor:
         If the line starts with query:, the sequence is extracted.
         Lastly, the last gene's sequence is saved.
         """
+        logging.info("Parsing alignment file...")
         current_query_sequence: list[str] = []
         current_gene = None
         with open(self.alignment_file, "r", encoding="utf-8") as file:
@@ -169,9 +173,10 @@ class AlignmentExtractor:
         """
         current_query_sequence: list[str] = []
         current_gene = None
-        match = re.match(r"#\s*([\w:]+)", line)
-        if match:
-            current_gene = match.group(1).split(":")[0]
+        line = line.split()[1]
+
+        if line in self.genes_list:
+            current_gene = line
             current_query_sequence = []
 
         return current_gene, current_query_sequence
@@ -202,6 +207,7 @@ class AlignmentExtractor:
             - query_sequences: sequences to write to the file
         ----------
         """
+        logging.info("Writing found sequences to fasta file...")
         with open(output_file, "w", encoding="utf-8") as fasta_out:
             for gene, sequence in query_sequences.items():
                 fasta_out.write(f">{gene}\n")
@@ -219,4 +225,5 @@ class AlignmentExtractor:
         if self.query_sequences:
             self.write_fasta(self.output_file, self.query_sequences)
         else:
+            logging.error("No sequences found in alignment file, exiting...")
             raise EmptySequenceError()

@@ -7,7 +7,7 @@
     “GitHub Copilot: Your AI pair programmer” (GPT-3). GitHub, Inc.
     https://github.com/features/copilot
 
-Module that is responsible for running the
+This module is responsible for running the
 right query against the reference database.
 
 First, the query is prepared by the respective runner
@@ -21,14 +21,15 @@ execute function of the command_utils.py module.
 
 from __future__ import annotations
 
-__author__ = "Mark Van de Streek"
-__data__ = "2024-09-24"
+__author__ = "Mark van de Streek"
+__date__ = "2024-09-24"
 __all__ = ["QueryRunner"]
 
 import logging
 import os
+import re
 import time
-from typing import Any, Tuple
+from typing import Any
 
 from command_utils import CommandInvoker, ShellCommand
 from queries.blast_runner import BLASTn
@@ -63,14 +64,19 @@ class QueryRunner:
         ----------
         """
         self.run_options = run_options
-        self.start_time = 0.0
-        self.stop_time = 0.0
+        self.version_command: str = ""
+        self.start_time: float = 0.0
+        self.stop_time: float = 0.0
         self.check_output_dir()
-        logging.debug("Preparing the query...")
         if self.run_options["file_type"] == "FASTA":
             self.query = BLASTn.get_query(option=self.run_options)
+            logging.info("Getting the BLAST version...")
+            self.version_command = BLASTn.get_version_command()
         elif self.run_options["file_type"] == "FASTQ":
             self.query = KMA.get_query(option=self.run_options)
+            logging.info("Getting the KMA version...")
+            self.version_command = KMA.get_version_command()
+        self.log_tool_version()
 
     def check_output_dir(self) -> bool:
         """
@@ -83,32 +89,60 @@ class QueryRunner:
         """
         logging.debug("Checking if the output directory exists...")
         output_dir = os.path.dirname(self.run_options["output"])
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
-            return False
+        if output_dir:
+            if not os.path.exists(output_dir):
+                os.makedirs(output_dir)
+                logging.debug("New output directory created: %s", output_dir)
+                return False
+        logging.debug("Output directory exists...")
         return True
 
-    def run(self) -> Tuple[str, str] | bool:
+    @staticmethod
+    def extract_version_number(stdout: str) -> str:
+        """
+        Method that extracts the version number from the tool output.
+        The method uses a regular expression to extract the version number.
+        ----------
+        Input:
+            - stdout: str: the output of the tool
+        Output:
+            - str: the version number of the tool
+        ----------
+        """
+        version_pattern = r"(\d+\.\d+\.\d+)"
+        match = re.search(version_pattern, stdout)
+
+        return match.group(1) if match else None
+
+    def log_tool_version(self) -> None:
+        """
+        Method that logs the version of the tool used.
+        The method calls the get_version_command method
+        from the respective runner.
+        This logging functionality was developed at RIVM's request
+        """
+        stdout, stderr = CommandInvoker(
+            ShellCommand(cmd=self.version_command, capture=True)
+        ).execute()
+        version = self.extract_version_number(stdout)
+        logging.info("Version tool: %s", version)
+
+    def run(self) -> None:
         """
         The query is already prepared in the constructor.
         This function runs the query.
         The runtime is started and stopped to calculate the runtime.
+        (calculation is done in the get_runtime method)
         The decorated log function logs the query command,
             see the ./decorators/decorators.py file for more information.
             This decorator also checks if the query was successful.
-        ----------
-        Output:
-            - Result of the subprocess.run
-        ----------
         """
-        logging.debug("Running query...")
+        logging.debug("Starting the query operation...")
         self.start_time = time.time()
-        # Use the execute function from command_utils
+        # Use the execute function of command_utils
         command = ShellCommand(cmd=self.query, capture=True)
-        result = CommandInvoker(command).execute()
+        CommandInvoker(command).execute()
         self.stop_time = time.time()
-
-        return result
 
     def get_runtime(self) -> float:
         """

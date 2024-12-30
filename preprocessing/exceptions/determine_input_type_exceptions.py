@@ -12,8 +12,8 @@ These exceptions are raised when invalid input is provided to the module.
 The raise statements are located in validation/validate_input.py.
 """
 
-__author__ = "Mark Van de Streek"
-__data__ = "2024-10-28"
+__author__ = "Mark van de Streek"
+__date__ = "2024-10-28"
 
 
 class InvalidFastaOrFastqError(Exception):

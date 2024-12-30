@@ -11,7 +11,7 @@
 """
 
 __author__ = "Mark van de Streek"
-__data__ = "2024-11-25"
+__date__ = "2024-11-25"
 __all__ = [
     "test_read_config_good",
     "test_read_config_file_error",
@@ -41,11 +41,9 @@ def test_read_config_good():
     same as in the expected file.
     The file /test_data/expected_output/expected_O1_config.json
     contains the expected output of the pattern read from the
-    configuration file parsing/O1.yaml
+    configuration file config/O1.yaml
     """
-    config = read_config_pattern.ReadConfigPattern(
-        "parsing/O139.yaml", "fasta"
-    )
+    config = read_config_pattern.ReadConfigPattern("config/O139.yaml", "fasta")
     assert len(config.pattern) > 1
     with open(
         "test_data/expected_output/expected_O139_config.json",
@@ -133,7 +131,7 @@ def test_construct_params_dict():
     fasta or fastq are already checked in earlier code
     ----------
     """
-    config = read_config_pattern.ReadConfigPattern("parsing/O1.yaml", "fastq")
+    config = read_config_pattern.ReadConfigPattern("config/O1.yaml", "fastq")
     assert (
         config.pattern["database"]["path"]
         == config.creation_dict["database_path"]

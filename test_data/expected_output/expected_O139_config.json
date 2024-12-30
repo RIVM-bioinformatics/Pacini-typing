@@ -9,7 +9,7 @@
   "database": {
     "name": "VIB-O139",
     "path": "databases/VIB-O139",
-    "matching_seq_file": "parsing/VIB-O139.fasta",
+    "target_genes_file": "config/VIB-O139.fasta",
     "run_output": "output/"
   },
   "pattern": {
@@ -19,18 +19,14 @@
     "p_value": 0.05,
     "genes": [
       {
-        "gene_name": "wbfZ",
-        "presence": true,
-        "pident": 98.0,
-        "pcoverage": 95.0
+        "gene_name": "wbfZ"
       },
       {
-        "gene_name": "wbfY",
-        "presence": true,
-        "pident": 98.0,
-        "pcoverage": null
+        "gene_name": "ctxA"
+      },
+      {
+        "gene_name": "ctxB"
       }
-    ],
-    "snps": null
+    ]
   }
 }

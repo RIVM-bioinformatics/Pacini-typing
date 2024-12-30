@@ -13,7 +13,7 @@ See the filter_pattern.py file for more information about the Filter interface.
 """
 
 __author__ = "Mark van de Streek"
-__data__ = "2024-11-22"
+__date__ = "2024-11-22"
 __all__ = ["GeneNameFilter"]
 
 import pandas as pd

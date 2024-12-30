@@ -17,8 +17,8 @@ validates the keys, and constructs a dictionary with
 parameters required for the database creation and the query operation.
 """
 
-__author__ = "Mark Van de Streek"
-__data__ = "2024-10-30"
+__author__ = "Mark van de Streek"
+__date__ = "2024-10-30"
 __all__ = ["ReadConfigPattern"]
 
 import logging
@@ -38,7 +38,6 @@ REQUIRED_PATTERN_KEYS = [
     "e_value",
     "p_value",
     "genes",
-    "snps",
 ]
 
 
@@ -89,7 +88,7 @@ class ReadConfigPattern:
         If the config file is loaded correctly,
         the pattern is stored in the pattern variable
         """
-        logging.debug("Reading configuration file...")
+        logging.info("Reading configuration file...")
         try:
             with open(self.config_file, "r", encoding="utf-8") as file:
                 self.pattern = yaml.safe_load(file)
@@ -140,7 +139,7 @@ class ReadConfigPattern:
         self.creation_dict = {
             "database_path": self.pattern["database"]["path"],
             "database_name": self.pattern["database"]["name"],
-            "input_fasta_file": self.pattern["database"]["matching_seq_file"],
+            "input_fasta_file": self.pattern["database"]["target_genes_file"],
             "database_type": self.input_file_type.upper(),
             "file_type": self.input_file_type,
         }
