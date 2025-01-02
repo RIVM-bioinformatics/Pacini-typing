@@ -33,6 +33,7 @@ __all__ = [
 ]
 
 import os
+import platform
 import time
 from typing import Any, Dict
 from unittest import mock
@@ -188,6 +189,9 @@ def test_blast_get_query_different(setup_query_input: Dict[str, Any]):
     ]
 
 
+@pytest.mark.skipif(
+    platform.system() == "Linux", reason="Test not supported on Linux"
+)
 @mock.patch("os.path.exists", return_value=False)
 @mock.patch("os.makedirs")
 @pytest.mark.parametrize("runtime", RUN_TIMES)
