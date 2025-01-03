@@ -1,10 +1,10 @@
-![Python](https://img.shields.io/badge/python-3670A0?style=flat&logo=python&logoColor=ffdd54)
-[![git](https://badgen.net/badge/icon/git?icon=git&label)](https://git-scm.com)
-[![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-%23FE5196?logo=conventionalcommits&logoColor=white)](https://conventionalcommits.org)
+![](https://anaconda.org/bioconda/pacini_typing/badges/version.svg)
 [![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/RIVM-bioinformatics/Pacini-typing?include_prereleases)](https://github.com/RIVM-bioinformatics/Pacini-typing/releases/latest)
-[![GitHub](https://img.shields.io/github/license/RIVM-bioinformatics/Pacini-typing)](https://github.com/RIVM-bioinformatics/Pacini-typing/blob/main/LICENSE)
-[![GitHub latest commit](https://badgen.net/github/last-commit/RIVM-bioinformatics/Pacini-typing)](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/main)
 ![Unit tests](https://github.com/RIVM-bioinformatics/Pacini-typing/actions/workflows/run_unit_tests.yaml/badge.svg)
+[![GitHub latest commit](https://badgen.net/github/last-commit/RIVM-bioinformatics/Pacini-typing)](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/main)
+![](https://anaconda.org/bioconda/pacini_typing/badges/downloads.svg
+)
+[![GitHub](https://img.shields.io/github/license/RIVM-bioinformatics/Pacini-typing)](https://github.com/RIVM-bioinformatics/Pacini-typing/blob/main/LICENSE)
 
 <!-- [![CodeFactor](https://www.codefactor.io/repository/github/rivm-bioinformatics/Pacini-typing/badge)](https://www.codefactor.io/repository/github/rivm-bioinformatics/Pacini-typing)   -->
 
@@ -36,21 +36,21 @@ With these genetic sequences, the application can determine whether the sequence
 
 ## Table of Contents
 
-* [Application information](#application-information)
-* [About this project](#about-this-project)
-* [Table of Contents](#table-of-contents)
-* [Prerequisites](#prerequisites)
-* [Complete list of required packages](#complete-list-of-required-packages)
-* [Installation](#installation)
-* [(very) Brief Overview of Pacini-typing](#very-brief-overview-of-pacini-typing)
-* [Getting Started](#getting-started)
-* [Parameters \& Usage](#parameters--usage)
-* [Output](#output)
-* [Example Run of Pacini-typing](#example-run-of-pacini-typing)
-* [Issues](#issues)
-* [Future Ideas](#future-ideas)
-* [License](#license)
-* [Contact](#contact)
+- [Application information](#application-information)
+- [About this project](#about-this-project)
+- [Table of Contents](#table-of-contents)
+- [Prerequisites](#prerequisites)
+- [Complete list of required packages](#complete-list-of-required-packages)
+- [Installation](#installation)
+- [(very) Brief Overview of Pacini-typing](#very-brief-overview-of-pacini-typing)
+- [Getting Started](#getting-started)
+- [Parameters \& Usage](#parameters--usage)
+- [Output](#output)
+- [Example Run of Pacini-typing](#example-run-of-pacini-typing)
+- [Issues](#issues)
+- [Future Ideas](#future-ideas)
+- [License](#license)
+- [Contact](#contact)
 
 ## Prerequisites
 
@@ -85,7 +85,17 @@ The following Tools are required:
 
 ## Installation
 
-Installation of the application can be done by cloning the repository and installing the requirements. The following steps can be followed:
+### 🐍 Conda installation
+
+Pacini-typing can be installed using the conda/mamba package manager. The package is available on the bioconda channel, under the name [*pacini_typing*](https://anaconda.org/bioconda/pacini_typing).
+
+```bash
+conda install bioconda::pacini_typing
+```
+
+### 💻 Other installation methods
+
+Manual installation of the application can be done by cloning the repository and installing the requirements. The following steps can be followed:
 
 1. Clone the repository.
 
@@ -99,9 +109,9 @@ git clone https://github.com/RIVM-bioinformatics/Pacini-typing.git
 cd Pacini-typing
 ```
 
-At this point, the repository is cloned to your system. It is advised to install the required packages.[Automatic installation of the required packages](#automatic-installation-of-the-required-packages)
+At this point, the repository is cloned to your system. It is advised to install the required packages. This can be done by following the steps in the section [Installation of the required packages](#installation-of-the-required-packages) or by installing the required packages manually listed in the [Prerequisites](#prerequisites) section.
 
-3. Install the package.
+1. Install the package.
 
 ```bash
 pip install .
@@ -112,10 +122,10 @@ Pacini-typing is now installed on your system. After installation, the applicati
 Additionally, the application can be run by calling the original `pacini_typing.py` script in the `pacini_typing` directory with the following command:
 
 ```bash
-python3 directory_to_pacini_typing_clone/pacini_typing.py --help
+python3 directory_of_clone/pacini_typing.py --help
 ```
 
-### Automatic installation of the required packages
+#### Installation of the required packages
 
 For both macOS and Linux users, a complete conda environment, containing all the required packages, can be found in the root of the repository.
 
