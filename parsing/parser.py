@@ -103,9 +103,7 @@ class Parser:
         """
         self.data_frame = self.strategy.read_output(self.query_run_filename)
 
-    def construct_report_record(
-        self, report_id: int, item: str
-    ) -> dict[str, Any]:
+    def construct_report_record(self, index: int, item: str) -> dict[str, Any]:
         """
         Function that constructs a record for the output report
         Every line in the output report is a dictionary
@@ -121,7 +119,7 @@ class Parser:
         ----------
         """
         return {
-            "ID": report_id + 1,
+            "ID": index,
             "Input": self.input_sequence_sample,
             "Configuration": self.config_options["metadata"]["filename"],
             "Type/Genes": self.config_options["metadata"]["type"],
@@ -147,14 +145,13 @@ class Parser:
         """
         logging.debug("Creating the output report...")
         output_records = []
-        for report_id, item in enumerate(
+        for index, item in enumerate(
             self.data_frame[
                 self.strategy.get_gene_column_name()
-            ].values.tolist()
+            ].values.tolist(),
+            start=1,
         ):
-            output_records.append(
-                self.construct_report_record(report_id, item)
-            )
+            output_records.append(self.construct_report_record(index, item))
         return pd.DataFrame(output_records)
 
     def construct_hit_csv_record(
@@ -162,7 +159,7 @@ class Parser:
         columns: dict[str, Any],
         significance_type: str,
         value_column: str,
-        report_id: int,
+        index: int,
         item: list[str],
     ) -> dict[str, Any]:
         """
@@ -183,7 +180,7 @@ class Parser:
         ----------
         """
         return {
-            "ID": report_id + 1,
+            "ID": index,
             "hit": item.iloc[columns.index("hit")].split(":")[0],
             "percentage identity": item.iloc[
                 columns.index("percentage identity")
@@ -215,10 +212,12 @@ class Parser:
         columns, significance_type, value_column = (
             self.strategy.get_hits_report_info()
         )
-        for report_id, item in self.data_frame.iterrows():
+        for index, (report_id, item) in enumerate(
+            self.data_frame.iterrows(), start=1
+        ):
             output_records.append(
                 self.construct_hit_csv_record(
-                    columns, significance_type, value_column, report_id, item
+                    columns, significance_type, value_column, index, item
                 )
             )
         return pd.DataFrame(output_records)
