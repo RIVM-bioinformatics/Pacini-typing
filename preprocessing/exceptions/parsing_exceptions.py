@@ -8,8 +8,8 @@
     https://github.com/features/copilot
 
 Module that contains custom exceptions for the parsing module.
-These exceptions are raised when invalid args or options are found.
-The raise statements are located in xxx module. # TODO: Update this line
+Mostly these exceptions are raised when an error occurs during
+the reading of the configuration file.
 """
 
 __author__ = "Mark van de Streek"

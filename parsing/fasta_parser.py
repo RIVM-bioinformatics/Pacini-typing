@@ -69,7 +69,7 @@ class FASTAParser(ParserStrategy):
             - data_frame: pd.DataFrame: the data frame with the BLAST results
         ----------
         """
-        logging.debug(f"Reading BLAST output file: {filename}...")
+        logging.debug("Reading BLAST output file: %s...", filename)
         data_frame = pd.read_csv(filename + ".tsv", sep="\t", header=None)
         data_frame.columns = list(BLAST_COLUMNS.keys())
         data_frame["pident"] = data_frame["pident"].astype(float)

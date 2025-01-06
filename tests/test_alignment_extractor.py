@@ -30,9 +30,7 @@ import platform
 import pytest
 
 from parsing.alignment_extractor import AlignmentExtractor
-from preprocessing.exceptions.alignment_exceptions import (
-    AlignmentFileNotFoundError,
-)
+from preprocessing.exceptions.alignment_exceptions import AlignmentFileNotFoundError
 
 
 def test_check_alignment_file_not_found():

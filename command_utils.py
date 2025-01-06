@@ -44,7 +44,7 @@ import logging
 import subprocess
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Tuple
+from typing import IO, Any, Tuple
 
 from preprocessing.exceptions.command_utils_exceptions import SubprocessError
 
@@ -95,8 +95,8 @@ class ShellCommand(Command):
         cmd: list[str] | str,
         directory: Path = Path.cwd(),
         capture: bool = False,
-        stdout_file: str | None = None,
-        stderr_file: str | None = None,
+        stdout_file: IO[Any] | None = None,
+        stderr_file: IO[Any] | None = None,
         allow_fail: bool = False,
     ) -> None:
         """

@@ -7,7 +7,10 @@
     “GitHub Copilot: Your AI pair programmer” (GPT-3). GitHub, Inc.
     https://github.com/features/copilot
 
-# TODO: Add a docstring to this module
+This module is used to store custom exceptions for the command_utils module.
+Shell commands are executed using the subprocess module,
+and this module is used to define exceptions that are possible raised
+during the execution of shell commands.
 """
 
 __author__ = "Mark van de Streek"

@@ -23,9 +23,7 @@ from argparse import RawTextHelpFormatter
 
 import pkg_resources
 
-from preprocessing.argsparse.args_makedatabase import (
-    build_makedatabase_command,
-)
+from preprocessing.argsparse.args_makedatabase import build_makedatabase_command
 from preprocessing.argsparse.args_query import build_query_command
 
 

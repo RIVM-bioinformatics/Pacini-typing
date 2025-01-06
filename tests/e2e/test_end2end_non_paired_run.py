@@ -39,8 +39,8 @@ import os
 import platform
 import shutil
 from typing import Generator
-import pandas as pd
 
+import pandas as pd
 import pytest
 
 from pacini_typing import main

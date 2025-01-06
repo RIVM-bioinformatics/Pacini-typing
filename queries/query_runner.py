@@ -64,7 +64,7 @@ class QueryRunner:
         ----------
         """
         self.run_options = run_options
-        self.version_command: str = ""
+        self.version_command: list[str] = []
         self.start_time: float = 0.0
         self.stop_time: float = 0.0
         self.check_output_dir()
@@ -98,7 +98,7 @@ class QueryRunner:
         return True
 
     @staticmethod
-    def extract_version_number(stdout: str) -> str:
+    def extract_version_number(stdout: str) -> str | None:
         """
         Method that extracts the version number from the tool output.
         The method uses a regular expression to extract the version number.

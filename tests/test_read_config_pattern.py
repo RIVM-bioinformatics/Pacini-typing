@@ -7,7 +7,10 @@
     “GitHub Copilot: Your AI pair programmer” (GPT-3). GitHub, Inc.
     https://github.com/features/copilot
 
-# TODO: Add module docstrings
+Test file that contains the tests for the read_config_pattern module.
+The tests are testing the reading of the configuration file and the
+validation of the keys in the configuration file.
+Real examples are used to test the functionality of the functions.
 """
 
 __author__ = "Mark van de Streek"

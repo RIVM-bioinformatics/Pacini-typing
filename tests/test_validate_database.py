@@ -44,9 +44,7 @@ from unittest import mock
 import pytest
 
 from pacini_typing import PaciniTyping
-from preprocessing.exceptions.validate_database_exceptions import (
-    InvalidDatabaseError,
-)
+from preprocessing.exceptions.validate_database_exceptions import InvalidDatabaseError
 from preprocessing.validation.validate_database import (
     check_for_database_existence,
     check_for_database_path,

@@ -22,12 +22,12 @@ import os
 import platform
 import shutil
 from typing import Generator
-import pandas as pd
 
+import pandas as pd
 import pytest
 
+from command_utils import CommandInvoker, ShellCommand
 from pacini_typing import main
-from command_utils import ShellCommand, CommandInvoker
 
 FASTA_FILE = "test_data/VIB_EA5348AA_AS.fasta"
 FASTQ_1 = "test_data/VIB_EA5348AA_AS_1.fq"

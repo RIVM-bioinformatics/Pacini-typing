@@ -67,9 +67,7 @@ from parsing.read_config_pattern import ReadConfigPattern
 from preprocessing.exceptions.determine_input_type_exceptions import (
     InvalidSequencingTypesError,
 )
-from preprocessing.exceptions.validate_database_exceptions import (
-    InvalidDatabaseError,
-)
+from preprocessing.exceptions.validate_database_exceptions import InvalidDatabaseError
 from preprocessing.validation.determine_input_type import InputFileInspector
 from preprocessing.validation.validate_database import check_for_database_path
 from preprocessing.validation.validating_input_arguments import ArgsValidator
@@ -702,13 +700,3 @@ def main(provided_args: list[str] | None = None) -> None:
 if __name__ == "__main__":
     logging.info("Starting Pacini-typing, parsing arguments...")
     main()
-
-###########################################################################
-###########################################################################
-
-# TODO: query_runner:run - This return statement is not used anywhere, should it be removed?
-
-# TODO : validating_input_arguments - Store certain values from main OPTION as class variable
-
-###########################################################################
-###########################################################################
