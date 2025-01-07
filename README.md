@@ -36,21 +36,21 @@ With these genetic sequences, the application can determine whether the sequence
 
 ## Table of Contents
 
-- [Application information](#application-information)
-- [About this project](#about-this-project)
-- [Table of Contents](#table-of-contents)
-- [Prerequisites](#prerequisites)
-- [Complete list of required packages](#complete-list-of-required-packages)
-- [Installation](#installation)
-- [(very) Brief Overview of Pacini-typing](#very-brief-overview-of-pacini-typing)
-- [Getting Started](#getting-started)
-- [Parameters \& Usage](#parameters--usage)
-- [Output](#output)
-- [Example Run of Pacini-typing](#example-run-of-pacini-typing)
-- [Issues](#issues)
-- [Future Ideas](#future-ideas)
-- [License](#license)
-- [Contact](#contact)
+* [Application information](#application-information)
+* [About this project](#about-this-project)
+* [Table of Contents](#table-of-contents)
+* [Prerequisites](#prerequisites)
+* [Complete list of required packages](#complete-list-of-required-packages)
+* [Installation](#installation)
+* [(very) Brief Overview of Pacini-typing](#very-brief-overview-of-pacini-typing)
+* [Getting Started](#getting-started)
+* [Parameters \& Usage](#parameters--usage)
+* [Output](#output)
+* [Example Run of Pacini-typing](#example-run-of-pacini-typing)
+* [Issues](#issues)
+* [Future Ideas](#future-ideas)
+* [License](#license)
+* [Contact](#contact)
 
 ## Prerequisites
 
@@ -82,12 +82,13 @@ The following Tools are required:
 | pandas     | >=2.2.3 |
 | blast      | >=2.16.0|
 | kma        | >=1.4.15|
+| pytest     | >=8.3.3 |
 
 ## Installation
 
 ### 🐍 Conda installation
 
-Pacini-typing can be installed using the conda/mamba package manager. The package is available on the bioconda channel, under the name [*pacini_typing*](https://anaconda.org/bioconda/pacini_typing).
+Pacini-typing can be installed using the conda/mamba package manager. The package is available on the bioconda channel, under the name [_pacini_typing_](https://anaconda.org/bioconda/pacini_typing).
 
 ```bash
 conda install bioconda::pacini_typing
@@ -239,7 +240,7 @@ The main logic for this operation is present in the `parsing` module of the appl
 1. **Strategy Pattern**
 2. **Filter Pattern**
 
-Firstly, the strategy parser consists of a base class `parsing_strategy.py` which is inherited by the `fasta_parser.py` and `fastq_parser.py` files. 
+Firstly, the strategy parser consists of a base class `parsing_strategy.py` which is inherited by the `fasta_parser.py` and `fastq_parser.py` files.
 The strategy pattern is used define overarching features required for both methods of parsing.
 
 The filter pattern is used to filter the hits based on the values in the configuration file. All specific filters are inheriting from the `filter_pattern.py` base class.
