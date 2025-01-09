@@ -15,8 +15,7 @@ database:
 pattern:
   pident: 95.0
   perc_cov: 90.0
-  p_values: 0.05
-  genes:
+  gene:
     - gene_name: "wbfZ"
     - gene_name: "ctxA"
     - gene_name: "ctxB"

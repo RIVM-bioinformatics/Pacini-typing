@@ -35,8 +35,6 @@ REQUIRED_KEYS = ["metadata", "database", "pattern"]
 REQUIRED_PATTERN_KEYS = [
     "perc_ident",
     "perc_cov",
-    "e_value",
-    "p_value",
     "genes",
 ]
 

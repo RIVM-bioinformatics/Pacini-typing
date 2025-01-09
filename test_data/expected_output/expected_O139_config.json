@@ -15,8 +15,6 @@
   "pattern": {
     "perc_ident": 95.0,
     "perc_cov": 90.0,
-    "e_value": 0,
-    "p_value": 0.05,
     "genes": [
       {
         "gene_name": "wbfZ"

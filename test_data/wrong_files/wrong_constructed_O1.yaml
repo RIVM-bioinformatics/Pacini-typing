@@ -15,10 +15,6 @@ database:
 pattern:
   perc_ident: 95.0
   perc_cov: 90.0
-  e_value: 0
-  p_value: 0.05
   genes:
     - gene_name: "rfbV"
       presence: true
-      pident: 98.0
-      pcoverage: 95.0
