@@ -36,21 +36,21 @@ With these genetic sequences, the application can determine whether the sequence
 
 ## Table of Contents
 
-* [Application information](#application-information)
-* [About this project](#about-this-project)
-* [Table of Contents](#table-of-contents)
-* [Prerequisites](#prerequisites)
-* [Complete list of required packages](#complete-list-of-required-packages)
-* [Installation](#installation)
-* [(very) Brief Overview of Pacini-typing](#very-brief-overview-of-pacini-typing)
-* [Getting Started](#getting-started)
-* [Parameters \& Usage](#parameters--usage)
-* [Output](#output)
-* [Example Run of Pacini-typing](#example-run-of-pacini-typing)
-* [Issues](#issues)
-* [Future Ideas](#future-ideas)
-* [License](#license)
-* [Contact](#contact)
+- [Application information](#application-information)
+- [About this project](#about-this-project)
+- [Table of Contents](#table-of-contents)
+- [Prerequisites](#prerequisites)
+- [Complete list of required packages](#complete-list-of-required-packages)
+- [Installation](#installation)
+- [(very) Brief Overview of Pacini-typing](#very-brief-overview-of-pacini-typing)
+- [Getting Started](#getting-started)
+- [Parameters \& Usage](#parameters--usage)
+- [Output](#output)
+- [Example Run of Pacini-typing](#example-run-of-pacini-typing)
+- [Issues](#issues)
+- [Future Ideas](#future-ideas)
+- [License](#license)
+- [Contact](#contact)
 
 ## Prerequisites
 
@@ -196,8 +196,6 @@ database:
 pattern:
   perc_ident: 99.8
   perc_cov: 100.0
-  e_value: 0
-  p_value: 0.05
   genes:
     - gene_name: "wbfZ"
     - gene_name: "ctxA"
