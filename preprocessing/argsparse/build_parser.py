@@ -143,5 +143,9 @@ def main(givenargs: list[str]) -> argparse.Namespace:
             parser.error(
                 "--config or --input cannot be used with subcommands."
             )
+        if args.fasta_out or args.save_intermediates:
+            parser.error(
+                "--fasta-out and --save-intermediates cannot be used with subcommands."
+            )
 
     return args
