@@ -37,21 +37,21 @@ With these genetic sequences, the application can determine whether the sequence
 
 ## Table of Contents
 
-- [Application information](#application-information)
-- [About this project](#about-this-project)
-- [Table of Contents](#table-of-contents)
-- [Prerequisites](#prerequisites)
-- [Complete list of required packages](#complete-list-of-required-packages)
-- [Installation](#installation)
-- [(very) Brief Overview of Pacini-typing](#very-brief-overview-of-pacini-typing)
-- [Getting Started](#getting-started)
-- [Parameters \& Usage](#parameters--usage)
-- [Output](#output)
-- [Example Run of Pacini-typing](#example-run-of-pacini-typing)
-- [Issues](#issues)
-- [Future Ideas](#future-ideas)
-- [License](#license)
-- [Contact](#contact)
+* [Application information](#application-information)
+* [About this project](#about-this-project)
+* [Table of Contents](#table-of-contents)
+* [Prerequisites](#prerequisites)
+* [Complete list of required packages](#complete-list-of-required-packages)
+* [Installation](#installation)
+* [(very) Brief Overview of Pacini-typing](#very-brief-overview-of-pacini-typing)
+* [Getting Started](#getting-started)
+* [Parameters \& Usage](#parameters--usage)
+* [Output](#output)
+* [Example Run of Pacini-typing](#example-run-of-pacini-typing)
+* [Issues](#issues)
+* [Future Ideas](#future-ideas)
+* [License](#license)
+* [Contact](#contact)
 
 ## Prerequisites
 
@@ -462,8 +462,8 @@ If encoutering any issues:
 
 ## Future Ideas
 
-* Add more optional parameters
-* Negatively search for genetic variants; search for the absence of genes
+* Implement a SNP detection method
+* Implement biological typing based on the configuration file
 
 ## License
 
