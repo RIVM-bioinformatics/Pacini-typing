@@ -37,21 +37,21 @@ With these genetic sequences, the application can determine whether the sequence
 
 ## Table of Contents
 
-* [Application information](#application-information)
-* [About this project](#about-this-project)
-* [Table of Contents](#table-of-contents)
-* [Prerequisites](#prerequisites)
-* [Complete list of required packages](#complete-list-of-required-packages)
-* [Installation](#installation)
-* [(very) Brief Overview of Pacini-typing](#very-brief-overview-of-pacini-typing)
-* [Getting Started](#getting-started)
-* [Parameters \& Usage](#parameters--usage)
-* [Output](#output)
-* [Example Run of Pacini-typing](#example-run-of-pacini-typing)
-* [Issues](#issues)
-* [Future Ideas](#future-ideas)
-* [License](#license)
-* [Contact](#contact)
+- [Application information](#application-information)
+- [About this project](#about-this-project)
+- [Table of Contents](#table-of-contents)
+- [Prerequisites](#prerequisites)
+- [Complete list of required packages](#complete-list-of-required-packages)
+- [Installation](#installation)
+- [(very) Brief Overview of Pacini-typing](#very-brief-overview-of-pacini-typing)
+- [Getting Started](#getting-started)
+- [Parameters \& Usage](#parameters--usage)
+- [Output](#output)
+- [Example Run of Pacini-typing](#example-run-of-pacini-typing)
+- [Issues](#issues)
+- [Future Ideas](#future-ideas)
+- [License](#license)
+- [Contact](#contact)
 
 ## Prerequisites
 
@@ -361,6 +361,8 @@ pacini_typing query -db_path [path_to_database_directory] -db_name [name_of_data
 * ```--log-file``` Save log file of the run, named `pacini_typing.log`
 * ```-t, --threads``` Number of threads to use
 * ```-f, --fasta-out``` Write found sequences (hits) to a FASTA output file, named `{prefix}_sequences.fasta`
+
+> **Note**: The `--save-intermediates` and `--fasta-out` parameters can not be used in combination with the `makedatabase` or `query` subcommands.
 
 ### The base command to run this program
 
