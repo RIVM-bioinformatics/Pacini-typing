@@ -8,8 +8,8 @@
     https://github.com/features/copilot
 
 Main entry point for the Pacini-Typing pipeline
-This script is responsible for parsing command-line arguments and
-initiating the pipeline.
+This script is responsible for calling all operations
+of the application in the correct order.
 
 Operations are performed in the following order:
     - Parsing all arguments into a dictionary
@@ -19,11 +19,10 @@ Operations are performed in the following order:
     - Validate input arguments
     - If makedatabase option is selected:
         - Run makedatabase operation
-    - If query option is selected:
+    - If query or config option is selected:
         - Get file type of input file(s)
-        - Check if args options are valid for the file type
-        - Check database existence
-        - Run query
+        - Start the query related operations
+        - Start the config related operations
 
 The run() function is the main method of the class.
 This function can accept arguments on two ways:
@@ -41,7 +40,7 @@ For help:
 Or:
     pacini_typing -h
 
-See the README.md file for more information about the pipeline
+See the README.md file for more specific information.
 ----------
 """
 
@@ -67,7 +66,9 @@ from parsing.read_config_pattern import ReadConfigPattern
 from preprocessing.exceptions.determine_input_type_exceptions import (
     InvalidSequencingTypesError,
 )
-from preprocessing.exceptions.validate_database_exceptions import InvalidDatabaseError
+from preprocessing.exceptions.validate_database_exceptions import (
+    InvalidDatabaseError,
+)
 from preprocessing.validation.determine_input_type import InputFileInspector
 from preprocessing.validation.validate_database import check_for_database_path
 from preprocessing.validation.validating_input_arguments import ArgsValidator
@@ -82,8 +83,7 @@ logging.basicConfig(
 
 class PaciniTyping:
     """
-    Main class for the Pacini-Typing pipeline.
-    This class is responsible for calling operations in the correct order.
+    Main class for the Pacini-Typing application.
     ----------
     Methods:
         - parse_all_args: Parse all arguments into a dictionary
@@ -93,21 +93,28 @@ class PaciniTyping:
         - validate_file_arguments: Validate input arguments
         - run_makedatabase: Run the makedatabase operation
         - get_file_type: Get file type of input file(s)
-        - check_valid_option_with_args: Check if args options are valid for the file type
-        - check_valid_database_path: Check database existence
-        - run_query: Run query
-        - run: Main method to run the pipeline
+        - check_valid_option_with_args: Check if file type is correct
+        - check_valid_database_path: Check if the database exists
+        - run_query: Run the query operation
+        - initialize_config_pattern: Initialize the ReadConfigPattern class
+        - save_intermediates: Save intermediate files in a zip archive
+        - delete_intermediates: Delete intermediate files
+        - handle_makedatabase_option: Handle the makedatabase option
+        - handle_config_or_query_option: Handle the config or query option
+        - handle_config_option: Handle all config related operations
+        - handle_config_option_parse_query: Parse the query operation
+        - handle_query_option: Handle all query related operations
+        - run: Main start point for the Pacini-Typing pipeline
     ----------
     """
 
     def __init__(self, input_args: argparse.Namespace) -> None:
         """
         Constructor for the PaciniTyping class.
-        The constructor accepts the parsed input arguments from argparse.
-        The input arguments are stored in the input_args attribute.
+        The constructor accepts the input arguments from argparse.
         All arguments and additional information are
-        stored in the self.option variable.
-        The run method is responsible for calling all other methods.
+        stored in the self.option variable and
+        other variables are set for type hinting.
         ----------
         Input:
             - input_args: argparse.Namespace object with parsed arguments
@@ -122,11 +129,10 @@ class PaciniTyping:
 
     def parse_all_args(self) -> None:
         """
-        Method to parse all arguments into a dictionary.
+        Function that parses all arguments into a dictionary.
         The arguments are grouped together with the args options.
-        The run_path is needed for operations that
-        require a path to certain files.
-        self.option is also used to store more information.
+        self.option is also used to store more information that
+        is needed along the way.
         """
         logging.debug("Parsing all args and necessary information...")
         self.set_general_attributes()
@@ -139,12 +145,11 @@ class PaciniTyping:
 
     def set_general_attributes(self):
         """
-        Method to set the general attributes.
-        It sets the general attributes of the self.option variable.
-        This means, some general arguments that coming from argparse are
-        stored in the option variable.
-        Other specific arguments are parsed in set_query_attributes and
-        set_makedatabase_attributes.
+        Function that sets the general attributes of the self.option variable.
+        This is a variable that is used throughout the application with mostly
+        incoming user arguments.
+        With general attributes, we mean attributes that are used
+        in all operations of the application.
         """
         logging.debug("Parsing general attributes...")
         self.option = {
@@ -167,9 +172,8 @@ class PaciniTyping:
 
     def set_query_attributes(self):
         """
-        Function that sets the query related attributes.
-        The query attributes are stored in the self.option variable.
-        These options are used to run the query operation later on.
+        Function that sets the query related attributes
+        in the self.option variable.
         """
         logging.debug("Parsing query-related attributes...")
         self.option["query"] = {
@@ -180,9 +184,8 @@ class PaciniTyping:
 
     def set_makedatabase_attributes(self):
         """
-        This function sets the makedatabase related attributes.
-        The makedatabase attributes are stored in the self.option variable.
-        These options are used to run the makedatabase operation manually later on.
+        Function that sets the makedatabase related attributes
+        in the self.option variable.
         """
         logging.debug("Parsing makedatabase-related attributes...")
         self.option["makedatabase"] = {
@@ -192,10 +195,8 @@ class PaciniTyping:
 
     def set_config_attributes(self):
         """
-        This function comes into play when the config option is selected.
-        The config attributes are stored in the self.option variable.
-        These options are used to read the config file later on.
-        From this config file, the input database and name are retrieved.
+        Function that sets the config-scheme related attributes
+        in the self.option variable.
         """
         logging.debug("Parsing config-related attributes...")
         self.option["config"] = {
@@ -209,6 +210,8 @@ class PaciniTyping:
         Simple method to setup the logging level.
         If user has selected verbose (args), the logging level is set to DEBUG.
         Otherwise, the logging level is set to INFO.
+        Additionally, if the log_file option is selected,
+        a log file is created with the name pacini_typing.log.
         """
         logging.debug("Setting up logging-level")
         logging.getLogger().setLevel(
@@ -240,7 +243,8 @@ class PaciniTyping:
         otherwise you will get an error.
 
         Therefore, the input files are once stored in a list,
-        which is stored in the self.option variable.
+        which is stored in the self.option variable and could
+        be used throughout the application.
         """
         logging.debug("Retrieving input filenames from selected option...")
         input_files_list: list[str] = []
@@ -321,12 +325,17 @@ class PaciniTyping:
 
     def validate_file_arguments(self) -> None:
         """
-        Function that validates all input arguments.
-        This function uses the ArgsValidator class to validate.
+        Function that calls the validation of the input arguments.
+        The ArgsValidator class is used to validate.
         This Class can be found in validation/validating_input_arguments.py
-        In this file, in dept comments are provided about the validation.
+        For more in dept information about the validation,
+        see the ArgsValidator class.
+
+        The validation methods raise specific error exceptions,
+        if the validation fails outside of this exceptions,
+        something bigger is wrong and the program will exit.
         ----------
-        Error:
+        Raises:
             - Every validation has his own error Exception class with
                 explanation and suggestion.
             - If the program fails here, something bigger is wrong.
@@ -349,19 +358,7 @@ class PaciniTyping:
     def run_makedatabase(self, database_creation_args: dict[str, Any]) -> None:
         """
         Function that runs the makedatabase operation.
-        This means the DatabaseBuilder of the
-        makedatabase.py is called.
-        DatabaseBuilder requires a dictionary with the following keys
-        - database_path: path to the database
-        - database_name: name of the database
-        - database_type: type of the database (fasta/fastq)
-        - input_fasta_file: input file for the database
-
-        The database_builder variable is needed because
-        of the generic re-use of the DatabaseBuilder class later on.
-
-        For more information about the DatabaseBuilder,
-        see the makedatabase.py file.
+        The DatabaseBuilder of the makedatabase.py is called.
         """
         logging.info("Creating the reference database...")
         DatabaseBuilder(database_creation_args)
@@ -391,10 +388,8 @@ class PaciniTyping:
         and FASTQ for paired files. If not, it will exit the program.
         This method is called after the file type has been determined.
         ----------
-        Error:
-            - If the program continues with the wrong file type,
-                a lot of errors will occur.
-            - The program will exit with code 1.
+        Raises:
+            - InvalidSequencingTypesError: Wrong file type for input arguments
         ----------
         """
         logging.debug(
@@ -417,21 +412,16 @@ class PaciniTyping:
         self, database_builder: dict[str, Any]
     ) -> bool:
         """
-        Function that calls the check_for_database_path function.
-        The validation is done based on the following:
-        - database_path: path to the database
-        - database_name: name of the database
-        - file_type: type of the database (fasta/fastq)
-
-        The check_for_database_builder variable is needed because
-        of the generic re-use of the function later on.
-
-        FASTQ and FASTA require different databases,
-        more information can be found in
-        validation/validate_database.py
+        Function that calls the validation operation for the database.
+        This function is responsible for checking if the database exists.
+        The database_builder dictionary is required for the re-use of
+        this method with different parameters.
         ----------
-        Raises:
-            - InvalidDatabaseError: Invalid or not found
+        Input:
+            - database_builder: Dictionary with all necessary information
+        Output:
+            - True: If the database exists
+            - False: If the database does not exist
         ----------
         """
         logging.debug("Checking if the database exists...")
@@ -439,13 +429,15 @@ class PaciniTyping:
 
     def run_query(self, query_runner_builder: dict[str, Any]) -> None:
         """
-        Function that runs the query operation.
-        This means the QueryRunner of the query_runner.py is called.
-        The self.option variable is passed to the QueryRunner.
-        Result of the query is stored in the result variable.
-        The QueryRunner class is responsible for running the query operation.
-        For more information about the QueryRunner,
-        See queries/query_runner.py
+        Function that runs the query with the QueryRunner class.
+        The QueryRunner class is set as a variable and run.
+        The variable is then used to get the runtime of the query operation.
+        The query_runner_builder dictionary is required for the re-use with
+        different parameters.
+        ----------
+        Input:
+            - query_runner_builder: Dictionary with all necessary information
+        ----------
         """
         logging.info("Starting the query running related options...")
         runner = QueryRunner(query_runner_builder)
@@ -473,9 +465,7 @@ class PaciniTyping:
         )
         # Additionally, the query input and output must be set.
         # The output is not specified by the user, because
-        # this is based on the input files. Therefore,
-        # the sample name is retrieved from the input file.
-        # This is done in the function retrieve_sample_name().
+        # this is based on the input files.
         logging.debug(
             "Setting additional information for the configuration..."
         )
@@ -490,7 +480,6 @@ class PaciniTyping:
             os.path.dirname(self.option["run_path"]),
             pattern.creation_dict["input_fasta_file"],
         )
-
         # Set threads for creation operations (makeblastdb/query)
         pattern.creation_dict["threads"] = self.threads
         # Store the fasta-output option in the pattern object
@@ -517,8 +506,6 @@ class PaciniTyping:
     def delete_intermediates(self) -> None:
         """
         Function that removes the intermediate files of the application.
-        The directory is used to store genetic variation information,
-        and is simply removed by shutil.rmtree.
         """
         logging.debug("Deleting intermediate files...")
         shutil.rmtree(self.output_dir)
@@ -527,7 +514,7 @@ class PaciniTyping:
         """
         Little helper function to split up functionality.
         This function simply defines the database_builder dictionary
-        and runs the run_makedatabase() method (which creates the database).
+        and runs the run_makedatabase() method.
         The run_makedatabase() method is re-used by other modules later on,
         that's why this pattern is defined in this helper function.
         """
@@ -546,8 +533,6 @@ class PaciniTyping:
         """
         Function that handles the config or query option.
         It decides which operation to run based on the input arguments.
-        If the query option is selected, the handle_query_option() is called.
-        Otherwise, the handle_config_option() is called.
         """
         if self.option["query"]:
             logging.info("Query option selected, starting query operation...")
@@ -562,21 +547,18 @@ class PaciniTyping:
 
     def handle_config_option(self):
         """
-        Function that handles all the config related operations.
-        This method is handling all these operations.
-        Actual operations are run in different methods
-        of this PaciniTyping class.
-
-        The config file is being read and database is checked,
+        Function that handles the calling of all the config
+        related operations.
+        The config file is being read and database is checked
         right before the query searching is called.
         If the database does not exist, the method is trying to create it.
-        Finally, the database is checked again and the query operation is started.
-        This query operation starting is done in the handle_config_option_parse_query() method.
+        Finally, the database is checked again and
+        the query operation is started.
         """
         pattern: ReadConfigPattern = self.initialize_config_pattern()
         if not self.check_valid_database_path(pattern.creation_dict):
-            # Re-use the run_makedatabase() method with right params
             logging.debug("Database does not exist, creating the database...")
+            # Re-use the run_makedatabase() method with right params
             self.run_makedatabase(pattern.creation_dict)
         logging.debug("Checking if the database was successfully created...")
         if not self.check_valid_database_path(pattern.creation_dict):
@@ -590,11 +572,11 @@ class PaciniTyping:
 
     def handle_config_option_parse_query(self, pattern: ReadConfigPattern):
         """
-        Function that is responsible for parsing the query operation.
-        This query operation is based on the config option (not query option).
-
-        At this point, the config file has been read and the database has been checked.
-        This function firstly runs the run_query() method and then starts the parsing operation.
+        Function that handles the parsing of the genetic variation
+        that is found by the query operation.
+        The ParsingManager class is called with the right parameters.
+        After parsing, the function makes a decision to save or delete
+        the intermediate files based on the input arguments.
         ----------
         Input:
             - pattern: The configuration file options
@@ -617,10 +599,6 @@ class PaciniTyping:
     def handle_query_option(self):
         """
         Method that handles all query related operations.
-        The right options are set and options are checked.
-        Actual operations are run in different methods,
-        this is why this function is called 'handle'.
-
         The function checks if the database exists,
         right before the query searching called.
         If the database does not exist, the program will exit.
@@ -650,18 +628,14 @@ class PaciniTyping:
 
     def run(self) -> None:
         """
-        Main start point for the Pacini-Typing pipeline.
+        Run method of the PaciniTyping class.
         This method calls all other methods in the correct order.
-        For more specific information about the methods,
-        navigate to the method itself and read the docstring.
-
         After all preprocessing actions are done,
         this function will split if the makedatabase option is selected.
         Otherwise, the config or query option is selected.
         """
         self.parse_all_args()
         self.setup_logging()
-        # Input files are retrieved based on query/makedatabase/config option
         self.get_input_filenames()
         self.retrieve_sample_name()
         self.check_for_unzip_files()
@@ -677,8 +651,8 @@ class PaciniTyping:
 
 def main(provided_args: list[str] | None = None) -> None:
     """
-    Entry point for the Pacini-Typing pipeline.
-    Parses command-line arguments and initiates the pipeline.
+    Main entry point for the Pacini-Typing application
+    that initiates the pipeline.
 
     If using (unit)tests, there is no sys.argv, so the provided_args are used.
     Otherwise, sys.argv is used to parse the arguments.
