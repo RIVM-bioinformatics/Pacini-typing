@@ -13,8 +13,8 @@ i.e., invalid file extensions, missing files, etc.
 The raise statements can be found in the validation/validate_input_arguments.py module.
 """
 
-__author__ = "Mark Van de Streek"
-__data__ = "2024-10-22"
+__author__ = "Mark van de Streek"
+__date__ = "2024-10-22"
 
 
 class InvalidPairedError(Exception):
@@ -90,29 +90,6 @@ class FileNotExistsError(Exception):
         SUGGESTION:
             - Check the file path
             - Make sure the file exists
-        ----------------------------------------------------
-                """
-
-
-class InvalidFilterOptionsError(Exception):
-    """
-    Raised when an invalid filter option is provided.
-    """
-
-    def __init__(self, filter_option: str) -> None:
-        self.filter_option = filter_option
-
-    def __str__(self) -> str:
-        return f"""
-        ---------------------------------------------------
-        ERROR: Invalid filter option provided
-        ---------------------------------------------------
-        The following filter value is invalid:
-            - {self.filter_option}
-        ---------------------------------------------------
-        SUGGESTION:
-            - Make sure the filter option is valid
-            - Provide plausible filter options (i.e., id between 0-100)
         ----------------------------------------------------
                 """
 

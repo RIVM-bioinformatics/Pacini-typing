@@ -12,7 +12,7 @@ These exceptions are raised when invalid args or options are found.
 The raise statements are located in xxx module. # TODO: Update this line
 """
 
-__author__ = "Mark Van de Streek"
+__author__ = "Mark van de Streek"
 __date__ = "2024-10-28"
 
 
@@ -61,5 +61,31 @@ class YAMLStructureError(Exception):
             - Check the structure of the YAML file
             - Ensure the indentation is correct
             - Make sure the keys are correctly aligned
+        ---------------------------------------------------
+                """
+
+
+class EmptySequenceError(Exception):
+    """
+    Raised when an empty sequence is found in the data frame.
+    """
+
+    def __init__(self) -> None:
+        pass
+
+    def __str__(self) -> str:
+        return """
+        ---------------------------------------------------
+        ERROR: Empty sequence found in filtered data frame
+        ---------------------------------------------------
+        There were no sequences found in the data frame
+        after filtering the found hits.
+        Probably caused by the extraction of the sequences
+        out of the filtered data frame.
+        ---------------------------------------------------
+        SUGGESTION:
+            - Make sure the BLAST output format has 'qseq'
+                column included at last index.
+            - Check the extraction method for errors
         ---------------------------------------------------
                 """

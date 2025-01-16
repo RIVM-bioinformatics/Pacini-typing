@@ -12,8 +12,8 @@ These exceptions are raised when invalid input is provided to the module.
 The raise statements are located in validation/validate_input.py.
 """
 
-__author__ = "Mark Van de Streek"
-__data__ = "2024-10-28"
+__author__ = "Mark van de Streek"
+__date__ = "2024-10-28"
 
 
 class InvalidFastaOrFastqError(Exception):
@@ -35,6 +35,14 @@ class InvalidFastaOrFastqError(Exception):
         SUGGESTION:
             - Make sure the file is in FASTA or FASTQ format
             - Check the file extension
+            - If the file is FASTA, make sure it contains:
+                >Header
+                Sequence
+            - If the file is FASTQ, make sure it contains:
+                @Header
+                Sequence
+                +
+                Quality Scores
         ----------------------------------------------------
                 """
 
@@ -77,7 +85,8 @@ class InvalidSequencingTypesError(Exception):
         ---------------------------------------------------
         ERROR: Wrong sequencing types detected
         ---------------------------------------------------
-        The following files cannot be used together:
+        The following files cannot be used together
+            due to different sequencing types:
             - {files_list}
         ---------------------------------------------------
         SUGGESTION: Make sure you provide:

@@ -14,8 +14,8 @@ The parser is being set up with the necessary arguments and subcommands
 The subcommands are built in separate scripts and added to the main parser object.
 """
 
-__author__ = "Mark Van de Streek"
-__data__ = "2024-09-24"
+__author__ = "Mark van de Streek"
+__date__ = "2024-09-24"
 __all__ = ["main"]
 
 import argparse
@@ -44,7 +44,7 @@ def main(givenargs: list[str]) -> argparse.Namespace:
     ----------
     """
     parser = argparse.ArgumentParser(
-        prog="Pacini",
+        prog="Pacini-typing",
         description=(
             "Bacterial Genotyping Tool for RIVM IDS-Bioinformatics\n\n"
             "Either pick a subcommand to manually run the tool or\n"
@@ -89,6 +89,38 @@ def main(givenargs: list[str]) -> argparse.Namespace:
         required=False,
         metavar="File",
         help="Path to input file(s). Accepts 1 fasta file or 2 fastq files",
+    )
+
+    parser.add_argument(
+        "--save-intermediates",
+        action="store_true",
+        default=False,
+        help="Save intermediate files of the run",
+    )
+
+    parser.add_argument(
+        "--log-file",
+        action="store_true",
+        default=False,
+        help="Save log file of the run",
+    )
+
+    parser.add_argument(
+        "-t",
+        "--threads",
+        required=False,
+        default=1,
+        type=lambda x: int(float(x)),
+        metavar="Threads",
+        help="Number of threads to use (rounded to the nearest integer)",
+    )
+
+    parser.add_argument(
+        "-f",
+        "--fasta-out",
+        action="store_true",
+        default=False,
+        help="Write found sequences to a FASTA output file",
     )
 
     subparsers = parser.add_subparsers(

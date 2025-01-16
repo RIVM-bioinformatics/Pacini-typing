@@ -1,0 +1,32 @@
+{
+  "metadata": {
+    "filename": "O139.yaml",
+    "id": "VIB-O139",
+    "type": "V. cholerae O139 Genes",
+    "description": "Genetic pattern run config file for Vibrio cholerae O139 serogroup",
+    "date_created": "2024-11-06"
+  },
+  "database": {
+    "name": "VIB-O139",
+    "path": "databases/VIB-O139",
+    "target_genes_file": "config/VIB-O139.fasta",
+    "run_output": "output/"
+  },
+  "pattern": {
+    "perc_ident": 95.0,
+    "perc_cov": 90.0,
+    "e_value": 0,
+    "p_value": 0.05,
+    "genes": [
+      {
+        "gene_name": "wbfZ"
+      },
+      {
+        "gene_name": "ctxA"
+      },
+      {
+        "gene_name": "ctxB"
+      }
+    ]
+  }
+}

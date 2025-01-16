@@ -30,9 +30,9 @@ Or capture output in a file:
                     )
 """
 
-__author__ = "Mark Van de Streek"
-__data__ = "2024-11-01"
-__all__ = ["execute"]
+__author__ = "Mark van de Streek"
+__date__ = "2024-11-01"
+__all__ = ["ShellCommand", "CommandInvoker", "Command"]
 
 import logging
 import subprocess
@@ -149,7 +149,7 @@ class ShellCommand(Command):
         Executes the shell command
         """
         try:
-            logging.info("running command: %s", " ".join(self.cmd))
+            logging.info("running command: '%s'", " ".join(self.cmd))
             result = subprocess.run(
                 " ".join(self.cmd) if isinstance(self.cmd, list) else self.cmd,
                 shell=True,

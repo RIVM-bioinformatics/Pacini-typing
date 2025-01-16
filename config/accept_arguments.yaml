@@ -1,6 +1,6 @@
 %YAML 1.2
 ---
-name : Configuration file for argument parsing
+description: Configuration file for input argument validation
 
 accepted_input_extensions:
   - .fq
@@ -8,6 +8,7 @@ accepted_input_extensions:
   - .fq.gz
   - .fastq.gz
   - .fna
+  - .fsa
   - .fasta
   - .tar.gz
   - .fasta.gz

@@ -1,0 +1,24 @@
+%YAML 1.2
+---
+metadata:
+  id: "VIB-O139"
+  name: "O139 Gene group"
+  description: "Genetic pattern run config file for Vibrio cholerae O139 serogroup"
+  date_created: "2024-11-06"
+
+database:
+  name: "VIB-O139"
+  path: "databases"
+  target_genes_file: "parsing/VIB-O139.fasta"
+  run_output: "output/"
+
+pattern:
+  pident: 95.0
+  perc_cov: 90.0
+  p_values: 0.05
+  genes:
+    - gene_name: "wbfZ"
+    - gene_name: "ctxA"
+    - gene_name: "ctxB"
+
+

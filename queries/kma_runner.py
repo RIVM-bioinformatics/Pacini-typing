@@ -14,10 +14,11 @@ The get_query() method prepares the query for the KMA run
 and returns it to the (main) QueryRunner class.
 """
 
-__author__ = "Mark Van de Streek"
-__data__ = "2024-09-24"
+__author__ = "Mark van de Streek"
+__date__ = "2024-09-24"
 __all__ = ["KMA"]
 
+import logging
 from enum import Enum
 from typing import Any
 
@@ -37,7 +38,6 @@ class KMA(Enum):
 
     RUN_OPTION = "kma"
     PAIRED_OPTION = "-ipe"
-    OUTPUT_FORMAT = "-tsv"
 
     @staticmethod
     def get_query(option: dict[str, Any]) -> list[str]:
@@ -52,14 +52,27 @@ class KMA(Enum):
             - list with the query to run KMA
         ----------
         """
+        logging.debug("Preparing KMA query...")
         return [
             KMA.RUN_OPTION.value,
             KMA.PAIRED_OPTION.value,
             option["input_file_list"][0],
             option["input_file_list"][1],
-            KMA.OUTPUT_FORMAT.value,
             "-t_db",
             option["database_path"] + option["database_name"],
             "-o",
             option["output"],
+            "-t",
+            str(option["threads"]),
         ]
+
+    @staticmethod
+    def get_version_command() -> list[str]:
+        """
+        Method that returns the version command for KMA
+        ----------
+        Output:
+            - list with the version command
+        ----------
+        """
+        return [KMA.RUN_OPTION.value, "-v"]

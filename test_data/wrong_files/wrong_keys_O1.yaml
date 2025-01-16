@@ -1,0 +1,22 @@
+%YAML 1.2
+---
+metadata:
+  id: "VIB-O1"
+  name: "O1 Gene group"
+  description: "Genetic pattern run config file for Vibrio cholerae O1 serogroup"
+  date_created: "2024-11-06"
+
+databases:
+  name: "VIB-O1"
+  path: "databases"
+  target_genes_file: "parsing/VIB-O1.fasta"
+  run_output: "output/"
+
+perc_ident: 95.0
+perc_cov: 90.0
+e_value: 0
+p_value: 0.05
+genes:
+  - gene_name: "rfbV"
+  - gene_name: "ctxA"
+  - gene_name: "ctxB"
