@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.6.2](https://github.com/RIVM-bioinformatics/Pacini-typing/compare/v1.6.1...v1.6.2) (2025-01-16)
+
+
+### Documentation
+
+* add markdown badge for bioconda ([211ac55](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/211ac556984c4891cdb8309a046a76732b2c570d))
+* Added a new python package to the list of required packages ([6d4be99](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/6d4be99e089bedc6f5a47e520f3a54395172b786))
+* New version of the logo ([90c5a86](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/90c5a860d9d66c8232f1b7423389e86dced0eb43))
+* update README with new installation instructions and badge updates ([8306a6a](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/8306a6ab07fb79848e4fcd7ddeb88e7730ecdf76))
+* update the example config file in readme ([80f5818](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/80f5818a3653a408054a8f2ef0b11560380476a6))
+* updated README with better future ideas ([3b22027](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/3b220272ee544db868bda5d537bfec1d82a9b9c5))
+* updated README with some information about bugfix ([2c97d75](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/2c97d757fec279f1b25a541e8eace91d17f957ea))
+
 ## [1.6.1](https://github.com/RIVM-bioinformatics/Pacini-typing/compare/v1.6.0...v1.6.1) (2024-12-30)
 
 ### Bug Fixes
