@@ -24,11 +24,14 @@ def get_version() -> str:
     Get the version of the package from git tags.
     If there are no tags, return "0.0.0".
     """
-    result = CommandInvoker(
-        ShellCommand(["git", "describe", "--tags"], capture=True)
-    ).execute()
-    if isinstance(result, tuple):
-        return result[0].strip().split("-")[0]
+    try:
+        result = CommandInvoker(
+            ShellCommand(["git", "describe", "--tags"], capture=True)
+        ).execute()
+        if isinstance(result, tuple):
+            return result[0].strip().split("-")[0]
+    except Exception:
+        return "0.0.0"
     return "0.0.0"
 
 
