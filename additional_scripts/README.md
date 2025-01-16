@@ -22,10 +22,13 @@ The literature-based validation was mainly focused on O139 serogroup Virbio chol
 
 Publications used for the literature-based validation were:
 
-1. https://www.nature.com/articles/s41588-018-0150-8
-2. https://www.nature.com/articles/s41467-022-31391-4
+1. <https://www.nature.com/articles/s41588-018-0150-8>
+2. <https://www.nature.com/articles/s41467-022-31391-4>
+3. <https://bmcinfectdis.biomedcentral.com/articles/10.1186/s12879-017-2252-9>
 
-Together, these two studies provided a total of 75+ samples that were used for the validation of the O139 serogroup of Vibrio cholerae.
+Together, these two studies provided a total of 250+ samples that were used for the validation of the O139 serogroup of Vibrio cholerae. The last study was used to determine homologous genes. The study contains a dataset of 50 closely-related Vibrio strains to spot if they may be causing false hits of Pacini-typing.
+
+Accession numbers of first two studies are placed in `public_O139_accession_numbers.txt` and the last study is placed in `related_vibrio_accession_numbers.txt`.
 
 ## Scripts
 
