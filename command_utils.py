@@ -12,28 +12,22 @@ The main goal of this module is to provide a simple
 interface for running shell commands and capturing their output for
 further processing.
 
-For this purpose, the module is using the command design pattern.
-This is done in the folowing classes:
-    - Command: Interface for all concrete commands
-    - ShellCommand: Concrete implementation of a shell command
-    - CommandInvoker: Invoker class that is responsible for executing a command
-
 Example:
-        >>> from command_utils import CommandInvoker, ShellCommand
-        >>> stdout, stderr = CommandInvoker(ShellCommand(
+        >>> from command_utils import execute
+        >>> stdout, stderr = execute(
                 ["ls", "-l", "my_directory"],
                 capture=True,
-                    )).execute()
+            )
 
 Or capture output in a file:
 
         >>> with open ("output.txt", "w") as f:
                 with open ("error.txt", "w") as e:
-                    CommandInvoker(ShellCommand(
+                    execute(
                         ["ls", "-l", "my_directory"],
                         stdout_file=f,
                         stderr_file=e,
-                    )).execute()
+                    )
 """
 
 __author__ = "Mark van de Streek"
@@ -46,48 +40,89 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Tuple
 
-from preprocessing.exceptions.command_utils_exceptions import SubprocessError
+# TODO: Make the implementation of the command pattern concrete with all docstrings filled in
+
+
+def execute(
+    cmd: list[str] | str,
+    directory: Path = Path.cwd(),
+    capture: bool = False,
+    stdout_file: str | None = None,
+    stderr_file: str | None = None,
+    allow_fail: bool = False,
+) -> Tuple[str, str] | bool:
+    """
+    Executes a shell command in a specified directory with
+    optional capturing of output.
+    ----------
+    Input:
+        - cmd: list of strings or str, the command to be executed
+        - directory: Path, the directory in which to execute the command
+        - capture: bool, whether to capture the output of the command
+        - stdout_file: Path, file to write standard output
+        - stderr_file: Path, file to write standard error
+        - allow_fail: bool, whether to allow command failures without exception
+    Output:
+        - tuple of (stdout, stderr) if capture is True
+        - bool indicating success if capture is False
+    ----------
+    """
+    try:
+        logging.info("running command: %s", " ".join(cmd))
+        result = subprocess.run(
+            " ".join(cmd) if isinstance(cmd, list) else cmd,
+            shell=True,
+            cwd=directory,
+            stdout=(
+                stdout_file
+                if stdout_file
+                else (subprocess.PIPE if capture else None)
+            ),
+            stderr=(
+                stderr_file
+                if stderr_file
+                else (subprocess.PIPE if capture else None)
+            ),
+            text=True,
+            check=True,
+        )
+
+        if capture:
+            return result.stdout, result.stderr
+        return result.returncode == 0
+
+    except subprocess.CalledProcessError as e:
+        logging.error(
+            "Command failed with return code %d:\n%s\n%s",
+            e.returncode,
+            e.cmd,
+            e.stderr,
+        )
+        if not allow_fail:
+            raise
+        return False
+
+
+###############
+
+# Implementation of command design pattern
 
 
 class Command(ABC):
     """
-    Class to define the command interface,
-    which is the base class for all concrete commands.
-    This class could very well being extended to include
-    more functionality like undo, redo, etc.
-    ----------
-    Methods:
-        - execute: Abstract method to execute the command
-    ----------
+    Abstract base class for command
     """
 
     @abstractmethod
     def execute(self) -> Tuple[str, str] | bool:
         """
-        Abstract method for executing a command
-        The output of this command is either a tuple of stdout and stderr
-        or a boolean indicating success or
-        failure if the capture flag is False.
-        ----------
-        Output:
-            - tuple of (stdout, stderr) if capture is True
-            - bool indicating success if capture is False
-        ----------
+        Abstract method to execute the command
         """
 
 
 class ShellCommand(Command):
     """
-    Concrete implementation of a shell command
-    as a subclass of the Command interface.
-    This class holds all necessary information for
-    running a shell command without depending on
-    other classes or modules.
-    ----------
-    Methods:
-        - execute: implementation of the execute method
-            for shell commands
-    ----------
+    Concrete class for shell command
     """
 
     def __init__(
@@ -100,17 +135,7 @@ class ShellCommand(Command):
         allow_fail: bool = False,
     ) -> None:
         """
-        Constructor of the ShellCommand class
-        where all incoming parameters are stored as attributes.
-        ----------
-        Input:
-            - cmd: list of strings or str, the command to be executed
-            - directory: Path, the directory in which to execute the command
-            - capture: bool, whether to capture the output of the command
-            - stdout_file: Path, file to write standard output
-            - stderr_file: Path, file to write standard error
-            - allow_fail: bool, whether to allow command failures without exception
-        ----------
+        Constructor for ShellCommand
         """
         self.cmd = cmd
         self.directory = directory
@@ -121,22 +146,7 @@ class ShellCommand(Command):
 
     def execute(self) -> Tuple[str, str] | bool:
         """
-        Executes a shell command in a specified directory with
-        optional capturing of output.
-        ----------
-        Input:
-            - cmd: list of strings or str, the command to be executed
-            - directory: Path, the directory in which to execute the command
-            - capture: bool, whether to capture the output of the command
-            - stdout_file: Path, file to write standard output
-            - stderr_file: Path, file to write standard error
-            - allow_fail: bool, whether to allow command failures without exception
-        Output:
-            - tuple of (stdout, stderr) if capture is True
-            - bool indicating success if capture is False
-        Raises:
-            - SubprocessError: if the command fails and allow_fail is False
-        ----------
+        Executes the shell command
         """
         try:
             logging.info("running command: '%s'", " ".join(self.cmd))
@@ -169,38 +179,33 @@ class ShellCommand(Command):
                 e.stderr,
             )
             if not self.allow_fail:
-                raise SubprocessError(e.stderr) from e
+                raise
             return False
 
 
 class CommandInvoker:
     """
-    Invoker class that is repsponsible for executing a command
-    This could be any implementation of the Command interface.
-    But in this case, it is a ShellCommand.
-    ----------
-    Methods:
-        - execute: Executes the command
-    ----------
+    Invoker class for command pattern
     """
 
     def __init__(self, command: Command) -> None:
         """
-        Constructor of the CommandInvoker class
-        ----------
-        Input:
-            - command: Command, the command to be executed
-        ----------
+        Constructor for CommandInvoker
         """
         self.command = command
 
     def execute(self) -> Tuple[str, str] | bool:
         """
-        Method that starts the execution of the command
-        ----------
-        Output:
-            - tuple of (stdout, stderr) if capture is True
-            - bool indicating success if capture is False
-        ----------
+        Executes the command
         """
         return self.command.execute()
+
+
+if __name__ == "__main__":
+    # Example usage of the command pattern
+    command = ShellCommand(
+        cmd="ls -la", capture=True, directory=Path("/Users/mvandestreek")
+    )
+    invoker = CommandInvoker(command).execute()
+    for i in invoker:
+        print(i)

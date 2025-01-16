@@ -31,7 +31,7 @@ import re
 import time
 from typing import Any
 
-from command_utils import CommandInvoker, ShellCommand
+from command_utils import execute
 from queries.blast_runner import BLASTn
 from queries.kma_runner import KMA
 
