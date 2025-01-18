@@ -37,21 +37,22 @@ With these genetic sequences, the application can determine whether the sequence
 
 ## Table of Contents
 
-- [Application information](#application-information)
-- [About this project](#about-this-project)
-- [Table of Contents](#table-of-contents)
-- [Prerequisites](#prerequisites)
-- [Complete list of required packages](#complete-list-of-required-packages)
-- [Installation](#installation)
-- [(very) Brief Overview of Pacini-typing](#very-brief-overview-of-pacini-typing)
-- [Getting Started](#getting-started)
-- [Parameters \& Usage](#parameters--usage)
-- [Output](#output)
-- [Example Run of Pacini-typing](#example-run-of-pacini-typing)
-- [Issues](#issues)
-- [Future Ideas](#future-ideas)
-- [License](#license)
-- [Contact](#contact)
+* [Application information](#application-information)
+* [About this project](#about-this-project)
+* [Table of Contents](#table-of-contents)
+* [Prerequisites](#prerequisites)
+* [Complete list of required packages](#complete-list-of-required-packages)
+* [Installation](#installation)
+* [(very) Brief Overview of Pacini-typing](#very-brief-overview-of-pacini-typing)
+* [Getting Started](#getting-started)
+* [Parameters \& Usage](#parameters--usage)
+* [Output](#output)
+* [Example Run of Pacini-typing](#example-run-of-pacini-typing)
+* [Testing](#testing)
+* [Issues](#issues)
+* [Future Ideas](#future-ideas)
+* [License](#license)
+* [Contact](#contact)
 
 ## Prerequisites
 
@@ -453,6 +454,31 @@ CCCFFFFFHHHGHJJJJJJIJJJJJHIJJJJJC1:FHIIIIIJJIIJFIJGHIJJJJJJJIGIJJJJIJJ
 pacini_typing \
   --i input_file.ext \ # 1 FASTA file OR 2 FASTQ files
   --config path_to_config_file.yaml
+```
+
+## Testing
+
+Pacini-typing contains a quite broad test suite. Most useful tests are probably the end-to-end (E2E) tests. These tests are located in the `tests/e2e` directory of the repository. The (most) tests are additionally run online by a GitHub action workflow on every push to the repository.
+
+All tests are written in the `pytest` framework. To run the tests, the following command can be used:
+
+```bash
+pytest -v tests/
+```
+
+Big downside of some good tests is the dependency of bigger data files. These files are not included in the repository, because of their size and the GitHub Organization's policy. Therefore, some tests must be skipped if running through a GitHub action workflow.
+
+This skipping is done by a skip-if condition in the test file:
+
+```python
+skip_in_ci = pytest.mark.skipif(
+    os.getenv("CI") == "true",
+    reason="Test online (GitHub Action) not available due to dependencies",
+)
+
+@skip_in_ci
+def test_example():
+    # Test code
 ```
 
 ## Issues
