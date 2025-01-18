@@ -27,7 +27,7 @@ VIB_EA5348AA_AS_NODE_19_length_64079_cov_13.745954	ctxB:1:KJ437653	96.532	346	12
 __author__ = "Mark van de Streek"
 __date__ = "2024-09-24"
 __all__ = [
-    "check_tools",
+    "test_check_tools",
     "is_tool",
     "setup_teardown_single_input",
     "cleanup_files",

@@ -36,7 +36,7 @@ __all__ = [
     "test_empty_file",
 ]
 
-import platform
+import os
 from io import StringIO
 
 import pytest
@@ -47,6 +47,10 @@ from preprocessing.exceptions.determine_input_type_exceptions import (
     InvalidSequencingTypesError,
 )
 from preprocessing.validation.determine_input_type import InputFileInspector
+
+skip_in_ci = pytest.mark.skipif(
+    os.getenv("CI") == "true", reason="Test not supported in CI"
+)
 
 
 @pytest.fixture
@@ -162,9 +166,7 @@ def test_validate_fastq_length_mismatch(setup_valid_data: dict[str, str]):
         inspector.validate_fastq(file_handle, "length_mismatch.fastq")
 
 
-@pytest.mark.skipif(
-    platform.system() == "Linux", reason="Test not supported on Linux"
-)
+@skip_in_ci
 def test_determine_file_type_fasta():
     """
     Function that tests file type determination for a FASTA file.
@@ -174,9 +176,7 @@ def test_determine_file_type_fasta():
     assert file_validator.get_file_type() == "FASTA"
 
 
-@pytest.mark.skipif(
-    platform.system() == "Linux", reason="Test not supported on Linux"
-)
+@skip_in_ci
 def test_determine_file_type_fastq():
     """
     Function that tests file type determination for a FASTQ file.
@@ -188,9 +188,7 @@ def test_determine_file_type_fastq():
     assert paired_validator.get_file_type() == "FASTQ"
 
 
-@pytest.mark.skipif(
-    platform.system() == "Linux", reason="Test not supported on Linux"
-)
+@skip_in_ci
 def test_compare_types_mixed():
     """
     Function that tests if an error is raised for
@@ -205,9 +203,7 @@ def test_compare_types_mixed():
         )
 
 
-@pytest.mark.skipif(
-    platform.system() == "Linux", reason="Test not supported on Linux"
-)
+@skip_in_ci
 def test_compare_types_same():
     """
     Function that tests if error is raised for multiple files of the same type.
@@ -219,9 +215,6 @@ def test_compare_types_same():
         )
 
 
-@pytest.mark.skipif(
-    platform.system() == "Linux", reason="Test not supported on Linux"
-)
 def test_empty_file():
     """
     Function that tests if an error is raised for an empty file.

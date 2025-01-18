@@ -41,7 +41,9 @@ __all__ = ["AlignmentExtractor"]
 import logging
 import os
 
-from preprocessing.exceptions.alignment_exceptions import AlignmentFileNotFoundError
+from preprocessing.exceptions.alignment_exceptions import (
+    AlignmentFileNotFoundError,
+)
 from preprocessing.exceptions.parsing_exceptions import EmptySequenceError
 
 

@@ -33,7 +33,6 @@ __all__ = [
 ]
 
 import os
-import platform
 import time
 from typing import Any, Dict
 from unittest import mock
@@ -43,6 +42,10 @@ import pytest
 from queries.blast_runner import BLASTn
 from queries.kma_runner import KMA
 from queries.query_runner import QueryRunner
+
+skip_in_ci = pytest.mark.skipif(
+    os.getenv("CI") == "true", reason="Test not supported in CI"
+)
 
 
 @pytest.fixture()
@@ -189,9 +192,7 @@ def test_blast_get_query_different(setup_query_input: Dict[str, Any]):
     ]
 
 
-@pytest.mark.skipif(
-    platform.system() == "Linux", reason="Test not supported on Linux"
-)
+@skip_in_ci
 @mock.patch("os.path.exists", return_value=False)
 @mock.patch("os.makedirs")
 @pytest.mark.parametrize("runtime", RUN_TIMES)

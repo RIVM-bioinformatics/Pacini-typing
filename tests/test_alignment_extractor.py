@@ -25,7 +25,6 @@ __all__ = [
 ]
 
 import os
-import platform
 
 import pytest
 
@@ -42,9 +41,6 @@ def test_check_alignment_file_not_found():
         AlignmentExtractor("non_existent_file.txt", ["gene1"], "output.fasta")
 
 
-@pytest.mark.skipif(
-    platform.system() == "Linux", reason="Test not supported on Linux"
-)
 def test_parse_alignment_file():
     """
     Function that tests if the sequences are extracted correctly
@@ -63,9 +59,6 @@ def test_parse_alignment_file():
     assert "wbfZ_O139:1:AB012956" in extractor.query_sequences
 
 
-@pytest.mark.skipif(
-    platform.system() == "Linux", reason="Test not supported on Linux"
-)
 def test_parse_alignment_file_single_gene():
     """
     Function that tests if the sequences are extracted correctly
@@ -83,9 +76,6 @@ def test_parse_alignment_file_single_gene():
     assert "ctxA" in extractor.query_sequences
 
 
-@pytest.mark.skipif(
-    platform.system() == "Linux", reason="Test not supported on Linux"
-)
 def check_file_output(file: str, gene: str):
     """
     Function that checks if the output file is correct.

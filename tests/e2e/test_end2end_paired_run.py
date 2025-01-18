@@ -28,7 +28,7 @@ ctxB:1:KJ437653	348	96.551724	100.287356	40.350575	96.275072	96.275072	40.234957
 __author__ = "Mark van de Streek"
 __date__ = "2024-09-24"
 __all__ = [
-    "check_tools",
+    "test_check_tools",
     "is_tool",
     "setup_teardown_paired_input",
     "cleanup_files",
