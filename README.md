@@ -481,6 +481,14 @@ def test_example():
     # Test code
 ```
 
+When cloning the repository, the tests must be skipped as well. This can be done by running the following command:
+
+```bash
+CI=true pytest -v tests/
+```
+
+This simply uses the same strategy as the GitHub action workflow by setting the `CI` environment variable to `true`.
+
 ## Issues
 
 If encoutering any issues:
