@@ -64,23 +64,9 @@ skip_in_ci = pytest.mark.skipif(
 )
 
 
-def is_tool(name: str) -> bool:
-    """
-    Basic function to check if a tool is installed
-    It uses the shutil.which() function to check if the tool is in the PATH
-    ----------
-    Input:
-        name: str -> Name of the tool to check
-    Output:
-        bool -> True if the tool is installed, False otherwise
-    ----------
-    """
-    return shutil.which(name) is not None
-
-
-@pytest.fixture(scope="module", autouse=True)
+@pytest.fixture
 @skip_in_ci
-def check_tools():
+def test_check_tools():
     """
     Fixture to check if the required tools are installed
     If the tools are not installed, the test will fail
@@ -98,7 +84,21 @@ def check_tools():
         )
 
 
-@pytest.fixture()
+def is_tool(name: str) -> bool:
+    """
+    Basic function to check if a tool is installed
+    It uses the shutil.which() function to check if the tool is in the PATH
+    ----------
+    Input:
+        name: str -> Name of the tool to check
+    Output:
+        bool -> True if the tool is installed, False otherwise
+    ----------
+    """
+    return shutil.which(name) is not None
+
+
+@pytest.fixture
 @skip_in_ci
 def setup_teardown() -> Generator[list[str], None, None]:
     """

@@ -54,9 +54,9 @@ skip_in_ci = pytest.mark.skipif(
 )
 
 
-@pytest.fixture(scope="module", autouse=True)
+@pytest.fixture
 @skip_in_ci
-def check_tools():
+def test_check_tools():
     """
     Fixture to check if the required tools are installed
     If the tools are not installed, the test will fail
@@ -88,7 +88,7 @@ def is_tool(name: str) -> bool:
     return shutil.which(name) is not None
 
 
-@pytest.fixture()
+@pytest.fixture
 @skip_in_ci
 def setup_teardown_single_input() -> Generator[list[str], None, None]:
     """

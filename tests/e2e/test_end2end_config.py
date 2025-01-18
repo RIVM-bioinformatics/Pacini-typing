@@ -43,7 +43,7 @@ skip_in_ci = pytest.mark.skipif(
 )
 
 
-@pytest.fixture()
+@pytest.fixture
 @skip_in_ci
 def setup_teardown_config_input() -> Generator[list[str], None, None]:
     """

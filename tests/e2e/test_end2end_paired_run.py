@@ -59,9 +59,8 @@ skip_in_ci = pytest.mark.skipif(
 )
 
 
-@pytest.fixture(scope="module", autouse=True)
 @skip_in_ci
-def check_tools():
+def test_check_tools():
     """
     Fixture to check if the required tools are installed
     If the tools are not installed, the test will fail
