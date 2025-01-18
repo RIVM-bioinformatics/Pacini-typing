@@ -49,7 +49,8 @@ from preprocessing.exceptions.determine_input_type_exceptions import (
 from preprocessing.validation.determine_input_type import InputFileInspector
 
 skip_in_ci = pytest.mark.skipif(
-    os.getenv("CI") == "true", reason="Test not supported in CI"
+    os.getenv("CI") == "true",
+    reason="Test online (GitHub Action) not available due to dependencies",
 )
 
 
