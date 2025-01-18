@@ -206,7 +206,10 @@ def test_blast_get_query_different(setup_query_input: Dict[str, Any]) -> None:
 @mock.patch("os.makedirs")
 @pytest.mark.parametrize("runtime", RUN_TIMES)
 def test_get_runtime(
-    mock, mock1, runtime: float, setup_query_input: Dict[str, Any]
+    mock: mock.MagicMock,
+    mock1: mock.MagicMock,
+    runtime: float,
+    setup_query_input: Dict[str, Any],
 ) -> None:
     """
     Function that tests the get_runtime() method of the QueryRunner class.

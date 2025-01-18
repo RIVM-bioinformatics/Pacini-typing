@@ -18,8 +18,11 @@ After the test is run, it cleans up the files created during the test.
 __author__ = "Mark van de Streek"
 __date__ = "2024-09-24"
 __all__ = [
+    "test_existence_of_tools",
     "setup_teardown_config_input",
     "cleanup_files",
+    "test_config_run",
+    "check_file_contents",
 ]
 
 import os
@@ -31,6 +34,7 @@ import pytest
 
 from command_utils import CommandInvoker, ShellCommand
 from pacini_typing import main
+from tests.e2e.check_tool_existence import check_tools
 
 FASTA_FILE = "test_data/VIB_EA5348AA_AS.fasta"
 FASTQ_1 = "test_data/VIB_EA5348AA_AS_1.fq"
@@ -46,6 +50,15 @@ skip_in_ci = pytest.mark.skipif(
     os.getenv("CI") == "true",
     reason="Test online (GitHub Action) not available due to dependencies",
 )
+
+
+@skip_in_ci
+def test_existence_of_tools() -> None:
+    """
+    Function to test the existence of the required tools for
+    this test script.
+    """
+    check_tools(["kma_index", "makeblastdb", "blastn", "kma"])
 
 
 @pytest.fixture
@@ -93,9 +106,7 @@ def cleanup_files() -> None:
 
 
 @skip_in_ci
-def test_config_run(
-    setup_teardown_config_input: Generator[list[str], None, None]
-) -> None:
+def test_config_run(setup_teardown_config_input: list[str]) -> None:
     """
     End-to-end test for the main function with single input.
     The test runs the main function of pacini_typing
@@ -138,9 +149,7 @@ def check_file_contents(file: str) -> None:
 
 
 @skip_in_ci
-def test_config_paired_run(
-    setup_teardown_config_input: Generator[list[str], None, None]
-) -> None:
+def test_config_paired_run(setup_teardown_config_input: list[str]) -> None:
     """
     Function that tests the main function with paired input
     it runs the main function of pacini_typing with the paired input arguments

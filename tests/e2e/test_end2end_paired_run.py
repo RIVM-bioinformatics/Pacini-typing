@@ -18,11 +18,11 @@ After the test is run, it cleans up the files created during the test.
 __author__ = "Mark van de Streek"
 __date__ = "2024-09-24"
 __all__ = [
-    "test_check_tools",
-    "is_tool",
+    "test_existence_of_tools",
     "setup_teardown_paired_input",
     "cleanup_files",
     "test_paired_run",
+    "check_file_contents",
 ]
 
 import os
@@ -34,6 +34,7 @@ import pytest
 
 from pacini_typing import main
 from preprocessing.validation import validating_input_arguments
+from tests.e2e.check_tool_existence import check_tools
 
 RUN_OUTPUT = "test_full_run/myresults"
 
@@ -51,36 +52,12 @@ skip_in_ci = pytest.mark.skipif(
 
 
 @skip_in_ci
-def test_check_tools():
+def test_existence_of_tools() -> None:
     """
-    Fixture to check if the required tools are installed.
-    If the tools are not installed, the test will fail.
-    KMA and BLASTN are required for a full run of Pacini-typing
-    ----------
-    Raises:
-        - pytest.fail
-    ----------
+    Function to test the existence of the required tools for
+    this test script
     """
-    required_tools = ["kma", "blastn"]
-    missing_tools = [tool for tool in required_tools if not is_tool(tool)]
-    if missing_tools:
-        pytest.fail(
-            f"Failed tests because the following tools are missing: {', '.join(missing_tools)}"
-        )
-
-
-def is_tool(name: str) -> bool:
-    """
-    Basic function to check if a tool is installed
-    It uses the shutil.which() function to check if the tool is in the PATH
-    ----------
-    Input:
-        - name: name of the tool to check
-    Output:
-        - bool: True if the tool is installed, False otherwise
-    ----------
-    """
-    return shutil.which(name) is not None
+    check_tools(["kma", "blastn"])
 
 
 @pytest.fixture()
@@ -136,9 +113,7 @@ def cleanup_files(dir_path: str) -> None:
 
 
 @skip_in_ci
-def test_paired_run(
-    setup_teardown_paired_input: Generator[list[str], None, None]
-) -> None:
+def test_paired_run(setup_teardown_paired_input: list[str]) -> None:
     """
     End-to-end test for the main function with paired input.
     It runs the main function of pacini_typing with the paired input arguments

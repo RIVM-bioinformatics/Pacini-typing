@@ -18,8 +18,12 @@ After the test is run, it cleans up the files created during the test.
 __author__ = "Mark van de Streek"
 __date__ = "2024-10-30"
 __all__ = [
+    "test_existence_of_tools",
     "setup_teardown",
     "cleanup_files",
+    "test_make_kma_database",
+    "test_make_blast_database",
+    "compare_result_with_expected_files",
 ]
 
 import os
@@ -30,6 +34,7 @@ import pytest
 
 from pacini_typing import main
 from preprocessing.validation import validating_input_arguments
+from tests.e2e.check_tool_existence import check_tools
 
 INPUT_FILE = "test_data/vibrio_genes.fasta"
 DATABASE_PATH = "./refdir/"
@@ -60,38 +65,13 @@ skip_in_ci = pytest.mark.skipif(
 )
 
 
-@pytest.fixture
 @skip_in_ci
-def test_check_tools():
+def test_existence_of_tools() -> None:
     """
-    Fixture to check if the required tools are installed
-    If the tools are not installed, the test will fail
-    KMA and BLASTN are required for a run of Pacini-typing
-    ----------
-    Raises:
-        - pytest.fail
-    ----------
+    Function to test the existence of the required tools for
+    this test script.
     """
-    required_tools = ["kma_index", "makeblastdb"]
-    missing_tools = [tool for tool in required_tools if not is_tool(tool)]
-    if missing_tools:
-        pytest.fail(
-            f"Skipping tests because the following tools are missing: {', '.join(missing_tools)}"
-        )
-
-
-def is_tool(name: str) -> bool:
-    """
-    Basic function to check if a tool is installed
-    It uses the shutil.which() function to check if the tool is in the PATH
-    ----------
-    Input:
-        - name: name of the tool to check
-    Output:
-        - bool: True if the tool is installed, False otherwise
-    ----------
-    """
-    return shutil.which(name) is not None
+    check_tools(["kma_index", "makeblastdb"])
 
 
 @pytest.fixture
