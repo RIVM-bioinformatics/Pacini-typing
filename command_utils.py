@@ -13,7 +13,7 @@ interface for running shell commands and capturing their output for
 further processing.
 
 For this purpose, the module is using the command design pattern.
-This is done in the folowing classes:
+This is done in the following classes:
     - Command: Interface for all concrete commands
     - ShellCommand: Concrete implementation of a shell command
     - CommandInvoker: Invoker class that is responsible for executing a command
@@ -34,6 +34,9 @@ Or capture output in a file:
                         stdout_file=f,
                         stderr_file=e,
                     )).execute()
+
+The capturing in a file is currently not used in the operations,
+but is built in for future use.
 """
 
 __author__ = "Mark van de Streek"
@@ -53,8 +56,6 @@ class Command(ABC):
     """
     Class to define the command interface,
     which is the base class for all concrete commands.
-    This class could very well being extended to include
-    more functionality like undo, redo, etc.
     ----------
     Methods:
         - execute: Abstract method to execute the command
@@ -175,7 +176,7 @@ class ShellCommand(Command):
 
 class CommandInvoker:
     """
-    Invoker class that is repsponsible for executing a command
+    Invoker class that is responsible for executing a command
     This could be any implementation of the Command interface.
     But in this case, it is a ShellCommand.
     ----------
