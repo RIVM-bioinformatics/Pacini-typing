@@ -12,14 +12,6 @@ This module tests the execute function from the command_utils module.
 
 The pytest fixture temp_files is used to
 create temporary files for stdout and stderr.
-
-The tests are divided into the following functions:
-- test_execute_capture_output
-- test_execute_no_capture_output
-- test_execute_with_stdout
-- test_execute_failing_command_allow_fail_false
-- test_execute_failing_command_allow_fail_true
-- pytest_capture_error_file
 """
 
 __author__ = "Mark van de Streek"
@@ -34,6 +26,7 @@ __all__ = [
 ]
 
 import os
+from typing import Generator, TextIO, Tuple
 
 import pytest
 
@@ -42,10 +35,15 @@ from preprocessing.exceptions.command_utils_exceptions import SubprocessError
 
 
 @pytest.fixture
-def temp_files():
+def temp_files() -> Generator[Tuple[TextIO, TextIO], None, None]:
     """
     Fixture to create temporary files for stdout and stderr.
     The files are used by a test and removed after the test is done.
+    ----------
+    Output:
+        - stdout_f: temporary file for stdout
+        - stderr_f: temporary file for stderr
+    ----------
     """
     stdout_file = "test_stdout.txt"
     stderr_file = "test_stderr.txt"
@@ -57,7 +55,7 @@ def temp_files():
     os.remove(stderr_file)
 
 
-def test_execute_capture_output():
+def test_execute_capture_output() -> None:
     """
     Test the execute function with capturing the output
     The output is placed in a tuple with stdout and stderr,
@@ -70,7 +68,7 @@ def test_execute_capture_output():
     assert result[1].strip() == ""
 
 
-def test_execute_no_capture_output():
+def test_execute_no_capture_output() -> None:
     """
     Test the execute function without capturing the output.
     """
@@ -81,10 +79,14 @@ def test_execute_no_capture_output():
     assert result is True
 
 
-def test_execute_with_stdout(temp_files):
+def test_execute_with_stdout(temp_files: tuple[TextIO, TextIO]) -> None:
     """
     Test the execute function with capturing the output to a file.
     The fixture creates temporary files for stdout and stderr.
+    ----------
+    Input:
+        - temp_files: temporary files for stdout and stderr
+    ----------
     """
     stdout_f, stderr_f = temp_files
     CommandInvoker(
@@ -102,7 +104,7 @@ def test_execute_with_stdout(temp_files):
     assert stdout_content == "Hello World"
 
 
-def test_execute_failing_command_allow_fail_false():
+def test_execute_failing_command_allow_fail_false() -> None:
     """
     Test the execute function with a failing command.
     The function makes sure that the command fails and raises an exception.
@@ -113,7 +115,7 @@ def test_execute_failing_command_allow_fail_false():
         ).execute()
 
 
-def test_execute_failing_command_allow_fail_true():
+def test_execute_failing_command_allow_fail_true() -> None:
     """
     Test the execute function with a failing command
     and allow_fail=True.
@@ -124,10 +126,14 @@ def test_execute_failing_command_allow_fail_true():
     assert result is False
 
 
-def pytest_capture_error_file(temp_files):
+def pytest_capture_error_file(temp_files: tuple[TextIO, TextIO]) -> None:
     """
     Test the execute function with a failing command
     and capturing the output in a file.
+    ----------
+    Input:
+        - temp_files: temporary files for stdout and stderr
+    ----------
     """
     stdout_f, stderr_f = temp_files
     with pytest.raises(SubprocessError):

@@ -8,17 +8,7 @@
     https://github.com/features/copilot
 
 This file contains tests for the query_runner module.
-These tests are repsponsible for testing the query_runner module.
-
-The tests are divided into the following functions:
-- test_prepare_query
-- test_get_query_different
-- test_get_query_verbose_false
-- test_blast_prepare_query
-- test_blast_get_query_different
-- test_get_runtime
-
-The OPTION dictionary is a mock dictionary that is used in the tests.
+These tests are responsible for testing the query_runner module.
 """
 
 __author__ = "Mark van de Streek"
@@ -48,16 +38,23 @@ skip_in_ci = pytest.mark.skipif(
     reason="Test online (GitHub Action) not available due to dependencies",
 )
 
+RUN_TIMES = [
+    0.1,
+    0.04,
+    1.5673,
+    1.4567,
+    1.2345,
+    0.01,
+]
+
 
 @pytest.fixture()
 def setup_query_input() -> Dict[str, Any]:
     """
-    Pytest fixture that sets up the input options for the query test
-
-    Returns a dictionary of test configuration options
+    Pytest fixture that sets up the input options for the query test.
     ----------
     Output:
-        OPTION: Dict[str, Any] -> Dictionary of test configuration options
+        - Dict: Dictionary of test configuration options
     ----------
     """
     return {
@@ -78,19 +75,13 @@ def setup_query_input() -> Dict[str, Any]:
     }
 
 
-RUN_TIMES = [
-    0.1,
-    0.04,
-    1.5673,
-    1.4567,
-    1.2345,
-    0.01,
-]
-
-
 def test_prepare_query(setup_query_input: Dict[str, Any]) -> None:
     """
     Function that tests the prepare_query() function(s) of the enums
+    ----------
+    Input:
+        - setup_query_input: Dictionary of test configuration options
+    ----------
     """
     query: list[str] = KMA.get_query(setup_query_input)
     assert query == [
@@ -109,9 +100,13 @@ def test_prepare_query(setup_query_input: Dict[str, Any]) -> None:
 
 def test_get_query_different(setup_query_input: Dict[str, Any]) -> None:
     """
-    Function that tests the prepare_query() function(s) of the enums
+    Function that tests the prepare_query() function(s) of the enums.
     It uses a different database name by simply copying the
     OPTION dictionary and changing the database name
+    ----------
+    Input:
+        - setup_query_input: Dictionary of test configuration options
+    ----------
     """
     sub_option = setup_query_input.copy()
     sub_option["database_name"] = "my_new_db"
@@ -130,9 +125,14 @@ def test_get_query_different(setup_query_input: Dict[str, Any]) -> None:
     ]
 
 
-def test_get_query_verbose_false(setup_query_input: Dict[str, Any]):
+def test_get_query_verbose_false(setup_query_input: Dict[str, Any]) -> None:
     """
-    Function that tests the prepare_query() function(s) of the enums with verbose set to False
+    Function that tests the prepare_query() function(s) of the
+    enums with verbose set to False
+    ----------
+    Input:
+        - setup_query_input: Dictionary of test configuration options
+    ----------
     """
     sub_option = setup_query_input.copy()
     sub_option["verbose"] = False
@@ -151,9 +151,13 @@ def test_get_query_verbose_false(setup_query_input: Dict[str, Any]):
     ]
 
 
-def test_blast_prepare_query(setup_query_input: Dict[str, Any]):
+def test_blast_prepare_query(setup_query_input: Dict[str, Any]) -> None:
     """
     Function that tests the prepare_query() function(s) of the enums
+    ----------
+    Input:
+        - setup_query_input: Dictionary of test configuration options
+    ----------
     """
     query = BLASTn.get_query(setup_query_input)
     assert query == [
@@ -171,9 +175,13 @@ def test_blast_prepare_query(setup_query_input: Dict[str, Any]):
     ]
 
 
-def test_blast_get_query_different(setup_query_input: Dict[str, Any]):
+def test_blast_get_query_different(setup_query_input: Dict[str, Any]) -> None:
     """
     Function that tests the prepare_query() function(s) of the enums
+    ----------
+    Input:
+        - setup_query_input: Dictionary of test configuration options
+    ----------
     """
     sub_option = setup_query_input.copy()
     sub_option["database_name"] = "my_new_db"
@@ -201,7 +209,15 @@ def test_get_runtime(
     mock, mock1, runtime: float, setup_query_input: Dict[str, Any]
 ) -> None:
     """
-    Function that tests the get_runtime() method of the QueryRunner class
+    Function that tests the get_runtime() method of the QueryRunner class.
+    Certain mocks are used to simulate the runtime of the test.
+    ----------
+    Input:
+        - mock: mock object for os.path.exists
+        - mock1: mock object for os.makedirs
+        - runtime: runtime to test
+        - setup_query_input: Dictionary of test configuration options
+    ----------
     """
     runner = QueryRunner(setup_query_input)
     runner.start_time = time.time()

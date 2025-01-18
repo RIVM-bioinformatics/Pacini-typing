@@ -35,16 +35,11 @@ from preprocessing.exceptions.parsing_exceptions import (
 )
 
 
-def test_read_config_good():
+def test_read_config_good() -> None:
     """
-    Test the reading of a good configuration file
-    First assert that the pattern var is actually being
-    filled with the correct information
-    Then, assert the pattern that is being read is the
-    same as in the expected file.
-    The file /test_data/expected_output/expected_O1_config.json
-    contains the expected output of the pattern read from the
-    configuration file config/O1.yaml
+    Test the good reading of a configuration file.
+    The configuration file is read and the pattern is
+    checked if it is the same as the expected pattern.
     """
     config = read_config_pattern.ReadConfigPattern("config/O139.yaml", "fasta")
     assert len(config.pattern) > 1
@@ -56,7 +51,7 @@ def test_read_config_good():
         assert config.pattern == json.load(file)
 
 
-def test_read_config_file_error():
+def test_read_config_file_error() -> None:
     """
     Test the reading of a non-existing configuration file
     The reading function of the class should raise a FileNotFoundError
@@ -65,17 +60,12 @@ def test_read_config_file_error():
         read_config_pattern.ReadConfigPattern("parsing/O100.yaml", "fasta")
 
 
-def test_read_config_wrong_structure_yaml():
+def test_read_config_wrong_structure_yaml() -> None:
     """
     Test if wrong YAML structured config files are raising
-    the correct exception. In the test_data/wrong_files folder
-    there are two files that are not correctly structured.
-    The function should raise a YAMLLoadingError.
-    Why not a YAMLStructureError?
-    This because a wrong constructed YAML file is not valid,
-    and therefore could not be read by the yaml module.
-    A YAMLStructureError is raised when the structure of the
-    YAML file contains wrong keys or is missing keys.
+    the correct exception.
+    Wrong constructed YAML files are used to test the
+    functionality of the function.
     """
     with pytest.raises(YAMLLoadingError):
         read_config_pattern.ReadConfigPattern(
@@ -86,13 +76,11 @@ def test_read_config_wrong_structure_yaml():
         )
 
 
-def test_validate_config_keys_structure_error():
+def test_validate_config_keys_structure_error() -> None:
     """
     Test if missing/wrong keys in the configuration file are raising
     the correct exception. In the test_data/wrong_files
     folder there are two files that are not correct.
-    The incorrectness is in the keys of the configuration file.
-    This function should raise a YAMLStructureError.
     """
     with pytest.raises(YAMLStructureError):
         read_config_pattern.ReadConfigPattern(
@@ -103,13 +91,11 @@ def test_validate_config_keys_structure_error():
         )
 
 
-def test_validate_pattern_keys_structure_error():
+def test_validate_pattern_keys_structure_error() -> None:
     """
     Test if missing/wrong pattern-keys in the configuration file are raising
     the correct exception. In the test_data/wrong_files folder there
-    are two files that are not correct. The incorrectness is especially
-    in the pattern keys of the configuration file. This function should
-    raise a YAMLStructureError.
+    are two files that are not correct.
     """
     with pytest.raises(YAMLStructureError):
         read_config_pattern.ReadConfigPattern(
@@ -120,19 +106,11 @@ def test_validate_pattern_keys_structure_error():
         )
 
 
-def test_construct_params_dict():
+def test_construct_params_dict() -> None:
     """
     Test if the construct_params_dict function is working correctly.
     The function should fill the creation_dict with the correct
-    parameters. The function should also be able to change the
-    input_file_type. The input_file_type should be the same as the
-    file_type in the creation_dict.
-    ----------
-    Note: although the input_file_type should be fasta or fastq,
-    the functionality is tested with a custom_file_type.
-    potential errors caused by input_file_types that are not
-    fasta or fastq are already checked in earlier code
-    ----------
+    parameters.
     """
     config = read_config_pattern.ReadConfigPattern("config/O1.yaml", "fastq")
     assert (

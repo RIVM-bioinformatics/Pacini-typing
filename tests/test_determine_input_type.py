@@ -61,7 +61,7 @@ def setup_valid_data() -> dict[str, str]:
     The variations are used to test the validation functions.
     ----------
     Output:
-        - dict: A dictionary with valid and invalid FASTA and FASTQ data.
+        - dict: dictionary with valid and invalid FASTA and FASTQ data.
     ----------
     """
     return {
@@ -79,7 +79,7 @@ def setup_valid_data() -> dict[str, str]:
     }
 
 
-def test_validate_fasta_valid(setup_valid_data: dict[str, str]):
+def test_validate_fasta_valid(setup_valid_data: dict[str, str]) -> None:
     """
     Function that tests if a valid FASTA file passes validation.
     It's a sunny day test: everything should pass.
@@ -94,7 +94,7 @@ def test_validate_fasta_valid(setup_valid_data: dict[str, str]):
     inspector.validate_fasta(file_handle, "valid.fasta")
 
 
-def test_validate_fasta_no_header(setup_valid_data: dict[str, str]):
+def test_validate_fasta_no_header(setup_valid_data: dict[str, str]) -> None:
     """
     Function that tests if a FASTA file with no header raises an error.
     ----------
@@ -108,7 +108,9 @@ def test_validate_fasta_no_header(setup_valid_data: dict[str, str]):
         inspector.validate_fasta(file_handle, "no_header.fasta")
 
 
-def test_validate_fasta_invalid_sequence(setup_valid_data: dict[str, str]):
+def test_validate_fasta_invalid_sequence(
+    setup_valid_data: dict[str, str]
+) -> None:
     """
     Function that tests if a FASTA file with an
     invalid sequence raises an error.
@@ -123,7 +125,7 @@ def test_validate_fasta_invalid_sequence(setup_valid_data: dict[str, str]):
         inspector.validate_fasta(file_handle, "invalid_sequence.fasta")
 
 
-def test_validate_fastq_valid(setup_valid_data: dict[str, str]):
+def test_validate_fastq_valid(setup_valid_data: dict[str, str]) -> None:
     """
     Test a valid FASTQ file passes validation.
     This test should simply pass.
@@ -138,13 +140,13 @@ def test_validate_fastq_valid(setup_valid_data: dict[str, str]):
     inspector.validate_fastq(file_handle, "valid.fastq")
 
 
-def test_validate_fastq_missing_plus(setup_valid_data: dict[str, str]):
+def test_validate_fastq_missing_plus(setup_valid_data: dict[str, str]) -> None:
     """
     Function that tests FASTQ file with missing '+' line raises an error.
     ----------
     Input:
         - setup_valid_data: valid and invalid FASTA and FASTQ data.
-    ----------
+    ---------
     """
     inspector = InputFileInspector([])
     file_handle = StringIO(setup_valid_data["invalid_fastq_missing_plus"])
@@ -152,7 +154,9 @@ def test_validate_fastq_missing_plus(setup_valid_data: dict[str, str]):
         inspector.validate_fastq(file_handle, "missing_plus.fastq")
 
 
-def test_validate_fastq_length_mismatch(setup_valid_data: dict[str, str]):
+def test_validate_fastq_length_mismatch(
+    setup_valid_data: dict[str, str]
+) -> None:
     """
     Function that tests FASTQ file with mismatched sequence and
     quality lengths raises an error.

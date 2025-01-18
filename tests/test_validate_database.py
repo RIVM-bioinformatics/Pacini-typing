@@ -7,20 +7,8 @@
     “GitHub Copilot: Your AI pair programmer” (GPT-3). GitHub, Inc.
     https://github.com/features/copilot
 
-Test module for the validate_database module.
-This module tests the functions from the validate_database module.
-In other words, the functions that check the existence of the database files.
-
-The tests are divided into the following functions:
-- test_create_database_file_list_fasta
-- test_create_database_file_list_fastq
-- test_check_for_database_existence
-- test_check_for_database_existence_missing_file
-- test_check_for_database_path_valid
-- test_check_for_database_path_invalid
-
-The fixtures fasta_options and fastq_options are used
-to provide options for the tests.
+Script that tests the validate_database module.
+This module is responsible for validating the database files and paths.
 """
 
 __author__ = "Mark van de Streek"
@@ -44,9 +32,7 @@ from unittest import mock
 import pytest
 
 from pacini_typing import PaciniTyping
-from preprocessing.exceptions.validate_database_exceptions import (
-    InvalidDatabaseError,
-)
+from preprocessing.exceptions.validate_database_exceptions import InvalidDatabaseError
 from preprocessing.validation.validate_database import (
     check_for_database_existence,
     check_for_database_path,
@@ -60,9 +46,13 @@ skip_in_ci = pytest.mark.skipif(
 
 
 @pytest.fixture
-def fasta_options():
+def fasta_options() -> dict[str, str]:
     """
     Fixture that returns a dictionary of options for FASTA files.
+    ----------
+    Output:
+        - Dict: Dictionary of options for FASTA files
+    ----------
     """
     return {
         "database_path": "./refdir/",
@@ -72,9 +62,13 @@ def fasta_options():
 
 
 @pytest.fixture
-def fastq_options():
+def fastq_options() -> dict[str, str]:
     """
     Fixture that returns a dictionary of options for FASTQ files.
+    ----------
+    Output:
+        - Dict: Dictionary of options for FASTQ files
+    ----------
     """
     return {
         "database_path": "./refdir/",
@@ -84,9 +78,15 @@ def fastq_options():
 
 
 @skip_in_ci
-def test_create_database_file_list_fasta(fasta_options):
+def test_create_database_file_list_fasta(
+    fasta_options: dict[str, str]
+) -> None:
     """
     Test that the function returns the correct list of database files for FASTA files.
+    ----------
+    Input:
+        - fasta_options: Dictionary of options for FASTA files
+    ----------
     """
     expected_files = [
         "mydb.ndb",
@@ -102,9 +102,15 @@ def test_create_database_file_list_fasta(fasta_options):
 
 
 @skip_in_ci
-def test_create_database_file_list_fastq(fastq_options):
+def test_create_database_file_list_fastq(
+    fastq_options: dict[str, str]
+) -> None:
     """
     Test that the function returns the correct list of database files for FASTQ files.
+    ----------
+    Input:
+        - fastq_options: Dictionary of options for FASTQ files
+    ----------
     """
     expected_files = [
         "mykma.comp.b",
@@ -117,18 +123,29 @@ def test_create_database_file_list_fastq(fastq_options):
 
 @skip_in_ci
 @mock.patch("os.path.exists", return_value=True)
-def test_check_for_database_existence(options):
+def test_check_for_database_existence(options: dict[str, str]) -> None:
     """
     Test that the function returns True when the database files are present.
+    ----------
+    Input:
+        - options: Dictionary of options for the database files
+    ----------
     """
     assert check_for_database_existence(options) is True
 
 
 @skip_in_ci
 @mock.patch("os.path.exists")
-def test_check_for_database_existence_missing_file(mock_exists, fasta_options):
+def test_check_for_database_existence_missing_file(
+    mock_exists, fasta_options: dict[str, str]
+) -> None:
     """
     Test that the function raises a SystemExit when the database files are missing.
+    ----------
+    Input:
+        - mock_exists: Mock object for the os.path.exists function
+        - fasta_options: Dictionary of options for FASTA files
+    ----------
     """
 
     def mock_exists_side_effect(path):
@@ -143,34 +160,52 @@ def test_check_for_database_existence_missing_file(mock_exists, fasta_options):
 
 @skip_in_ci
 @mock.patch("os.path.exists", return_value=True)
-def test_check_for_database_path_valid(fasta_options):
+def test_check_for_database_path_valid(fasta_options: dict[str, str]) -> None:
     """
     Test that the function returns True when the database path is valid.
+    ----------
+    Input:
+        - fasta_options: Dictionary of options for FASTA files
+    ----------
     """
     assert check_for_database_path(fasta_options) is True
 
 
 @skip_in_ci
 @mock.patch("os.path.exists", return_value=False)
-def test_check_for_database_path_invalid(fasta_options):
+def test_check_for_database_path_invalid(
+    fasta_options: dict[str, str]
+) -> None:
     """
-    Test that the function raises a SystemExit when the database path is invalid.
+    Test that the function raises a SystemExit when
+    the database path is invalid.
+    ----------
+    Input:
+        - fasta_options: Dictionary of options for FASTA files
+    ----------
     """
     assert check_for_database_path(fasta_options) is False
 
 
 @skip_in_ci
 @mock.patch("os.path.exists", return_value=True)
-def test_check_for_database_path_append_slash(mock, fasta_options):
+def test_check_for_database_path_append_slash(
+    mock, fasta_options: dict[str, str]
+) -> None:
     """
     Test that the function appends a slash to the database path if it does not end with one.
+    ----------
+    Input:
+        - mock: Mock object for the os.path.exists function
+        - fasta_options: Dictionary of options for FASTA files
+    ----------
     """
     fasta_options["database_path"] = "./refdir"
     assert check_for_database_path(fasta_options) is True
     assert fasta_options["database_path"] == "./refdir/"
 
 
-def test_run_method_raises_invalid_database_error():
+def test_run_method_raises_invalid_database_error() -> None:
     """
     This function is a very hard to understand.
     The InvalidDatabaseError is raised when the database path is invalid.

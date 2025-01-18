@@ -49,12 +49,9 @@ def setup_args() -> Generator[list[str], None, None]:
     Pytest fixture that sets up the arguments for tests.
     It creates a Generator object that yields the arguments
     After the test is run, it comes back and looks for possible cleanup
-
-    Test is skipped if the platform is Linux,
-    this is due to the use of GitHub actions
     ----------
     Output:
-        args: list[str] -> List of arguments for the test
+        - args: list of arguments for the test
     ----------
     """
     args = [
@@ -76,7 +73,7 @@ def cleanup_files(dir_path: str) -> None:
     Is simply removes the directory and all files in it
     ----------
     Input:
-        dir_path: str -> Path to the directory to remove
+        - dir_path: path to the directory to remove
     ----------
     """
     if os.path.exists(dir_path):
@@ -97,7 +94,7 @@ def test_wrong_extension(setup_args: list[str]):
     the wrong extension is provided for the database.
     ----------
     Input:
-        setup_args: list[str] -> Arguments for the test
+        - setup_args: list of arguments for the test
     ----------
     """
     setup_args.extend(
@@ -118,7 +115,7 @@ def test_not_existing_file(setup_args: list[str]):
     a file that does not exist is provided.
     ----------
     Input:
-        setup_args: list[str] -> Arguments for the test
+        - setup_args: list of arguments for the test
     ----------
     """
     setup_args.extend(["test_data/VIBAABBCC_1.fq", "test_data/VIBAABBCC_2.fq"])
@@ -134,7 +131,7 @@ def test_wrong_sequence(setup_args: list[str]):
     In this case, the sequence is mutated with wrong characters
     ----------
     Input:
-        setup_args: list[str] -> Arguments for the test
+        - setup_args: list of arguments for the test
     ----------
     """
     setup_args.extend(["test_data/wrong_files/wrong_sequence.fasta"])
@@ -150,7 +147,7 @@ def test_wrong_fasta_construction(setup_args: list[str]):
     In this case, the header line '>' is changed to '+'
     ----------
     Input:
-        setup_args: list[str] -> Arguments for the test
+        - setup_args: list of arguments for the test
     ----------
     """
     setup_args.extend(["test_data/wrong_files/wrong_constructed.fasta"])
@@ -163,10 +160,10 @@ def test_wrong_fastq_construction(setup_args: list[str]):
     Test if the InvalidFastaOrFastqError is raised when
     a file is provided which is not a valid FASTQ file.
 
-    In this case, the seperator line '+' is changed to '-'
+    In this case, the separator line '+' is changed to '-'
     ----------
     Input:
-        setup_args: list[str] -> Arguments for the test
+        - setup_args: list of arguments for the test
     ----------
     """
     setup_args.extend(["test_data/wrong_files/wrong_constructed.fastq"])
@@ -183,7 +180,7 @@ def test_wrong_fastq_construction_2(setup_args: list[str]):
     is not equal to the sequence length
     ----------
     Input:
-        setup_args: list[str] -> Arguments for the test
+        - setup_args: list of arguments for the test
     ----------
     """
     setup_args.extend(["test_data/wrong_files/wrong_constructed_2.fastq"])
@@ -197,7 +194,7 @@ def test_wrong_pairing(setup_args: list[str]):
     the wrong files are provided.
     ----------
     Input:
-        setup_args: list[str] -> Arguments for the test
+        setup_args: list of arguments for the test
     ----------
     """
     setup_args.extend(
@@ -216,7 +213,7 @@ def test_wrong_fastq_input(setup_args: list[str]):
     the wrong amount of input files are provided.
     ----------
     Input:
-        setup_args: list[str] -> Arguments for the test
+        setup_args: list of arguments for the test
     ----------
     """
     setup_args.extend(["test_data/wrong_files/VIB_EA5348AA_AS_1.fq"])
@@ -230,7 +227,7 @@ def test_wrong_fasta_input(setup_args: list[str]):
     the wrong amount of input files are provided.
     ----------
     Input:
-        setup_args: list[str] -> Arguments for the test
+        - setup_args: list of arguments for the test
     ----------
     """
     setup_args.extend(
@@ -251,7 +248,7 @@ def test_wrong_fasta_with_fastq_names(setup_args: list[str]):
     In this case, two FASTA files are provided with FASTQ names.
     ----------
     Input:
-        setup_args: list[str] -> Arguments for the test
+        - setup_args: list of arguments for the test
     ----------
     """
     setup_args.extend(
