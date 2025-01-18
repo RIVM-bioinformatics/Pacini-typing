@@ -36,7 +36,6 @@ __all__ = [
 ]
 
 import os
-import platform
 import shutil
 from typing import Generator
 
@@ -55,8 +54,13 @@ EXPECTED_FILES = [
     "test_data/expected_output/expected_paired_VIB_EA5348AA.frag.gz",
 ]
 
+skip_in_ci = pytest.mark.skipif(
+    os.getenv("CI") == "true", reason="Test not supported in CI"
+)
+
 
 @pytest.fixture(scope="module", autouse=True)
+@skip_in_ci
 def check_tools():
     """
     Fixture to check if the required tools are installed
@@ -67,9 +71,6 @@ def check_tools():
         pytest.fail
     ----------
     """
-    if platform.system() == "Linux":
-        pytest.skip("Test not supported on Linux")
-
     required_tools = ["kma", "blastn"]
     missing_tools = [tool for tool in required_tools if not is_tool(tool)]
     if missing_tools:
@@ -93,9 +94,7 @@ def is_tool(name: str) -> bool:
 
 
 @pytest.fixture()
-@pytest.mark.skipif(
-    platform.system() == "Linux", reason="Test not supported on Linux"
-)
+@skip_in_ci
 def setup_teardown_paired_input() -> Generator[list[str], None, None]:
     """
     Pytest fixture that sets up the arguments for the paired input test
@@ -152,9 +151,7 @@ def cleanup_files(dir_path: str) -> None:
         os.rmdir(dir_path)
 
 
-@pytest.mark.skipif(
-    platform.system() == "Linux", reason="Test not supported on Linux"
-)
+@skip_in_ci
 def test_paired_run(
     setup_teardown_paired_input: Generator[list[str], None, None]
 ) -> None:

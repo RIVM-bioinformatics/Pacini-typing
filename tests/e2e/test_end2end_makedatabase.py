@@ -29,7 +29,6 @@ __all__ = [
 ]
 
 import os
-import platform
 import shutil
 from typing import Generator
 
@@ -60,6 +59,10 @@ BLAST_EXTENSIONS = [
     ".nto",
 ]
 
+skip_in_ci = pytest.mark.skipif(
+    os.getenv("CI") == "true", reason="Test not supported in CI"
+)
+
 
 def is_tool(name: str) -> bool:
     """
@@ -76,6 +79,7 @@ def is_tool(name: str) -> bool:
 
 
 @pytest.fixture(scope="module", autouse=True)
+@skip_in_ci
 def check_tools():
     """
     Fixture to check if the required tools are installed
@@ -86,9 +90,6 @@ def check_tools():
         pytest.fail
     ----------
     """
-    if platform.system() == "Linux":
-        pytest.skip("Test not supported on Linux")
-
     required_tools = ["kma_index", "makeblastdb"]
     missing_tools = [tool for tool in required_tools if not is_tool(tool)]
     if missing_tools:
@@ -98,6 +99,7 @@ def check_tools():
 
 
 @pytest.fixture()
+@skip_in_ci
 def setup_teardown() -> Generator[list[str], None, None]:
     """
     Pytest fixture that sets up the arguments for the single input test
@@ -112,9 +114,6 @@ def setup_teardown() -> Generator[list[str], None, None]:
         args: list[str] -> List of arguments for the test
     ----------
     """
-    if platform.system() == "Linux":
-        pytest.skip("Test not supported on Linux")
-
     args = [
         "--verbose",
         "makedatabase",
@@ -157,9 +156,7 @@ def cleanup_files(dir_path: str) -> None:
         os.rmdir(dir_path)
 
 
-@pytest.mark.skipif(
-    platform.system() == "Linux", reason="Test not supported on Linux"
-)
+@skip_in_ci
 def test_make_kma_database(setup_teardown: list[str]) -> None:
     """
     Function to test the creation of a KMA database
@@ -198,9 +195,7 @@ def compare_result_with_expected_files(
         )
 
 
-@pytest.mark.skipif(
-    platform.system() == "Linux", reason="Test not supported on Linux"
-)
+@skip_in_ci
 def test_make_blast_database(setup_teardown: list[str]) -> None:
     """
     Function to test the creation of a BLAST database

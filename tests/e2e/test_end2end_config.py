@@ -19,7 +19,6 @@ __all__ = [
 ]
 
 import os
-import platform
 import shutil
 from typing import Generator
 
@@ -39,8 +38,13 @@ OUTPUT = [
     "VIB_EA5348AA_AS_sequences.fasta",
 ]
 
+skip_in_ci = pytest.mark.skipif(
+    os.getenv("CI") == "true", reason="Test not supported in CI"
+)
+
 
 @pytest.fixture()
+@skip_in_ci
 def setup_teardown_config_input() -> Generator[list[str], None, None]:
     """
     Pytest fixture that sets up the arguments for the single input test
@@ -55,9 +59,6 @@ def setup_teardown_config_input() -> Generator[list[str], None, None]:
         args: list[str] -> List of arguments for the test
     ----------
     """
-    if platform.system() == "Linux":
-        pytest.skip("Test not supported on Linux")
-
     args = [
         "--verbose",
         "--config",
@@ -90,9 +91,7 @@ def cleanup_files() -> None:
         os.rmdir(DIR_PATH)
 
 
-@pytest.mark.skipif(
-    platform.system() == "Linux", reason="Test not supported on Linux"
-)
+@skip_in_ci
 def test_config_run(
     setup_teardown_config_input: Generator[list[str], None, None]
 ) -> None:
@@ -138,6 +137,7 @@ def check_file_contents(file: str) -> None:
     pd.testing.assert_frame_equal(run_output, expected_output)
 
 
+@skip_in_ci
 def test_config_paired_run(
     setup_teardown_config_input: Generator[list[str], None, None]
 ) -> None:

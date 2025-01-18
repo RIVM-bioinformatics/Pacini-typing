@@ -36,7 +36,6 @@ __all__ = [
 ]
 
 import os
-import platform
 import shutil
 from typing import Generator
 
@@ -50,8 +49,13 @@ RUN_OUTPUT = "test_full_run/myresults"
 DATABASE_PATH = "./refdir/"
 DATABASE_NAME = "my_blast_db"
 
+skip_in_ci = pytest.mark.skipif(
+    os.getenv("CI") == "true", reason="Test not supported in CI"
+)
+
 
 @pytest.fixture(scope="module", autouse=True)
+@skip_in_ci
 def check_tools():
     """
     Fixture to check if the required tools are installed
@@ -62,9 +66,6 @@ def check_tools():
         pytest.fail
     ----------
     """
-    if platform.system() == "Linux":
-        pytest.skip("Test not supported on Linux")
-
     required_tools = ["kma", "blastn"]
     missing_tools = [tool for tool in required_tools if not is_tool(tool)]
     if missing_tools:
@@ -88,6 +89,7 @@ def is_tool(name: str) -> bool:
 
 
 @pytest.fixture()
+@skip_in_ci
 def setup_teardown_single_input() -> Generator[list[str], None, None]:
     """
     Pytest fixture that sets up the arguments for the single input test
@@ -102,9 +104,6 @@ def setup_teardown_single_input() -> Generator[list[str], None, None]:
         args: list[str] -> List of arguments for the test
     ----------
     """
-    if platform.system() == "Linux":
-        pytest.skip("Test not supported on Linux")
-
     args = [
         "--verbose",
         "query",
@@ -146,9 +145,7 @@ def cleanup_files(dir_path: str) -> None:
         os.rmdir(dir_path)
 
 
-@pytest.mark.skipif(
-    platform.system() == "Linux", reason="Test not supported on Linux"
-)
+@skip_in_ci
 def test_single_run(
     setup_teardown_single_input: Generator[list[str], None, None]
 ) -> None:

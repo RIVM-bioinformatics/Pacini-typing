@@ -23,5 +23,7 @@ jobs:
         pip install pandas
         pip install .
     - name: Run tests
+      env:
+        CI: true
       run: |
         pytest -vv tests/
