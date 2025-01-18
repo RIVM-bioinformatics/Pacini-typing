@@ -10,18 +10,9 @@
 End-to-end test for the main function of pacini_typing.
 This file tests full runs of the program with single input files (FASTA).
 
-The check_tools and is_tool functions are used to check if the required tools are installed.
-
-The setup_teardown_single_input fixture is used to set up the arguments for the single input test.
+The setup_teardown fixture is used to set up the arguments for the tests.
 It creates a directory for the test and yields the arguments for the test.
 After the test is run, it cleans up the files created during the test.
-
-Example output of Pacini-typing for a single input file (BLAST results):
-
-VIB_EA5348AA_AS_NODE_11_length_166519_cov_13.420434	rfbV_O1:1:AE003852	100.000	1233	0	0	106763	107995	1233	1	0.0	2278
-VIB_EA5348AA_AS_NODE_11_length_166519_cov_13.420434	wbfZ_O139:1:AB012956	96.907	1164	35	1	111617	112780	15	1177	0.0	1949
-VIB_EA5348AA_AS_NODE_19_length_64079_cov_13.745954	ctxA:1:CP001235	100.000	777	0	0	54336	55112	1	777	0.0	1435
-VIB_EA5348AA_AS_NODE_19_length_64079_cov_13.745954	ctxB:1:KJ437653	96.532	346	12	0	53994	54339	346	1	4.79e-165	573
 """
 
 __author__ = "Mark van de Streek"
@@ -50,7 +41,8 @@ DATABASE_PATH = "./refdir/"
 DATABASE_NAME = "my_blast_db"
 
 skip_in_ci = pytest.mark.skipif(
-    os.getenv("CI") == "true", reason="Test not supported in CI"
+    os.getenv("CI") == "true",
+    reason="Test online (GitHub Action) not available due to dependencies",
 )
 
 
@@ -63,7 +55,7 @@ def test_check_tools():
     KMA and BLASTN are required for a full run of Pacini-typing
     ----------
     Raises:
-        pytest.fail
+        - pytest.fail
     ----------
     """
     required_tools = ["kma", "blastn"]
@@ -80,9 +72,9 @@ def is_tool(name: str) -> bool:
     It uses the shutil.which() function to check if the tool is in the PATH
     ----------
     Input:
-        name: str -> Name of the tool to check
+        - name: name of the tool to check
     Output:
-        bool -> True if the tool is installed, False otherwise
+        - bool: True if the tool is installed, False otherwise
     ----------
     """
     return shutil.which(name) is not None
@@ -92,16 +84,13 @@ def is_tool(name: str) -> bool:
 @skip_in_ci
 def setup_teardown_single_input() -> Generator[list[str], None, None]:
     """
-    Pytest fixture that sets up the arguments for the single input test
-    It creates a Generator object that yields the arguments
-    After the test is run, it cleans up the files created during the test
+    Pytest fixture that sets up the arguments for the single input test.
+    It creates a Generator object that yields the arguments.
+    After the test is run, it cleans up the files created during the test.
     The generator does not accept or return any arguments
-
-    Test is skipped if the platform is Linux,
-    this is due to the use of GitHub actions
     ----------
     Output:
-        args: list[str] -> List of arguments for the test
+        - args: list of arguments for the test
     ----------
     """
     args = [
@@ -116,10 +105,9 @@ def setup_teardown_single_input() -> Generator[list[str], None, None]:
         "--database_name",
         DATABASE_NAME,
     ]
-    # Make the directory for the test
     dir_path = "test_full_run/"
     os.mkdir(dir_path)
-    # Yield the arguments and clean up afterwords
+
     yield args
     cleanup_files(dir_path)
 
@@ -130,7 +118,7 @@ def cleanup_files(dir_path: str) -> None:
     Is simply removes the directory and all files in it
     ----------
     Input:
-        dir_path: str -> Path to the directory to remove
+        - dir_path: path to the directory to remove
     ----------
     """
     if os.path.exists(dir_path):
@@ -150,15 +138,14 @@ def test_single_run(
     setup_teardown_single_input: Generator[list[str], None, None]
 ) -> None:
     """
-    End-to-end test for the main function with single input
-    it runs the main function of pacini_typing with the single input arguments
+    End-to-end test for the main function with single input.
+    It runs the main function of pacini_typing with the single input arguments
     and checks if the output file is successfully created.
     The output file is not checked for contents in this test,
     that is done in another test.
     ----------
     Input:
-        setup_teardown_single_input: Generator ->
-            Pytest fixture for the single input test
+        - setup_teardown_single_input: list of arguments for the test
     ----------
     """
     main(setup_teardown_single_input)

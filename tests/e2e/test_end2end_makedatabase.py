@@ -8,13 +8,7 @@
     https://github.com/features/copilot
 
 End-to-end test for the makedatabase command of Pacini-typing
-This test checks if the KMA and BLAST databases are created successfully
-
-File contents are binary,
-so there is no need to check the contents of the files.
-
-The functions is_tool and check_tools are used to check if
-the required tools are installed.
+This test checks if the KMA and BLAST databases are created successfully.
 
 The setup_teardown fixture is used to set up the arguments for the tests.
 It creates a directory for the test and yields the arguments for the test.
@@ -41,6 +35,7 @@ INPUT_FILE = "test_data/vibrio_genes.fasta"
 DATABASE_PATH = "./refdir/"
 DATABASE_NAME = "mydb"
 
+# Expected file extensions for KMA and BLAST databases
 KMA_EXTENSIONS = [
     ".comp.b",
     ".length.b",
@@ -60,7 +55,8 @@ BLAST_EXTENSIONS = [
 ]
 
 skip_in_ci = pytest.mark.skipif(
-    os.getenv("CI") == "true", reason="Test not supported in CI"
+    os.getenv("CI") == "true",
+    reason="Test online (GitHub Action) not available due to dependencies",
 )
 
 
@@ -73,13 +69,13 @@ def test_check_tools():
     KMA and BLASTN are required for a run of Pacini-typing
     ----------
     Raises:
-        pytest.fail
+        - pytest.fail
     ----------
     """
     required_tools = ["kma_index", "makeblastdb"]
     missing_tools = [tool for tool in required_tools if not is_tool(tool)]
     if missing_tools:
-        pytest.skip(
+        pytest.fail(
             f"Skipping tests because the following tools are missing: {', '.join(missing_tools)}"
         )
 
@@ -90,9 +86,9 @@ def is_tool(name: str) -> bool:
     It uses the shutil.which() function to check if the tool is in the PATH
     ----------
     Input:
-        name: str -> Name of the tool to check
+        - name: name of the tool to check
     Output:
-        bool -> True if the tool is installed, False otherwise
+        - bool: True if the tool is installed, False otherwise
     ----------
     """
     return shutil.which(name) is not None
@@ -103,15 +99,10 @@ def is_tool(name: str) -> bool:
 def setup_teardown() -> Generator[list[str], None, None]:
     """
     Pytest fixture that sets up the arguments for the single input test
-    It creates a Generator object that yields the arguments
-    After the test is run, it cleans up the files created during the test
-    The generator does not accept or return any arguments
-
-    Test is skipped if the platform is Linux,
-    this is due to the use of GitHub actions
+    It creates a Generator object that yields the arguments.
     ----------
     Output:
-        args: list[str] -> List of arguments for the test
+        - args: list of arguments for the test
     ----------
     """
     args = [
@@ -141,7 +132,7 @@ def cleanup_files(dir_path: str) -> None:
     Is simply removes the directory and all files in it
     ----------
     Input:
-        dir_path: str -> Path to the directory to remove
+        - dir_path: path to the directory to remove
     ----------
     """
     if os.path.exists(dir_path):
@@ -160,12 +151,12 @@ def cleanup_files(dir_path: str) -> None:
 def test_make_kma_database(setup_teardown: list[str]) -> None:
     """
     Function to test the creation of a KMA database
-    It runs the main function of Pacini_typing with the setup_teardown fixture
+    It runs the main function of pacini_typing with the setup_teardown fixture
     After the test is run,
     it checks if the database files are created successfully
     ----------
     Input:
-        setup_teardown: list[str] -> Arguments for the test
+        - setup_teardown: list of arguments for the test
     ----------
     """
     main(setup_teardown)
@@ -178,11 +169,11 @@ def compare_result_with_expected_files(
     extensions: list[str], database_type: str
 ) -> None:
     """
-    Function to compare the files created by KMA with the expected files
+    Function to compare the files created by KMA with the expected files.
     It checks if the files are created successfully
     ----------
     Input:
-        iiiii
+        - extensions: list of extensions of the files to compare
     ----------
     """
     for extension in extensions:
@@ -198,17 +189,14 @@ def compare_result_with_expected_files(
 @skip_in_ci
 def test_make_blast_database(setup_teardown: list[str]) -> None:
     """
-    Function to test the creation of a BLAST database
-    It runs the main function of Pacini_typing with the setup_teardown fixture
-    After the test is run,
-    it checks if the database files are created successfully
-
-    At the moment, the files of blast database can't be compared
-    with excpeted output, because the binary files are slightly
-    different every run.
+    Function to test the creation of a BLAST database.
+    The main function of pacini_typing is run with the arguments.
+    File existence is checked after the test is run.
+    Expected files are not used, because of the binary files
+    that changes with each run.
     ----------
     Input:
-        setup_teardown: list[str] -> Arguments for the test
+        - setup_teardown: list of arguments
     ----------
     """
     setup_teardown[-1] = "fasta"
