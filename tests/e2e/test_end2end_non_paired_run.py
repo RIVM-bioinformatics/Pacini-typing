@@ -24,24 +24,22 @@ VIB_EA5348AA_AS_NODE_19_length_64079_cov_13.745954	ctxA:1:CP001235	100.000	777	0
 VIB_EA5348AA_AS_NODE_19_length_64079_cov_13.745954	ctxB:1:KJ437653	96.532	346	12	0	53994	54339	346	1	4.79e-165	573
 """
 
-__author__ = "Mark Van de Streek"
-__data__ = "2024-09-24"
+__author__ = "Mark van de Streek"
+__date__ = "2024-09-24"
 __all__ = [
     "check_tools",
     "is_tool",
     "setup_teardown_single_input",
     "cleanup_files",
     "test_single_run",
-    "test_single_contents",
-    "check_non_empty_content",
-    "validate_float_columns",
-    "validate_thresholds",
+    "check_file_contents",
 ]
 
 import os
 import platform
 import shutil
-from typing import Generator, List
+from typing import Generator
+import pandas as pd
 
 import pytest
 
@@ -51,7 +49,6 @@ FASTA_FILE = "test_data/VIB_EA5348AA_AS.fasta"
 RUN_OUTPUT = "test_full_run/myresults"
 DATABASE_PATH = "./refdir/"
 DATABASE_NAME = "my_blast_db"
-IDENTITY = 90
 
 
 @pytest.fixture(scope="module", autouse=True)
@@ -119,8 +116,6 @@ def setup_teardown_single_input() -> Generator[list[str], None, None]:
         DATABASE_PATH,
         "--database_name",
         DATABASE_NAME,
-        "--identity",
-        str(IDENTITY),
     ]
     # Make the directory for the test
     dir_path = "test_full_run/"
@@ -171,75 +166,18 @@ def test_single_run(
     """
     main(setup_teardown_single_input)
     assert os.path.exists("test_full_run/myresults.tsv")
+    check_file_contents()
 
 
-@pytest.mark.skipif(
-    platform.system() == "Linux", reason="Test not supported on Linux"
-)
-def test_single_contents(
-    setup_teardown_single_input: Generator[list[str], None, None]
-) -> None:
+def check_file_contents() -> None:
     """
-    End-to-end test for the contents of the output file for the single input
-    it runs the main function of pacini_typing with the single input arguments
-    and checks the contents of the output file.
-    The output file is checked for the correct number of columns.
+    File that checks the contents of the tsv output file
+    with the expected output file
     """
-    main(setup_teardown_single_input)
-    output_file = f"{RUN_OUTPUT}.tsv"
-    assert os.path.exists(output_file), "Output file was not created"
-    with open(output_file, "r", encoding="utf-8") as f:
-        for line in f:
-            columns = line.strip().split("\t")
-            check_non_empty_content(columns)
-            assert len(columns) == 12
-            validate_float_columns(columns)
-            validate_thresholds(columns)
+    run_output: pd.DataFrame = pd.read_csv(f"{RUN_OUTPUT}.tsv", sep="\t")
+    expected_output: pd.DataFrame = pd.read_csv(
+        "test_data/expected_output/expected_non_paired_VIBEA5348AA_AS.tsv",
+        sep="\t",
+    )
 
-
-def check_non_empty_content(columns: List[str]) -> None:
-    """
-    Function to check if the content of the output file is not empty
-    If the content is empty, the test fails
-    ----------
-    Input:
-        columns: list -> List of columns in the output file
-    ----------
-    """
-    assert columns != []
-
-
-def validate_float_columns(columns: List[str]) -> None:
-    """
-    Function to validate that the columns in the output file are floats
-    It tries to convert the columns to floats, if it fails the test fails
-    ----------
-    Input:
-        columns: list -> List of columns in the output file
-    Raises:
-        pytest.fail -> If the columns are not floats
-    ----------
-    """
-    try:
-        float(columns[2])
-        float(columns[10])
-        float(columns[11])
-    except ValueError:
-        pytest.fail("Values in the output file are not floats")
-
-
-def validate_thresholds(columns: List[str]) -> None:
-    """
-    Validate that the rfbV_O1 column is above a certain threshold
-    If the column is below the threshold, the test fails
-    ----------
-    Input:
-        columns: list -> List of columns in the output file
-    ----------
-    """
-    if "rfbV_O1:1" in columns:
-        assert 98.0 <= float(columns[2]) <= 100.0
-    if "wbfZ_O139" in columns:
-        # WbfZ_O139 is not allowed to be 100% identical, only in O139 strains
-        # Input file is not a Vibrio cholerae O139 strain
-        assert int(columns[2]) != 100
+    pd.testing.assert_frame_equal(run_output, expected_output)

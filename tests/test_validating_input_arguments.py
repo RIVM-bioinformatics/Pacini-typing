@@ -14,7 +14,7 @@ Both good and bad cases are tested to ensure the functions work as expected.
 Variables in capital letters are used to store the test data and are used in the tests.
 """
 
-__author__ = "Mark Van de Streek"
+__author__ = "Mark van de Streek"
 __date__ = "2024-10-07"
 
 from unittest import mock

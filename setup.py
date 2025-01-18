@@ -13,15 +13,15 @@ Debugging and logging are easier with this way of executing shell commands.
 See docstring for more explicit information about functions and their parameters.
 """
 
-__author__ = "Mark Van de Streek"
-__data__ = "2024-11-01"
+__author__ = "Mark van de Streek"
+__date__ = "2024-11-01"
 __all__ = ["get_version"]
 
 import platform
 
 from setuptools import find_packages, setup
 
-from command_utils import execute
+from command_utils import CommandInvoker, ShellCommand
 
 
 def get_version() -> str:
@@ -29,10 +29,6 @@ def get_version() -> str:
     Get the version of the package from git tags.
     If there are no tags, return "0.0.0".
     """
-    # skip this function if the platform is Linux
-    if platform.system() == "Linux":
-        return "1.2.0"
-
     result = execute(["git", "describe", "--tags"], capture=True)
     if isinstance(result, tuple):
         return result[0].strip().split("-")[0]
@@ -42,7 +38,7 @@ def get_version() -> str:
 setup(
     name="pacini_typing",
     version=get_version(),
-    author="Mark Van de Streek",
+    author="Mark van de Streek",
     author_email="ids-bioinformatics@rivm.nl",
     packages=find_packages(),
     long_description=open("README.md", encoding="utf-8").read(),

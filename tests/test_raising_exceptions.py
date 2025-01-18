@@ -14,8 +14,8 @@ It only tests the cases where the input is wrong, so it's not a complete
 end-to-end test setup.
 """
 
-__author__ = "Mark Van de Streek"
-__data__ = "2024-10-30"
+__author__ = "Mark van de Streek"
+__date__ = "2024-10-30"
 __all__ = [
     "setup_args",
     "test_wrong_extension",
@@ -59,7 +59,7 @@ def setup_args() -> Generator[list[str], None, None]:
     """
     args = [
         "--config",
-        "patterns/O1.yaml",
+        "config/O1.yaml",
         "--input",
     ]
 

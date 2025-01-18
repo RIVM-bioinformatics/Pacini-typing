@@ -25,8 +25,8 @@ ctxA:1:CP001235	777	100.000000	100.000000	44.438867	100.000000	100.000000	44.438
 ctxB:1:KJ437653	348	96.551724	100.287356	40.350575	96.275072	96.275072	40.234957	105	105	12277	15851.962347	454.348640	1.000000e-26	12277	376.619315
 """
 
-__author__ = "Mark Van de Streek"
-__data__ = "2024-09-24"
+__author__ = "Mark van de Streek"
+__date__ = "2024-09-24"
 __all__ = [
     "check_tools",
     "is_tool",
@@ -49,11 +49,10 @@ from preprocessing.validation import validating_input_arguments
 RUN_OUTPUT = "test_full_run/myresults"
 
 EXPECTED_FILES = [
-    "test_data/expected_output/expected_paired_VIB_EA5348AA.tsv",
+    "test_data/expected_output/expected_paired_VIB_EA5348AA.res",
     "test_data/expected_output/expected_paired_VIB_EA5348AA.aln",
     "test_data/expected_output/expected_paired_VIB_EA5348AA.fsa",
     "test_data/expected_output/expected_paired_VIB_EA5348AA.frag.gz",
-    "test_data/expected_output/expected_paired_VIB_EA5348AA.res",
 ]
 
 
@@ -123,8 +122,6 @@ def setup_teardown_paired_input() -> Generator[list[str], None, None]:
         "./refdir/",
         "--database_name",
         "mykma",
-        "--identity",
-        "90",
     ]
     # Make the directory for the test
     dir_path = "test_full_run/"
@@ -172,7 +169,6 @@ def test_paired_run(
     ----------
     """
     main(setup_teardown_paired_input)
-    assert os.path.exists(f"{RUN_OUTPUT}.tsv")
     assert os.path.exists(f"{RUN_OUTPUT}.fsa")
     assert os.path.exists(f"{RUN_OUTPUT}.res")
     assert os.path.exists(f"{RUN_OUTPUT}.frag.gz")
@@ -186,11 +182,11 @@ def check_file_contents() -> None:
     with the expected output file
     It uses the pandas library to read the files and compare them
     """
-    run_output = pd.read_csv(f"{RUN_OUTPUT}.tsv", sep="\t")
+    run_output = pd.read_csv(f"{RUN_OUTPUT}.res", sep="\t")
     expected_output = pd.read_csv(EXPECTED_FILES[0], sep="\t")
 
     # Use the equals function of the pandas DataFrame to compare the files
-    assert run_output.equals(expected_output)
+    pd.testing.assert_frame_equal(run_output, expected_output)
     compare_additional_files()
 
 
@@ -208,7 +204,6 @@ def compare_additional_files() -> None:
             f"{RUN_OUTPUT}.aln",
             f"{RUN_OUTPUT}.fsa",
             f"{RUN_OUTPUT}.frag.gz",
-            f"{RUN_OUTPUT}.res",
         ],
         EXPECTED_FILES[1:],
     ):

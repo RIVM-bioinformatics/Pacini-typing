@@ -3,34 +3,77 @@ channels:
   - conda-forge
   - bioconda
   - defaults
+  - bioconda/osx-64
 dependencies:
+  - blast=2.16.0
+  - boost=1.82.0
   - bzip2=1.0.8
-  - kma=1.4.15
-  - pip=24.2
-  - python=3.12.7
-  - pip:
-      - pyyaml==6.0.2
-      - setuptools==75.1.0
-      - pytest==8.3.3
-      - pandas===2.2.3
   - c-ares=1.34.3
-  - ca-certificates=2024.8.30
-  - curl=8.10.1
+  - ca-certificates=2024.9.24
+  - curl=8.8.0
   - entrez-direct=22.4
-  - gettext=0.22.5
-  - gettext-tools=0.22.5
+  - expat=2.6.3
+  - gettext=0.19.8.1
+  - icu=73.1
+  - kma=1.4.15
   - krb5=1.21.3
-  - libasprintf=0.22.5
-  - libasprintf-devel=0.22.5
-  - libcurl=8.10.1
+  - libboost=1.82.0
+  - libcurl=8.8.0
+  - libcxx=19.1.4
   - libedit=3.1.20191231
   - libev=4.33
-  - libexpat=2.6.4
-  - libffi=3.4.2
-  - libgettextpo=0.22.5
-  - libgettextpo-devel=0.22.5
-  - libidn2=2.3.7
-  - libnghttp2=1.64.0
-  - libsqlite=3.47.0
+  - libffi=3.4.4
+  - libiconv=1.16
+  - libidn2=2.3.3
+  - libnghttp2=1.58.0
+  - libsqlite=3.46.0
   - libssh2=1.11.0
-  - zlib=1.3.1
+  - libunistring=0.9.10
+  - libuuid=1.41.5
+  - libzlib=1.2.13
+  - lz4-c=1.9.4
+  - ncbi-vdb=3.1.1
+  - ncurses=6.4
+  - openssl=3.4.0
+  - perl=5.32.1
+  - perl-archive-tar=2.40
+  - perl-carp=1.38
+  - perl-common-sense=3.75
+  - perl-compress-raw-bzip2=2.201
+  - perl-compress-raw-zlib=2.105
+  - perl-encode=3.19
+  - perl-exporter=5.72
+  - perl-exporter-tiny=1.002002
+  - perl-extutils-makemaker=7.70
+  - perl-io-compress=2.201
+  - perl-io-zlib=1.14
+  - perl-json=4.10
+  - perl-json-xs=4.03
+  - perl-list-moreutils=0.430
+  - perl-list-moreutils-xs=0.430
+  - perl-parent=0.236
+  - perl-pathtools=3.75
+  - perl-scalar-list-utils=1.62
+  - perl-types-serialiser=1.01
+  - pip=24.2
+  - py-boost=1.82.0
+  - python=3.12.7
+  - readline=8.2
+  - rpsbproc=0.5.0
+  - setuptools=75.1.0
+  - sqlite=3.45.3
+  - tk=8.6.14
+  - tzdata=2024b
+  - wget=1.21.4
+  - wheel=0.44.0
+  - xz=5.4.6
+  - zlib=1.2.13
+  - zstd=1.5.6
+  - pip:
+    - numpy==2.1.3
+    - pandas==2.2.3
+    - python-dateutil==2.9.0.post0
+    - pytz==2024.2
+    - pyyaml==6.0.2
+    - six==1.16.0
+    - tzdata==2024.2

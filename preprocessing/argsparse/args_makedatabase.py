@@ -12,8 +12,8 @@ The subcommand is used to create a new reference database.
 The subcommand is added to the main parsing object in the build_parser script.
 """
 
-__author__ = "Mark Van de Streek"
-__data__ = "2024-09-24"
+__author__ = "Mark van de Streek"
+__date__ = "2024-09-24"
 __all__ = ["build_makedatabase_command"]
 
 
@@ -44,10 +44,10 @@ def build_makedatabase_command(subparsers: _SubParsersAction) -> None:
     makedatabase.add_argument(
         "-db_type",
         "--database_type",
-        type=lambda x: x.lower(),
+        type=lambda x: x.upper(),
         required=True,
         metavar="fastq/fasta",
-        choices=["fastq", "fasta"],
+        choices=["FASTQ", "FASTA"],
         help="Specify the database type that is being used",
     )
     makedatabase.add_argument(

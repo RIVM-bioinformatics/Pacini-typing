@@ -1,3 +1,2 @@
-include patterns/*.yaml
-include patterns/*.fasta
 include config/*.yaml
+include config/*.fasta

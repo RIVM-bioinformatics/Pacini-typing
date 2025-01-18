@@ -23,8 +23,8 @@ The fixtures fasta_options and fastq_options are used
 to provide options for the tests.
 """
 
-__author__ = "Mark Van de Streek"
-__data__ = "2024-09-24"
+__author__ = "Mark van de Streek"
+__date__ = "2024-09-24"
 __all__ = [
     "fasta_options",
     "fastq_options",
@@ -37,11 +37,16 @@ __all__ = [
 ]
 
 
+import argparse
 import platform
 from unittest import mock
 
 import pytest
 
+from pacini_typing import PaciniTyping
+from preprocessing.exceptions.validate_database_exceptions import (
+    InvalidDatabaseError,
+)
 from preprocessing.validation.validate_database import (
     check_for_database_existence,
     check_for_database_path,
@@ -172,3 +177,52 @@ def test_check_for_database_path_append_slash(mock, fasta_options):
     fasta_options["database_path"] = "./refdir"
     assert check_for_database_path(fasta_options) is True
     assert fasta_options["database_path"] == "./refdir/"
+
+
+def test_run_method_raises_invalid_database_error():
+    """
+    This function is a very hard to understand.
+    The InvalidDatabaseError is raised when the database path is invalid.
+    But this raise is not in the validate_database module, but in the middle
+    of the main run method of PaciniTyping.
+    This because the validate_database module is reused in
+    other parts of the code.
+
+    But to test if the the InvalidDatabaseError is raised,
+    a lot of mocking has to be done.
+    """
+    pacini_typing = PaciniTyping(
+        argparse.Namespace(
+            query=False,
+            input_file_list=["test_input.fastq"],
+            database_path="/non/existent/path",
+            database_name="test_database",
+            threads=1,
+        )
+    )
+    # Custom options
+    pacini_typing.option = {
+        "query": {
+            "output": "test_output",
+        },
+        "input_file_list": ["test_input.fastq"],
+        "database_path": "/non/existent/path",
+        "database_name": "test_database",
+        "threads": 1,
+        "makedatabase": False,
+    }
+
+    pacini_typing.parse_all_args = lambda: None
+    pacini_typing.setup_logging = lambda: None
+    pacini_typing.get_input_filenames = lambda: None
+    pacini_typing.retrieve_sample_name = lambda: None
+    pacini_typing.check_for_unzip_files = lambda: None
+    pacini_typing.validate_file_arguments = lambda: None
+    pacini_typing.get_file_type = lambda: None
+    pacini_typing.check_valid_option_with_args = lambda: None
+
+    # Mock check_valid_database_path to return False
+    pacini_typing.check_valid_database_path = lambda x: False
+
+    with pytest.raises(InvalidDatabaseError):
+        pacini_typing.run()

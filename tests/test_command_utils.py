@@ -22,8 +22,8 @@ The tests are divided into the following functions:
 - pytest_capture_error_file
 """
 
-__author__ = "Mark Van de Streek"
-__data__ = "2024-11-01"
+__author__ = "Mark van de Streek"
+__date__ = "2024-11-01"
 __all__ = [
     "test_execute_capture_output",
     "test_execute_no_capture_output",

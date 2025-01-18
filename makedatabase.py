@@ -13,8 +13,8 @@ For both methods, a subprocess.run command is used to execute the command in the
 See the methods for more information.
 """
 
-__author__ = "Mark Van de Streek"
-__data__ = "2024-09-24"
+__author__ = "Mark van de Streek"
+__date__ = "2024-09-24"
 __all__ = ["DatabaseBuilder"]
 
 import logging
@@ -72,15 +72,13 @@ class DatabaseBuilder:
             self.database_path, self.database_name
         )
         if not os.path.exists(self.full_database_path):
-            if self.database_type == "fastq":
+            if self.database_type == "FASTQ":
                 if not os.path.exists(self.database_path):
                     logging.debug(
-                        """
-                        Database path for FASTQ (KMA) does not exist,
-                        creating path for it automatically
-                        """
+                        "Database path for FASTQ (KMA) does not exist,"
+                        "creating path for it automatically"
                     )
-                    os.mkdir(self.database_path)
+                    os.makedirs(self.database_path, exist_ok=True)
                 self.create_kma_database()
             else:
                 self.create_blast_database()

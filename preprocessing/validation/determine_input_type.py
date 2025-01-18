@@ -22,12 +22,13 @@ Example FASTQ File:
     B@@FDFFFHHGHHJIJJIIJJJJIJIJIIJJI
 """
 
-__author__ = "Mark Van de Streek"
+__author__ = "Mark van de Streek"
 __date__ = "2024-09-24"
 __all__ = ["InputFileInspector"]
 
 import logging
 import re
+from typing import TextIO
 
 from preprocessing.exceptions.determine_input_type_exceptions import (
     InvalidFastaOrFastqError,
@@ -47,10 +48,13 @@ class InputFileInspector:
     Methods:
         - __init__: Constructor for the InputFileInspector class
         - determine_file_type: Method that determines the file type
-        - retrieve_body: Method that retrieves the body of the input file
-        - check_valid_sequence: Method that checks if the sequence is valid
-        - compare_types: Method that compares the types of input files
-        - get_file_type: Method that returns the file type
+        - validate_fasta: Method that validates the FASTA file
+        - validate_fastq: Method that validates the FASTQ file
+        - validate_sequence_length: Method that validates the sequence length
+        - validate_plus_line: Method that validates the '+' line in FASTQ
+        - validate_sequence: Method that validates the sequence
+        - compare_types: Method that compares the types of the input files
+        - get_file_type: Getter method to retrieve the file type
     ----------
     """
 
@@ -68,7 +72,6 @@ class InputFileInspector:
         self.input_files = input_files
         self.body: dict[str, list[str]] = {}
         self.type: dict[str, str] = {}
-        self.retrieve_body()
         self.determine_file_type()
         if len(self.type) == 2:
             self.compare_types()
@@ -76,96 +79,162 @@ class InputFileInspector:
     def determine_file_type(self) -> None:
         """
         Main logic function of the class that does the checking.
-        With the body of the file, the function determines if the file is a FASTA or FASTQ file.
-        The function first checks if the sequence is valid,
-        then it checks the header and quality score line.
-        If the file is valid, the type is determined and stored in the type dictionary.
-        Example:
-            - {
-            file1: "FASTA",
-            file2: "FASTQ"
-            }
+        The function first checks the first line of the file.
+        If the line starts with '>', the type is set to FASTA,
+        and the file is validated further assuming it is a FASTA file.
+        If the line starts with '@', the type is set to FASTQ,
+        and the file is validated further assuming it is a FASTQ file.
+        If during the validation of the rest of the file,
+        an invalid structure is found, both the FASTA and FASTQ
+        validation functions raise an error.
         ----------
-        Input:
-            - self.input_files: list with the input files
-            - self.body: dictionary with the file name and the first 5 lines
-        Output:
-            - self.type: dictionary with the file name and the type (FASTA or FASTQ)
+        Raises:
+            - InvalidFastaOrFastqError: If the file is not a valid
         ----------
         """
-        logging.debug("Determining the file type of the input files...")
-        for file in self.input_files:
-            if self.check_valid_sequence(file):
-                if (
-                    self.body[file][0].startswith(">")
-                    and not self.body[file][1].startswith("+")
-                ) and not self.body[file][2].startswith("@"):
-                    self.type[file] = "FASTA"
-                elif (
-                    self.body[file][0].startswith("@")
-                    and self.body[file][2].startswith("+")
-                    and len(self.body[file][1]) == len(self.body[file][3])
-                ) and self.body[file][4].startswith("@"):
-                    self.type[file] = "FASTQ"
-                else:
-                    logging.error(
-                        "Invalid FASTA or FASTQ file provided. Exiting..."
-                    )
-                    raise InvalidFastaOrFastqError(file)
-
-    def retrieve_body(self) -> None:
-        """
-        Method that retrieves the body of the input file.
-        The first 5 lines of the file are retrieved and stored in a dictionary.
-        The dictionary has the file name as key and the first 5 lines as values.
-        Example:
-            - {
-            file1: [line1, line2, line3, line4, line5],
-            file2: [line1, line2, line3, line4, line5]
-            }
-        ----------
-        Input:
-            - self.input_files: list with the input files
-        Output:
-            - self.body: dictionary with the file name and the first 5 lines
-        ----------
-        """
-        logging.debug("Retrieving the body of the input files...")
+        logging.debug("Walking through input filename(s) and reading them...")
         for file in self.input_files:
             with open(file, "r", encoding="utf-8") as f:
-                self.body[file] = [f.readline().strip() for _ in range(5)]
-                # self.body[file] = [line.strip() for line in f.readlines()]
+                first_line = f.readline().strip()
+                if first_line.startswith(">"):
+                    # FASTA file validation
+                    self.type[file] = "FASTA"
+                    f.seek(0)
+                    self.validate_fasta(f, file)
+                elif first_line.startswith("@"):
+                    # FASTQ file validation
+                    self.type[file] = "FASTQ"
+                    f.seek(0)
+                    self.validate_fastq(f, file)
+                else:
+                    logging.error("Invalid file format found. Exiting...")
+                    raise InvalidFastaOrFastqError(file)
 
-    def check_valid_sequence(self, file: str) -> bool:
+    def validate_fasta(self, file_handle: TextIO, file: str) -> None:
         """
-        Simple method to check if the sequence is valid.
-        It simply checks if the sequence is a valid DNA sequence,
-        i.e., only contains A, C, T, or G. With the input name,
-        the right sequence is retrieved from the body dictionary.
+        Function that validates the FASTA file format.
+        The function assumes the file is a FASTA file
+        and is designed to validate this type of file.
         ----------
         Input:
-            - file: string with the file name
-        Output:
-            - True: if the sequence is valid
-            - False: if the sequence is not valid
+            - file_handle: open file handle
         ----------
         """
-        logging.debug("Checking if the sequence is valid...")
-        if re.fullmatch(r"[ACTGN]+", self.body[file][1]):
-            return True
-        logging.error("Invalid sequence provided. Exiting...")
-        raise InvalidSequenceError(self.body[file][1], file)
+        sequence: list[str] = []
+        has_header = False  # Track if any header is found
 
-        # TODO: Thinks about reading in batches of 4 lines?
+        for line in file_handle:
+            line = line.strip()
+            if not line:
+                continue
+            if line.startswith(">"):
+                has_header = True
+                # If we had a previous sequence, validate it
+                if sequence:
+                    self.validate_sequence("".join(sequence), file)
+                    sequence = []
+            else:
+                sequence.append(line)
 
-        # TODO: Is it necessary to check the entire file?
-        #  It's probably better, but how to efficiently do it?
-        # for index, lines in enumerate(self.body[file]):
-        #     line = lines.strip()
-        #     if line and index % 4 == 1:
-        #         if not re.fullmatch(r"[ACTG]+", line):
-        #             logging.error("The sequence is not valid.")
-        #             sys.exit(1)
+        if not has_header:
+            logging.error("No headers found in FASTA file: %s", file)
+            raise InvalidFastaOrFastqError(
+                f"No headers found in FASTA file: {file}"
+            )
+
+        # Validate the last sequence
+        if sequence:
+            self.validate_sequence("".join(sequence), file)
+
+    def validate_fastq(self, file_handle: TextIO, file: str) -> None:
+        """
+        Function that validates the FASTQ file format.
+        The function assumes the file is a FASTQ file
+        and is designed to validate this type of file.
+        The function reads the file line by line and validates
+        the structure of the file.
+        The function raises an error if the file is invalid.
+        ----------
+        Input:
+            - file_handle (file): Open file handle
+            - file (str): Filename for error reporting
+        Raises:
+            - InvalidFastaOrFastqError: If the FASTQ file is invalid
+        ----------
+        """
+        file_handle.seek(0)
+        while True:
+            header_line = file_handle.readline().strip()
+            if not header_line:
+                break
+            seq_line = file_handle.readline().strip()
+            plus_line = file_handle.readline().strip()
+            qual_line = file_handle.readline().strip()
+
+            self.validate_plus_line(file, plus_line)
+            self.validate_sequence(seq_line, file)
+            self.validate_sequence_length(file, seq_line, qual_line)
+
+    def validate_sequence_length(
+        self, file: str, seq_line: str, qual_line: str
+    ):
+        """
+        Simple function that validates the length of the
+        sequence and quality scores.
+        If the length of the sequence and quality scores
+        do not match, an error is raised.
+        ----------
+        Input:
+            - file (str): Filename for error reporting
+            - seq_line (str): Sequence line
+            - qual_line (str): Quality scores line
+        Raises:
+            - InvalidFastaOrFastqError: If an invalid length is found
+        """
+        if len(seq_line) != len(qual_line):
+            logging.error(
+                "Sequence and quality scores length mismatch, exiting..."
+            )
+            raise InvalidFastaOrFastqError(
+                f"Sequence and quality scores length mismatch in FASTQ file: {file}"
+            )
+
+    def validate_plus_line(self, file: str, plus_line: str):
+        """
+        Function that validates the '+' line in the FASTQ file.
+        The function checks if the line starts with a '+' character.
+        If the line does not start with a '+', an error is raised.
+        ----------
+        Input:
+            - file (str): Filename for error reporting
+            - plus_line (str): Line to validate
+        Raises:
+            - InvalidFastaOrFastqError: If the line is invalid
+        ----------
+        """
+        if not plus_line.startswith("+"):
+            logging.error("Missing '+' line in FASTQ file, exiting...")
+            raise InvalidFastaOrFastqError(
+                f"Missing '+' line in FASTQ file: {file}"
+            )
+
+    def validate_sequence(self, sequence: str, file: str) -> None:
+        """
+        Basic validation function for the sequence.
+        The function checks if the sequence contains only valid characters.
+        If an invalid character is found, the function raises an error.
+        ----------
+        Input:
+            sequence (str): Sequence to validate
+            file (str): Filename for error reporting
+        Raises:
+            InvalidFastaOrFastqError: If the sequence is invalid
+        ----------
+        """
+        sequence = sequence.replace(" ", "")
+        if not re.fullmatch(r"[ACTGN]+", sequence, re.IGNORECASE):
+            logging.error("Invalid sequence found, exiting...")
+            raise InvalidSequenceError(sequence, file)
 
     def compare_types(self) -> None:
         """
@@ -186,9 +255,7 @@ class InputFileInspector:
             if "FASTA" in file_types and len(self.type) == 2:
                 logging.error("Error while comparing the types. Exiting...")
                 raise InvalidSequencingTypesError(self.input_files)
-            logging.debug(
-                "All files are valid and the same type, continuing..."
-            )
+            logging.debug("Input files are of the same type, continuing...")
         else:
             logging.error("Error while comparing the types. Exiting...")
             raise InvalidSequencingTypesError(self.input_files)

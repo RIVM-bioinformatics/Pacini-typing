@@ -37,5 +37,6 @@ A very short description of the scripts:
 4. `run_pacini_on_external_samples.py`: Runs the Pacini-typing application on the external samples.
 5. `run_pacini_on_internal_samples.py`: Runs the Pacini-typing application on the internal samples.
 6. `create_report.py`: Creates a basic report of the results of the Pacini-typing application.
+7. `downloader.py`: Downloads the accession numbers using multiple threads.
 
 For specific information about the scripts, please take a look at the scripts themselves.
