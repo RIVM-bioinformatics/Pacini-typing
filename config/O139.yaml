@@ -14,8 +14,8 @@ database:
   run_output: "output/"
 
 pattern:
-  perc_ident: 95.0
-  perc_cov: 90.0
+  perc_ident: 99.8
+  perc_cov: 100.0
   genes:
     - gene_name: "wbfZ"
     - gene_name: "ctxA"
