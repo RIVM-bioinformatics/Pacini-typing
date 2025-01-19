@@ -15,7 +15,7 @@ The subcommands are built in separate scripts and added to the main parser objec
 """
 
 __author__ = "Mark van de Streek"
-__date__ = "2024-09-24"
+__date__ = "2024-09-27"
 __all__ = ["main"]
 
 import argparse
@@ -23,7 +23,9 @@ from argparse import RawTextHelpFormatter
 
 import pkg_resources
 
-from preprocessing.argsparse.args_makedatabase import build_makedatabase_command
+from preprocessing.argsparse.args_makedatabase import (
+    build_makedatabase_command,
+)
 from preprocessing.argsparse.args_query import build_query_command
 
 
@@ -132,7 +134,8 @@ def main(givenargs: list[str]) -> argparse.Namespace:
 
     args = parser.parse_args(givenargs)
 
-    # Custom validation logic
+    # Some first level argument checks
+    # to ensure that the user has provided the correct arguments
     if not args.options:
         if not args.config or not args.input:
             parser.error(

@@ -10,20 +10,10 @@
 This script is responsible for determining the input file type.
 Additionally, it checks if the input files are valid FASTA or FASTQ.
 The type is also checked if the input files are of the same type.
-
-Example FASTA File:
-    >MY Sequence
-    ATCGTACGATCGATCGATCGATCGATCGATCG
-
-Example FASTQ File:
-    @My Sequence
-    ATCGTACGATCGATCGATCGATCGATCGATCG
-    +
-    B@@FDFFFHHGHHJIJJIIJJJJIJIJIIJJI
 """
 
 __author__ = "Mark van de Streek"
-__date__ = "2024-09-24"
+__date__ = "2024-09-27"
 __all__ = ["InputFileInspector"]
 
 import logging
@@ -177,7 +167,7 @@ class InputFileInspector:
 
     def validate_sequence_length(
         self, file: str, seq_line: str, qual_line: str
-    ):
+    ) -> None:
         """
         Simple function that validates the length of the
         sequence and quality scores.
@@ -199,7 +189,7 @@ class InputFileInspector:
                 f"Sequence and quality scores length mismatch in FASTQ file: {file}"
             )
 
-    def validate_plus_line(self, file: str, plus_line: str):
+    def validate_plus_line(self, file: str, plus_line: str) -> None:
         """
         Function that validates the '+' line in the FASTQ file.
         The function checks if the line starts with a '+' character.

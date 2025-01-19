@@ -10,11 +10,16 @@
 Module that contains custom exceptions for the validation input arguments module.
 These exceptions are raised for basic validation errors in the input arguments,
 i.e., invalid file extensions, missing files, etc.
-The raise statements can be found in the validation/validate_input_arguments.py module.
 """
 
 __author__ = "Mark van de Streek"
-__date__ = "2024-10-22"
+__date__ = "2024-10-25"
+__all__ = [
+    "InvalidPairedError",
+    "InvalidFileExtensionError",
+    "FileNotExistsError",
+    "ValidationError",
+]
 
 
 class InvalidPairedError(Exception):

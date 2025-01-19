@@ -12,7 +12,7 @@ It is used when cloning the repository and installing through Bioconda.
 """
 
 __author__ = "Mark van de Streek"
-__date__ = "2024-11-01"
+__date__ = "2024-11-06"
 __all__ = ["get_version"]
 
 from setuptools import find_packages, setup
@@ -23,6 +23,10 @@ def get_version() -> str:
     """
     Get the version of the package from git tags.
     If there are no tags, return "0.0.0".
+    ----------
+    Output:
+        - version: version of the package
+    ----------
     """
     try:
         result = CommandInvoker(

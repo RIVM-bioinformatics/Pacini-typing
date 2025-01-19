@@ -99,10 +99,10 @@ class ParsingManager:
         identity from the config file.
         ----------
         Output:
-            - int: identity
+            - float: identity
         ----------
         """
-        return self.pattern.pattern["pattern"]["perc_ident"]
+        return float(self.pattern.pattern["pattern"]["perc_ident"])
 
     def get_config_coverage(self) -> float:
         """
@@ -110,10 +110,10 @@ class ParsingManager:
         coverage from the config file obj.
         ----------
         Output:
-            - int: coverage
+            - float: coverage
         ----------
         """
-        return self.pattern.pattern["pattern"]["perc_cov"]
+        return float(self.pattern.pattern["pattern"]["perc_cov"])
 
     def add_filters_to_parser(self) -> None:
         """

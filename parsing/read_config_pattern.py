@@ -18,7 +18,7 @@ parameters required for the database creation and the query operation.
 """
 
 __author__ = "Mark van de Streek"
-__date__ = "2024-10-30"
+__date__ = "2024-11-08"
 __all__ = ["ReadConfigPattern"]
 
 import logging
@@ -77,7 +77,7 @@ class ReadConfigPattern:
         self.validate_pattern_keys()
         self.construct_params_dict()
 
-    def read_config(self):
+    def read_config(self) -> None:
         """
         Function that reads the configuration file
         If the config file is not found, an error is raised.
@@ -99,7 +99,7 @@ class ReadConfigPattern:
             logging.error("Error loading YAML file, exiting...")
             raise YAMLLoadingError(self.config_file) from e
 
-    def validate_config_keys(self):
+    def validate_config_keys(self) -> None:
         """
         Function that validates the keys of the configuration file
         If the keys are not present, a custom error is raised.
@@ -111,7 +111,7 @@ class ReadConfigPattern:
             if key not in REQUIRED_KEYS:
                 raise YAMLStructureError(self.config_file)
 
-    def validate_pattern_keys(self):
+    def validate_pattern_keys(self) -> None:
         """
         This function checks the specific keys that
         are required for the genetic pattern to be valid.
@@ -124,7 +124,7 @@ class ReadConfigPattern:
             if key not in self.pattern["pattern"]:
                 raise YAMLStructureError(self.config_file)
 
-    def construct_params_dict(self):
+    def construct_params_dict(self) -> None:
         """
         Constructs a dictionary with parameters required for
         the database creation and the query operation.

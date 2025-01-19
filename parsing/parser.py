@@ -7,14 +7,15 @@
     “GitHub Copilot: Your AI pair programmer” (GPT-3). GitHub, Inc.
     https://github.com/features/copilot
 
-Module that handles all the parsing of the query results.
-The results are read from the output file of the BLAST or KMA run.
-The results are stored in a pandas dataframe.
-After filtering, the results are written to multiple output files.
+This script is the main implementation of the strategy pattern.
+This script is therefore delegating the reading, filtering
+and writing of the found hits to the specific strategy.
+
+An incoming parameter is used to define the strategy to use.
 """
 
 __author__ = "Mark van de Streek"
-__date__ = "2024-11-22"
+__date__ = "2024-11-08"
 __all__ = ["Parser"]
 
 import logging

@@ -8,11 +8,12 @@
     https://github.com/features/copilot
 
 Module that contains the exceptions for the extraction of
-sequences from an alignment file.
+sequences from an alignment file (AlignmentExtractor).
 """
 
 __author__ = "Mark van de Streek"
-__date__ = "2024-10-28"
+__date__ = "2024-12-17"
+__all__ = ["AlignmentFileNotFoundError"]
 
 
 class AlignmentFileNotFoundError(Exception):

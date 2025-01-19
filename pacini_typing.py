@@ -47,7 +47,7 @@ See the README.md file for more specific information.
 from __future__ import annotations
 
 __author__ = "Mark van de Streek"
-__date__ = "2024-10-24"
+__date__ = "2024-09-27"
 __all__ = ["PaciniTyping", "main"]
 
 import argparse
@@ -143,7 +143,7 @@ class PaciniTyping:
         elif self.input_args.options is None:
             self.set_config_attributes()
 
-    def set_general_attributes(self):
+    def set_general_attributes(self) -> None:
         """
         Function that sets the general attributes of the self.option variable.
         This is a variable that is used throughout the application with mostly
@@ -170,7 +170,7 @@ class PaciniTyping:
             "makedatabase": None,
         }
 
-    def set_query_attributes(self):
+    def set_query_attributes(self) -> None:
         """
         Function that sets the query related attributes
         in the self.option variable.
@@ -182,7 +182,7 @@ class PaciniTyping:
             "output": self.input_args.output,
         }
 
-    def set_makedatabase_attributes(self):
+    def set_makedatabase_attributes(self) -> None:
         """
         Function that sets the makedatabase related attributes
         in the self.option variable.
@@ -193,7 +193,7 @@ class PaciniTyping:
             "input": self.input_args.input_file,
         }
 
-    def set_config_attributes(self):
+    def set_config_attributes(self) -> None:
         """
         Function that sets the config-scheme related attributes
         in the self.option variable.
@@ -207,7 +207,7 @@ class PaciniTyping:
 
     def setup_logging(self) -> None:
         """
-        Simple method to setup the logging level.
+        Simple method to set up the logging level.
         If user has selected verbose (args), the logging level is set to DEBUG.
         Otherwise, the logging level is set to INFO.
         Additionally, if the log_file option is selected,
@@ -510,7 +510,7 @@ class PaciniTyping:
         logging.debug("Deleting intermediate files...")
         shutil.rmtree(self.output_dir)
 
-    def handle_makedatabase_option(self):
+    def handle_makedatabase_option(self) -> None:
         """
         Little helper function to split up functionality.
         This function simply defines the database_builder dictionary
@@ -529,7 +529,7 @@ class PaciniTyping:
         }
         self.run_makedatabase(database_builder)
 
-    def handle_config_or_query_option(self):
+    def handle_config_or_query_option(self) -> None:
         """
         Function that handles the config or query option.
         It decides which operation to run based on the input arguments.
@@ -545,7 +545,7 @@ class PaciniTyping:
             )
             self.handle_config_option()
 
-    def handle_config_option(self):
+    def handle_config_option(self) -> None:
         """
         Function that handles the calling of all the config
         related operations.
@@ -570,7 +570,9 @@ class PaciniTyping:
             logging.debug("Database exists, starting the query operation...")
             self.handle_config_option_parse_query(pattern)
 
-    def handle_config_option_parse_query(self, pattern: ReadConfigPattern):
+    def handle_config_option_parse_query(
+        self, pattern: ReadConfigPattern
+    ) -> None:
         """
         Function that handles the parsing of the genetic variation
         that is found by the query operation.
@@ -596,7 +598,7 @@ class PaciniTyping:
         else:
             self.delete_intermediates()
 
-    def handle_query_option(self):
+    def handle_query_option(self) -> None:
         """
         Method that handles all query related operations.
         The function checks if the database exists,

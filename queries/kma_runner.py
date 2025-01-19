@@ -15,7 +15,7 @@ and returns it to the (main) QueryRunner class.
 """
 
 __author__ = "Mark van de Streek"
-__date__ = "2024-09-24"
+__date__ = "2024-10-02"
 __all__ = ["KMA"]
 
 import logging

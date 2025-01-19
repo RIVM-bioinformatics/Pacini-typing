@@ -10,11 +10,9 @@
 This module is responsible for running the
 right query against the reference database.
 
-First, the query is prepared by the respective runner
-(BLASTn or KMA). The query is then run by the QueryRunner
-class. The runtime of the query is calculated and the result
-is returned to the main script (pacini_typing.py).
-
+The query is prepared by the respective runner
+(BLASTn or KMA) and is then run by the QueryRunner
+class.
 The actual shell code will be executed by the
 execute function of the command_utils.py module.
 """
@@ -22,7 +20,7 @@ execute function of the command_utils.py module.
 from __future__ import annotations
 
 __author__ = "Mark van de Streek"
-__date__ = "2024-09-24"
+__date__ = "2024-10-02"
 __all__ = ["QueryRunner"]
 
 import logging

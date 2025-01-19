@@ -12,7 +12,7 @@ Based on the input type, the methods will check if the specific files exist.
 """
 
 __author__ = "Mark van de Streek"
-__date__ = "2024-09-24"
+__date__ = "2024-10-04"
 __all__ = [
     "check_for_database_existence",
     "create_database_file_list",

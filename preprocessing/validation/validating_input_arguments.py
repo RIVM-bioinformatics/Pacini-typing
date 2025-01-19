@@ -10,11 +10,10 @@
 Module responsible for validating the input arguments.
 The main goal of this module is to provide (basic) validation
 for the input files.
-See class ArgsValidator for more information about specific validation methods.
 """
 
 __author__ = "Mark van de Streek"
-__date__ = "2024-09-24"
+__date__ = "2024-09-27"
 __all__ = ["ArgsValidator"]
 
 import hashlib

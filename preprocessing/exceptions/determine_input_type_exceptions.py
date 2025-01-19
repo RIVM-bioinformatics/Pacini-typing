@@ -9,11 +9,15 @@
 
 Module that contains custom exceptions for the determine_input_type module.
 These exceptions are raised when invalid input is provided to the module.
-The raise statements are located in validation/validate_input.py.
 """
 
 __author__ = "Mark van de Streek"
 __date__ = "2024-10-28"
+__all__ = [
+    "InvalidFastaOrFastqError",
+    "InvalidSequenceError",
+    "InvalidSequencingTypesError",
+]
 
 
 class InvalidFastaOrFastqError(Exception):

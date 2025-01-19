@@ -12,7 +12,7 @@ See the class and methods for specific information about the working.
 """
 
 __author__ = "Mark van de Streek"
-__date__ = "2024-09-24"
+__date__ = "2024-09-27"
 __all__ = ["DatabaseBuilder"]
 
 import logging

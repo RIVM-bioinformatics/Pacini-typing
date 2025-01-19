@@ -8,7 +8,7 @@
     https://github.com/features/copilot
 
 This module is responsible for extracting sequences from an alignment file.
-KMA is outputting an alingment file with the following format:
+KMA is outputting an alignment file with the following format:
 
 # rfbV_O1:1:AE003852
 template: 	ATGCCATGGAAGACCTACTCACGGAACTTGATGTATGCTGTCATAACTTTGATGTTGAAT
@@ -31,7 +31,8 @@ The above example would be extracted as:
 >ctxA
 TCATAATTCATCCTTAATTCTATTATGTGTATCAATATCAGATTGATAGCCTGAAAATAT
 
-As you see, the line after query: is the sequence that is found.
+> Note: This class is only applicable for KMA output files,
+blast outputs the found sequences in a column.
 """
 
 __author__ = "Mark van de Streek"
@@ -195,7 +196,7 @@ class AlignmentExtractor:
         }
 
     @staticmethod
-    def write_fasta(output_file: str, query_sequences: dict[str, str]):
+    def write_fasta(output_file: str, query_sequences: dict[str, str]) -> None:
         """
         Method that writes the sequences to a fasta file
         with a max line length of 70.

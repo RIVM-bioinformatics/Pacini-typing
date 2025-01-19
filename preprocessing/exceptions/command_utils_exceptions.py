@@ -9,12 +9,13 @@
 
 This module is used to store custom exceptions for the command_utils module.
 Shell commands are executed using the subprocess module,
-and this module is used to define exceptions that are possible raised
+and this module is used to define exceptions that are possibly raised
 during the execution of shell commands.
 """
 
 __author__ = "Mark van de Streek"
-__date__ = "2024-10-28"
+__date__ = "2024-11-21"
+__all__ = ["SubprocessError"]
 
 
 class SubprocessError(Exception):
