@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.4](https://github.com/RIVM-bioinformatics/Pacini-typing/compare/v1.6.3...v1.6.4) (2025-01-20)
+
+
+### Documentation
+
+* Added short description about accepted arguments ([d4c195d](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/d4c195dd0d43ece4994dec1f4f53940e22179bc7))
+
 ## [1.6.3](https://github.com/RIVM-bioinformatics/Pacini-typing/compare/v1.6.2...v1.6.3) (2025-01-20)
 
 
