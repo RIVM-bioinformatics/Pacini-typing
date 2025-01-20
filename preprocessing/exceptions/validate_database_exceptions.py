@@ -22,6 +22,14 @@ class InvalidDatabaseError(Exception):
     """
 
     def __init__(self, database_path: str, database_name: str) -> None:
+        """
+        Initialize the exception with the database path and name.
+        ----------
+        Input:
+            - database_path: path to the database
+            - database_name: name of the database
+        ----------
+        """
         self.database_path = database_path
         self.database_name = database_name
 

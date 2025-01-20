@@ -24,6 +24,13 @@ class SubprocessError(Exception):
     """
 
     def __init__(self, message: str) -> None:
+        """
+        Initialize the exception with the error message.
+        ----------
+        Input:
+            - message: error message from the subprocess module
+        ----------
+        """
         self.message = message
 
     def __str__(self) -> str:

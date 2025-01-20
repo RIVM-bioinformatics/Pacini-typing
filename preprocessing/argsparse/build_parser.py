@@ -125,7 +125,7 @@ def main(givenargs: list[str]) -> argparse.Namespace:
 
     subparsers = parser.add_subparsers(
         title="operations",
-        description="For more information on a specific command, type: Pacini.py <command> -h",
+        description="For more information on a specific command, type: pacini_typing <command> -h",
         dest="options",
     )
 

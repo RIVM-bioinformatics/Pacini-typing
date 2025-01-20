@@ -22,6 +22,13 @@ class AlignmentFileNotFoundError(Exception):
     """
 
     def __init__(self, file: str) -> None:
+        """
+        Initialize the exception with the file path.
+        ----------
+        Input:
+            - file: path to the alignment file
+        ----------
+        """
         self.file = file
 
     def __str__(self) -> str:

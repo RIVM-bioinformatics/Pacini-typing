@@ -28,6 +28,14 @@ class InvalidPairedError(Exception):
     """
 
     def __init__(self, file1: str, file2: str) -> None:
+        """
+        Initialize the exception with the paired files.
+        ----------
+        Input:
+            - file1: first file name
+            - file2: second file name
+        ----------
+        """
         self.file1 = file1
         self.file2 = file2
 
@@ -54,6 +62,14 @@ class InvalidFileExtensionError(Exception):
     """
 
     def __init__(self, file: str, all_valid_extensions: str) -> None:
+        """
+        Initialize the exception with the file and valid extensions.
+        ----------
+        Input:
+            - file: file with the invalid extension
+            - all_valid_extensions: list of valid extensions
+        ----------
+        """
         self.file = file
         self.all_valid_extensions = all_valid_extensions
 
@@ -82,6 +98,13 @@ class FileNotExistsError(Exception):
     """
 
     def __init__(self, file: str) -> None:
+        """
+        Initialize the exception with the file path.
+        ----------
+        Input:
+            - file: path to the file
+        ----------
+        """
         self.file = file
 
     def __str__(self) -> str:

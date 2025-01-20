@@ -35,8 +35,9 @@ def check_for_database_existence(arg_options: dict[str, Any]) -> bool:
         db_name.comp.b, db_name.length.b, db_name.name, db_name.seq.b
     ----------
     Input:
-        - database_name: string with the database name
-        - input_file_type: string with the input file type
+        - arg_options: dictionary with the input arguments
+    Output:
+        - True if all files exist, False otherwise
     ----------
     """
     db_files = create_database_file_list(arg_options)
@@ -54,10 +55,12 @@ def check_for_database_existence(arg_options: dict[str, Any]) -> bool:
 def create_database_file_list(arg_options: dict[str, Any]) -> list[str]:
     """
     Function that creates a list of database files based on the input file type.
+    The list will contain the required files for the database.
     ----------
     Input:
-        - database_name: string with the database name
-        - input_file_type: string with the input file type
+        - arg_options: dictionary with the input arguments
+    Output:
+        - list of required database files
     ----------
     """
     logging.debug("Creating list of required database files...")
@@ -78,11 +81,15 @@ def create_database_file_list(arg_options: dict[str, Any]) -> list[str]:
 
 def check_for_database_path(arg_options: dict[str, Any]) -> bool:
     """
-    Function that checks if the database path exists.
-    If not, the program will exit with an error message.
+    Main check function that validates the database path.
+    The method will check if the database path exists.
+    If the path does not exist, the method will return False to
+    the main pacini_typing script.
     ----------
     Input:
-        - input_path: string with the database path
+        - arg_options: dictionary with the input arguments
+    Output:
+        - True if the database path exists, False otherwise
     ----------
     """
     if not arg_options["database_path"].endswith("/"):

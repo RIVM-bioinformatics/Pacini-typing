@@ -58,6 +58,10 @@ class ArgsValidator:
         The main option dictionary is passed to
         this class and initialized as a class attribute here.
         Additionally, the input file list is stored as a class attribute.
+        ----------
+        Input:
+            - option: dictionary with the input arguments
+        ----------
         """
         self.option = option
         self.config = None
@@ -75,8 +79,9 @@ class ArgsValidator:
         Input:
             - file: string with the file path
         Output:
-            - True: if the extension is in the accepted list
-            - False: if the extension is not in the accepted list
+            - True if the extension is in the accepted list, False otherwise
+        Raises:
+            - InvalidFileExtensionError: if the extension is not in the accepted list
         ----------
         """
         logging.debug("Validating file extension for file: %s", file)
@@ -93,7 +98,7 @@ class ArgsValidator:
     @staticmethod
     def get_file_extension(file_extension: list[str]) -> str:
         """
-        Function that retrieves the file extension from a file name.
+        Static Function that retrieves the file extension from a file name.
         It handles both single and double file extensions.
         For example: file.fastq.gz -> .fastq.gz
         ----------
@@ -130,14 +135,15 @@ class ArgsValidator:
     @staticmethod
     def check_file_existence(file: str) -> bool:
         """
-        Function that checks if a given file exists and is a file.
+        Static function that checks if a given file exists and is a file.
         If not exists, the program will exit and the error will be logged.
         ----------
         Input:
             - file: string with the file path
         Output:
-            - True: if the file exists
-            - False: if the file does not
+            - True if the file exists, False otherwise
+        Raises:
+            - FileNotExistsError: if the file does not exist
         ----------
         """
         logging.debug("Checking if file %s exists", file)
@@ -153,6 +159,10 @@ class ArgsValidator:
         this is done in the create_sha_hash function.
         The hash is then compared, if they are the same,
         the program will exit with an error message.
+        ----------
+        Raises:
+            - InvalidPairedError: if the files are the same
+        ----------
         """
         logging.debug("Comparing paired input files using a hash...")
         if self.create_sha_hash(
@@ -167,7 +177,7 @@ class ArgsValidator:
     @staticmethod
     def create_sha_hash(file: str) -> str:
         """
-        Method that creates a SHA256 hash for a given file.
+        Static method that creates a SHA256 hash for a given file.
         The file is read in chunks of 4096 bytes and the hash is updated.
         The Hash is then returned as a hexadecimal string for comparison.
         ----------
@@ -191,6 +201,10 @@ class ArgsValidator:
         This check is done right before the paired file check.
         Therefore, no big operations are done before this check,
         because the program will exit with an error message.
+        ----------
+        Raises:
+            - InvalidPairedError: if the files are the same
+        ----------
         """
         logging.debug("Paired files supplied, checking similarity...")
         if (
@@ -208,6 +222,10 @@ class ArgsValidator:
         Function that checks if the input files are paired.
         This means, 1 and 2 are in the file names, or something similar.
         An error message will be logged and the program will exit if the names are not paired.
+        ----------
+        Raises:
+            - InvalidPairedError: if the names are not paired
+        ----------
         """
         logging.debug("Checking if the paired input contains valid names...")
         pattern1 = re.compile(r".+(_1|R1).+")
@@ -224,18 +242,19 @@ class ArgsValidator:
 
     def run_file_checks(self, file: str) -> bool:
         """
-        Method runs checks on the input files.
-        If these checks pass, the method returns True.
-        The following checks are done:
-            - Validate the file extensions: check if the extension is in the accepted list
-            - Check if the file exists: check if the file exists and is a file
-        If not, the program will exit with an error message.
+        Method that delegates the file checks to the other functions.
+        The checks are done in the following order:
+        - check_file_existence
+        - validate_file_extensions
+        If the checks pass, the method will return True.
         ----------
         Input:
             - file: string with the file path that needs to be checked
         Output:
             - True: if the checks pass
             - sys.exit(1): if the checks do not pass
+        Raises:
+            - ValidationError: if the checks do not pass
         ----------
         """
         logging.debug(
@@ -254,8 +273,7 @@ class ArgsValidator:
         The files are then passed to the run_file_checks method.
         ----------
         Output:
-            - True: if the files are valid
-            - False: if the files are not valid
+            - True: if the checks pass, False otherwise
         ----------
         """
         if len(self.input_file_list) == 2:

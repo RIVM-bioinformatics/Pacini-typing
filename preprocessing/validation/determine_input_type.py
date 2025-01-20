@@ -68,15 +68,13 @@ class InputFileInspector:
 
     def determine_file_type(self) -> None:
         """
-        Main logic function of the class that does the checking.
-        The function first checks the first line of the file.
-        If the line starts with '>', the type is set to FASTA,
-        and the file is validated further assuming it is a FASTA file.
-        If the line starts with '@', the type is set to FASTQ,
-        and the file is validated further assuming it is a FASTQ file.
-        If during the validation of the rest of the file,
-        an invalid structure is found, both the FASTA and FASTQ
-        validation functions raise an error.
+        Function that determines the file type.
+        The function reads the input files and determines if they are
+        FASTA or FASTQ files. The function calls the validate_fasta
+        and validate_fastq functions to validate the files.
+        Based on the first line of the file, the function determines
+        if the file is a FASTA or FASTQ file. The whole file is then
+        validated to check if it is a valid FASTA or FASTQ file.
         ----------
         Raises:
             - InvalidFastaOrFastqError: If the file is not a valid
@@ -105,21 +103,22 @@ class InputFileInspector:
         Function that validates the FASTA file format.
         The function assumes the file is a FASTA file
         and is designed to validate this type of file.
+        Any differences in the data are resulting in an error.
         ----------
         Input:
-            - file_handle: open file handle
+            - file_handle: open file to check
+            - file: filename for error reporting
         ----------
         """
         sequence: list[str] = []
-        has_header = False  # Track if any header is found
-
+        has_header = False
         for line in file_handle:
             line = line.strip()
             if not line:
                 continue
             if line.startswith(">"):
                 has_header = True
-                # If we had a previous sequence, validate it
+                # Validate the previous sequence
                 if sequence:
                     self.validate_sequence("".join(sequence), file)
                     sequence = []
@@ -131,7 +130,6 @@ class InputFileInspector:
             raise InvalidFastaOrFastqError(
                 f"No headers found in FASTA file: {file}"
             )
-
         # Validate the last sequence
         if sequence:
             self.validate_sequence("".join(sequence), file)
@@ -232,11 +230,8 @@ class InputFileInspector:
         This function makes sure the user is not mixing FASTA and FASTQ files
         It basically checks if all files are of the same type.
         ----------
-        Input:
-            - type: dictionary with the file name and type (FASTA or FASTQ)
-        Output:
-            - logging.debug: if all files are of the same type
-            - logging.error: if the files are not of the same type, sys.exit(1)
+        Raises:
+            - InvalidSequencingTypesError: If the types are invalid
         ----------
         """
         logging.debug("Comparing the types of the input files...")

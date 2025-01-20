@@ -23,6 +23,13 @@ class YAMLLoadingError(Exception):
     """
 
     def __init__(self, file_path: str) -> None:
+        """
+        Initialize the exception with the file path.
+        ----------
+        Input:
+            - file_path: path to the YAML file
+        ----------
+        """
         self.file_path = file_path
 
     def __str__(self) -> str:
@@ -48,6 +55,13 @@ class YAMLStructureError(Exception):
     """
 
     def __init__(self, file_path: str) -> None:
+        """
+        Initialize the exception with the file path.
+        ----------
+        Input:
+            - file_path: path to the YAML file
+        ----------
+        """
         self.file_path = file_path
 
     def __str__(self) -> str:
@@ -70,9 +84,6 @@ class EmptySequenceError(Exception):
     """
     Raised when an empty sequence is found in the data frame.
     """
-
-    def __init__(self) -> None:
-        pass
 
     def __str__(self) -> str:
         return """
