@@ -22,7 +22,7 @@ __all__ = [
     "test_execute_with_stdout",
     "test_execute_failing_command_allow_fail_false",
     "test_execute_failing_command_allow_fail_true",
-    "pytest_capture_error_file",
+    "test_capture_error_file",
 ]
 
 import os
@@ -126,7 +126,7 @@ def test_execute_failing_command_allow_fail_true() -> None:
     assert result is False
 
 
-def pytest_capture_error_file(temp_files: tuple[TextIO, TextIO]) -> None:
+def test_capture_error_file(temp_files: tuple[TextIO, TextIO]) -> None:
     """
     Test the execute function with a failing command
     and capturing the output in a file.

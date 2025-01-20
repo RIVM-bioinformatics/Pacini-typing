@@ -48,6 +48,7 @@ import subprocess
 from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import IO, Any, Tuple
+from preprocessing.exceptions.command_utils_exceptions import SubprocessError
 
 
 def execute(
@@ -186,7 +187,7 @@ class ShellCommand(Command):
                 e.stderr,
             )
             if not self.allow_fail:
-                raise
+                raise SubprocessError("Command failed")
             return False
 
 
