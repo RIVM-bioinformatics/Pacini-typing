@@ -20,7 +20,9 @@ __all__ = [
     "test_execute_capture_output",
     "test_execute_no_capture_output",
     "test_execute_with_stdout",
+    "test_execute_failing_command_allow_fail_false",
     "test_execute_failing_command_allow_fail_true",
+    "pytest_capture_error_file",
 ]
 
 import os
@@ -29,6 +31,7 @@ from typing import Generator, TextIO, Tuple
 import pytest
 
 from command_utils import CommandInvoker, ShellCommand
+from preprocessing.exceptions.command_utils_exceptions import SubprocessError
 
 
 @pytest.fixture
@@ -99,6 +102,17 @@ def test_execute_with_stdout(temp_files: tuple[TextIO, TextIO]) -> None:
         stdout_content = stdout_f.read().strip()
 
     assert stdout_content == "Hello World"
+
+
+def test_execute_failing_command_allow_fail_false() -> None:
+    """
+    Test the execute function with a failing command.
+    The function makes sure that the command fails and raises an exception.
+    """
+    with pytest.raises(SubprocessError):
+        CommandInvoker(
+            ShellCommand(cmd=["ls", "xyz"], allow_fail=False)
+        ).execute()
 
 
 def test_execute_failing_command_allow_fail_true() -> None:
