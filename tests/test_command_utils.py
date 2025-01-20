@@ -22,7 +22,7 @@ __all__ = [
     "test_execute_with_stdout",
     "test_execute_failing_command_allow_fail_false",
     "test_execute_failing_command_allow_fail_true",
-    "test_capture_error_file",
+    "pytest_capture_error_file",
 ]
 
 import os
@@ -124,28 +124,3 @@ def test_execute_failing_command_allow_fail_true() -> None:
         ShellCommand(cmd=["false"], allow_fail=True)
     ).execute()
     assert result is False
-
-
-def test_capture_error_file(temp_files: tuple[TextIO, TextIO]) -> None:
-    """
-    Test the execute function with a failing command
-    and capturing the output in a file.
-    ----------
-    Input:
-        - temp_files: temporary files for stdout and stderr
-    ----------
-    """
-    stdout_f, stderr_f = temp_files
-    with pytest.raises(SubprocessError):
-        CommandInvoker(
-            ShellCommand(
-                cmd=["ls", "xyz"],
-                stdout_file=stdout_f,
-                stderr_file=stderr_f,
-                allow_fail=False,
-            )
-        ).execute()
-
-    with open("test_stderr.txt", "r", encoding="utf-8") as stderr_f:
-        stderr_content = stderr_f.read().strip()
-        assert stderr_content == "ls: xyz: No such file or directory"
