@@ -13,7 +13,7 @@ See the filter_pattern.py file for more information about the Filter interface.
 """
 
 __author__ = "Mark van de Streek"
-__date__ = "2024-11-22"
+__date__ = "2024-11-27"
 __all__ = ["CoverageFilter"]
 
 import pandas as pd

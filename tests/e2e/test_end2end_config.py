@@ -9,25 +9,32 @@
 
 End-to-end test for the main function of pacini_typing.
 This file tests full runs of the program with config option.
+
+The setup_teardown fixture is used to set up the arguments for the tests.
+It creates a directory for the test and yields the arguments for the test.
+After the test is run, it cleans up the files created during the test.
 """
 
 __author__ = "Mark van de Streek"
 __date__ = "2024-09-24"
 __all__ = [
+    "test_existence_of_tools",
     "setup_teardown_config_input",
     "cleanup_files",
+    "test_config_run",
+    "check_file_contents",
 ]
 
 import os
-import platform
 import shutil
 from typing import Generator
-import pandas as pd
 
+import pandas as pd
 import pytest
 
+from command_utils import CommandInvoker, ShellCommand
 from pacini_typing import main
-from command_utils import ShellCommand, CommandInvoker
+from tests.e2e.check_tool_existence import check_tools
 
 FASTA_FILE = "test_data/VIB_EA5348AA_AS.fasta"
 FASTQ_1 = "test_data/VIB_EA5348AA_AS_1.fq"
@@ -39,25 +46,33 @@ OUTPUT = [
     "VIB_EA5348AA_AS_sequences.fasta",
 ]
 
+skip_in_ci = pytest.mark.skipif(
+    os.getenv("CI") == "true",
+    reason="Test online (GitHub Action) not available due to dependencies",
+)
 
-@pytest.fixture()
+
+@skip_in_ci
+def test_existence_of_tools() -> None:
+    """
+    Function to test the existence of the required tools for
+    this test script.
+    """
+    check_tools(["kma_index", "makeblastdb", "blastn", "kma"])
+
+
+@pytest.fixture
+@skip_in_ci
 def setup_teardown_config_input() -> Generator[list[str], None, None]:
     """
-    Pytest fixture that sets up the arguments for the single input test
-    It creates a Generator object that yields the arguments
-    After the test is run, it cleans up the files created during the test
+    Pytest fixture that sets up the arguments for the single input test.
+    It creates a Generator object that yields the arguments.
     The generator does not accept or return any arguments
-
-    Test is skipped if the platform is Linux,
-    this is due to the use of GitHub actions
     ----------
     Output:
-        args: list[str] -> List of arguments for the test
+        - args: list of arguments for the test
     ----------
     """
-    if platform.system() == "Linux":
-        pytest.skip("Test not supported on Linux")
-
     args = [
         "--verbose",
         "--config",
@@ -68,14 +83,14 @@ def setup_teardown_config_input() -> Generator[list[str], None, None]:
     ]
     # Make the directory for the test
     os.mkdir(DIR_PATH)
-    # Yield the arguments and clean up afterwords
+
     yield args
     cleanup_files()
 
 
 def cleanup_files() -> None:
     """
-    Function to clean up the files created during the test
+    Function to clean up the files created during the test.
     Is simply removes the directory and all files in it
     """
     if os.path.exists(DIR_PATH):
@@ -90,22 +105,16 @@ def cleanup_files() -> None:
         os.rmdir(DIR_PATH)
 
 
-@pytest.mark.skipif(
-    platform.system() == "Linux", reason="Test not supported on Linux"
-)
-def test_config_run(
-    setup_teardown_config_input: Generator[list[str], None, None]
-) -> None:
+@skip_in_ci
+def test_config_run(setup_teardown_config_input: list[str]) -> None:
     """
-    End-to-end test for the main function with single input
-    it runs the main function of pacini_typing with the single input arguments
-    and checks if the output file is successfully created.
-    The output file is not checked for contents in this test,
-    that is done in another test.
+    End-to-end test for the main function with single input.
+    The test runs the main function of pacini_typing
+    with arguments of the fixture.
+    File contents aren't checked here, but file existence is.
     ----------
     Input:
-        setup_teardown_single_input: Generator ->
-            Pytest fixture for the single input test
+        - setup_teardown_single_input: list of input arguments
     ----------
     """
     main(setup_teardown_config_input)
@@ -120,8 +129,9 @@ def test_config_run(
 
 def check_file_contents(file: str) -> None:
     """
-    Function to check the contents of the output file
-    It checks if the output file contains the expected contents
+    Function to check the contents of the output file.
+    The checking is done by comparing the output file data
+    with the expected output data.
     """
     expected_output: pd.DataFrame = pd.read_csv(
         f"test_data/expected_output/expected_config_{file}", sep="\t"
@@ -138,16 +148,15 @@ def check_file_contents(file: str) -> None:
     pd.testing.assert_frame_equal(run_output, expected_output)
 
 
-def test_config_paired_run(
-    setup_teardown_config_input: Generator[list[str], None, None]
-) -> None:
+@skip_in_ci
+def test_config_paired_run(setup_teardown_config_input: list[str]) -> None:
     """
     Function that tests the main function with paired input
     it runs the main function of pacini_typing with the paired input arguments
     and checks if the output files are successfully created.
     ----------
     Input:
-        setup_teardown_config_input: fixture for the paired input test
+        - setup_teardown_config_input: list of input arguments
     ----------
     """
     setup_teardown_config_input[-1] = FASTQ_1

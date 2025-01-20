@@ -15,7 +15,7 @@ and returns it to the (main) QueryRunner class.
 """
 
 __author__ = "Mark van de Streek"
-__date__ = "2024-09-24"
+__date__ = "2024-10-02"
 __all__ = ["KMA"]
 
 import logging
@@ -31,8 +31,6 @@ class KMA(Enum):
     ----------
     RUN_OPTION: string that is used in the subprocess.run() method
     PAIRED_OPTION: option for paired-end reads
-    OUTPUT_FORMAT: flag for the output format
-    MIN_IDENTITY: flag for the minimum identity percentage
     ----------
     """
 

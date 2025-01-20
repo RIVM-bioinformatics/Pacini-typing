@@ -36,7 +36,7 @@ __all__ = [
     "test_empty_file",
 ]
 
-import platform
+import os
 from io import StringIO
 
 import pytest
@@ -48,6 +48,11 @@ from preprocessing.exceptions.determine_input_type_exceptions import (
 )
 from preprocessing.validation.determine_input_type import InputFileInspector
 
+skip_in_ci = pytest.mark.skipif(
+    os.getenv("CI") == "true",
+    reason="Test online (GitHub Action) not available due to dependencies",
+)
+
 
 @pytest.fixture
 def setup_valid_data() -> dict[str, str]:
@@ -56,7 +61,7 @@ def setup_valid_data() -> dict[str, str]:
     The variations are used to test the validation functions.
     ----------
     Output:
-        - dict: A dictionary with valid and invalid FASTA and FASTQ data.
+        - dict: dictionary with valid and invalid FASTA and FASTQ data.
     ----------
     """
     return {
@@ -74,7 +79,7 @@ def setup_valid_data() -> dict[str, str]:
     }
 
 
-def test_validate_fasta_valid(setup_valid_data: dict[str, str]):
+def test_validate_fasta_valid(setup_valid_data: dict[str, str]) -> None:
     """
     Function that tests if a valid FASTA file passes validation.
     It's a sunny day test: everything should pass.
@@ -89,7 +94,7 @@ def test_validate_fasta_valid(setup_valid_data: dict[str, str]):
     inspector.validate_fasta(file_handle, "valid.fasta")
 
 
-def test_validate_fasta_no_header(setup_valid_data: dict[str, str]):
+def test_validate_fasta_no_header(setup_valid_data: dict[str, str]) -> None:
     """
     Function that tests if a FASTA file with no header raises an error.
     ----------
@@ -103,7 +108,9 @@ def test_validate_fasta_no_header(setup_valid_data: dict[str, str]):
         inspector.validate_fasta(file_handle, "no_header.fasta")
 
 
-def test_validate_fasta_invalid_sequence(setup_valid_data: dict[str, str]):
+def test_validate_fasta_invalid_sequence(
+    setup_valid_data: dict[str, str]
+) -> None:
     """
     Function that tests if a FASTA file with an
     invalid sequence raises an error.
@@ -118,7 +125,7 @@ def test_validate_fasta_invalid_sequence(setup_valid_data: dict[str, str]):
         inspector.validate_fasta(file_handle, "invalid_sequence.fasta")
 
 
-def test_validate_fastq_valid(setup_valid_data: dict[str, str]):
+def test_validate_fastq_valid(setup_valid_data: dict[str, str]) -> None:
     """
     Test a valid FASTQ file passes validation.
     This test should simply pass.
@@ -133,13 +140,13 @@ def test_validate_fastq_valid(setup_valid_data: dict[str, str]):
     inspector.validate_fastq(file_handle, "valid.fastq")
 
 
-def test_validate_fastq_missing_plus(setup_valid_data: dict[str, str]):
+def test_validate_fastq_missing_plus(setup_valid_data: dict[str, str]) -> None:
     """
     Function that tests FASTQ file with missing '+' line raises an error.
     ----------
     Input:
         - setup_valid_data: valid and invalid FASTA and FASTQ data.
-    ----------
+    ---------
     """
     inspector = InputFileInspector([])
     file_handle = StringIO(setup_valid_data["invalid_fastq_missing_plus"])
@@ -147,7 +154,9 @@ def test_validate_fastq_missing_plus(setup_valid_data: dict[str, str]):
         inspector.validate_fastq(file_handle, "missing_plus.fastq")
 
 
-def test_validate_fastq_length_mismatch(setup_valid_data: dict[str, str]):
+def test_validate_fastq_length_mismatch(
+    setup_valid_data: dict[str, str]
+) -> None:
     """
     Function that tests FASTQ file with mismatched sequence and
     quality lengths raises an error.
@@ -162,9 +171,7 @@ def test_validate_fastq_length_mismatch(setup_valid_data: dict[str, str]):
         inspector.validate_fastq(file_handle, "length_mismatch.fastq")
 
 
-@pytest.mark.skipif(
-    platform.system() == "Linux", reason="Test not supported on Linux"
-)
+@skip_in_ci
 def test_determine_file_type_fasta():
     """
     Function that tests file type determination for a FASTA file.
@@ -174,9 +181,7 @@ def test_determine_file_type_fasta():
     assert file_validator.get_file_type() == "FASTA"
 
 
-@pytest.mark.skipif(
-    platform.system() == "Linux", reason="Test not supported on Linux"
-)
+@skip_in_ci
 def test_determine_file_type_fastq():
     """
     Function that tests file type determination for a FASTQ file.
@@ -188,9 +193,7 @@ def test_determine_file_type_fastq():
     assert paired_validator.get_file_type() == "FASTQ"
 
 
-@pytest.mark.skipif(
-    platform.system() == "Linux", reason="Test not supported on Linux"
-)
+@skip_in_ci
 def test_compare_types_mixed():
     """
     Function that tests if an error is raised for
@@ -205,9 +208,7 @@ def test_compare_types_mixed():
         )
 
 
-@pytest.mark.skipif(
-    platform.system() == "Linux", reason="Test not supported on Linux"
-)
+@skip_in_ci
 def test_compare_types_same():
     """
     Function that tests if error is raised for multiple files of the same type.
@@ -219,9 +220,6 @@ def test_compare_types_same():
         )
 
 
-@pytest.mark.skipif(
-    platform.system() == "Linux", reason="Test not supported on Linux"
-)
 def test_empty_file():
     """
     Function that tests if an error is raised for an empty file.

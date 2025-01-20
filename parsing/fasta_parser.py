@@ -53,7 +53,8 @@ class FASTAParser(ParserStrategy):
         - extract_gene_list: Method to extract the gene list from the data frame
         - get_hits_report_info: Method to get the hits report information
         - get_gene_column_name: Method to get the gene column name
-        - write_fasta_out: Method to write the FASTA output
+        - requires_dataframe: Method to determine if the parser requires a data frame
+        - write_fasta_out: Method to write the hits to a FASTA output file
     ----------
     """
 
@@ -64,12 +65,12 @@ class FASTAParser(ParserStrategy):
         The data frame is also formatted with the right column names.
         ----------
         Input:
-            - filename: str: the name of the file to read
+            - filename: the name of the file to read
         Output:
-            - data_frame: pd.DataFrame: the data frame with the BLAST results
+            - data_frame: the data frame with the BLAST results
         ----------
         """
-        logging.debug(f"Reading BLAST output file: {filename}...")
+        logging.debug("Reading BLAST output file: %s...", filename)
         data_frame = pd.read_csv(filename + ".tsv", sep="\t", header=None)
         data_frame.columns = list(BLAST_COLUMNS.keys())
         data_frame["pident"] = data_frame["pident"].astype(float)
@@ -84,9 +85,9 @@ class FASTAParser(ParserStrategy):
         The genes are simply split so that id's or codes are removed.
         ----------
         Input:
-            - data_frame: pd.DataFrame: the data frame with the BLAST results
+            - data_frame: the data frame with the BLAST results
         Output:
-            - list[str]: list with gene names
+            - list with gene names
         ----------
         """
         return [
@@ -101,9 +102,9 @@ class FASTAParser(ParserStrategy):
         Therefore, this function is implemented in the concrete classes.
         ----------
         Output:
-            - columns: list[str]: list with column names
-            - significance_type: str: the type of significance
-            - value_column: Any: the value column
+            - columns: list with column names
+            - significance_type: the type of significance
+            - value_column: the value column
         ----------
         """
         columns = list(BLAST_COLUMNS.values())
@@ -116,7 +117,7 @@ class FASTAParser(ParserStrategy):
         This is used for creating the report.
         ----------
         Output:
-            - str: the gene column name
+            - the gene column name
         ----------
         """
         return "sseqid"
@@ -128,7 +129,7 @@ class FASTAParser(ParserStrategy):
         For more specific information, see the ParserStrategy class.
         ----------
         Output:
-            - bool: False
+            - bool True
         ----------
         """
         return True

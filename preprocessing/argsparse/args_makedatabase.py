@@ -8,12 +8,12 @@
     https://github.com/features/copilot
 
 This module is responsible for building the makedatabase subcommand for the parser.
-The subcommand is used to create a new reference database.
-The subcommand is added to the main parsing object in the build_parser script.
+The subcommand is used to create a new reference database and
+is added to the main parsing object in the build_parser script.
 """
 
 __author__ = "Mark van de Streek"
-__date__ = "2024-09-24"
+__date__ = "2024-09-27"
 __all__ = ["build_makedatabase_command"]
 
 
@@ -22,7 +22,7 @@ from argparse import _SubParsersAction
 
 def build_makedatabase_command(subparsers: _SubParsersAction) -> None:
     """
-    Function that builds the makedatabase subcommand for the parser
+    Function that builds the makedatabase subcommand for the parser.
     This function is called from the build_parser script
     ----------
     Input:

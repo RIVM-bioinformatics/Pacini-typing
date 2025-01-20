@@ -8,12 +8,13 @@
     https://github.com/features/copilot
 
 Module that contains custom exceptions for the parsing module.
-These exceptions are raised when invalid args or options are found.
-The raise statements are located in xxx module. # TODO: Update this line
+Mostly these exceptions are raised when an error occurs during
+the reading of the configuration file.
 """
 
 __author__ = "Mark van de Streek"
-__date__ = "2024-10-28"
+__date__ = "2024-11-06"
+__all__ = ["YAMLLoadingError", "YAMLStructureError", "EmptySequenceError"]
 
 
 class YAMLLoadingError(Exception):
@@ -22,6 +23,13 @@ class YAMLLoadingError(Exception):
     """
 
     def __init__(self, file_path: str) -> None:
+        """
+        Initialize the exception with the file path.
+        ----------
+        Input:
+            - file_path: path to the YAML file
+        ----------
+        """
         self.file_path = file_path
 
     def __str__(self) -> str:
@@ -47,6 +55,13 @@ class YAMLStructureError(Exception):
     """
 
     def __init__(self, file_path: str) -> None:
+        """
+        Initialize the exception with the file path.
+        ----------
+        Input:
+            - file_path: path to the YAML file
+        ----------
+        """
         self.file_path = file_path
 
     def __str__(self) -> str:
@@ -69,9 +84,6 @@ class EmptySequenceError(Exception):
     """
     Raised when an empty sequence is found in the data frame.
     """
-
-    def __init__(self) -> None:
-        pass
 
     def __str__(self) -> str:
         return """

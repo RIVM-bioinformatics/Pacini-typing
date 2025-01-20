@@ -9,11 +9,15 @@
 
 Module that contains custom exceptions for the determine_input_type module.
 These exceptions are raised when invalid input is provided to the module.
-The raise statements are located in validation/validate_input.py.
 """
 
 __author__ = "Mark van de Streek"
 __date__ = "2024-10-28"
+__all__ = [
+    "InvalidFastaOrFastqError",
+    "InvalidSequenceError",
+    "InvalidSequencingTypesError",
+]
 
 
 class InvalidFastaOrFastqError(Exception):
@@ -22,6 +26,13 @@ class InvalidFastaOrFastqError(Exception):
     """
 
     def __init__(self, file: str) -> None:
+        """
+        Initialize the exception with the file path.
+        ----------
+        Input:
+            - file: path to the invalid FASTA or FASTQ file
+        ----------
+        """
         self.file = file
 
     def __str__(self) -> str:
@@ -53,6 +64,14 @@ class InvalidSequenceError(Exception):
     """
 
     def __init__(self, sequence: str, file: str) -> None:
+        """
+        Initialize the exception with the invalid sequence and file path.
+        ----------
+        Input:
+            - sequence: invalid sequence
+            - file: path to the file containing the invalid sequence
+        ----------
+        """
         self.sequence = sequence
         self.file = file
 
@@ -77,6 +96,13 @@ class InvalidSequencingTypesError(Exception):
     """
 
     def __init__(self, files: list[str]) -> None:
+        """
+        Initialize the exception with the list of files.
+        ----------
+        Input:
+            - files: list of files with different sequencing types
+        ----------
+        """
         self.files = files
 
     def __str__(self) -> str:

@@ -18,7 +18,7 @@ parameters required for the database creation and the query operation.
 """
 
 __author__ = "Mark van de Streek"
-__date__ = "2024-10-30"
+__date__ = "2024-11-08"
 __all__ = ["ReadConfigPattern"]
 
 import logging
@@ -35,8 +35,6 @@ REQUIRED_KEYS = ["metadata", "database", "pattern"]
 REQUIRED_PATTERN_KEYS = [
     "perc_ident",
     "perc_cov",
-    "e_value",
-    "p_value",
     "genes",
 ]
 
@@ -48,6 +46,7 @@ class ReadConfigPattern:
     The options can then be used to run the analysis
     ----------
     Methods:
+        - __init__: Constructor for the ReadConfigPattern class
         - read_config: Read the configuration file
         - validate_config_keys: Validate the configuration file
         - validate_pattern_keys: Validate the pattern keys
@@ -57,10 +56,10 @@ class ReadConfigPattern:
 
     def __init__(self, config_file: str, input_file_type: str) -> None:
         """
-        Costructor for the ReadConfigPattern class
+        Constructor for the ReadConfigPattern class
         It accepts the configuration file and the input file type
         The pattern variable is initialized as an empty dictionary
-        the pattern is placed in this pattern var.
+        the pattern is placed in this pattern variable.
         The creation_dict is used for database operations and
         running the query, so that not the entire pattern will be passed around
         ----------
@@ -79,14 +78,19 @@ class ReadConfigPattern:
         self.validate_pattern_keys()
         self.construct_params_dict()
 
-    def read_config(self):
+    def read_config(self) -> None:
         """
         Function that reads the configuration file
         If the config file is not found, an error is raised.
         If the config file is wrong constructed,
-        an custom error is raised. (YAMLStructureError)
+        a custom error is raised. (YAMLStructureError)
         If the config file is loaded correctly,
         the pattern is stored in the pattern variable
+        ----------
+        Raises:
+            - FileNotFoundError: If the config file is not found
+            - YAMLLoadingError: If the config file is not loaded correctly
+        ----------
         """
         logging.info("Reading configuration file...")
         try:
@@ -101,41 +105,45 @@ class ReadConfigPattern:
             logging.error("Error loading YAML file, exiting...")
             raise YAMLLoadingError(self.config_file) from e
 
-    def validate_config_keys(self):
+    def validate_config_keys(self) -> None:
         """
         Function that validates the keys of the configuration file
         If the keys are not present, a custom error is raised.
-        The keys that are required are stored in the REQUIRED_KEYS variable
-        This keys are the main keys of the configuration file
+        The keys that are required are stored in the REQUIRED_KEYS variable.
+        These keys are the main keys of the configuration file
+        ----------
+        Raises:
+            - YAMLStructureError: If the keys are not present
+        ----------
         """
         logging.debug("Validating keys of config file...")
         for key in self.pattern:
             if key not in REQUIRED_KEYS:
                 raise YAMLStructureError(self.config_file)
 
-    def validate_pattern_keys(self):
+    def validate_pattern_keys(self) -> None:
         """
         This function checks the specific keys that
         are required for the genetic pattern to be valid.
         If the keys are not present, a custom error is raised.
         The keys that are required are stored
         in the REQUIRED_PATTERN_KEYS variable
+        ----------
+        Raises:
+            - YAMLStructureError: If the keys are not present
+        ----------
         """
         logging.debug("Validating keys of genetic pattern...")
         for key in REQUIRED_PATTERN_KEYS:
             if key not in self.pattern["pattern"]:
                 raise YAMLStructureError(self.config_file)
 
-    def construct_params_dict(self):
+    def construct_params_dict(self) -> None:
         """
         Constructs a dictionary with parameters required for
         the database creation and the query operation.
         """
         logging.debug("Creating database from config file...")
-        # Create the database
-        # Check if the database exists
-        # If it does not exist, create the database
-        # If it does exist, do nothing
         self.creation_dict = {
             "database_path": self.pattern["database"]["path"],
             "database_name": self.pattern["database"]["name"],

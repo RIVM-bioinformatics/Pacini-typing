@@ -15,7 +15,7 @@ and returns it to the (main) QueryRunner class.
 """
 
 __author__ = "Mark van de Streek"
-__date__ = "2024-09-24"
+__date__ = "2024-10-02"
 __all__ = ["BLASTn"]
 
 import logging
@@ -68,7 +68,7 @@ class BLASTn(Enum):
     def get_query(option: dict[str, Any]) -> list[str]:
         """
         Simple method that prepares the query for the BLAST run.
-        This query is passed to the super class QueryRunner.
+        This query is passed to the main class QueryRunner.
         The script-constants are used to set the run option and output format.
         ----------
         Input:

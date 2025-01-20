@@ -33,7 +33,8 @@ class ParserStrategy(ABC):
         - extract_gene_list: Method to extract the gene list from the data frame
         - get_hits_report_info: Method to get the hits report information
         - get_gene_column_name: Method to get the gene column name
-        - write_fasta_out: Method to write the FASTA output
+        - requires_dataframe: Method to determine if the parser requires a data frame
+        - write_fasta_out: Method to write the hits to a FASTA output file
     ----------
     """
 
@@ -95,7 +96,7 @@ class ParserStrategy(ABC):
         Helper method to determine if the parser requires a data frame.
         The write_fasta_out method is quite different between the parsers.
         And to not make the code too duplicate in the main Parser class,
-        this methods helps to determine if a data frame is required to send
+        this method helps to determine if a data frame is required to send
         to the write_fasta_out method.
         ----------
         Output:

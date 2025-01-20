@@ -7,32 +7,31 @@
     “GitHub Copilot: Your AI pair programmer” (GPT-3). GitHub, Inc.
     https://github.com/features/copilot
 
-Python script that contains the DatabaseBuilder class.
-This class is responsible for building a database using either KMA or BLAST.
-For both methods, a subprocess.run command is used to execute the command in the terminal.
-See the methods for more information.
+This script is responsible for building a database using either KMA or BLAST.
+See the class and methods for specific information about the working.
 """
 
 __author__ = "Mark van de Streek"
-__date__ = "2024-09-24"
+__date__ = "2024-09-27"
 __all__ = ["DatabaseBuilder"]
 
 import logging
 import os
 from typing import Any, Tuple
 
-from command_utils import execute
+from command_utils import CommandInvoker, ShellCommand
 
 
 class DatabaseBuilder:
     """
-    Class that contains the methods to build a database using either KMA or BLAST.
+    Class that contains the methods to build a database for
+    KMA of BLAST using the input arguments.
     ----------
     Methods:
         - __init__: Constructor for the DatabaseBuilder class
-        - build_database: Generic function to build a database using either KMA or BLAST
-        - create_kma_database: Method that creates a KMA database
-        - create_blast_database: Method that creates a BLAST database
+        - build_database: Generic function to build the database
+        - create_kma_database: Method that creates the KMA database
+        - create_blast_database: Method that creates the BLAST database
     ----------
     """
 
@@ -47,6 +46,7 @@ class DatabaseBuilder:
             - database_name: str
             - input_fasta_file: str
             - database_type: str
+        ----------
         """
         self.full_database_path: str = ""
         self.database_path: str = arg_options["database_path"]
@@ -60,12 +60,10 @@ class DatabaseBuilder:
         Generic function to build a database using either KMA or BLAST.
         ----------
         Input:
-            - database_path: str
-            - database_name: str
-            - input_fasta_file: str
-            - database_type: str
-        Output:
-            - Database in the specified path
+            - database_path: path to the database
+            - database_name: database name
+            - input_fasta_file: file containing sequences of interest
+            - database_type: type of database to build (FASTA/FASTQ)
         ----------
         """
         self.full_database_path = os.path.join(
@@ -87,53 +85,55 @@ class DatabaseBuilder:
 
     def create_kma_database(self) -> Tuple[str, str] | bool:
         """
-        kma_index -i input_fasta_file -o path + name
+        Function that creates the KMA database
+        using the kma_index command.
+        The command_utils module is used to execute the command
+        in the terminal.
+        Command: kma_index -i input_fasta_file -o path + name
         ----------
-        Input:
-            - full_database_path: str
-            - input_fasta_file: str
         Output:
-            - Result of the subprocess.run
+            - captured output of the shell command
         ----------
         """
         logging.debug("Running KMA subprocess to create database")
-
-        return execute(
-            [
-                "kma_index",
-                "-i",
-                os.path.join(self.input_fasta_file),
-                "-o",
-                self.full_database_path,
-            ],
-            capture=True,
-        )
+        return CommandInvoker(
+            ShellCommand(
+                cmd=[
+                    "kma_index",
+                    "-i",
+                    os.path.join(self.input_fasta_file),
+                    "-o",
+                    self.full_database_path,
+                ],
+                capture=True,
+            )
+        ).execute()
 
     def create_blast_database(self) -> Tuple[str, str] | bool:
         """
-        Method that creates a BLAST database using the makeblastdb command.
-        The subprocess.run command is used to execute the command in the terminal.
-        This object contains the return code, stdout and stderr and is being returned.
-        makeblastdb -in input_fasta_file -dbtype nucl -out path + name
+        Method that creates a BLAST database
+        using the makeblastdb command.
+        The command_utils module is used to execute the command
+        in the terminal.
+        Command: makeblastdb -in input_fasta_file \
+            -dbtype nucl -out path + name
         ----------
-        Input:
-            - full_database_path: str
-            - input_fasta_file: str
         Output:
-            - Result of the subprocess.run
+            - captured output of the shell command
         ----------
         """
         logging.debug("Running BLAST subprocess to create database")
-
-        return execute(
-            [
-                "makeblastdb",
-                "-in",
-                os.path.join(self.input_fasta_file),
-                "-dbtype",
-                "nucl",
-                "-out",
-                self.full_database_path,
-            ],
-            capture=True,
-        )
+        return CommandInvoker(
+            ShellCommand(
+                cmd=[
+                    "makeblastdb",
+                    "-in",
+                    os.path.join(self.input_fasta_file),
+                    "-dbtype",
+                    "nucl",
+                    "-out",
+                    self.full_database_path,
+                ],
+                capture=True,
+            )
+        ).execute()

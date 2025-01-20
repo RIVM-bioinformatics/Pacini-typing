@@ -7,20 +7,15 @@
     “GitHub Copilot: Your AI pair programmer” (GPT-3). GitHub, Inc.
     https://github.com/features/copilot
 
-The main goal of this file is providing utils for executing shell commands in Python.
-Debugging and logging are easier with this way of executing shell commands.
-
-See docstring for more explicit information about functions and their parameters.
+The main goal of this file is to make the package installable.
+It is used when cloning the repository and installing through Bioconda.
 """
 
 __author__ = "Mark van de Streek"
-__date__ = "2024-11-01"
+__date__ = "2024-11-06"
 __all__ = ["get_version"]
 
-import platform
-
 from setuptools import find_packages, setup
-
 from command_utils import CommandInvoker, ShellCommand
 
 
@@ -28,10 +23,19 @@ def get_version() -> str:
     """
     Get the version of the package from git tags.
     If there are no tags, return "0.0.0".
+    ----------
+    Output:
+        - version: version of the package
+    ----------
     """
-    result = execute(["git", "describe", "--tags"], capture=True)
-    if isinstance(result, tuple):
-        return result[0].strip().split("-")[0]
+    try:
+        result = CommandInvoker(
+            ShellCommand(["git", "describe", "--tags"], capture=True)
+        ).execute()
+        if isinstance(result, tuple):
+            return result[0].strip().split("-")[0]
+    except Exception:
+        return "0.0.0"
     return "0.0.0"
 
 

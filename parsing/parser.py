@@ -7,14 +7,14 @@
     “GitHub Copilot: Your AI pair programmer” (GPT-3). GitHub, Inc.
     https://github.com/features/copilot
 
-Module that handles all the parsing of the query results.
-The results are read from the output file of the BLAST or KMA run.
-The results are stored in a pandas dataframe.
-After filtering, the results are written to multiple output files.
+This script is the main implementation of the strategy pattern.
+This script is therefore delegating the reading, filtering
+and writing of the found hits to the specific strategy.
+An incoming parameter is used to define the strategy.
 """
 
 __author__ = "Mark van de Streek"
-__date__ = "2024-11-22"
+__date__ = "2024-11-08"
 __all__ = ["Parser"]
 
 import logging
@@ -79,13 +79,13 @@ class Parser:
         The incoming object is an implementation of the Filter class
         ----------
         Input:
-            - filter: Filter object
+            - filter: Filter object to add to the list of filters
         ----------
         """
         logging.debug("Adding filter: %s", filter_pattern.__class__.__name__)
         self.filters.append(filter_pattern)
 
-    def apply_filters(self):
+    def apply_filters(self) -> None:
         """
         Function that applies all filters to the DataFrame
         It loops over the list of filters and applies them.
@@ -95,17 +95,15 @@ class Parser:
         for filter_pattern in self.filters:
             self.data_frame = filter_pattern.apply(self.data_frame)
 
-    def read_run_output(self):
+    def read_run_output(self) -> None:
         """
         Function that handles the reading the run output of the query.
-        It's not acutually being read here, but the strategy pattern
+        It's not actually being read here, but the strategy pattern
         is used to read the output file.
         """
         self.data_frame = self.strategy.read_output(self.query_run_filename)
 
-    def construct_report_record(
-        self, report_id: int, item: str
-    ) -> dict[str, Any]:
+    def construct_report_record(self, index: int, item: str) -> dict[str, Any]:
         """
         Function that constructs a record for the output report
         Every line in the output report is a dictionary
@@ -114,14 +112,14 @@ class Parser:
         appended to a list of all records.
         ----------
         Input:
-            - report_id: int: id of the record
-            - item: str: incoming item from the dataframe
+            - report_id: id of the record
+            - item: incoming item from the dataframe
         Output:
-            - dict[str, Any]: dictionary with the record
+            - dictionary with the record
         ----------
         """
         return {
-            "ID": report_id + 1,
+            "ID": index,
             "Input": self.input_sequence_sample,
             "Configuration": self.config_options["metadata"]["filename"],
             "Type/Genes": self.config_options["metadata"]["type"],
@@ -142,19 +140,18 @@ class Parser:
         3,SAMPLE123,O1-scheme.yaml,V. cholerae O1 related genes,ctxB
         ----------
         Output:
-            - pd.DataFrame: output report
+            - output report to write to a csv file
         --------
         """
         logging.debug("Creating the output report...")
         output_records = []
-        for report_id, item in enumerate(
+        for index, item in enumerate(
             self.data_frame[
                 self.strategy.get_gene_column_name()
-            ].values.tolist()
+            ].values.tolist(),
+            start=1,
         ):
-            output_records.append(
-                self.construct_report_record(report_id, item)
-            )
+            output_records.append(self.construct_report_record(index, item))
         return pd.DataFrame(output_records)
 
     def construct_hit_csv_record(
@@ -162,7 +159,7 @@ class Parser:
         columns: dict[str, Any],
         significance_type: str,
         value_column: str,
-        report_id: int,
+        index: int,
         item: list[str],
     ) -> dict[str, Any]:
         """
@@ -173,17 +170,17 @@ class Parser:
         appended to a list of all records.
         ----------
         Input:
-            - columns: dict[str, Any]: columns of the DataFrame
-            - significance_type: str: type of significance value
-            - value_column: str: value of the significance
-            - report_id: int: id of the record
-            - item: list[str]: incoming item from the dataframe
+            - columns: columns of the DataFrame
+            - significance_type: type of significance value
+            - value_column: value of the significance
+            - report_id: id of the record
+            - item: incoming item from the dataframe
         Output:
-            - dict[str, Any]: dictionary with the record
+            - dictionary with the record for the hits report
         ----------
         """
         return {
-            "ID": report_id + 1,
+            "ID": index,
             "hit": item.iloc[columns.index("hit")].split(":")[0],
             "percentage identity": item.iloc[
                 columns.index("percentage identity")
@@ -215,15 +212,17 @@ class Parser:
         columns, significance_type, value_column = (
             self.strategy.get_hits_report_info()
         )
-        for report_id, item in self.data_frame.iterrows():
+        for index, (report_id, item) in enumerate(
+            self.data_frame.iterrows(), start=1
+        ):
             output_records.append(
                 self.construct_hit_csv_record(
-                    columns, significance_type, value_column, report_id, item
+                    columns, significance_type, value_column, index, item
                 )
             )
         return pd.DataFrame(output_records)
 
-    def write_report(self, report: pd.DataFrame, suffix: str):
+    def write_report(self, report: pd.DataFrame, suffix: str) -> None:
         """
         Function that writes a given DataFrame to a csv file.
         The pandas DataFrame is created by other methods,
@@ -254,7 +253,7 @@ class Parser:
         that are searched for, but the actual hits !
         ----------
         Output:
-            - list[str]: The list of genes after filtering
+            - The list of genes after filtering
         --------
         """
         return self.strategy.extract_gene_list(self.data_frame)

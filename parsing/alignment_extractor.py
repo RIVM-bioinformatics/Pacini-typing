@@ -8,7 +8,7 @@
     https://github.com/features/copilot
 
 This module is responsible for extracting sequences from an alignment file.
-KMA is outputting an alingment file with the following format:
+KMA is outputting an alignment file with the following format:
 
 # rfbV_O1:1:AE003852
 template: 	ATGCCATGGAAGACCTACTCACGGAACTTGATGTATGCTGTCATAACTTTGATGTTGAAT
@@ -31,7 +31,8 @@ The above example would be extracted as:
 >ctxA
 TCATAATTCATCCTTAATTCTATTATGTGTATCAATATCAGATTGATAGCCTGAAAATAT
 
-As you see, the line after query: is the sequence that is found.
+> Note: This class is only applicable for KMA output files,
+blast outputs the found sequences in a column.
 """
 
 __author__ = "Mark van de Streek"
@@ -55,10 +56,11 @@ class AlignmentExtractor:
     ----------
     Methods:
         - __init__: Constructor for the AlignmentExtractor class
+        - check_alignment_file: Method that checks if the alignment file exists
         - parse_alignment_file: Method that parses the alignment file
         - update_query_sequences: Method that updates the query sequences
-        - get_gene_match: Method that gets the gene match
-        - filter_genes: Method that filters the genes
+        - get_gene_match: Method that matches the gene in the line
+        - filter_genes: Method that filters the extracted genes
         - write_fasta: Method that writes the sequences to a fasta file
         - run: Method that runs the extraction
     ----------
@@ -86,8 +88,6 @@ class AlignmentExtractor:
     def check_alignment_file(self) -> None:
         """
         Method that checks if the alignment file exists.
-        If the file does not exist, an AlignmentFileNotFoundError
-        is raised.
         ----------
         Raises:
             - AlignmentFileNotFoundError: If the alignment file is not found
@@ -95,7 +95,7 @@ class AlignmentExtractor:
         """
         if not os.path.exists(self.alignment_file):
             logging.error(
-                f"Alignment file not found: {self.alignment_file}, exiting..."
+                "Alignment file not found: %s, exiting...", self.alignment_file
             )
             raise AlignmentFileNotFoundError(self.alignment_file)
 
@@ -103,11 +103,8 @@ class AlignmentExtractor:
         """
         Method that parses the alignment file.
         The file is read line by line and the sequences
-        are extraced by other methods. This method
+        are extracted by other methods. This method
         delegates the extraction to other methods.
-        If the line starts with a #, the gene is updated.
-        If the line starts with query:, the sequence is extracted.
-        Lastly, the last gene's sequence is saved.
         """
         logging.info("Parsing alignment file...")
         current_query_sequence: list[str] = []
@@ -124,7 +121,6 @@ class AlignmentExtractor:
                     query_seq = line.split()[1]
                     query_seq = query_seq.replace("-", "").upper()
                     current_query_sequence.append(query_seq)
-
         # Save the last gene's sequence
         if current_gene and current_query_sequence:
             self.query_sequences[current_gene] = "".join(
@@ -141,8 +137,6 @@ class AlignmentExtractor:
         Method that updates the query sequences.
         If the current gene and sequence are not None,
         the gene and sequence are saved.
-        The gene is extracted from the line.
-        The matching of the gene is done by the get_gene_match method.
         ----------
         Input:
             - line: current line from the alignment file
@@ -168,7 +162,7 @@ class AlignmentExtractor:
         Input:
             - line: line from the alignment file
         Output:
-            - list of the current query sequence and the gene
+            - tuple of the gene and the current query sequence
         ----------
         """
         current_query_sequence: list[str] = []
@@ -195,12 +189,11 @@ class AlignmentExtractor:
         }
 
     @staticmethod
-    def write_fasta(output_file: str, query_sequences: dict[str, str]):
+    def write_fasta(output_file: str, query_sequences: dict[str, str]) -> None:
         """
         Method that writes the sequences to a fasta file
         with a max line length of 70.
         Multiple sequences are written to the same file.
-        Static method, so it can be reused for BLAST method.
         ----------
         Input:
             - output_file: file path

@@ -17,8 +17,6 @@ database:
 pattern:
   perc_ident: 99
   perc_cov: 80
-  e_value: 0
-  p_value: 0.05
   genes:
     - gene_name: "rfbV_O1"
     - gene_name: "wbfZ_O139"

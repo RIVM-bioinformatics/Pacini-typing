@@ -9,11 +9,11 @@
 
 Module that contains custom exceptions for the validate_database module.
 These exceptions are raised when invalid database is provided or not found.
-The raise statements are located in validation/validate_database.py
 """
 
 __author__ = "Mark van de Streek"
 __date__ = "2024-10-28"
+__all__ = ["InvalidDatabaseError"]
 
 
 class InvalidDatabaseError(Exception):
@@ -22,6 +22,14 @@ class InvalidDatabaseError(Exception):
     """
 
     def __init__(self, database_path: str, database_name: str) -> None:
+        """
+        Initialize the exception with the database path and name.
+        ----------
+        Input:
+            - database_path: path to the database
+            - database_name: name of the database
+        ----------
+        """
         self.database_path = database_path
         self.database_name = database_name
 

@@ -9,8 +9,6 @@
 
 This script is used to build the query subcommand for the parser.
 The query command is used for running a query against the reference database.
-All the arguments needed for the query subcommand are defined here.
-This subcommand is added to the main parsing object in the build_parser script.
 """
 
 __author__ = "Mark van de Streek"
@@ -23,7 +21,7 @@ from argparse import _SubParsersAction
 
 def build_query_command(subparsers: _SubParsersAction) -> None:
     """
-    Script that builds the query subcommand for the parser
+    Script that builds the query subcommand for the parser.
     This function is called from the build_parser script
     ----------
     Input:

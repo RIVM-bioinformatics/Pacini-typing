@@ -48,7 +48,8 @@ class FASTQParser(ParserStrategy):
         - extract_gene_list: Method to extract the gene list from the data frame
         - get_hits_report_info: Method to get the hits report information
         - get_gene_column_name: Method to get the gene column name
-        - write_fasta_out: Method to write the FASTA output
+        - requires_dataframe: Method to determine if the parser requires a data frame
+        - write_fasta_out: Method to write the hits to a FASTA output file
     ----------
     """
 
@@ -65,7 +66,7 @@ class FASTQParser(ParserStrategy):
         ----------
         """
         filename += ".res"
-        logging.debug(f"Reading KMA output file: {filename}...")
+        logging.debug("Reading KMA output file: %s...", filename)
         data_frame = pd.read_csv(filename, sep="\t", header=0)
         data_frame.columns = list(KMA_COLUMNS.keys())
         data_frame["Template_Identity"] = data_frame[
@@ -86,7 +87,7 @@ class FASTQParser(ParserStrategy):
         Input:
             - data_frame: The data frame with the KMA results.
         Output:
-            - list[str]: List with gene names.
+            - List with gene names.
         """
         return [gene for gene in data_frame["Template"].values.tolist()]
 
@@ -143,9 +144,10 @@ class FASTQParser(ParserStrategy):
         For methods and attributes, see the AlignmentExtractor class.
         ----------
         Input:
-            - config_options: dict[str, Any]: The configuration options.
-            - input_sequence_sample: str: The input sequence sample.
-            - list_of_genes: list[str]: The list of genes.
+            - config_options: The configuration file options.
+            - input_sequence_sample: The input sequence sample.
+            - list_of_genes: The list of genes to extract.
+            - data_frame: The data frame with the KMA results.
         ----------
         """
         logging.info("Extracting found sequences from alignment file...")

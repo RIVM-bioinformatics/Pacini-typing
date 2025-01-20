@@ -7,9 +7,8 @@
     “GitHub Copilot: Your AI pair programmer” (GPT-3). GitHub, Inc.
     https://github.com/features/copilot
 
-Simpeler test module for the alignment_extractor module.
-This module test the extracting of sequences from an alignment file.
-This file is created by KMA and therefore always has the same format.
+Test script for the alignment_extractor module.
+The working of extracting sequences from an alignment file is tested.
 
 The tests are applied by using a test alignment file that was created
 for his purpose. The file contains a three genes and their (shorter) sequences.
@@ -25,7 +24,6 @@ __all__ = [
 ]
 
 import os
-import platform
 
 import pytest
 
@@ -35,7 +33,7 @@ from preprocessing.exceptions.alignment_exceptions import (
 )
 
 
-def test_check_alignment_file_not_found():
+def test_check_alignment_file_not_found() -> None:
     """
     Function that tests if the AlignmentFileNotFoundError is raised
     when the alignment file is not found.
@@ -44,10 +42,7 @@ def test_check_alignment_file_not_found():
         AlignmentExtractor("non_existent_file.txt", ["gene1"], "output.fasta")
 
 
-@pytest.mark.skipif(
-    platform.system() == "Linux", reason="Test not supported on Linux"
-)
-def test_parse_alignment_file():
+def test_parse_alignment_file() -> None:
     """
     Function that tests if the sequences are extracted correctly
     from the alignment file. The real output file is checked
@@ -65,10 +60,7 @@ def test_parse_alignment_file():
     assert "wbfZ_O139:1:AB012956" in extractor.query_sequences
 
 
-@pytest.mark.skipif(
-    platform.system() == "Linux", reason="Test not supported on Linux"
-)
-def test_parse_alignment_file_single_gene():
+def test_parse_alignment_file_single_gene() -> None:
     """
     Function that tests if the sequences are extracted correctly
     from the alignment file when only one gene is given.
@@ -85,10 +77,7 @@ def test_parse_alignment_file_single_gene():
     assert "ctxA" in extractor.query_sequences
 
 
-@pytest.mark.skipif(
-    platform.system() == "Linux", reason="Test not supported on Linux"
-)
-def check_file_output(file: str, gene: str):
+def check_file_output(file: str, gene: str) -> None:
     """
     Function that checks if the output file is correct.
     The file should start with the gene name and then the sequence.

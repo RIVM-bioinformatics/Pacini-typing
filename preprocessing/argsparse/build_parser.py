@@ -15,7 +15,7 @@ The subcommands are built in separate scripts and added to the main parser objec
 """
 
 __author__ = "Mark van de Streek"
-__date__ = "2024-09-24"
+__date__ = "2024-09-27"
 __all__ = ["main"]
 
 import argparse
@@ -125,7 +125,7 @@ def main(givenargs: list[str]) -> argparse.Namespace:
 
     subparsers = parser.add_subparsers(
         title="operations",
-        description="For more information on a specific command, type: Pacini.py <command> -h",
+        description="For more information on a specific command, type: pacini_typing <command> -h",
         dest="options",
     )
 
@@ -134,7 +134,8 @@ def main(givenargs: list[str]) -> argparse.Namespace:
 
     args = parser.parse_args(givenargs)
 
-    # Custom validation logic
+    # Some first level argument checks
+    # to ensure that the user has provided the correct arguments
     if not args.options:
         if not args.config or not args.input:
             parser.error(
@@ -144,6 +145,10 @@ def main(givenargs: list[str]) -> argparse.Namespace:
         if args.config or args.input:
             parser.error(
                 "--config or --input cannot be used with subcommands."
+            )
+        if args.fasta_out or args.save_intermediates:
+            parser.error(
+                "--fasta-out and --save-intermediates cannot be used with subcommands."
             )
 
     return args

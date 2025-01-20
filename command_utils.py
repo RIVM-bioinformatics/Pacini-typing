@@ -12,6 +12,12 @@ The main goal of this module is to provide a simple
 interface for running shell commands and capturing their output for
 further processing.
 
+For this purpose, the module is using the command design pattern.
+This is done in the following classes:
+    - Command: Interface for all concrete commands
+    - ShellCommand: Concrete implementation of a shell command
+    - CommandInvoker: Invoker class that is responsible for executing a command
+
 Example:
         >>> from command_utils import execute
         >>> stdout, stderr = execute(
@@ -27,7 +33,10 @@ Or capture output in a file:
                         ["ls", "-l", "my_directory"],
                         stdout_file=f,
                         stderr_file=e,
-                    )
+                    )).execute()
+
+The capturing in a file is currently not used in the operations,
+but is built in for future use.
 """
 
 __author__ = "Mark van de Streek"
@@ -38,9 +47,8 @@ import logging
 import subprocess
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Tuple
-
-# TODO: Make the implementation of the command pattern concrete with all docstrings filled in
+from typing import IO, Any, Tuple
+from preprocessing.exceptions.command_utils_exceptions import SubprocessError
 
 
 def execute(
@@ -103,14 +111,14 @@ def execute(
         return False
 
 
-###############
-
-# Implementation of command design pattern
-
-
 class Command(ABC):
     """
-    Abstract base class for command
+    Class to define the command interface,
+    which is the base class for all concrete commands.
+    ----------
+    Methods:
+        - execute: Abstract method to execute the command
+    ----------
     """
 
     @abstractmethod
@@ -130,8 +138,8 @@ class ShellCommand(Command):
         cmd: list[str] | str,
         directory: Path = Path.cwd(),
         capture: bool = False,
-        stdout_file: str | None = None,
-        stderr_file: str | None = None,
+        stdout_file: IO[Any] | None = None,
+        stderr_file: IO[Any] | None = None,
         allow_fail: bool = False,
     ) -> None:
         """
@@ -179,13 +187,19 @@ class ShellCommand(Command):
                 e.stderr,
             )
             if not self.allow_fail:
-                raise
+                raise SubprocessError("Command failed")
             return False
 
 
 class CommandInvoker:
     """
-    Invoker class for command pattern
+    Invoker class that is responsible for executing a command
+    This could be any implementation of the Command interface.
+    But in this case, it is a ShellCommand.
+    ----------
+    Methods:
+        - execute: Executes the command
+    ----------
     """
 
     def __init__(self, command: Command) -> None:
@@ -199,13 +213,3 @@ class CommandInvoker:
         Executes the command
         """
         return self.command.execute()
-
-
-if __name__ == "__main__":
-    # Example usage of the command pattern
-    command = ShellCommand(
-        cmd="ls -la", capture=True, directory=Path("/Users/mvandestreek")
-    )
-    invoker = CommandInvoker(command).execute()
-    for i in invoker:
-        print(i)
