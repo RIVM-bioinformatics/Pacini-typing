@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.3](https://github.com/RIVM-bioinformatics/Pacini-typing/compare/v1.6.2...v1.6.3) (2025-01-20)
+
+
+### Bug Fixes
+
+* reverted an error in merge conflict ([bccf9ac](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/bccf9ac72f8bd4444190ed23b40422eab9178c77))
+
 ## [1.6.2](https://github.com/RIVM-bioinformatics/Pacini-typing/compare/v1.6.1...v1.6.2) (2025-01-16)
 
 
