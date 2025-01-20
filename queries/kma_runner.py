@@ -31,8 +31,6 @@ class KMA(Enum):
     ----------
     RUN_OPTION: string that is used in the subprocess.run() method
     PAIRED_OPTION: option for paired-end reads
-    OUTPUT_FORMAT: flag for the output format
-    MIN_IDENTITY: flag for the minimum identity percentage
     ----------
     """
 

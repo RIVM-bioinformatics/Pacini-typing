@@ -41,6 +41,9 @@ class QueryRunner:
     ----------
     Methods:
         - __init__: Constructor for the QueryRunner class
+        - check_output_dir: Method that checks if the output directory exists
+        - extract_version_number: Method that extracts the version number from the tool output
+        - log_tool_version: Method that logs the version of the tool used
         - run: Method that runs the query
         - get_runtime: Method that returns the runtime of the query
     ----------
@@ -53,12 +56,9 @@ class QueryRunner:
         the input type (FASTA/FASTQ).
         The arguments are coming from the input dictionary.
         ----------
-        Input used:
-            - input_file_type: str
-            - input_file: str
-            - database_path: str
-            - database_name: str
-            - output_file: str
+        Input:
+            - run_options: dictionary with the input files,
+                database, and output file
         ----------
         """
         self.run_options = run_options
@@ -104,7 +104,8 @@ class QueryRunner:
         Input:
             - stdout: str: the output of the tool
         Output:
-            - str: the version number of the tool
+            - str: the version number of the tool or
+                None if not found
         ----------
         """
         version_pattern = r"(\d+\.\d+\.\d+)"
@@ -122,8 +123,7 @@ class QueryRunner:
         stdout, stderr = CommandInvoker(
             ShellCommand(cmd=self.version_command, capture=True)
         ).execute()
-        version = self.extract_version_number(stdout)
-        logging.info("Version tool: %s", version)
+        logging.info("Version tool: %s", self.extract_version_number(stdout))
 
     def run(self) -> None:
         """
@@ -131,15 +131,10 @@ class QueryRunner:
         This function runs the query.
         The runtime is started and stopped to calculate the runtime.
         (calculation is done in the get_runtime method)
-        The decorated log function logs the query command,
-            see the ./decorators/decorators.py file for more information.
-            This decorator also checks if the query was successful.
         """
         logging.debug("Starting the query operation...")
         self.start_time = time.time()
-        # Use the execute function of command_utils
-        command = ShellCommand(cmd=self.query, capture=True)
-        CommandInvoker(command).execute()
+        CommandInvoker(ShellCommand(cmd=self.query, capture=True)).execute()
         self.stop_time = time.time()
 
     def get_runtime(self) -> float:

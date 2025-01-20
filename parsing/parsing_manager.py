@@ -57,6 +57,7 @@ class ParsingManager:
             - pattern: ReadConfigPattern: the config file object
             - file_type: str: the type of the parser (FASTA or FASTQ)
             - sample_name: str: the name of the sample
+        ----------
         """
         logging.debug("Preparing parsing process...")
         self.pattern = pattern
@@ -85,7 +86,7 @@ class ParsingManager:
         gene names from the config file.
         ----------
         Output:
-            - list[str]: list with gene names
+            - list with gene names
         ----------
         """
         return [
@@ -99,7 +100,7 @@ class ParsingManager:
         identity from the config file.
         ----------
         Output:
-            - float: identity
+            - percentage identity
         ----------
         """
         return float(self.pattern.pattern["pattern"]["perc_ident"])
@@ -110,7 +111,7 @@ class ParsingManager:
         coverage from the config file obj.
         ----------
         Output:
-            - float: coverage
+            - percentage coverage
         ----------
         """
         return float(self.pattern.pattern["pattern"]["perc_cov"])

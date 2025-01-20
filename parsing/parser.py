@@ -10,8 +10,7 @@
 This script is the main implementation of the strategy pattern.
 This script is therefore delegating the reading, filtering
 and writing of the found hits to the specific strategy.
-
-An incoming parameter is used to define the strategy to use.
+An incoming parameter is used to define the strategy.
 """
 
 __author__ = "Mark van de Streek"
@@ -80,13 +79,13 @@ class Parser:
         The incoming object is an implementation of the Filter class
         ----------
         Input:
-            - filter: Filter object
+            - filter: Filter object to add to the list of filters
         ----------
         """
         logging.debug("Adding filter: %s", filter_pattern.__class__.__name__)
         self.filters.append(filter_pattern)
 
-    def apply_filters(self):
+    def apply_filters(self) -> None:
         """
         Function that applies all filters to the DataFrame
         It loops over the list of filters and applies them.
@@ -96,10 +95,10 @@ class Parser:
         for filter_pattern in self.filters:
             self.data_frame = filter_pattern.apply(self.data_frame)
 
-    def read_run_output(self):
+    def read_run_output(self) -> None:
         """
         Function that handles the reading the run output of the query.
-        It's not acutually being read here, but the strategy pattern
+        It's not actually being read here, but the strategy pattern
         is used to read the output file.
         """
         self.data_frame = self.strategy.read_output(self.query_run_filename)
@@ -113,10 +112,10 @@ class Parser:
         appended to a list of all records.
         ----------
         Input:
-            - report_id: int: id of the record
-            - item: str: incoming item from the dataframe
+            - report_id: id of the record
+            - item: incoming item from the dataframe
         Output:
-            - dict[str, Any]: dictionary with the record
+            - dictionary with the record
         ----------
         """
         return {
@@ -141,7 +140,7 @@ class Parser:
         3,SAMPLE123,O1-scheme.yaml,V. cholerae O1 related genes,ctxB
         ----------
         Output:
-            - pd.DataFrame: output report
+            - output report to write to a csv file
         --------
         """
         logging.debug("Creating the output report...")
@@ -171,13 +170,13 @@ class Parser:
         appended to a list of all records.
         ----------
         Input:
-            - columns: dict[str, Any]: columns of the DataFrame
-            - significance_type: str: type of significance value
-            - value_column: str: value of the significance
-            - report_id: int: id of the record
-            - item: list[str]: incoming item from the dataframe
+            - columns: columns of the DataFrame
+            - significance_type: type of significance value
+            - value_column: value of the significance
+            - report_id: id of the record
+            - item: incoming item from the dataframe
         Output:
-            - dict[str, Any]: dictionary with the record
+            - dictionary with the record for the hits report
         ----------
         """
         return {
@@ -223,7 +222,7 @@ class Parser:
             )
         return pd.DataFrame(output_records)
 
-    def write_report(self, report: pd.DataFrame, suffix: str):
+    def write_report(self, report: pd.DataFrame, suffix: str) -> None:
         """
         Function that writes a given DataFrame to a csv file.
         The pandas DataFrame is created by other methods,
@@ -254,7 +253,7 @@ class Parser:
         that are searched for, but the actual hits !
         ----------
         Output:
-            - list[str]: The list of genes after filtering
+            - The list of genes after filtering
         --------
         """
         return self.strategy.extract_gene_list(self.data_frame)

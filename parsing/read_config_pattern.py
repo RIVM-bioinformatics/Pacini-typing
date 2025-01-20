@@ -46,6 +46,7 @@ class ReadConfigPattern:
     The options can then be used to run the analysis
     ----------
     Methods:
+        - __init__: Constructor for the ReadConfigPattern class
         - read_config: Read the configuration file
         - validate_config_keys: Validate the configuration file
         - validate_pattern_keys: Validate the pattern keys
@@ -55,10 +56,10 @@ class ReadConfigPattern:
 
     def __init__(self, config_file: str, input_file_type: str) -> None:
         """
-        Costructor for the ReadConfigPattern class
+        Constructor for the ReadConfigPattern class
         It accepts the configuration file and the input file type
         The pattern variable is initialized as an empty dictionary
-        the pattern is placed in this pattern var.
+        the pattern is placed in this pattern variable.
         The creation_dict is used for database operations and
         running the query, so that not the entire pattern will be passed around
         ----------
@@ -82,9 +83,14 @@ class ReadConfigPattern:
         Function that reads the configuration file
         If the config file is not found, an error is raised.
         If the config file is wrong constructed,
-        an custom error is raised. (YAMLStructureError)
+        a custom error is raised. (YAMLStructureError)
         If the config file is loaded correctly,
         the pattern is stored in the pattern variable
+        ----------
+        Raises:
+            - FileNotFoundError: If the config file is not found
+            - YAMLLoadingError: If the config file is not loaded correctly
+        ----------
         """
         logging.info("Reading configuration file...")
         try:
@@ -103,8 +109,12 @@ class ReadConfigPattern:
         """
         Function that validates the keys of the configuration file
         If the keys are not present, a custom error is raised.
-        The keys that are required are stored in the REQUIRED_KEYS variable
-        This keys are the main keys of the configuration file
+        The keys that are required are stored in the REQUIRED_KEYS variable.
+        These keys are the main keys of the configuration file
+        ----------
+        Raises:
+            - YAMLStructureError: If the keys are not present
+        ----------
         """
         logging.debug("Validating keys of config file...")
         for key in self.pattern:
@@ -118,6 +128,10 @@ class ReadConfigPattern:
         If the keys are not present, a custom error is raised.
         The keys that are required are stored
         in the REQUIRED_PATTERN_KEYS variable
+        ----------
+        Raises:
+            - YAMLStructureError: If the keys are not present
+        ----------
         """
         logging.debug("Validating keys of genetic pattern...")
         for key in REQUIRED_PATTERN_KEYS:
@@ -130,10 +144,6 @@ class ReadConfigPattern:
         the database creation and the query operation.
         """
         logging.debug("Creating database from config file...")
-        # Create the database
-        # Check if the database exists
-        # If it does not exist, create the database
-        # If it does exist, do nothing
         self.creation_dict = {
             "database_path": self.pattern["database"]["path"],
             "database_name": self.pattern["database"]["name"],

@@ -53,9 +53,9 @@ class PercentageIdentityFilter(Filter):
         Values above the threshold are returned.
         ----------
         Input:
-            - data_frame: pd.DataFrame: the dataframe that needs to be filtered
+            - data_frame: the dataframe that needs to be filtered
         Output:
-            - pd.DataFrame: the filtered dataframe
+            - the filtered dataframe
         ----------
         """
         if self.parse_type == "FASTA":

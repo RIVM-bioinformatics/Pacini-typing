@@ -47,9 +47,9 @@ class GeneNameFilter(Filter):
         presence in the dataframe.
         ----------
         Input:
-            - data_frame: pd.DataFrame: the dataframe that needs to be filtered
+            - data_frame: the dataframe that needs to be filtered
         Output:
-            - pd.DataFrame: the filtered dataframe
+            - the filtered dataframe
         ----------
         """
         pattern = "|".join(self.gene_names)
