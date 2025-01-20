@@ -365,6 +365,8 @@ pacini_typing query -db_path [path_to_database_directory] -db_name [name_of_data
 
 > **Note**: The `--save-intermediates` and `--fasta-out` parameters can not be used in combination with the `makedatabase` or `query` subcommands.
 
+In the `accept_arguments.yaml` file in the `config` directory, the accepted extensions for the input files are defined. These can be changed by the user.
+
 ### The base command to run this program
 
 ```python
