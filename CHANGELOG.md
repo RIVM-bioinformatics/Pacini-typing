@@ -1,5 +1,63 @@
 # Changelog
 
+## [1.6.2](https://github.com/RIVM-bioinformatics/Pacini-typing/compare/v1.6.1...v1.6.2) (2025-01-16)
+
+
+### Documentation
+
+* add markdown badge for bioconda ([211ac55](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/211ac556984c4891cdb8309a046a76732b2c570d))
+* Added a new python package to the list of required packages ([6d4be99](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/6d4be99e089bedc6f5a47e520f3a54395172b786))
+* New version of the logo ([90c5a86](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/90c5a860d9d66c8232f1b7423389e86dced0eb43))
+* update README with new installation instructions and badge updates ([8306a6a](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/8306a6ab07fb79848e4fcd7ddeb88e7730ecdf76))
+* update the example config file in readme ([80f5818](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/80f5818a3653a408054a8f2ef0b11560380476a6))
+* updated README with better future ideas ([3b22027](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/3b220272ee544db868bda5d537bfec1d82a9b9c5))
+* updated README with some information about bugfix ([2c97d75](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/2c97d757fec279f1b25a541e8eace91d17f957ea))
+
+## [1.6.1](https://github.com/RIVM-bioinformatics/Pacini-typing/compare/v1.6.0...v1.6.1) (2024-12-30)
+
+### Bug Fixes
+
+* bug fix where a non-existing path was causing an error in query option ([7ec633d](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/7ec633d34f747a0f29b20345e75ad5249e81a4f2))
+
+## [1.6.0](https://github.com/RIVM-bioinformatics/Pacini-typing/compare/v1.5.1...v1.6.0) (2024-12-18)
+
+
+### Features
+
+* --fasta-out option for BLAST runs, with small change in the strategy ([8621a86](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/8621a865ee7bea45761054957412e3542188a8d1))
+* --fasta-out option that writes sequence hits to output fasta. Only working for FASTQ-reads in this commit ([f86adfc](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/f86adfc70d2214b76644f5fa6ac9b24b18bf5a4a))
+* add EmptySequenceError exception and handle empty query sequences in AlignmentExtractor ([ae9b52a](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/ae9b52ac9eefb62c99b5df7f20132603c62238be))
+* add new validation tests for determining input type ([34e0b1e](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/34e0b1e89a8f00156cde2a4adc1828d9be14dad3))
+* add support for multi-threading in query processing ([7a1b2e0](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/7a1b2e0298337e38af91fb8f71da4b9c9e087f1e))
+* add tests for alignment_extractor and update output handling in end-to-end tests ([b002fed](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/b002fedad473f7db17d06fc3277b11808288dfee))
+* Full file checking for both fastq and fasta files ([46eed5f](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/46eed5fbd45dca4d2076d6949803153ee606757f))
+* implement parsing strategy to split functions of FASTA/FASTQ ([26c2665](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/26c2665e17cbeaba00528edfe39b1f8398e94604))
+
+
+### Bug Fixes
+
+* correct spelling of "extractor" in fasta_parser and fastq_parser ([5d182f7](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/5d182f7e86c6f39268ff22aa7165fbf229d519ad))
+* fixed bug issue [#16](https://github.com/RIVM-bioinformatics/Pacini-typing/issues/16): --save-intermediates options fails ([2ec7e99](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/2ec7e99f4eeadfd84d9424f747a0260ad8f92195))
+* fixed bug issue [#17](https://github.com/RIVM-bioinformatics/Pacini-typing/issues/17): always save database dir ([604f7a8](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/604f7a8ec68fc9bd074df90e71dee0d3eca27065))
+* normalize database type to uppercase in configuration and argument parsing ([93452ab](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/93452ab14682255db13ec2506842c72df19f685c))
+* small fix in de intermediate delete/save option for paths that were custom provided ([2ef3bc4](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/2ef3bc4975f450853c40db7ba604c5e32ea97525))
+* swapped the mkdir to makedirs function to handle intermediates folders in paths ([8879e28](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/8879e2841b47476914044d05bb5ea7bacb899605))
+
+## [1.5.1](https://github.com/RIVM-bioinformatics/Pacini-typing/compare/v1.5.0...v1.5.1) (2024-12-02)
+
+
+### Documentation
+
+* reshuffled the environment section and added more information about the output files ([623d767](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/623d76766c805e6a4eabfa7bb4b5991319feeeae))
+* update README with improved YAML configuration details ([88a9f6c](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/88a9f6c0279fd5f81919874c26b34ef73d027c67))
+
+## [1.5.0](https://github.com/RIVM-bioinformatics/Pacini-typing/compare/v1.4.0...v1.5.0) (2024-11-22)
+
+
+### Features
+
+* usage of the command design pattern for executing commands in Pacini-typing ([f276115](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/f27611567b0401a3292ab6ec2065675fca602f59))
+
 ## [1.4.0](https://github.com/RIVM-bioinformatics/Pacini-typing/compare/v1.3.1...v1.4.0) (2024-11-21)
 
 
@@ -28,8 +86,6 @@
 
 
 ### Bug Fixes
-
-* fixed a bug whith package dependenies in the linux env ([a758b6c](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/a758b6cf3d3e937dcfb4e82bff1aa9bd013e90ca))
 
 ## [1.3.1](https://github.com/RIVM-bioinformatics/Pacini-typing/compare/v1.3.0...v1.3.1) (2024-11-18)
 
