@@ -22,7 +22,6 @@ __all__ = [
     "test_execute_with_stdout",
     "test_execute_failing_command_allow_fail_false",
     "test_execute_failing_command_allow_fail_true",
-    "pytest_capture_error_file",
 ]
 
 import os
