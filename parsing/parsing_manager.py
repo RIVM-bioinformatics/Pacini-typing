@@ -22,7 +22,6 @@ from parsing.coverage_filter import CoverageFilter
 from parsing.fasta_parser import FASTAParser
 from parsing.fastq_parser import FASTQParser
 from parsing.identity_filter import PercentageIdentityFilter
-from parsing.name_filter import GeneNameFilter
 from parsing.parser import Parser
 from parsing.read_config_pattern import ReadConfigPattern
 
@@ -125,9 +124,6 @@ class ParsingManager:
         getter functions.
         """
         logging.info("Adding filters to Parser object...")
-        self.parser.add_filter(
-            GeneNameFilter(self.get_config_gene_names(), self.file_type)
-        )
         self.parser.add_filter(
             PercentageIdentityFilter(
                 self.get_config_identity(), self.file_type
