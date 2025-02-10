@@ -103,7 +103,14 @@ class Parser:
         """
         self.data_frame = self.strategy.read_output(self.query_run_filename)
 
-    def construct_report_record(self, index: int, item: str) -> dict[str, Any]:
+    def construct_report_record(
+        self,
+        index: int,
+        item: pd.Series,
+        columns: dict[str, Any],
+        significance_type: str,
+        value_column: str,
+    ) -> dict[str, Any]:
         """
         Function that constructs a record for the output report
         Every line in the output report is a dictionary
@@ -112,8 +119,11 @@ class Parser:
         appended to a list of all records.
         ----------
         Input:
-            - report_id: id of the record
+            - index: id of the record
             - item: incoming item from the dataframe
+            - columns: columns of the DataFrame
+            - significance_type: type of significance value
+            - value_column: value of the significance
         Output:
             - dictionary with the record
         ----------
@@ -123,103 +133,43 @@ class Parser:
             "Input": self.input_sequence_sample,
             "Configuration": self.config_options["metadata"]["filename"],
             "Type/Genes": self.config_options["metadata"]["type"],
-            "Hits": item.split(":")[0],
+            "Hits": item.iloc[columns.index("hit")].split(":")[0],
+            "Percentage Identity": item.iloc[
+                columns.index("percentage identity")
+            ],
+            "Percentage Coverage": item.iloc[
+                columns.index("percentage coverage")
+            ],
+            significance_type: item.iloc[value_column],
         }
 
     def create_output_report(self) -> pd.DataFrame:
         """
         Function that creates a filtered output report
-        This report holds the most important information
-        to quickly check the results.
-        > No specific values are stored in the report,
-        > only the hits after filtering.
+        This report holds the information to check the results.
         Output example:
-        ID,Input,Configuration,Type/Genes,Hits,
-        1,SAMPLE123,O1-scheme.yaml,V. cholerae O1 related genes,rfbV
-        2,SAMPLE123,O1-scheme.yaml,V. cholerae O1 related genes,ctxA
-        3,SAMPLE123,O1-scheme.yaml,V. cholerae O1 related genes,ctxB
+        ID,Input,Configuration,Type/Genes,Hits,Percentage Identity,Percentage Coverage
+        1,SAMPLE123,O1-scheme.yaml,V. cholerae O1 related genes,rfbV,100.0,1.0
+        2,SAMPLE123,O1-scheme.yaml,V. cholerae O1 related genes,ctxA,100.0,1.0
+        3,SAMPLE123,O1-scheme.yaml,V. cholerae O1 related genes,ctxB,100.0,1.0
         ----------
         Output:
             - output report to write to a csv file
         --------
         """
         logging.debug("Creating the output report...")
-        output_records = []
-        for index, item in enumerate(
-            self.data_frame[
-                self.strategy.get_gene_column_name()
-            ].values.tolist(),
-            start=1,
-        ):
-            output_records.append(self.construct_report_record(index, item))
-        return pd.DataFrame(output_records)
-
-    def construct_hit_csv_record(
-        self,
-        columns: dict[str, Any],
-        significance_type: str,
-        value_column: str,
-        index: int,
-        item: list[str],
-    ) -> dict[str, Any]:
-        """
-        Function that constructs a record for the hits report
-        Every line in the hits report is a dictionary
-        This function constructs the dictionary.
-        In the create_hits_report function, the dictionary is
-        appended to a list of all records.
-        ----------
-        Input:
-            - columns: columns of the DataFrame
-            - significance_type: type of significance value
-            - value_column: value of the significance
-            - report_id: id of the record
-            - item: incoming item from the dataframe
-        Output:
-            - dictionary with the record for the hits report
-        ----------
-        """
-        return {
-            "ID": index,
-            "hit": item.iloc[columns.index("hit")].split(":")[0],
-            "percentage identity": item.iloc[
-                columns.index("percentage identity")
-            ],
-            "percentage coverage": item.iloc[
-                columns.index("percentage coverage")
-            ],
-            significance_type: item.iloc[value_column],
-        }
-
-    def create_hits_report(self) -> pd.DataFrame:
-        """
-        Function that creates a csv file with
-        all information about the hits.
-        Where the report only holds the hit names,
-        this report holds all information about the hits.
-        Output example:
-        ID,hit,percentage identity,percentage coverage,e/p-value
-        1,rfbV,100.0,100.0,0.0
-        2,ctxA,99.3,99.0,0.0
-        3,ctxB,96.3,87.0,0.05
-        ----------
-        Output:
-            - pd.DataFrame: hits report
-        --------
-        """
-        logging.debug("Creating the hits report...")
         output_records: list[dict[str, Any]] = []
         columns, significance_type, value_column = (
             self.strategy.get_hits_report_info()
         )
-        for index, (report_id, item) in enumerate(
-            self.data_frame.iterrows(), start=1
-        ):
+
+        for index, (_, item) in enumerate(self.data_frame.iterrows(), start=1):
             output_records.append(
-                self.construct_hit_csv_record(
-                    columns, significance_type, value_column, index, item
+                self.construct_report_record(
+                    index, item, columns, significance_type, value_column
                 )
             )
+
         return pd.DataFrame(output_records)
 
     def write_report(self, report: pd.DataFrame, suffix: str) -> None:
@@ -301,8 +251,6 @@ class Parser:
 
         if not self.data_frame.empty:
             self.write_report(self.create_output_report(), "report")
-            self.write_report(self.create_hits_report(), "hits_report")
-
             if self.config_options.get("fasta_out", False):
                 self.write_fasta_out()
         else:

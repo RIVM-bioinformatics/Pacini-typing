@@ -41,7 +41,6 @@ FASTQ_1 = "test_data/VIB_EA5348AA_AS_1.fq"
 FASTQ_2 = "test_data/VIB_EA5348AA_AS_2.fq"
 DIR_PATH = "test_full_run/"
 OUTPUT = [
-    "VIB_EA5348AA_AS_hits_report.csv",
     "VIB_EA5348AA_AS_report.csv",
     "VIB_EA5348AA_AS_sequences.fasta",
 ]

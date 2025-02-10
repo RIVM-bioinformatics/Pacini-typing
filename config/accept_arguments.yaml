@@ -13,3 +13,4 @@ accepted_input_extensions:
   - .tar.gz
   - .fasta.gz
   - .scaffold.fasta
+  - .result.fasta
