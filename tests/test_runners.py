@@ -31,7 +31,7 @@ import pytest
 
 from queries.blast_runner import BLASTn
 from queries.kma_runner import KMA
-from queries.query_runner import QueryRunner
+from queries.query_runner_genes import GeneQueryRunner
 
 skip_in_ci = pytest.mark.skipif(
     os.getenv("CI") == "true",
@@ -222,7 +222,7 @@ def test_get_runtime(
         - setup_query_input: Dictionary of test configuration options
     ----------
     """
-    runner = QueryRunner(setup_query_input)
+    runner = GeneQueryRunner(setup_query_input)
     runner.start_time = time.time()
     time.sleep(runtime)
     runner.stop_time = time.time()

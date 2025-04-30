@@ -72,7 +72,7 @@ from preprocessing.exceptions.validate_database_exceptions import (
 from preprocessing.validation.determine_input_type import InputFileInspector
 from preprocessing.validation.validate_database import check_for_database_path
 from preprocessing.validation.validating_input_arguments import ArgsValidator
-from queries.query_runner import QueryRunner
+from queries.query_runner_genes import GeneQueryRunner
 
 logging.basicConfig(
     level=logging.INFO,
@@ -440,7 +440,7 @@ class PaciniTyping:
         ----------
         """
         logging.info("Starting the query running related options...")
-        runner = QueryRunner(query_runner_builder)
+        runner = GeneQueryRunner(query_runner_builder)
         runner.run()
         logging.info(
             "Command raised no errors, runtime: %s seconds",

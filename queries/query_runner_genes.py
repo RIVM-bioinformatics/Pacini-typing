@@ -21,7 +21,7 @@ from __future__ import annotations
 
 __author__ = "Mark van de Streek"
 __date__ = "2024-10-02"
-__all__ = ["QueryRunner"]
+__all__ = ["GeneQueryRunner"]
 
 import logging
 import os
@@ -34,7 +34,7 @@ from queries.blast_runner import BLASTn
 from queries.kma_runner import KMA
 
 
-class QueryRunner:
+class GeneQueryRunner:
     """
     Main class that runs the input query against the reference database.
     The query is prepared by the prepare_query method from the respective runner.
