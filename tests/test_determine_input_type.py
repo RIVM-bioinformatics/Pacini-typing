@@ -109,7 +109,7 @@ def test_validate_fasta_no_header(setup_valid_data: dict[str, str]) -> None:
 
 
 def test_validate_fasta_invalid_sequence(
-    setup_valid_data: dict[str, str]
+    setup_valid_data: dict[str, str],
 ) -> None:
     """
     Function that tests if a FASTA file with an
@@ -155,7 +155,7 @@ def test_validate_fastq_missing_plus(setup_valid_data: dict[str, str]) -> None:
 
 
 def test_validate_fastq_length_mismatch(
-    setup_valid_data: dict[str, str]
+    setup_valid_data: dict[str, str],
 ) -> None:
     """
     Function that tests FASTQ file with mismatched sequence and

@@ -31,7 +31,7 @@ import pytest
 
 from queries.blast_runner import BLASTn
 from queries.kma_runner import KMA
-from queries.query_runner_genes import GeneQueryRunner
+from queries.gene_query_runner import GeneQueryRunner
 
 skip_in_ci = pytest.mark.skipif(
     os.getenv("CI") == "true",

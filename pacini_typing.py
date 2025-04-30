@@ -72,7 +72,7 @@ from preprocessing.exceptions.validate_database_exceptions import (
 from preprocessing.validation.determine_input_type import InputFileInspector
 from preprocessing.validation.validate_database import check_for_database_path
 from preprocessing.validation.validating_input_arguments import ArgsValidator
-from queries.query_runner_genes import GeneQueryRunner
+from queries.gene_query_runner import GeneQueryRunner
 
 logging.basicConfig(
     level=logging.INFO,
