@@ -30,8 +30,8 @@ from unittest import mock
 import pytest
 
 from queries.blast_runner import BLASTn
-from queries.kma_runner import KMA
 from queries.gene_query_runner import GeneQueryRunner
+from queries.kma_runner import KMA
 
 skip_in_ci = pytest.mark.skipif(
     os.getenv("CI") == "true",

@@ -24,17 +24,15 @@ __date__ = "2024-10-02"
 __all__ = ["GeneQueryRunner"]
 
 import logging
-import os
 import re
-import time
 from typing import Any
 
-from command_utils import CommandInvoker, ShellCommand
 from queries.blast_runner import BLASTn
 from queries.kma_runner import KMA
+from queries.base_query_runner import BaseQueryRunner
 
 
-class GeneQueryRunner:
+class GeneQueryRunner(BaseQueryRunner):
     """
     Main class that runs the input query against the reference database.
     The query is prepared by the prepare_query method from the respective runner.
@@ -51,21 +49,18 @@ class GeneQueryRunner:
 
     def __init__(self, run_options: dict[str, Any]) -> None:
         """
-        Constructor of the QueryRunner class.
-        The constructor calls the prepare_query method based on
-        the input type (FASTA/FASTQ).
-        The arguments are coming from the input dictionary.
+        Constructor of the GeneQueryRunner class,
+        the super class is used to initialize the shared variables.
+        The query is prepared by the respective runner (BLASTn or KMA)
+        with some logic to determine which one to use.
+        Also, the preparation of the version command is delegated.
         ----------
         Input:
             - run_options: dictionary with the input files,
                 database, and output file
         ----------
         """
-        self.run_options = run_options
-        self.version_command: list[str] = []
-        self.start_time: float = 0.0
-        self.stop_time: float = 0.0
-        self.check_output_dir()
+        super().__init__(run_options)
         if self.run_options["file_type"] == "FASTA":
             self.query = BLASTn.get_query(option=self.run_options)
             logging.info("Getting the BLAST version...")
@@ -76,33 +71,14 @@ class GeneQueryRunner:
             self.version_command = KMA.get_version_command()
         self.log_tool_version()
 
-    def check_output_dir(self) -> bool:
+    def extract_version_number(self, stdout: str) -> str | None:
         """
-        Method that checks if the output directory exists.
-        If the directory does not exist, it will be created.
-        ----------
-        Output:
-            - bool: True if the directory exists, False otherwise
-        ----------
-        """
-        logging.debug("Checking if the output directory exists...")
-        output_dir = os.path.dirname(self.run_options["output"])
-        if output_dir:
-            if not os.path.exists(output_dir):
-                os.makedirs(output_dir)
-                logging.debug("New output directory created: %s", output_dir)
-                return False
-        logging.debug("Output directory exists...")
-        return True
-
-    @staticmethod
-    def extract_version_number(stdout: str) -> str | None:
-        """
-        Method that extracts the version number from the tool output.
-        The method uses a regular expression to extract the version number.
+        Implementation of the abstract method from the base class.
+        The method gets an output string from the command and
+        simply extract the version using regex.
         ----------
         Input:
-            - stdout: str: the output of the tool
+            - stdout: the output of the version command
         Output:
             - str: the version number of the tool or
                 None if not found
@@ -112,40 +88,3 @@ class GeneQueryRunner:
         match = re.search(version_pattern, stdout)
 
         return match.group(1) if match else None
-
-    def log_tool_version(self) -> None:
-        """
-        Method that logs the version of the tool used.
-        The method calls the get_version_command method
-        from the respective runner.
-        This logging functionality was developed at RIVM's request
-        """
-        stdout, stderr = CommandInvoker(
-            ShellCommand(cmd=self.version_command, capture=True)
-        ).execute()
-        logging.info("Version tool: %s", self.extract_version_number(stdout))
-
-    def run(self) -> None:
-        """
-        The query is already prepared in the constructor.
-        This function runs the query.
-        The runtime is started and stopped to calculate the runtime.
-        (calculation is done in the get_runtime method)
-        """
-        logging.debug("Starting the query operation...")
-        self.start_time = time.time()
-        CommandInvoker(ShellCommand(cmd=self.query, capture=True)).execute()
-        self.stop_time = time.time()
-
-    def get_runtime(self) -> float:
-        """
-        Simple method that returns the runtime of the query.
-        The function is called in a logging event in the
-        main script (pacini_typing.py).
-        ----------
-        - Output:
-            - float: with the runtime in seconds
-        ----------
-        """
-        logging.debug("Getting the runtime of the query...")
-        return round((self.stop_time - self.start_time), 2)
