@@ -460,8 +460,7 @@ class PaciniTyping:
         """
         logging.debug("Initializing the configuration file...")
         pattern = ReadConfigPattern(
-            self.option["config"]["config_path"],
-            self.file_type,
+            self.option["config"]["config_path"], self.file_type
         )
         # Additionally, the query input and output must be set.
         # The output is not specified by the user, because
@@ -556,6 +555,27 @@ class PaciniTyping:
         the query operation is started.
         """
         pattern: ReadConfigPattern = self.initialize_config_pattern()
+        # TODO: Place a additional check for SNP patterns,
+        # since only searching for SNP patterns does not require
+        # a reference database for genes
+
+        # if (
+        #     self.option["search_mode"].lower() == "genes"
+        #     or self.option["search_mode"].lower() == "both"
+        # ):
+        #     # Do usual gene reference validation
+        #     Call query operation run_query()
+        #     pass
+
+        # if (
+        #     self.option["search_mode"].lower() == "snp"
+        #     or self.option["search_mode"].lower() == "both"
+        # ):  # Default is Genes
+        #     # Implement the SNP validation calling
+        #     # Call SNP query operation
+        #     pass
+
+        # Paste to above if statement:
         if not self.check_valid_database_path(pattern.creation_dict):
             logging.debug("Database does not exist, creating the database...")
             # Re-use the run_makedatabase() method with right params
@@ -584,6 +604,7 @@ class PaciniTyping:
             - pattern: The configuration file options
         ----------
         """
+        # Probably better to move the run_query() to above function
         self.run_query(pattern.creation_dict)
         logging.info("Starting the parsing operation...")
         ParsingManager(
