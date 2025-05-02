@@ -17,6 +17,25 @@ __date__ = "2025-05-29"
 __all__ = ["FileContentError"]
 
 
+class PathError(Exception):
+    """
+    Raised when a error with the KMA/Blastn path occurs.
+    """
+
+    def __str__(self) -> str:
+        return """
+        ---------------------------------------------------
+        ERROR: Path error
+        ---------------------------------------------------
+        CAUSE: Shutil probably couldn't find a path
+        ---------------------------------------------------
+        SUGGESTION:
+            - Check the path to the KMA/Blastn tool: 
+                (`which kma` or `which blastn`)
+            - Ensure the tool is installed and in the PATH
+        """
+
+
 class FileContentError(Exception):
     """
     Raised when the content of a file is not as expected.
