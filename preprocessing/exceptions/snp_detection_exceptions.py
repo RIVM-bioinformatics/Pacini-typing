@@ -30,7 +30,7 @@ class PathError(Exception):
         CAUSE: Shutil probably couldn't find a path
         ---------------------------------------------------
         SUGGESTION:
-            - Check the path to the KMA/Blastn tool: 
+            - Check the path to the KMA/Blastn tool:
                 (`which kma` or `which blastn`)
             - Ensure the tool is installed and in the PATH
         """

@@ -22,6 +22,7 @@ __date__ = "2024-11-08"
 __all__ = ["ReadConfigPattern"]
 
 import logging
+import shutil
 from typing import Any
 
 import yaml
@@ -30,6 +31,7 @@ from preprocessing.exceptions.parsing_exceptions import (
     YAMLLoadingError,
     YAMLStructureError,
 )
+from preprocessing.exceptions.snp_detection_exceptions import PathError
 
 REQUIRED_KEYS = ["metadata", "database", "pattern"]
 REQUIRED_PATTERN_KEYS = [
@@ -54,7 +56,12 @@ class ReadConfigPattern:
     ----------
     """
 
-    def __init__(self, config_file: str, input_file_type: str) -> None:
+    def __init__(
+        self,
+        config_file: str,
+        input_file_type: str,
+        enable_snp_search: bool = False,
+    ) -> None:
         """
         Constructor for the ReadConfigPattern class
         It accepts the configuration file and the input file type
@@ -69,14 +76,18 @@ class ReadConfigPattern:
         ----------
         """
         self.config_file = config_file
-        self.input_file_type = input_file_type
+        self.input_file_type = input_file_type.upper()
         self.pattern: dict[Any, Any] = {}
         self.creation_dict: dict[str, Any] = {}
+        self.enable_snp_search: bool = enable_snp_search
         # Start the process
         self.read_config()
         self.validate_config_keys()
         self.validate_pattern_keys()
         self.construct_params_dict()
+        self.construct_params_dict()
+        if self.enable_snp_search:
+            self.handle_snp_pattern()
 
     def read_config(self) -> None:
         """
@@ -110,16 +121,21 @@ class ReadConfigPattern:
         Function that validates the keys of the configuration file
         If the keys are not present, a custom error is raised.
         The keys that are required are stored in the REQUIRED_KEYS variable.
-        These keys are the main keys of the configuration file
+        These keys are the main keys of the configuration file.
+        Additional keys are not mandatory, but the main keys are required.
         ----------
         Raises:
             - YAMLStructureError: If the keys are not present
         ----------
         """
         logging.debug("Validating keys of config file...")
-        for key in self.pattern:
-            if key not in REQUIRED_KEYS:
-                raise YAMLStructureError(self.config_file)
+        missing_keys = [
+            key for key in REQUIRED_KEYS if key not in self.pattern
+        ]
+        if missing_keys:
+            raise YAMLStructureError(
+                f"The following required keys are missing in {self.config_file}: {missing_keys}"
+            )
 
     def validate_pattern_keys(self) -> None:
         """
@@ -148,6 +164,36 @@ class ReadConfigPattern:
             "database_path": self.pattern["database"]["path"],
             "database_name": self.pattern["database"]["name"],
             "input_fasta_file": self.pattern["database"]["target_genes_file"],
-            "database_type": self.input_file_type.upper(),
+            "database_type": self.input_file_type,
             "file_type": self.input_file_type,
         }
+
+    def handle_snp_pattern(self) -> None:
+        """
+        TODO: Fill in later...
+        - validate SNP pattern
+        - prepare SNP pattern
+        - add SNP pattern to creation_dict
+            self.craetion_dict["my_variable"] =
+                self.pattern["pattern"]["my_variable"]
+
+        - Add the execution path to the creation_dict (self.get_method_path())
+        """
+        pass
+
+    def get_method_path(self) -> str:
+        """
+        Returns the path to either the kma or blastn executable,
+        based on the input files type. This path is required to
+        be passed to PointFinder.
+        ----------
+        Output:
+            - str: Path to the executable
+        ----------
+        """
+        path: str | None = shutil.which(
+            "blastn" if self.input_file_type == "FASTA" else "kma"
+        )
+        if path:
+            return path
+        raise PathError
