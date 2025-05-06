@@ -19,10 +19,11 @@ __author__ = "Mark van de Streek"
 __date__ = "2025-04-30"
 __all__ = ["BaseQueryRunner"]
 
-from abc import ABC, abstractmethod
 import logging
-import time
 import os
+import time
+from abc import ABC, abstractmethod
+
 from command_utils import CommandInvoker, ShellCommand
 
 

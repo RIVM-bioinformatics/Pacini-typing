@@ -250,7 +250,7 @@ def test_run_method_raises_invalid_database_error() -> None:
     pacini_typing.check_valid_option_with_args = lambda: None
 
     # Mock check_valid_database_path to return False
-    pacini_typing.check_valid_database_path = lambda x: False
+    pacini_typing.check_valid_gene_database_path = lambda x: False
 
     with pytest.raises(InvalidDatabaseError):
         pacini_typing.run()

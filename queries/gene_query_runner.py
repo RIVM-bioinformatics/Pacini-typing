@@ -27,9 +27,9 @@ import logging
 import re
 from typing import Any
 
+from queries.base_query_runner import BaseQueryRunner
 from queries.blast_runner import BLASTn
 from queries.kma_runner import KMA
-from queries.base_query_runner import BaseQueryRunner
 
 
 class GeneQueryRunner(BaseQueryRunner):

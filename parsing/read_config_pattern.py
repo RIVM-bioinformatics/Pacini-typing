@@ -60,7 +60,7 @@ class ReadConfigPattern:
         self,
         config_file: str,
         input_file_type: str,
-        enable_snp_search: bool = False,
+        search_mode: str,
     ) -> None:
         """
         Constructor for the ReadConfigPattern class
@@ -79,14 +79,14 @@ class ReadConfigPattern:
         self.input_file_type = input_file_type.upper()
         self.pattern: dict[Any, Any] = {}
         self.creation_dict: dict[str, Any] = {}
-        self.enable_snp_search: bool = enable_snp_search
+        self.search_mode: str = search_mode
         # Start the process
         self.read_config()
         self.validate_config_keys()
         self.validate_pattern_keys()
         self.construct_params_dict()
         self.construct_params_dict()
-        if self.enable_snp_search:
+        if self.search_mode in {"SNPs", "both"}:
             self.handle_snp_pattern()
 
     def read_config(self) -> None:
