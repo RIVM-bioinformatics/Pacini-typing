@@ -123,6 +123,17 @@ def main(givenargs: list[str]) -> argparse.Namespace:
         help="Write found sequences to a FASTA output file",
     )
 
+    parser.add_argument(
+        "-m",
+        "--search_mode",
+        type=str,
+        choices=["SNPs", "genes", "both"],
+        default="genes",
+        help=(
+            "Search mode to use. SNPs, genes or both.\n" "Default is genes.\n"
+        ),
+    )
+
     subparsers = parser.add_subparsers(
         title="operations",
         description="For more information on a specific command, type: pacini_typing <command> -h",
