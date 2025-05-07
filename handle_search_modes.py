@@ -31,6 +31,7 @@ from preprocessing.exceptions.validate_database_exceptions import (
 from preprocessing.validation.validate_database import check_for_database_path
 from queries.query_runners import run_gene_query, run_snp_query
 from validate_pointfinder_database import PointFinderReferenceChecker
+import sys
 
 
 class HandleSearchModes:
@@ -117,9 +118,10 @@ class HandleSearchModes:
             - database_builder: Dictionary with all necessary information
         ----------
         """
-        # TODO: Change path to actual SNP database path
         checker: PointFinderReferenceChecker = PointFinderReferenceChecker(
-            database_builder["database_path"]
+            database_builder["SNP_database_path"]
+            + "/"
+            + database_builder["species"]
         )
         return checker.validate()
 
@@ -144,8 +146,6 @@ class HandleSearchModes:
         else:
             logging.debug("Database exists, starting the query operation...")
             run_gene_query(self.pattern.creation_dict)
-            # TODO: Parsing ...
-            # self.handle_config_option_parse_query(self.pattern)
 
     def handle_snp_search_mode(self) -> None:
         """
@@ -155,16 +155,36 @@ class HandleSearchModes:
         The function checks if the SNP database exists, handles the
         creating of a new database if it does not exist and calls the query
         related operations, just like the gene search mode.
+
+        Helpful information:
+        {'database_path': 'databases/VIB-O1',
+        'database_name': 'VIB-O1',
+        'input_fasta_file': '/Users/mvandestreek/Developer/pacini_typing/config/VIB-O1.fasta',
+        'database_type': 'FASTA',
+        'file_type': 'FASTA',
+        'SNP_database_path': '/path/to/snp_database',
+        'species': 'Yersinia',
+        'method': 'blastn',
+        'method_path': '/opt/homebrew/bin/blastn',
+        'input_file_list': ['test_data/VIB_EA5348AA_AS.fasta'],
+        'output': 'output/VIB_EA5348AA_AS', 'threads': 1}
         """
+        logging.info(self.pattern.creation_dict)
         if not self.check_valid_SNP_database(self.pattern.creation_dict):
-            # TODO: create the SNP database
-            pass
+            logging.error(
+                "SNP database not exist, creating still has to be implemented"
+            )
+            sys.exit(1)
         if not self.check_valid_SNP_database(self.pattern.creation_dict):
-            # TODO: change to SNP database path
             raise InvalidSNPDatabaseError(
-                self.pattern.creation_dict["database_name"],
+                self.pattern.creation_dict["SNP_database_path"]
+                + "/"
+                + self.pattern.creation_dict["species"]
             )
         else:
+            logging.info(
+                "SNP database exists, starting the query operation..."
+            )
             run_snp_query(self.pattern.creation_dict)
 
     def handle(self) -> None:
@@ -173,7 +193,7 @@ class HandleSearchModes:
         related operations. The function simply checks which
         search mode is selected and calls the right function(s).
         """
-        if self.search_mode in {"genes", "both"}:
+        if self.search_mode in ["genes", "both"]:
             self.handle_gene_search_mode()
-        if self.search_mode in {"snp", "both"}:
+        if self.search_mode in ["snps", "both"]:
             self.handle_snp_search_mode()
