@@ -55,17 +55,18 @@ class PointFinder(Enum):
         ----------
         """
         return [
+            "python",
             PointFinder.RUN_OPTION.value,
             "--inputfiles",
             *option["input_file_list"],
             "--out_path",
             (
-                option["output_dir"]
-                if option["output_dir"].endswith("/")
-                else option["output_dir"] + "/"
+                option["SNP_output_dir"]
+                if option["SNP_output_dir"].endswith("/")
+                else option["SNP_output_dir"] + "/"
             ),
             PointFinder.DATABASE_PATH_OPTION.value,
-            option["database_path"],
+            option["SNP_database_path"],
             PointFinder.DATABASE_SUBDIR_OPTION.value,
             option["species"],
             "--method",

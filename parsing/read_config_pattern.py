@@ -22,6 +22,7 @@ __date__ = "2024-11-08"
 __all__ = ["ReadConfigPattern"]
 
 import logging
+import os
 import shutil
 from typing import Any
 
@@ -179,7 +180,16 @@ class ReadConfigPattern:
 
         - Add the execution path to the creation_dict (self.get_method_path())
         """
-        pass
+        # TODO: validate SNP pattern here too...
+        self.creation_dict["SNP_database_path"] = self.pattern["database"][
+            "SNP_database_path"
+        ]
+        self.creation_dict["species"] = self.pattern["database"]["species"]
+        self.creation_dict["method"] = (
+            "blastn" if self.input_file_type == "FASTA" else "kma"
+        )
+        self.creation_dict["method_path"] = self.get_method_path()
+        self.creation_dict["SNP_output_dir"] = self.get_output_dir()
 
     def get_method_path(self) -> str:
         """
@@ -197,3 +207,20 @@ class ReadConfigPattern:
         if path:
             return path
         raise PathError
+
+    def get_output_dir(self) -> str:
+        """
+        Checks if the output directory exists,
+        if not, it creates the directory.
+        If the directory already exists, it returns the path to the directory.
+        ----------
+        Output:
+            - str: Path to the output directory
+        ----------
+        """
+        path: str = self.pattern["database"]["SNP_output_dir"]
+        if os.path.exists(path) and os.path.isdir(path):
+            return path
+        else:
+            os.makedirs(path, exist_ok=True)
+            return path
