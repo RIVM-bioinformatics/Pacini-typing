@@ -14,6 +14,7 @@ database:
   run_output: "output/"
   SNP_database_path: "/Users/mvandestreek/Desktop/salm-simulation/example_db"
   species: "Yersinia"
+  SNP_output_dir: "output/snp/"
 
 pattern:
   perc_ident: 99.8
