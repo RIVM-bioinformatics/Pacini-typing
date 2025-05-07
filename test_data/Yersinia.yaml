@@ -1,0 +1,24 @@
+%YAML 1.2
+---
+metadata:
+  filename: "Yersinia.yaml"
+  id: "YP-01"
+  type: "Y. pestis related variants"
+  description: "Genetic pattern run config file for Yersinia pestis related variants"
+  date_created: "2025-05-07"
+
+database:
+  name: "VIB-O1"
+  path: "databases/VIB-O1"
+  target_genes_file: "config/VIB-O1.fasta"
+  run_output: "output/"
+  SNP_database_path: "/Users/mvandestreek/Desktop/salm-simulation/example_db"
+  species: "Yersinia"
+
+pattern:
+  perc_ident: 99.8
+  perc_cov: 100.0
+  genes:
+    - gene_name: "rfbV"
+    - gene_name: "ctxA"
+    - gene_name: "ctxB"
