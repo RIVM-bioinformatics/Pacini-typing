@@ -60,6 +60,7 @@ import tarfile
 from typing import Any
 
 import preprocessing.argsparse.build_parser
+from handle_search_modes import HandleSearchModes
 from makedatabase import DatabaseBuilder
 from parsing.parsing_manager import ParsingManager
 from parsing.read_config_pattern import ReadConfigPattern
@@ -72,9 +73,7 @@ from preprocessing.exceptions.validate_database_exceptions import (
 from preprocessing.validation.determine_input_type import InputFileInspector
 from preprocessing.validation.validate_database import check_for_database_path
 from preprocessing.validation.validating_input_arguments import ArgsValidator
-from queries.gene_query_runner import GeneQueryRunner
-from queries.SNP_query_runnner import SNPQueryRunner
-from validate_pointfinder_database import PointFinderReferenceChecker
+from queries.query_runners import run_gene_query
 
 logging.basicConfig(
     level=logging.INFO,
@@ -96,8 +95,6 @@ class PaciniTyping:
         - run_makedatabase: Run the makedatabase operation
         - get_file_type: Get file type of input file(s)
         - check_valid_option_with_args: Check if file type is correct
-        - check_valid_database_path: Check if the database exists
-        - run_query: Run the query operation
         - initialize_config_pattern: Initialize the ReadConfigPattern class
         - save_intermediates: Save intermediate files in a zip archive
         - delete_intermediates: Delete intermediate files
@@ -115,7 +112,7 @@ class PaciniTyping:
         Constructor for the PaciniTyping class.
         The constructor accepts the input arguments from argparse.
         All arguments and additional information are
-        stored in the self.option variable and
+        stored in the self.option variable, and
         other variables are set for type hinting.
         ----------
         Input:
@@ -430,46 +427,6 @@ class PaciniTyping:
         logging.debug("Checking if the database exists...")
         return check_for_database_path(database_builder)
 
-    def check_valid_SNP_database(
-        self, database_builder: dict[str, Any]
-    ) -> bool:
-        """TODO: Implement the SNP database validation"""
-        # TODO: Change path to actual SNP database path
-        checker: PointFinderReferenceChecker = PointFinderReferenceChecker(
-            database_builder["database_path"]
-        )
-        return checker.validate()
-
-    def run_gene_query(self, query_runner_builder: dict[str, Any]) -> None:
-        """
-        Function that runs the query with the QueryRunner class.
-        The QueryRunner class is set as a variable and run.
-        The variable is then used to get the runtime of the query operation.
-        The query_runner_builder dictionary is required for the re-use with
-        different parameters.
-        ----------
-        Input:
-            - query_runner_builder: Dictionary with all necessary information
-        ----------
-        """
-        logging.info("Starting the query running related options...")
-        runner = GeneQueryRunner(query_runner_builder)
-        runner.run()
-        logging.info(
-            "Command raised no errors, runtime: %s seconds",
-            runner.get_runtime(),
-        )
-
-    def run_snp_query(self, query_runner_builder: dict[str, Any]) -> None:
-        """TODO: Implement the SNP query operation"""
-        logging.info("Starting the SNP query running related options...")
-        runner = SNPQueryRunner(query_runner_builder)
-        runner.run()
-        logging.info(
-            "Command raised no errors, runtime: %s seconds",
-            runner.get_runtime(),
-        )
-
     def initialize_config_pattern(self) -> ReadConfigPattern:
         """
         Function that initializes the ReadConfigPattern class.
@@ -573,52 +530,18 @@ class PaciniTyping:
         """
         Function that handles the calling of all the config
         related operations.
-        The config file is being read and database is checked
-        right before the query searching is called.
-        If the database does not exist, the method is trying to create it.
-        Finally, the database is checked again and
-        the query operation is started.
+        The reading of the config file is first delegated to the
+        ReadConfigPattern class.
+        Then, the handler object is created with the pattern and
+        the main self.option variable, of which the search mode
+        is extracted.
+        The handler object makes sure the databases are checked,
+        and the query is executed in the correct runner.
         """
         pattern: ReadConfigPattern = self.initialize_config_pattern()
-        # TODO: Place a additional check for SNP patterns,
-        # since only searching for SNP patterns does not require
-        # a reference database for genes
-
-        # if (
-        #     self.option["config"]["search_mode"].lower() == "genes"
-        #     or self.option["config"]["search_mode"].lower() == "both"
-        # ):
-        if not self.check_valid_gene_database_path(pattern.creation_dict):
-            logging.debug("Database does not exist, creating the database...")
-            # Re-use the run_makedatabase() method with right params
-            self.run_makedatabase(pattern.creation_dict)
-        logging.debug("Checking if the database was successfully created...")
-        if not self.check_valid_gene_database_path(pattern.creation_dict):
-            raise InvalidDatabaseError(
-                pattern.creation_dict["database_name"],
-                pattern.creation_dict["file_type"],
-            )
-        else:
-            logging.debug("Database exists, starting the query operation...")
-            self.run_gene_query(pattern.creation_dict)
-            self.handle_config_option_parse_query(pattern)
-
-        # if (
-        #     self.option["config"]["search_mode"].lower() == "snp"
-        #     or self.option["config"]["search_mode"].lower() == "both"
-        # ):  # Default is Genes
-        #     # Implement the SNP validation calling
-        #     # Call SNP query operation
-        #     if self.check_valid_SNP_database(pattern.creation_dict):
-        #         self.run_snp_query(pattern.creation_dict)
-        #     # Check again if the SNP database is valid
-        #     if self.check_valid_SNP_database(pattern.creation_dict):
-        #         self.run_snp_query(pattern.creation_dict)
-        #     else:
-        #         # TODO: change to SNP database path
-        #         raise InvalidSNPDatabaseError(
-        #             pattern.creation_dict["database_name"],
-        #         )
+        handler: HandleSearchModes = HandleSearchModes(pattern, self.option)
+        handler.handle()
+        self.handle_config_option_parse_query(pattern)
 
     def handle_config_option_parse_query(
         self, pattern: ReadConfigPattern
@@ -670,7 +593,7 @@ class PaciniTyping:
             "threads": self.threads,
         }
         if self.check_valid_gene_database_path(query_builder):
-            self.run_gene_query(query_builder)
+            run_gene_query(query_builder)
         else:
             raise InvalidDatabaseError(
                 query_builder["database_name"],
