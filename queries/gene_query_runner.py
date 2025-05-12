@@ -34,17 +34,17 @@ from queries.kma_runner import KMA
 
 class GeneQueryRunner(BaseQueryRunner):
     """
-    Main class that runs the input query against the reference database.
-    The query is prepared by the prepare_query method from the respective runner.
+    Concrete implementation of the QueryRunner class
+    for running Gene related queries (BLASTn or KMA).
+
+    The class follows a command pattern, since the gene and
+    SNP queries are following the same recipe, but only the
+    some (small) parts are different.
     ----------
     Methods:
-        - __init__: Constructor for the QueryRunner class
-        - check_output_dir: Method that checks if the output directory exists
-        - extract_version_number: Method that extracts the version number from the tool output
-        - log_tool_version: Method that logs the version of the tool used
-        - run: Method that runs the query
-        - get_runtime: Method that returns the runtime of the query
-    ----------
+        - __init__: Constructor of the GeneQueryRunner class
+        - extract_version_number: Method to extract the version number
+            from the output of the version command
     """
 
     def __init__(self, run_options: dict[str, Any]) -> None:
