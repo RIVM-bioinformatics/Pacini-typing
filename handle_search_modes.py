@@ -37,9 +37,9 @@ class HandleSearchModes:
     """
     Class responsible for handling different search modes of
     Pacini-typing. These search modes are:
-    - genes
-    - SNPs
-    - both
+        - genes
+        - SNPs
+        - both
     The class only handles configuration file related operations.
     ----------
     Methods:
@@ -153,7 +153,8 @@ class HandleSearchModes:
         """
         Function that handles the SNP query especially for FASTQ files.
         This option requires an additional GENE database check and/or creation.
-        Therefore, the functionality is separated from the handle_snp_search_mode.
+        Therefore, the functionality is separated
+        from the handle_snp_search_mode.
         """
         custom_database_builder: dict[str, Any] = {
             "database_path": self.pattern.creation_dict["SNP_database_path"]
@@ -162,9 +163,16 @@ class HandleSearchModes:
             "database_name": self.pattern.creation_dict["species"],
             "file_type": self.file_type,
         }
+        logging.debug(
+            "Checking if the gene database exists for the FASTQ file type..."
+        )
         if self.check_valid_gene_database_path(custom_database_builder):
             run_snp_query(self.pattern.creation_dict)
         else:
+            logging.warning(
+                "Gene database does not exist inside SNP database, "
+                "trying to create it..."
+            )
             self.create_genes_database(custom_database_builder)
             if not self.check_valid_gene_database_path(
                 custom_database_builder
@@ -203,12 +211,12 @@ class HandleSearchModes:
     ) -> None:
         """
         Little helper function that creates the gene database
-        for the SNP database. it's confusing, but the PoitFinder database
+        for the SNP database. it's confusing, but the PointFinder database
         requires a gene database only when the file type is FASTQ.
-        The developed class is used for this purpose, but with different params.
+        The developed class is used for this purpose, with different params.
         ----------
         Input:
-            - custom_database_builder: Dictionary with all necessary information
+            - custom_database_builder: Dictionary with necessary information
         ----------
         """
         custom_database_builder["input_fasta_file"] = (
@@ -230,12 +238,18 @@ class HandleSearchModes:
         self.validate_or_create_SNP_database()
         logging.info("SNP database exists, starting the query operation...")
         if self.file_type == "FASTQ":
+            logging.info(
+                "File type is FASTQ, starting additional validation steps..."
+            )
             # File type is FASTQ, PointFinder requires again a indexed
             # database, so we can reuse our own creation class to achieve
             # this. The database is created in the same directory as the
             # SNP database, but with the name of the species (as required)
             self.handle_fastq_snp_query()
         else:
+            logging.info(
+                "File type is FASTA, starting the SNP query operation..."
+            )
             run_snp_query(self.pattern.creation_dict)
 
     def handle(self) -> None:
