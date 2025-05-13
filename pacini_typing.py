@@ -453,6 +453,7 @@ class PaciniTyping:
         pattern.creation_dict["input_file_list"] = self.option["config"][
             "input"
         ]
+        pattern.creation_dict["file_type"] = self.file_type
         pattern.creation_dict["output"] = (
             pattern.pattern["database"]["run_output"] + self.sample_name
         )
@@ -562,6 +563,7 @@ class PaciniTyping:
             pattern,
             self.file_type,
             self.sample_name,
+            self.option["config"]["search_mode"],
         )
         # Define the output directory for further usage
         self.output_dir = pattern.pattern["database"]["run_output"]
