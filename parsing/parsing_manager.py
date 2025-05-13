@@ -17,6 +17,9 @@ __date__ = "2024-12-02"
 __all__ = ["ParsingManager"]
 
 import logging
+from typing import Any
+
+import pandas as pd
 
 from parsing.coverage_filter import CoverageFilter
 from parsing.fasta_parser import FASTAParser
@@ -24,6 +27,8 @@ from parsing.fastq_parser import FASTQParser
 from parsing.identity_filter import PercentageIdentityFilter
 from parsing.parser import Parser
 from parsing.read_config_pattern import ReadConfigPattern
+from parsing.snp_parser import SNPParser
+from preprocessing.exceptions.parsing_exceptions import HandlingError
 
 
 class ParsingManager:
@@ -43,7 +48,11 @@ class ParsingManager:
     """
 
     def __init__(
-        self, pattern: ReadConfigPattern, file_type: str, sample_name: str
+        self,
+        pattern: ReadConfigPattern,
+        file_type: str,
+        sample_name: str,
+        search_mode: str,
     ) -> None:
         """
         Constructor of the ParsingManager class.
@@ -62,9 +71,142 @@ class ParsingManager:
         self.pattern = pattern
         self.file_type = file_type
         self.sample_name = sample_name
-        self.set_parser()
+        self.search_mode: str = search_mode
+        # define the handler functions for the right search mode
+        self.handlers: dict[str, Any] = {
+            "genes": self._run_genes,
+            "SNPs": self._run_snps,
+            "both": self._run_both,
+        }
+        self.run()
+
+    def run(self) -> None:
+        """
+        Function that calls the right handler function,
+        based on the search mode. The search mode is used
+        to determine which parsing function to call.
+
+        If the search mode is both, two parser objects are required,
+        therefore this function contains the main logic for the calling.
+        ----------
+        Raises:
+            - HandlingError: if something goes wrong with the
+                handling of the parsing process
+        ----------
+        """
+        try:
+            handler = self.handlers[self.search_mode]
+        except KeyError as exc:
+            raise HandlingError(self.search_mode) from exc
+        handler()
+
+    def _prepare_gene_parser(self):
+        """
+        Function that prepare the gene parser object
+        for running the parsing process. The object is being
+        added as a class variable to easier apply filters and operations
+        on the parser object.
+        The parser object could either be a FASTA or FASTQ parser,
+        based on the file type.
+        ----------
+        Output:
+            - parser: FASTA or FASTQ Parser object
+        ----------
+        """
+        logging.debug("Setting up parser object...")
+        self.parser = Parser(
+            self.pattern.pattern,
+            FASTAParser() if self.file_type == "FASTA" else FASTQParser(),
+            self.pattern.creation_dict["output"],
+            self.sample_name,
+        )
         self.add_filters_to_parser()
-        self.parser.parse()
+
+        return self.parser
+
+    def _create_snp_parser(self):
+        """
+        Function that creates the SNP parser object
+        and returns it to the caller.
+        The SNP parser is not executed but only initialized
+        and returned to the caller.
+        ----------
+        Output:
+            - SNPParser: SNP parser object
+        ----------
+        """
+        # TODO: fix the right output file name passing
+        return SNPParser(
+            self.pattern.pattern, self.sample_name, self.file_type
+        )
+
+    def _run_genes(self) -> None:
+        """
+        Function that handles the parsing process for the genes,
+        this means calling the parser object and writing the report
+        to a csv file. The parser object creation is delegated and
+        the parse method is called to start the parsing process.
+        """
+        parser = self._prepare_gene_parser()
+        parser.parse()
+        self.write_report(parser.output_report, "report", self.sample_name)
+
+    def process_reports(
+        self, gene_report: pd.DataFrame, snp_report: pd.DataFrame
+    ) -> None:
+        """
+        Function that processes the reports of either genes, SNPs or both.
+        If both reports are empty, a warning is logged and the function
+        returns. Furthermore, the check seems very straightforward,
+        if one of the reports is empty, the other report is used.
+        ----------
+        Input:
+            - gene_report: DataFrame: the gene report
+            - snp_report: DataFrame: the SNP report
+        ----------
+        """
+        if gene_report.empty and snp_report.empty:
+            logging.warning("Both gene and SNP reports are empty.")
+            return
+        if gene_report.empty:
+            final_report = snp_report
+            logging.info("Using only SNP report.")
+        elif snp_report.empty:
+            final_report = gene_report
+            logging.info("Using only gene report.")
+        else:
+            final_report = pd.concat([gene_report, snp_report])
+
+        self.write_report(final_report, "report", self.sample_name)
+
+    def _run_snps(self) -> None:
+        """
+        Function that handles the parsing process for the SNPs,
+        this means calling the SNP parser object and writing the report
+        to a csv file. The SNP parser object creation is delegated and
+        the parse method is called to start the parsing process.
+        """
+        parser = self._create_snp_parser()
+        parser.parse()
+        self.write_report(parser.output_report, "report", self.sample_name)
+
+    def _run_both(self) -> None:
+        """
+        Main function that handles the parsing of both genes and SNPs.
+        The _prepare_gene_parser and _create_snp_parser methods are called
+        and respectively executed by calling the parse methods.
+        Subsequently, the reports are concatenated passed along to the
+        write_report method to write the report to a csv file.
+        """
+        gene_parser = self._prepare_gene_parser()
+        gene_parser.parse()
+        snp_parser = self._create_snp_parser()
+        snp_parser.parse()
+        # Define the reports and check their content
+        gene_report = gene_parser.output_report
+        snp_report = snp_parser.output_report
+        # Process the reports
+        return self.process_reports(gene_report, snp_report)
 
     def set_parser(self) -> None:
         """
@@ -133,3 +275,25 @@ class ParsingManager:
             CoverageFilter(self.get_config_coverage(), self.file_type)
         )
         logging.debug("Filters: %s successfully added", self.parser.filters)
+
+    def write_report(
+        self, report: pd.DataFrame, suffix: str, input_sequence_sample: str
+    ) -> None:
+        """
+        Function that writes a given DataFrame to a csv file.
+        The pandas DataFrame is created by other methods,
+        and passed to this method to write it to a file.
+        ----------
+        Input:
+            - report: the DataFrame to write
+            - suffix: suffix to add to the filename
+        ----------
+        """
+        logging.debug("Writing the %s...", suffix)
+        file_name = f"{input_sequence_sample}_{suffix}.csv"
+        report.to_csv(
+            file_name,
+            sep=",",
+            index=False,
+        )
+        logging.info("Successfully wrote %s...", file_name)
