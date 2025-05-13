@@ -101,3 +101,36 @@ class EmptySequenceError(Exception):
             - Check the extraction method for errors
         ---------------------------------------------------
                 """
+
+
+class HandlingError(Exception):
+    """
+    Raised when an error occurs while handling either gene or
+    SNP parsing.
+    """
+
+    def __init__(self, search_mode: str) -> None:
+        """
+        Initialize the exception with a message.
+        ----------
+        Input:
+            - search_mode: str: the search mode
+        ----------
+        """
+        self.search_mode = search_mode
+
+    def __str__(self) -> str:
+        return f"""
+        ---------------------------------------------------
+        ERROR: Handling error during parsing {self.search_mode}
+        ---------------------------------------------------
+        This error occurred while handling the parsing,
+        mostly due to an error in the search mode or setting
+        parsers.
+        ---------------------------------------------------
+        SUGGESTION:
+            - Check the search mode and make sure it is correct
+            - Check the input files for errors
+            - Check the log file for more information
+        ---------------------------------------------------
+                """
