@@ -469,28 +469,54 @@ class PaciniTyping:
 
         return pattern
 
-    def save_intermediates(self) -> None:
+    def save_intermediates(self, output_dir: str) -> None:
         """
         Function that saves intermediate files in a zip archive.
         The zip archive is named after the sample name.
         The zip format is .tar.gz.
+        ----------
+        Input:
+            - output_dir: The output directory of the run
+        ----------
         """
         logging.info("Saving intermediate files in a zip archive...")
         with tarfile.open(
             f"{self.sample_name}_intermediates.tar.gz", "w:gz"
         ) as tar:
-            tar.add(self.output_dir, arcname=os.path.basename(self.output_dir))
+            tar.add(output_dir, arcname=os.path.basename(output_dir))
         # Call the delete_intermediates function to
         # remove the original output directory
         logging.debug("Saved intermediate files in a zip...")
-        self.delete_intermediates()
+        self.delete_intermediates(output_dir)
 
-    def delete_intermediates(self) -> None:
+    def delete_intermediates(self, output_dir: str) -> None:
         """
-        Function that removes the intermediate files of the application.
+        Function that removes the intermediate files of a run,
+        using the shutil module.
+        ----------
+        Input:
+            - output_dir: The output directory of the run
+        ----------
         """
         logging.debug("Deleting intermediate files...")
-        shutil.rmtree(self.output_dir)
+        shutil.rmtree(output_dir)
+
+    def save_or_delete_intermediate(self, pattern):
+        """
+        Function that determines if the intermediate files of the run
+        should be saved or deleted.
+        The actual saving or deleting is delegated to other functions.
+        ----------
+        Input:
+            - pattern: The configuration file options
+        ----------
+        """
+        # Set the output directory to pass along the functions
+        output_dir: str = pattern.pattern["database"]["run_output"]
+        if self.input_args.save_intermediates:
+            self.save_intermediates(output_dir)
+        else:
+            self.delete_intermediates(output_dir)
 
     def handle_makedatabase_option(self) -> None:
         """
@@ -542,9 +568,9 @@ class PaciniTyping:
         pattern: ReadConfigPattern = self.initialize_config_pattern()
         handler: HandleSearchModes = HandleSearchModes(pattern, self.option)
         handler.handle()
-        self.handle_config_option_parse_query(pattern)
+        self.filter_and_parse_results(pattern)
 
-    def handle_config_option_parse_query(
+    def filter_and_parse_results(
         self, pattern: ReadConfigPattern
     ) -> None:
         """
@@ -565,12 +591,8 @@ class PaciniTyping:
             self.sample_name,
             self.option["config"]["search_mode"],
         )
-        # Define the output directory for further usage
-        self.output_dir = pattern.pattern["database"]["run_output"]
-        if self.input_args.save_intermediates:
-            self.save_intermediates()
-        else:
-            self.delete_intermediates()
+        # Determine if the intermediate files should be saved or deleted
+        self.save_or_delete_intermediate(pattern)
 
     def handle_query_option(self) -> None:
         """
