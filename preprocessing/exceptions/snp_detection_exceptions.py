@@ -134,3 +134,37 @@ class MissingGenesError(Exception):
             - Ensure the reference database is complete
         ----------------------------------------------------
         """
+
+
+class PointFinderScriptError(Exception):
+    """
+    Raised when the PointFinder script is not found or
+    is wrong formatted.
+    """
+
+    def __init__(self, script_path: str) -> None:
+        """
+        Initialize the exception with the script path.
+        ----------
+        Input:
+            - script_path: path to the PointFinder script
+        ----------
+        """
+        self.script_path = script_path
+
+    def __str__(self) -> str:
+        return f"""
+        ---------------------------------------------------
+        ERROR: PointFinder script not found
+        ---------------------------------------------------
+        The following PointFinder script could not be found:
+            - Path: {self.script_path}
+        ---------------------------------------------------
+        SUGGESTION:
+            - Make sure the script is a valid Python script
+            - Check the path to the script
+            - Check if the path was correctly defined in
+                the config file:
+                    - /path/to/PointFinder.py
+        ----------------------------------------------------
+                """
