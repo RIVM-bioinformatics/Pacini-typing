@@ -570,9 +570,7 @@ class PaciniTyping:
         handler.handle()
         self.filter_and_parse_results(pattern)
 
-    def filter_and_parse_results(
-        self, pattern: ReadConfigPattern
-    ) -> None:
+    def filter_and_parse_results(self, pattern: ReadConfigPattern) -> None:
         """
         Function that handles the parsing of the genetic variation
         that is found by the query operation.
