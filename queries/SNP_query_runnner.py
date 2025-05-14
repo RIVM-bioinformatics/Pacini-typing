@@ -18,6 +18,10 @@ __author__ = "Mark van de Streek"
 __date__ = "2025-05-12"
 __all__ = ["SNPQueryRunner"]
 
+import logging
+import os
+
+from command_utils import CommandInvoker, ShellCommand
 from queries.base_query_runner import BaseQueryRunner
 from queries.pointfinder_runner import PointFinder
 
@@ -43,6 +47,9 @@ class SNPQueryRunner(BaseQueryRunner):
 
     def __init__(self, run_options: dict[str, str]) -> None:
         super().__init__(run_options)
+        self.check_pointfinder_existence(
+            self.run_options["PointFinder_script_path"]
+        )
         self.query = PointFinder.get_query(option=self.run_options)
         self.version_command = PointFinder.get_version_command()
         # TODO remove ?
@@ -52,3 +59,27 @@ class SNPQueryRunner(BaseQueryRunner):
         """later..."""
         # TODO STILL HAVE TO IMPLEMENT THIS
         return f"{stdout.split(" ")[-1]}"
+
+    def check_pointfinder_existence(self, path: str) -> None:
+        """
+        Function that checks if the PointFinder script exists.
+        Because the script is not available via Conda, this
+        check is required to download the script.
+        """
+        if not os.path.isfile(path):
+            logging.info("PointFinder script not found, downloading...")
+            CommandInvoker(
+                ShellCommand(
+                    cmd=[
+                        "wget",
+                        "-O",
+                        path,
+                        "https://bitbucket.org/genomicepidemiology/pointfinder/raw/master/PointFinder.py",
+                    ],
+                    capture=True,
+                )
+            ).execute()
+        else:
+            logging.debug(
+                "PointFinder script already exists, skipping download..."
+            )
