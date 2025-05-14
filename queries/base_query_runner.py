@@ -109,7 +109,10 @@ class BaseQueryRunner(ABC):
         stdout, stderr = CommandInvoker(
             ShellCommand(cmd=self.version_command, capture=True)
         ).execute()
-        logging.info("Version tool: %s", self.extract_version_number(stdout))
+        if stdout:
+            logging.info(
+                "Version tool: %s", self.extract_version_number(stdout)
+            )
 
     def run(self) -> None:
         """
