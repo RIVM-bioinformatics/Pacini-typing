@@ -14,7 +14,12 @@ the reading of the configuration file.
 
 __author__ = "Mark van de Streek"
 __date__ = "2024-11-06"
-__all__ = ["YAMLLoadingError", "YAMLStructureError", "EmptySequenceError"]
+__all__ = [
+    "YAMLLoadingError",
+    "YAMLStructureError",
+    "EmptySequenceError",
+    "HandlingError",
+]
 
 
 class YAMLLoadingError(Exception):

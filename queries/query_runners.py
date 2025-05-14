@@ -19,8 +19,7 @@ __date__ = "2025-05-07"
 __all__ = ["run_query", "run_gene_query", "run_snp_query"]
 
 import logging
-from typing import Any
-from typing import Type
+from typing import Any, Type
 
 from queries.gene_query_runner import GeneQueryRunner
 from queries.SNP_query_runnner import SNPQueryRunner
