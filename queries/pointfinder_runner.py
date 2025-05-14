@@ -24,7 +24,6 @@ class PointFinder(Enum):
     to be executed in PointFinder.
     The options could be changed for future versions.
     ----------
-    RUN_OPTION: string that is used in the command invoker
     DATABASE_PATH_OPTION: option for the database path
     DATABASE_SUBDIR_OPTION: option for the database subdirectory
     UNKNOWN_MUT_OPTION: option for the unknown mutations
@@ -32,7 +31,6 @@ class PointFinder(Enum):
     ----------
     """
 
-    RUN_OPTION = "pointfinder.py"
     DATABASE_PATH_OPTION = "--databasePath"
     # PointFinder requires the database path and a species.
     # The 'species' is actually the subdirname of the specific
@@ -56,15 +54,11 @@ class PointFinder(Enum):
         """
         return [
             "python",
-            PointFinder.RUN_OPTION.value,
+            option["PointFinder_script_path"],
             "--inputfiles",
             *option["input_file_list"],
             "--out_path",
-            (
-                option["SNP_output_dir"]
-                if option["SNP_output_dir"].endswith("/")
-                else option["SNP_output_dir"] + "/"
-            ),
+            option["SNP_output_dir"],
             PointFinder.DATABASE_PATH_OPTION.value,
             option["SNP_database_path"],
             PointFinder.DATABASE_SUBDIR_OPTION.value,
@@ -98,4 +92,5 @@ class PointFinder(Enum):
             - list with the version command
         ----------
         """
-        return ["python", PointFinder.RUN_OPTION.value, "--version"]
+        # TODO: FIX!
+        return ["python", "--version"]

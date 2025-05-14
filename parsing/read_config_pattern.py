@@ -32,7 +32,10 @@ from preprocessing.exceptions.parsing_exceptions import (
     YAMLLoadingError,
     YAMLStructureError,
 )
-from preprocessing.exceptions.snp_detection_exceptions import PathError
+from preprocessing.exceptions.snp_detection_exceptions import (
+    PathError,
+    PointFinderScriptError,
+)
 
 REQUIRED_KEYS = ["metadata", "database", "pattern"]
 REQUIRED_PATTERN_KEYS = [
@@ -190,6 +193,9 @@ class ReadConfigPattern:
         )
         self.creation_dict["method_path"] = self.get_method_path()
         self.creation_dict["SNP_output_dir"] = self.get_output_dir()
+        self.creation_dict["PointFinder_script_path"] = (
+            self.get_pointfinder_script_path()
+        )
 
     def get_method_path(self) -> str:
         """
@@ -219,8 +225,29 @@ class ReadConfigPattern:
         ----------
         """
         path: str = self.pattern["database"]["SNP_output_dir"]
+        path = path if path.endswith("/") else path + "/"
         if os.path.exists(path) and os.path.isdir(path):
             return path
         else:
             os.makedirs(path, exist_ok=True)
             return path
+
+    def get_pointfinder_script_path(self) -> str:
+        """
+        Function that returns the path to the PointFinder script,
+        if valid. If not valid, an error is raised.
+        The path is not checked for existence, that is done right
+        before usage.
+        ----------
+        Output:
+            - str: Path to the PointFinder script
+        ----------
+        """
+        path: str = self.pattern["metadata"]["PointFinder_script_path"]
+        if path.endswith("PointFinder.py"):
+            return path
+        else:
+            logging.error(
+                "The PointFinder script is incorrectly specified in the config file, exiting..."
+            )
+            raise PointFinderScriptError(path)
