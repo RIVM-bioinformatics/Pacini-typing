@@ -84,7 +84,7 @@ class IncorrectStructureError(Exception):
     def __str__(self) -> str:
         return f"""
         ---------------------------------------------------
-        ERROR: Incorrect structure error
+        ERROR: Incorrect structure PointFinder database
         ---------------------------------------------------
         The following directory has an incorrect structure
             or does not exists:
@@ -117,7 +117,7 @@ class MissingGenesError(Exception):
     def __str__(self) -> str:
         return f"""
         ---------------------------------------------------
-        ERROR: Missing genes error
+        ERROR: Missing genes in PointFinder database error
         ---------------------------------------------------
         The following reference database path is missing genes:
             - Path: {self.file_path}
