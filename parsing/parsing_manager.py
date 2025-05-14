@@ -141,6 +141,25 @@ class ParsingManager:
 
         return self.parser
 
+    def get_path_to_pointfinder_file(self) -> str:
+        """
+        Little helper function that combines the path to the
+        PointFinder file with the hits information.
+        The file name is based on the sample name and method used.
+        ----------
+        Output:
+            - str: path to the PointFinder file
+        ----------
+        """
+        return (
+            self.pattern.creation_dict["SNP_output_dir"]
+            + self.sample_name.split(".")[0].split("_")[0]
+            + "_"
+            + "kma"
+            if self.file_type == "FASTQ"
+            else "blastn" + "_results.tsv"
+        )
+
     def _create_snp_parser(self):
         """
         Function that creates the SNP parser object
@@ -153,6 +172,12 @@ class ParsingManager:
         ----------
         """
         # TODO: fix the right output file name passing
+        # file_fullpath = out_path + "/" + sample_name + "_" + method + "_" + output_files[i]
+        # out_path: output path (/ ?)
+        # method: 'kma' OR 'blastn'
+        # output_files: 'results.tsv'
+
+        # path_to_snp_file: str = self.get_path_to_pointfinder_file()
         logging.debug("Setting up the SNP parser object...")
         return SNPParser(
             self.pattern.pattern, self.sample_name, self.file_type
