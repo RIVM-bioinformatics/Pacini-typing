@@ -67,30 +67,23 @@ class PointFinder(Enum):
             option["method"],
             "--method_path",
             option["method_path"],
+            # The unknown muatations flag is required
+            # to be set to True, since we want to also search
+            # for unknown (custom defined) mutations.
             PointFinder.UNKNOWN_MUT_OPTION.value,
-            #
-            # Expected:
-            # PointFinder.py
-            #   -i test.fsa - (test_1.fastq test_2.fastq)
-            #   -o /path/to/output-dir/ - Dir should exist
-            #   -p /path/to/db/ - Path to database
-            #   -s escherichia_coli - Species name - Database dir name
-            #   -m blastn - kma/blastn
-            #   -m_p /path/to/blastn - Path to blastn or kma
-            #   --unknown_mut
-            #
         ]
 
     @staticmethod
     def get_version_command() -> list[str]:
         """
-        Method that returns the version command for PointFinder.
-        This command could then directly be used in the
-        CommandInvoker class to retrieve the version of PointFinder.
+        Method that returns the version command for KMA
         ----------
         Output:
             - list with the version command
         ----------
         """
-        # TODO: FIX!
-        return ["python", "--version"]
+        return [
+            "curl",
+            "-s",
+            "https://api.bitbucket.org/2.0/repositories/genomicepidemiology/pointfinder/filehistory/master/PointFinder.py?fields=values.commit.date",
+        ]

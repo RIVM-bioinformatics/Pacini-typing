@@ -18,6 +18,7 @@ __author__ = "Mark van de Streek"
 __date__ = "2025-05-12"
 __all__ = ["SNPQueryRunner"]
 
+import json
 import logging
 import os
 
@@ -35,8 +36,8 @@ class SNPQueryRunner(BaseQueryRunner):
     SNP queries are following the same recipe, but only the
     some (small) parts are different.
 
-    *PointFinder's doesn't have a version command,
-    so the extract_version_number is a bit different here.
+    *PointFinder doesn't have a version command,
+    so logging the version number is not possible.
     ----------
     Methods:
         - __init__: Constructor of the SNPQueryRunner class
@@ -46,25 +47,60 @@ class SNPQueryRunner(BaseQueryRunner):
     """
 
     def __init__(self, run_options: dict[str, str]) -> None:
+        """
+        Constructor class of the SNPQueryRunner class.
+        This class is responsible for initializing the class.
+        The checking of the PointFinder existence is additionally
+        to the BaseQueryRunner abstract class and is only required
+        for the SNP-related operations.
+        ----------
+        Input:
+            - run_options: dictionary with the input files,
+                database, and output file
+        ----------
+        """
         super().__init__(run_options)
         self.check_pointfinder_existence(
             self.run_options["PointFinder_script_path"]
         )
         self.query = PointFinder.get_query(option=self.run_options)
         self.version_command = PointFinder.get_version_command()
-        # TODO remove ?
-        # self.log_tool_version()
+        self.log_tool_version()
 
     def extract_version_number(self, stdout: str) -> str | None:
-        """later..."""
-        # TODO STILL HAVE TO IMPLEMENT THIS
-        return f"{stdout.split(" ")[-1]}"
+        """
+        Function that extracts the version number
+        of the incoming PointFinder output.
+        PointFinder doesn't have a version command,
+        so the version number is extracted from a request
+        to the version history of the PointFinder API.
+        ----------
+        Input:
+            - stdout: the output of the version command
+        Output:
+            - str: the version number of the tool or
+                Not available if the version number couldn't be extracted
+        ----------
+        """
+        try:
+            data = json.loads(stdout)
+            return data["values"][0]["commit"]["date"]
+        except Exception:
+            logging.error("Error extracting version number from PointFinder")
+            # The program should not crash if a version number could not
+            # be extracted, but the error should be logged.
+            return "Not available"
 
     def check_pointfinder_existence(self, path: str) -> None:
         """
-        Function that checks if the PointFinder script exists.
-        Because the script is not available via Conda, this
+        Function that checks if the PointFinder script exists
+        and downloads if not present.
+        Because the script is not available via Conda/PIP, this
         check is required to download the script.
+        ----------
+        Input:
+            - path: Path to the PointFinder script
+        ----------
         """
         if not os.path.isfile(path):
             logging.info("PointFinder script not found, downloading...")
