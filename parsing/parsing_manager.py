@@ -35,15 +35,25 @@ class ParsingManager:
     """
     Class to manage all parsing/configurations based
     operations. It's a caller class that prepares
-    all arguments and call the parsing functions.
+    the right parsers objects and adds the right filters
+    to the classes.
     ----------
     Methods:
         - __init__: Constructor to initialize the config file
-        - set_parser: Method to initialize the parser object
-        - get_config_gene_names: Getter function to retrieve gene names
-        - get_config_identity: Getter function to retrieve identity
-        - get_config_coverage: Getter function to retrieve coverage
-        - add_filters_to_parser: Method to add filters to the parser
+        - run: Function that calls the right handler function
+        - _prepare_gene_parser: Function that prepares the gene parser
+        - _create_snp_parser: Function that creates the SNP parser
+        - _run_genes: Function that handles the parsing process for genes
+        - process_reports: Function that processes the reports of either genes,
+            SNPs or both
+        - _run_snps: Function that handles the parsing process for SNPs
+        - _run_both: Function that handles the parsing process for both genes and SNPs
+        - set_parser: Function that initializes the parser object
+        - get_config_gene_names: Function that retrieves the gene names
+        - get_config_identity: Function that retrieves the identity
+        - get_config_coverage: Function that retrieves the coverage
+        - add_filters_to_parser: Function that adds the filters to the parser object
+        - write_report: Function that writes a given DataFrame to a csv file
     ----------
     """
 
@@ -72,6 +82,9 @@ class ParsingManager:
         self.file_type = file_type
         self.sample_name = sample_name
         self.search_mode: str = search_mode
+        # Define the gene parser as a class variable,
+        # since this is easier for adding filters and operations
+        self.parser = pd.DataFrame()
         # define the handler functions for the right search mode
         self.handlers: dict[str, Any] = {
             "genes": self._run_genes,
@@ -94,9 +107,13 @@ class ParsingManager:
                 handling of the parsing process
         ----------
         """
+        logging.info("Determining which parsers to use...")
         try:
             handler = self.handlers[self.search_mode]
         except KeyError as exc:
+            logging.error(
+                "No handler found for search mode %s", self.search_mode
+            )
             raise HandlingError(self.search_mode) from exc
         handler()
 
@@ -113,7 +130,7 @@ class ParsingManager:
             - parser: FASTA or FASTQ Parser object
         ----------
         """
-        logging.debug("Setting up parser object...")
+        logging.debug("Setting up the gene parser object...")
         self.parser = Parser(
             self.pattern.pattern,
             FASTAParser() if self.file_type == "FASTA" else FASTQParser(),
@@ -136,6 +153,7 @@ class ParsingManager:
         ----------
         """
         # TODO: fix the right output file name passing
+        logging.debug("Setting up the SNP parser object...")
         return SNPParser(
             self.pattern.pattern, self.sample_name, self.file_type
         )
@@ -147,6 +165,7 @@ class ParsingManager:
         to a csv file. The parser object creation is delegated and
         the parse method is called to start the parsing process.
         """
+        logging.debug("Running the gene parser...")
         parser = self._prepare_gene_parser()
         parser.parse()
         self.write_report(parser.output_report, "report", self.sample_name)
@@ -166,18 +185,21 @@ class ParsingManager:
         ----------
         """
         if gene_report.empty and snp_report.empty:
-            logging.warning("Both gene and SNP reports are empty.")
+            logging.warning("Both gene and SNP reports are empty, skipping...")
             return
         if gene_report.empty:
             final_report = snp_report
-            logging.info("Using only SNP report.")
+            logging.info("Gene report is empty, writing SNP report only...")
         elif snp_report.empty:
             final_report = gene_report
-            logging.info("Using only gene report.")
+            logging.info("SNP report is empty, writing gene report only...")
         else:
+            logging.info(
+                "Found both gene and SNP reports, concatenating and writing..."
+            )
             final_report = pd.concat([gene_report, snp_report])
 
-        self.write_report(final_report, "report", self.sample_name)
+        ParsingManager.write_report(final_report, "report", self.sample_name)
 
     def _run_snps(self) -> None:
         """
@@ -198,6 +220,7 @@ class ParsingManager:
         Subsequently, the reports are concatenated passed along to the
         write_report method to write the report to a csv file.
         """
+        logging.debug("Running both gene and SNP parsers...")
         gene_parser = self._prepare_gene_parser()
         gene_parser.parse()
         snp_parser = self._create_snp_parser()
@@ -206,6 +229,7 @@ class ParsingManager:
         gene_report = gene_parser.output_report
         snp_report = snp_parser.output_report
         # Process the reports
+        logging.info("Parsing process finished, processing reports...")
         return self.process_reports(gene_report, snp_report)
 
     def set_parser(self) -> None:
@@ -276,8 +300,9 @@ class ParsingManager:
         )
         logging.debug("Filters: %s successfully added", self.parser.filters)
 
+    @staticmethod
     def write_report(
-        self, report: pd.DataFrame, suffix: str, input_sequence_sample: str
+        report: pd.DataFrame, suffix: str, input_sequence_sample: str
     ) -> None:
         """
         Function that writes a given DataFrame to a csv file.
