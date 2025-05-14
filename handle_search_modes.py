@@ -30,7 +30,9 @@ from preprocessing.exceptions.validate_database_exceptions import (
 )
 from preprocessing.validation.validate_database import check_for_database_path
 from queries.query_runners import run_gene_query, run_snp_query
-from validate_pointfinder_database import PointFinderReferenceChecker
+from preprocessing.validation.validate_pointfinder_database import (
+    PointFinderReferenceChecker,
+)
 
 
 class HandleSearchModes:
