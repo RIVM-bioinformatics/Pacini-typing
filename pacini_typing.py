@@ -59,7 +59,7 @@ from typing import Any
 
 import preprocessing.argsparse.build_parser
 from handle_search_modes import HandleSearchModes
-from makedatabase import DatabaseBuilder
+from make_gene_database import GeneDatabaseBuilder
 from parsing.parsing_manager import ParsingManager
 from parsing.read_config_pattern import ReadConfigPattern
 from preprocessing.exceptions.determine_input_type_exceptions import (
@@ -356,10 +356,10 @@ class PaciniTyping:
     def run_makedatabase(self, database_creation_args: dict[str, Any]) -> None:
         """
         Function that runs the makedatabase operation.
-        The DatabaseBuilder of the makedatabase.py is called.
+        The DatabaseBuilder of the make_gene_database.py is called.
         """
         logging.info("Creating the reference database...")
-        DatabaseBuilder(database_creation_args)
+        GeneDatabaseBuilder(database_creation_args)
 
     def get_file_type(self) -> None:
         """

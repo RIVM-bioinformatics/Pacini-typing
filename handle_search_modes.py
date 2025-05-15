@@ -22,7 +22,7 @@ __all__ = ["HandleSearchModes"]
 import logging
 from typing import Any
 
-from makedatabase import DatabaseBuilder
+from make_gene_database import GeneDatabaseBuilder
 from parsing.read_config_pattern import ReadConfigPattern
 from preprocessing.exceptions.validate_database_exceptions import (
     InvalidDatabaseError,
@@ -99,14 +99,14 @@ class HandleSearchModes:
         Function that runs the makedatonabase operation for the
         gene database. This function simply creates a new reference
         database.
-        The DatabaseBuilder of the makedatabase.py is called.
+        The DatabaseBuilder of the make_gene_database.py is called.
         ----------
         Input:
             - database_creation_args: Dictionary with all necessary information
         ----------
         """
         logging.info("Creating the reference database...")
-        DatabaseBuilder(database_creation_args)
+        GeneDatabaseBuilder(database_creation_args)
 
     def check_valid_SNP_database(
         self, database_builder: dict[str, Any]
@@ -226,7 +226,7 @@ class HandleSearchModes:
             f"{self.pattern.creation_dict['species']}/genes.fasta"
         )
         custom_database_builder["database_type"] = "FASTQ"
-        DatabaseBuilder(custom_database_builder)
+        GeneDatabaseBuilder(custom_database_builder)
 
     def handle_snp_search_mode(self) -> None:
         """

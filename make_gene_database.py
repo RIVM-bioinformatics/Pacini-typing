@@ -13,7 +13,7 @@ See the class and methods for specific information about the working.
 
 __author__ = "Mark van de Streek"
 __date__ = "2024-09-27"
-__all__ = ["DatabaseBuilder"]
+__all__ = ["GeneDatabaseBuilder"]
 
 import logging
 import os
@@ -22,7 +22,7 @@ from typing import Any, Tuple
 from command_utils import CommandInvoker, ShellCommand
 
 
-class DatabaseBuilder:
+class GeneDatabaseBuilder:
     """
     Class that contains the methods to build a database for
     KMA of BLAST using the input arguments.
