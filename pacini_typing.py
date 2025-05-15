@@ -44,8 +44,6 @@ See the README.md file for more specific information.
 ----------
 """
 
-from __future__ import annotations
-
 __author__ = "Mark van de Streek"
 __date__ = "2024-09-27"
 __all__ = ["PaciniTyping", "main"]
@@ -469,7 +467,40 @@ class PaciniTyping:
 
         return pattern
 
-    def save_intermediates(self, output_dir: str) -> None:
+    def handle_intermediate_saving(
+        self, gene_output_dir: str, snp_output_dir: str
+    ) -> None:
+        """
+        Little helper function that contains some logic for saving
+        intermediate files. In some sitations, the gene_output_dir
+        or snp_output_dir are the same or subdirectories of each other.
+        Therefore, this checking is helpful to avoid wrong saving.
+        ----------
+        Input:
+            - gene_output_dir: The output directory of the gene run
+            - snp_output_dir: The output directory of the SNP run
+        ----------
+        """
+        if gene_output_dir == snp_output_dir:
+            self.save_intermediates(gene_output_dir)
+        elif snp_output_dir.startswith(gene_output_dir):
+            self.save_intermediates(gene_output_dir)
+        elif gene_output_dir.startswith(snp_output_dir):
+            self.save_intermediates(snp_output_dir)
+        else:
+            self.save_intermediates(
+                gene_output_dir,
+                f"{self.sample_name}_intermediates_gene.tar.gz",
+            )
+            self.save_intermediates(
+                snp_output_dir, f"{self.sample_name}_intermediates_SNP.tar.gz"
+            )
+
+    def save_intermediates(
+        self,
+        output_dir: str,
+        zip_name: str | None = None,
+    ) -> None:
         """
         Function that saves intermediate files in a zip archive.
         The zip archive is named after the sample name.
@@ -479,10 +510,10 @@ class PaciniTyping:
             - output_dir: The output directory of the run
         ----------
         """
+        if zip_name is None:
+            zip_name = f"{self.sample_name}_intermediates.tar.gz"
         logging.info("Saving intermediate files in a zip archive...")
-        with tarfile.open(
-            f"{self.sample_name}_intermediates.tar.gz", "w:gz"
-        ) as tar:
+        with tarfile.open(zip_name, "w:gz") as tar:
             tar.add(output_dir, arcname=os.path.basename(output_dir))
         # Call the delete_intermediates function to
         # remove the original output directory
@@ -496,12 +527,18 @@ class PaciniTyping:
         ----------
         Input:
             - output_dir: The output directory of the run
+                (either gene or SNP)
         ----------
         """
-        logging.debug("Deleting intermediate files...")
-        shutil.rmtree(output_dir)
+        logging.debug("Deleting intermediate files if they exist...")
+        if os.path.exists(output_dir):
+            shutil.rmtree(output_dir)
+        else:
+            logging.debug(
+                "Directory %s does not exist, skipping deletion", output_dir
+            )
 
-    def save_or_delete_intermediate(self, pattern):
+    def save_or_delete_intermediate(self, pattern: ReadConfigPattern):
         """
         Function that determines if the intermediate files of the run
         should be saved or deleted.
@@ -511,12 +548,14 @@ class PaciniTyping:
             - pattern: The configuration file options
         ----------
         """
-        # Set the output directory to pass along the functions
-        output_dir: str = pattern.pattern["database"]["run_output"]
+        gene_output_dir: str = pattern.pattern["database"]["run_output"]
+        snp_output_dir: str = pattern.pattern["database"]["SNP_output_dir"]
+
         if self.input_args.save_intermediates:
-            self.save_intermediates(output_dir)
+            self.handle_intermediate_saving(gene_output_dir, snp_output_dir)
         else:
-            self.delete_intermediates(output_dir)
+            self.delete_intermediates(gene_output_dir)
+            self.delete_intermediates(snp_output_dir)
 
     def handle_makedatabase_option(self) -> None:
         """
