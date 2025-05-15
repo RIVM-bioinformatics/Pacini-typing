@@ -35,6 +35,7 @@ from preprocessing.exceptions.parsing_exceptions import (
 from preprocessing.exceptions.snp_detection_exceptions import (
     PathError,
     PointFinderScriptError,
+    IncorrectSNPConfiguration,
 )
 
 REQUIRED_KEYS = ["metadata", "database", "global_settings", "pattern"]
@@ -227,16 +228,11 @@ class ReadConfigPattern:
 
     def handle_snp_pattern(self) -> None:
         """
-        TODO: Fill in later...
-        - validate SNP pattern
-        - prepare SNP pattern
-        - add SNP pattern to creation_dict
-            self.craetion_dict["my_variable"] =
-                self.pattern["pattern"]["my_variable"]
-
-        - Add the execution path to the creation_dict (self.get_method_path())
+        Function that handles to adding of SNP-related parameters
+        to the creation_dict. This is done by calling other functions
+        that will return the required parameters.
+        These getter functions also validate the variables.
         """
-        # TODO: validate SNP pattern here too...
         self.creation_dict["SNP_database_path"] = self.pattern["database"][
             "SNP_database_path"
         ]
@@ -308,9 +304,30 @@ class ReadConfigPattern:
 
     def get_snp_list(self) -> list[dict[str, str | int]]:
         """
-        TODO: Write docstring...
+        Function that returns the SNP list from the pattern
+        after it is retrieved from the pattern and validated.
+        When retrieving the SNP list, the pattern also contains
+        gene information, which is not needed and is removed from
+        the list.
         ----------
-
+        Output:
+            - list[dict[str, str | int]]: List of SNPs like:
+            [
+                {
+                    "SNP": "gyrA",
+                    "ref": "ATG",
+                    "alt": "L",
+                    "pos": 1
+                },
+                {
+                    "SNP": "gyrA",
+                    "ref": "CCC",
+                    "alt": "F",
+                    "pos": 2
+                },
+        ]
+        Raises:
+            - IncorrectSNPConfiguration: If the SNP list is not valid
         ----------
         """
         SNP_list: list[dict[str, str | int]] = self.pattern["pattern"]
@@ -320,23 +337,34 @@ class ReadConfigPattern:
             for entry in SNP_list
             if not next(iter(entry)).startswith("gene")
         ]
-
         if self.validate_SNP_list(SNP_list):
             return SNP_list
         else:
-            # Log error
-            raise ValueError()
+            logging.error(
+                "SNP list is not valid in configuration file %s",
+                self.config_file,
+            )
+            raise IncorrectSNPConfiguration(self.config_file)
 
     def _validate_snp_entry(
         self, index: int, entry: dict[str, str | int]
     ) -> None:
         """
-        TODO: Write docstring...
+        Function that validates a single SNP entry of the SNP list.
+        The entry should be a dictionary with the following keys:
+            - SNP: str
+            - ref: str
+            - alt: str
+            - pos: int
+        The values should be of the correct type and not empty.
+        This pattern is used to create the reference database
+        and to run the query.
         ----------
         Input:
-            - TODO: Write input...
+            - index: The index of the entry in the SNP list
+            - entry: The entry to be validated
         Raises:
-            - TODO: Write exceptions...
+            - IncorrectSNPConfiguration: If the entry is not valid
         ----------
         """
         snp, ref, alt, pos = (
@@ -355,7 +383,12 @@ class ReadConfigPattern:
             and isinstance(pos, int)
             and pos >= 1
         ):
-            raise ValueError(index)
+            logging.error(
+                "SNP entry %d is not valid in configuration file %s",
+                index,
+                self.config_file,
+            )
+            raise IncorrectSNPConfiguration(self.config_file)
 
     def validate_SNP_list(self, snp_list: list[dict[str, str | int]]) -> bool:
         """
@@ -374,23 +407,36 @@ class ReadConfigPattern:
             "pos": 2
             },
         ]
-        The function should check if all information is present and in a good format.
+        The delegates the validation of every single entry to the
+        _validate_snp_entry function.
+        The function checks if the list is a list of dictionaries
+        and if the dictionaries contain the required keys.
         ----------
         Input:
-            - TODO: Write input...
+            - snp_list: list[dict[str, str | int]]
+                The SNP list to be validated
         Raises:
-            - TODO: Write exceptions...
+            - IncorrectSNPConfiguration: If the SNP list is not valid
         ----------
         """
         if not isinstance(snp_list, list):
-            raise ValueError()
+            logging.error(
+                "SNP list is not a list in configuration file, exiting..."
+            )
+            raise IncorrectSNPConfiguration(self.config_file)
 
         required_keys: set[str] = {"SNP", "ref", "alt", "pos"}
         for index, entry in enumerate(snp_list):
             if not isinstance(entry, dict):
-                raise ValueError()
+                logging.error(
+                    "SNP entry in configuration file is not a dictionary, exiting..."
+                )
+                raise IncorrectSNPConfiguration(self.config_file)
             missing: set[str] = required_keys - entry.keys()
             if missing:
-                raise ValueError()
+                logging.error(
+                    "SNP entry in configuration file has missing keys: %s, exiting..."
+                )
+                raise IncorrectSNPConfiguration(self.config_file)
             self._validate_snp_entry(index, entry)
         return True

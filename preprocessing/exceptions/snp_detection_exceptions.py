@@ -168,3 +168,34 @@ class PointFinderScriptError(Exception):
                     - /path/to/PointFinder.py
         ----------------------------------------------------
                 """
+
+
+class IncorrectSNPConfiguration(Exception):
+    """
+    Raised when the SNP configuration is incorrect.
+    """
+
+    def __init__(self, config_path: str) -> None:
+        """
+        Initialize the exception with the config path.
+        ----------
+        Input:
+            - config_path: path to the SNP configuration file
+        ----------
+        """
+        self.config_path = config_path
+
+    def __str__(self) -> str:
+        return f"""
+        ---------------------------------------------------
+        ERROR: Incorrect SNP cosnfiguration in config file
+        ---------------------------------------------------
+        The following SNP configuration file is incorrect:
+            - Path: {self.config_path}
+        ---------------------------------------------------
+        SUGGESTION:
+            - Check the SNP configuration file for correctness
+            - Check the log file for more information
+            - Check the "pattern" field in the config file
+        ----------------------------------------------------
+                """
