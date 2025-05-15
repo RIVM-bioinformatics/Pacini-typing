@@ -14,7 +14,7 @@ the database of PointFinder
 
 __author__ = "Mark van de Streek"
 __date__ = "2025-05-29"
-__all__ = ["FileContentError"]
+__all__ = ["PointFinderScriptError", "PathError", "IncorrectSNPConfiguration"]
 
 
 class PathError(Exception):
