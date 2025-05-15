@@ -33,9 +33,9 @@ from preprocessing.exceptions.parsing_exceptions import (
     YAMLStructureError,
 )
 from preprocessing.exceptions.snp_detection_exceptions import (
+    IncorrectSNPConfiguration,
     PathError,
     PointFinderScriptError,
-    IncorrectSNPConfiguration,
 )
 
 REQUIRED_KEYS = ["metadata", "database", "global_settings", "pattern"]
@@ -246,6 +246,9 @@ class ReadConfigPattern:
             self.get_pointfinder_script_path()
         )
         self.creation_dict["SNP_list"] = self.get_snp_list()
+        self.creation_dict["pointfinder_genes_file"] = (
+            self.get_pointfinder_genes_file()
+        )
 
     def get_method_path(self) -> str:
         """
@@ -298,97 +301,10 @@ class ReadConfigPattern:
             return path
         else:
             logging.error(
-                "The PointFinder script is incorrectly specified in the config file, exiting..."
+                "The PointFinder script is incorrectly specified or "
+                "missing in the config file, exiting..."
             )
             raise PointFinderScriptError(path)
-
-    def get_snp_list(self) -> list[dict[str, str | int]]:
-        """
-        Function that returns the SNP list from the pattern
-        after it is retrieved from the pattern and validated.
-        When retrieving the SNP list, the pattern also contains
-        gene information, which is not needed and is removed from
-        the list.
-        ----------
-        Output:
-            - list[dict[str, str | int]]: List of SNPs like:
-            [
-                {
-                    "SNP": "gyrA",
-                    "ref": "ATG",
-                    "alt": "L",
-                    "pos": 1
-                },
-                {
-                    "SNP": "gyrA",
-                    "ref": "CCC",
-                    "alt": "F",
-                    "pos": 2
-                },
-        ]
-        Raises:
-            - IncorrectSNPConfiguration: If the SNP list is not valid
-        ----------
-        """
-        SNP_list: list[dict[str, str | int]] = self.pattern["pattern"]
-        # Remove dictionaries from the list that are having 'gene' as first key
-        SNP_list = [
-            entry
-            for entry in SNP_list
-            if not next(iter(entry)).startswith("gene")
-        ]
-        if self.validate_SNP_list(SNP_list):
-            return SNP_list
-        else:
-            logging.error(
-                "SNP list is not valid in configuration file %s",
-                self.config_file,
-            )
-            raise IncorrectSNPConfiguration(self.config_file)
-
-    def _validate_snp_entry(
-        self, index: int, entry: dict[str, str | int]
-    ) -> None:
-        """
-        Function that validates a single SNP entry of the SNP list.
-        The entry should be a dictionary with the following keys:
-            - SNP: str
-            - ref: str
-            - alt: str
-            - pos: int
-        The values should be of the correct type and not empty.
-        This pattern is used to create the reference database
-        and to run the query.
-        ----------
-        Input:
-            - index: The index of the entry in the SNP list
-            - entry: The entry to be validated
-        Raises:
-            - IncorrectSNPConfiguration: If the entry is not valid
-        ----------
-        """
-        snp, ref, alt, pos = (
-            entry["SNP"],
-            entry["ref"],
-            entry["alt"],
-            entry["pos"],
-        )
-        if not (
-            isinstance(snp, str)
-            and snp
-            and isinstance(ref, str)
-            and ref
-            and isinstance(alt, str)
-            and alt
-            and isinstance(pos, int)
-            and pos >= 1
-        ):
-            logging.error(
-                "SNP entry %d is not valid in configuration file %s",
-                index,
-                self.config_file,
-            )
-            raise IncorrectSNPConfiguration(self.config_file)
 
     def validate_SNP_list(self, snp_list: list[dict[str, str | int]]) -> bool:
         """
@@ -440,3 +356,144 @@ class ReadConfigPattern:
                 raise IncorrectSNPConfiguration(self.config_file)
             self._validate_snp_entry(index, entry)
         return True
+
+    def _validate_snp_entry(
+        self, index: int, entry: dict[str, str | int]
+    ) -> None:
+        """
+        Function that validates a single SNP entry of the SNP list.
+        The entry should be a dictionary with the following keys:
+            - SNP: str
+            - ref: str
+            - alt: str
+            - pos: int
+        The values should be of the correct type and not empty.
+        This pattern is used to create the reference database
+        and to run the query.
+        ----------
+        Input:
+            - index: The index of the entry in the SNP list
+            - entry: The entry to be validated
+        Raises:
+            - IncorrectSNPConfiguration: If the entry is not valid
+        ----------
+        """
+        snp, ref, alt, pos = (
+            entry["SNP"],
+            entry["ref"],
+            entry["alt"],
+            entry["pos"],
+        )
+        if not (
+            isinstance(snp, str)
+            and snp
+            and isinstance(ref, str)
+            and ref
+            and isinstance(alt, str)
+            and alt
+            and isinstance(pos, int)
+            and pos >= 1
+        ):
+            logging.error(
+                "SNP entry %d is not valid in configuration file %s",
+                index,
+                self.config_file,
+            )
+            raise IncorrectSNPConfiguration(self.config_file)
+
+    def get_snp_list(self) -> list[dict[str, str | int]]:
+        """
+        Function that returns the SNP list from the pattern
+        after it is retrieved from the pattern and validated.
+        When retrieving the SNP list, the pattern also contains
+        gene information, which is not needed and is removed from
+        the list.
+
+        *Please note the pattern existence itself has already been
+        checked in the validate_pattern_keys function.
+        ----------
+        Output:
+            - list[dict[str, str | int]]: List of SNPs like:
+            [
+                {
+                    "SNP": "gyrA",
+                    "ref": "ATG",
+                    "alt": "L",
+                    "pos": 1
+                },
+                {
+                    "SNP": "gyrA",
+                    "ref": "CCC",
+                    "alt": "F",
+                    "pos": 2
+                },
+        ]
+        Raises:
+            - IncorrectSNPConfiguration: If the SNP list is not valid
+        ----------
+        """
+        SNP_list: list[dict[str, str | int]] = self.pattern["pattern"]
+        # Remove dictionaries from the list that are having 'gene' as first key
+        SNP_list = [
+            entry
+            for entry in SNP_list
+            if not next(iter(entry)).startswith("gene")
+        ]
+        if self.validate_SNP_list(SNP_list):
+            return SNP_list
+        else:
+            logging.error(
+                "SNP list is not valid in configuration file %s",
+                self.config_file,
+            )
+            raise IncorrectSNPConfiguration(self.config_file)
+
+    def validate_pointfinder_genes_file(
+        self, pointfinder_genes_file: str
+    ) -> str:
+        """
+        Little helper function that checks if the PointFinder genes file
+        exists. If it does, it returns the path to the file.
+        If it does not, it raises an error.
+        ----------
+        Input:
+            - pointfinder_genes_file: str
+                Path to the PointFinder genes file
+        Output:
+            - str: Path to the PointFinder genes file
+        Raises:
+            - IncorrectSNPConfiguration: If the PointFinder genes file
+                is not found
+        ----------
+        """
+        if os.path.exists(pointfinder_genes_file):
+            return pointfinder_genes_file
+        else:
+            logging.error(
+                "PointFinder genes file %s not found, exiting...",
+                pointfinder_genes_file,
+            )
+            raise IncorrectSNPConfiguration(self.config_file)
+
+    def get_pointfinder_genes_file(self) -> str:
+        """
+        Function that returns the path to the PointFinder genes file
+        from the pattern. The path is not checked for correctness,
+        but only for existence.
+        The path is required for the database creation.
+        ----------
+        Output:
+            - str: Path to the PointFinder genes file
+        ----------
+        """
+        try:
+            pointfinder_genes_file: str = self.pattern["database"][
+                "pointfinder_genes_file"
+            ]
+        except KeyError as e:
+            logging.error(
+                "PointFinder genes file not found in configuration file %s",
+                self.config_file,
+            )
+            raise IncorrectSNPConfiguration(self.config_file) from e
+        return self.validate_pointfinder_genes_file(pointfinder_genes_file)
