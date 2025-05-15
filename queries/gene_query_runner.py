@@ -8,16 +8,15 @@
     https://github.com/features/copilot
 
 This module is responsible for running the
-right query against the reference database.
+right BLAST or KMA query against the reference database.
+So this module is actually searching for the genes.
 
 The query is prepared by the respective runner
-(BLASTn or KMA) and is then run by the QueryRunner
+(BLASTn or KMA) and is then run by the GeneQueryRunner
 class.
 The actual shell code will be executed by the
 execute function of the command_utils.py module.
 """
-
-from __future__ import annotations
 
 __author__ = "Mark van de Streek"
 __date__ = "2024-10-02"

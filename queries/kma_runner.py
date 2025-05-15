@@ -11,7 +11,7 @@ Enum class to store all KMA-related options and flags.
 This class is used to create the right query for the KMA run.
 
 The get_query() method prepares the query for the KMA run
-and returns it to the (main) QueryRunner class.
+and returns it to the (main) GeneQueryRunner class.
 """
 
 __author__ = "Mark van de Streek"

@@ -7,7 +7,12 @@
     “GitHub Copilot: Your AI pair programmer” (GPT-3). GitHub, Inc.
     https://github.com/features/copilot
 
-TODO: Add exact description of the PointFinder class
+Enum class to store all PointFinder-related options and flags.
+This class is used to create the right query for the PointFinder and
+return the command to retrieve the version number.
+
+The get_query() method prepares the query for the PointFinder run
+and returns it to the (main) SNPQueryRunner class.
 """
 
 __author__ = "Mark van de Streek"
@@ -42,8 +47,9 @@ class PointFinder(Enum):
     def get_query(option: dict[str, str]) -> list[str]:
         """
         Getter method that combines the options and input
-        variables of the user in a list to be
-        called in the other modules.
+        variables of the user into a query that could be
+        executed in PointFinder. The query is executed
+        using the custom command invoker.
         ----------
         Input:
             - dictionary with the input files,
@@ -76,7 +82,12 @@ class PointFinder(Enum):
     @staticmethod
     def get_version_command() -> list[str]:
         """
-        Method that returns the version command for KMA
+        Method that returns the version command for KMA.
+        The PointFinder script doesn't have a version command,
+        so the version number is extracted from a request.
+
+        *The logging of the version number is a wish of the RIVM
+        team, but is not a big requirement for Pacini-typing.
         ----------
         Output:
             - list with the version command
@@ -85,5 +96,6 @@ class PointFinder(Enum):
         return [
             "curl",
             "-s",
+            # Request to the PointFinder API and retrieve the commit dates
             "https://api.bitbucket.org/2.0/repositories/genomicepidemiology/pointfinder/filehistory/master/PointFinder.py?fields=values.commit.date",
         ]

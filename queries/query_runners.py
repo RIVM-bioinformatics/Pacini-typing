@@ -10,6 +10,11 @@
 Simple module that holds the running methods for the gene and SNP queries.
 The functions of this module are reused in multiple modules, including tests.
 
+The run_gene_query and run_snp_query functions are both calling the
+run_query function, only with a different class. The run_query function
+then initializes the class and executes the run method. Finally, the
+runtime is logged.
+
 *Main reason for placing them separate was the circular import issue if placing
 them in main PaciniTyping class.
 """
@@ -33,7 +38,7 @@ def run_query(
     The incoming class could either be the GeneQueryRunner or SNPQueryRunner.
     Both classes are following the same interface, so they could be combined
     in this function.
-    The incoming class is instantiated and the run method is called.
+    The incoming class is initialized and the run method is called.
     After the run method is called, the runtime is logged.
     ----------
     Input:

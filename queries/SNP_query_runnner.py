@@ -76,7 +76,7 @@ class SNPQueryRunner(BaseQueryRunner):
         to the version history of the PointFinder API.
         ----------
         Input:
-            - stdout: the output of the version command
+            - stdout: the output of the version command (json structure)
         Output:
             - str: the version number of the tool or
                 Not available if the version number couldn't be extracted
@@ -86,7 +86,10 @@ class SNPQueryRunner(BaseQueryRunner):
             data = json.loads(stdout)
             return data["values"][0]["commit"]["date"]
         except Exception:
-            logging.error("Error extracting version number from PointFinder")
+            logging.error(
+                "Error extracting version number from PointFinder,"
+                " returning 'Not available'..."
+            )
             # The program should not crash if a version number could not
             # be extracted, but the error should be logged.
             return "Not available"

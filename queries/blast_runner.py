@@ -11,7 +11,7 @@ Enum class to store all BLAST-related options and flags.
 This class is used to create the right query for the BLAST run.
 
 The get_query() method prepares the query for the BLAST run
-and returns it to the (main) QueryRunner class.
+and returns it to the (main) GeneQueryRunner class.
 """
 
 __author__ = "Mark van de Streek"
