@@ -222,7 +222,11 @@ class ParsingManager:
             logging.info(
                 "Found both gene and SNP reports, concatenating and writing..."
             )
-            final_report = pd.concat([gene_report, snp_report])
+            final_report = pd.concat(
+                [gene_report, snp_report], ignore_index=True
+            )
+            if "ID" in final_report.columns:
+                final_report["ID"] = range(1, len(final_report) + 1)
 
         ParsingManager.write_report(final_report, "report", self.sample_name)
 
