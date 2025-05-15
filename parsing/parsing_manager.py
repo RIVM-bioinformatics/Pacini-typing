@@ -285,7 +285,7 @@ class ParsingManager:
         """
         return [
             item["gene_name"]
-            for item in self.pattern.pattern["pattern"]["genes"]
+            for item in self.pattern.pattern["pattern"]["gene"]
         ]
 
     def get_config_identity(self) -> float:
@@ -297,7 +297,7 @@ class ParsingManager:
             - percentage identity
         ----------
         """
-        return float(self.pattern.pattern["pattern"]["perc_ident"])
+        return float(self.pattern.pattern["global_settings"]["perc_ident"])
 
     def get_config_coverage(self) -> float:
         """
@@ -308,7 +308,7 @@ class ParsingManager:
             - percentage coverage
         ----------
         """
-        return float(self.pattern.pattern["pattern"]["perc_cov"])
+        return float(self.pattern.pattern["global_settings"]["perc_cov"])
 
     def add_filters_to_parser(self) -> None:
         """

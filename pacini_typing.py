@@ -453,7 +453,7 @@ class PaciniTyping:
         ]
         pattern.creation_dict["file_type"] = self.file_type
         pattern.creation_dict["output"] = (
-            pattern.pattern["database"]["run_output"] + self.sample_name
+            pattern.pattern["global_settings"]["run_output"] + self.sample_name
         )
 
         pattern.creation_dict["input_fasta_file"] = os.path.join(
@@ -548,8 +548,11 @@ class PaciniTyping:
             - pattern: The configuration file options
         ----------
         """
-        gene_output_dir: str = pattern.pattern["database"]["run_output"]
-        snp_output_dir: str = pattern.pattern["database"]["SNP_output_dir"]
+        gene_output_dir: str = pattern.pattern["global_settings"]["run_output"]
+        snp_output_dir: str = pattern.pattern["global_settings"][
+            "SNP_output_dir"
+        ]
+        # TODO: fix search modes differences
 
         if self.input_args.save_intermediates:
             self.handle_intermediate_saving(gene_output_dir, snp_output_dir)
