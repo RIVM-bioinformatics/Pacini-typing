@@ -21,12 +21,6 @@ import os
 
 import pandas as pd
 
-from preprocessing.exceptions.snp_detection_exceptions import (
-    FileContentError,
-    IncorrectStructureError,
-    MissingGenesError,
-)
-
 
 class PointFinderReferenceChecker:
     """
@@ -84,6 +78,7 @@ class PointFinderReferenceChecker:
             - genes.fasta
             - genes.txt
             - resistens-overview.txt
+            - RNA_genes.txt
         ----------
         Output:
             - True if all files are present
@@ -94,6 +89,7 @@ class PointFinderReferenceChecker:
             "genes.fasta",
             "genes.txt",
             "resistens-overview.txt",
+            "RNA_genes.txt",
         ]
         for file in required_files:
             if not os.path.isfile(os.path.join(self.path, file)):
@@ -286,28 +282,31 @@ class PointFinderReferenceChecker:
 
     def validate(self) -> bool:
         """
-        Main function to run the checks.
-        This function is not meant to be run directly.
-        It is intended to be imported as a module.
+        Main function to run the validation of PointFinder's
+        reference database. The function delegates the checks to
+        other functions of this class. Finally, the function returns
+        True if all checks passed and False if any check failed.
+        ----------
+        Output:
+            - True if all checks passed
+            - False if any check failed
+        ----------
         """
         if (
             not self.check_path_directory()
             and not self.check_folder_structure()
         ):
-            logging.error(
+            logging.warning(
                 "Path to the reference database does not exists or"
-                "does not have the correct structure, exiting..."
+                "does not have the correct structure"
             )
-            raise IncorrectStructureError(self.path)
+            return False
         if not self.check_resistens_overview_file():
-            logging.error(
-                "resistens-overview.txt file is not correct, exiting..."
-            )
-            raise FileContentError(self.resistance_overview)
+            logging.warning("resistens-overview.txt file is not correct")
+            return False
         if not self.check_matching_genes_file():
-            logging.error("Error in the matching genes file, exiting...")
-            raise MissingGenesError(f"{self.path}/genes.fasta")
-
+            logging.error("Error in the matching genes file")
+            return False
         return True
 
 
