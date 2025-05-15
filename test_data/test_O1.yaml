@@ -12,14 +12,19 @@ database:
   path: "databases/VIB-O1"
   target_genes_file: "/Users/mvandestreek/Developer/pacini_typing/test_data/vibrio_genes.fasta"
   run_output: "myoutput/"
+  SNP_database_path: "/Users/mvandestreek/Desktop/salm-simulation/example_db"
+  species: "Yersinia"
 
-
-pattern:
+global_settings:
+  run_output: "myoutput/"
+  # SNP output only required if search mode is SNPs or both
+  SNP_output_dir: "output/snp/"
   perc_ident: 99
   perc_cov: 80
-  genes:
-    - gene_name: "rfbV_O1"
-    - gene_name: "wbfZ_O139"
-    - gene_name: "ctxA"
-    - gene_name: "ctxB"
+
+pattern:
+  - gene: "rfbV_O1"
+  - gene: "wbfZ_O139"
+  - gene: "ctxA"
+  - gene: "ctxB"
 

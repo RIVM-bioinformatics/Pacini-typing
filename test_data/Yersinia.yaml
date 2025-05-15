@@ -6,20 +6,28 @@ metadata:
   type: "Y. pestis related variants"
   description: "Genetic pattern run config file for Yersinia pestis related variants"
   date_created: "2025-05-07"
+  PointFinder_script_path: "/Users/mvandestreek/Developer/pacini_typing/PointFinder.py"
 
 database:
   name: "VIB-O1"
   path: "databases/VIB-O1"
   target_genes_file: "config/VIB-O1.fasta"
-  run_output: "output/"
   SNP_database_path: "/Users/mvandestreek/Desktop/salm-simulation/example_db"
   species: "Yersinia"
-  SNP_output_dir: "output/snp/"
+  
 
-pattern:
+global_settings:
+  run_output: "output/"
+  # SNP output only required if search mode is SNPs or both
+  SNP_output_dir: "output/snp/"
   perc_ident: 99.8
   perc_cov: 100.0
-  genes:
-    - gene_name: "rfbV"
-    - gene_name: "ctxA"
-    - gene_name: "ctxB"
+
+pattern:
+  - gene: "rfbV"
+  - gene: "ctxA"
+  - gene: "ctxB"
+  - SNP: "salmonella_gene"
+    ref: "ATG"
+    alt: "L"
+    pos: 1
