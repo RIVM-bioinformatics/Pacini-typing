@@ -175,28 +175,6 @@ class PointFinderReferenceChecker:
         ) as genes_txt_file:
             return [line.strip() for line in genes_txt_file if line.strip()]
 
-    def get_fasta_headers(self, filename: str) -> list[str]:
-        """
-        Helper function to extract headers from a fasta file.
-        The function is general, so could be used for other
-        fasta files as well.
-        ----------
-        Input:
-            - filename: Path to the fasta file
-                (i.e., home/secret_folder/genes.fasta)
-        Output:
-            - fasta_headers: list of fasta headers excluding the '>'
-        ----------
-        """
-        with open(
-            os.path.join(filename), "r", encoding="utf-8"
-        ) as genes_fasta_file:
-            return [
-                line[1:].strip()
-                for line in genes_fasta_file
-                if line.startswith(">")
-            ]
-
     def create_missing_genes_list(
         self, target_genes: list[str], available_genes: list[str]
     ) -> list[str] | None:
@@ -247,10 +225,10 @@ class PointFinderReferenceChecker:
     def check_matching_genes_file(self) -> bool:
         """
         Function that checks if the genes listed in
-        `genes.txt` are present in the `genes.fasta` file,
-        if the headers are correct (starting with >) and
-        if the genes present in the `resistens-overview.txt` file
-        are also present in the `genes.fasta` file.
+        `genes.txt` are present as individual .fsa files
+        in the database directory. Also checks if the
+        genes present in the `resistens-overview.txt` file
+        are also present in the `genes.txt` file.
         ----------
         Output:
             - True if all genes are present
@@ -258,20 +236,19 @@ class PointFinderReferenceChecker:
         ----------
         """
         genes_list: list[str] = self.get_gene_names()
-        fasta_headers = self.get_fasta_headers(self.path + "/genes.fasta")
-        # Perform the checks for missing genes and
-        # assign the result to the dictionary of all checks
+        # retrieve the list of .fsa files in the database directory
+        fsa_files = [
+            f.replace(".fsa", "")
+            for f in os.listdir(self.path)
+            if f.endswith(".fsa")
+        ]
         checks: dict[str, list[str] | None] = {
             "resistens-overview.txt": self.create_missing_genes_list(
                 target_genes=self.unique_genes_resistens_overview,
                 available_genes=genes_list,
             ),
-            "genes.fasta": self.create_missing_genes_list(
-                target_genes=self.unique_genes_resistens_overview,
-                available_genes=fasta_headers,
-            ),
-            "genes.txt": self.create_missing_genes_list(
-                target_genes=genes_list, available_genes=fasta_headers
+            ".fsa files": self.create_missing_genes_list(
+                target_genes=genes_list, available_genes=fsa_files
             ),
         }
         # Check if any of the lists in the dictionary
@@ -308,11 +285,3 @@ class PointFinderReferenceChecker:
             logging.error("Error in the matching genes file")
             return False
         return True
-
-
-if __name__ == "__main__":
-    checker: PointFinderReferenceChecker = PointFinderReferenceChecker(
-        "/Users/mvandestreek/Desktop/salm-simulation/pointfinder_db/Salmonella"
-    )
-    if checker.validate():
-        logging.info("All checks passed. Database is ready to use...")
