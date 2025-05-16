@@ -31,8 +31,6 @@ class PointFinder(Enum):
     ----------
     DATABASE_PATH_OPTION: option for the database path
     DATABASE_SUBDIR_OPTION: option for the database subdirectory
-    UNKNOWN_MUT_OPTION: option for the unknown mutations
-        (outputs the unknown mutations)
     ----------
     """
 
@@ -41,7 +39,6 @@ class PointFinder(Enum):
     # The 'species' is actually the subdirname of the specific
     # database that is used. The could therfore be a bit misleading.
     DATABASE_SUBDIR_OPTION = "--species"
-    UNKNOWN_MUT_OPTION = "--unknown_mut"
 
     @staticmethod
     def get_query(option: dict[str, str]) -> list[str]:
@@ -73,10 +70,6 @@ class PointFinder(Enum):
             option["method"],
             "--method_path",
             option["method_path"],
-            # The unknown muatations flag is required
-            # to be set to True, since we want to also search
-            # for unknown (custom defined) mutations.
-            PointFinder.UNKNOWN_MUT_OPTION.value,
         ]
 
     @staticmethod
