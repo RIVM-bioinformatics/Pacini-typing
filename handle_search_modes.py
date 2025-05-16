@@ -33,6 +33,7 @@ from queries.query_runners import run_gene_query, run_snp_query
 from preprocessing.validation.validate_pointfinder_database import (
     PointFinderReferenceChecker,
 )
+from make_snp_database import SNPDatabaseBuilder
 
 
 class HandleSearchModes:
@@ -140,11 +141,14 @@ class HandleSearchModes:
         ----------
         """
         if not self.check_valid_SNP_database(self.pattern.creation_dict):
-            # TODO: CREATE THE SNP DATABASE Here...
-            pass
+            SNPDatabaseBuilder(self.pattern.creation_dict)
         if not self.check_valid_SNP_database(self.pattern.creation_dict):
             # Check again if the SNP database was created, and raise an
             # error if it was not created successfully.
+            logging.error(
+                "SNP database not valid, "
+                "already tried to create it, exiting..."
+            )
             raise InvalidSNPDatabaseError(
                 self.pattern.creation_dict["SNP_database_path"]
                 + "/"

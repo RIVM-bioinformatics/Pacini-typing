@@ -51,9 +51,11 @@ setup(
     include_package_data=True,
     py_modules=[
         "pacini_typing",
-        "makedatabase",
+        "make_gene_database",
         "command_utils",
         "handle_search_modes",
+        "make_snp_database",
+        "codon_table_enum",
     ],
     entry_points={
         "console_scripts": [
