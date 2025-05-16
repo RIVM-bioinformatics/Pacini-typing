@@ -99,3 +99,39 @@ class IncorrectSNPConfiguration(Exception):
             - Check the "pattern" field in the config file
         ----------------------------------------------------
                 """
+
+
+class PointFinderReportError(Exception):
+    """
+    Raised when the PointFinder report is not found or
+    is wrong formatted.
+    """
+
+    def __init__(self, report_path: str) -> None:
+        """
+        Initialize the exception with the report path.
+        ----------
+        Input:
+            - report_path: path to the PointFinder report
+        ----------
+        """
+        self.report_path = report_path
+
+    def __str__(self) -> str:
+        return f"""
+        ---------------------------------------------------
+        ERROR: PointFinder's report not found
+        ---------------------------------------------------
+        The following PointFinder report could not be found:
+            - Path: {self.report_path}
+        ---------------------------------------------------
+        SUGGESTION:
+            - Read the above log message for the exact
+                file name and see if the file exists
+            - Most likely the PointFinder's script named
+                the report file incosistently
+            - Change input file name of the FASTA or FASTQ,
+                without the use of any special characters
+        ----------------------------------------------------
+                """
+    

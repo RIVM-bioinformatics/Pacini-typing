@@ -141,11 +141,38 @@ class ParsingManager:
 
         return self.parser
 
+    def _get_correct_method_name(self) -> str:
+        """
+        Basic helper function that formats the correct
+        method name according to the file type.
+        This name is used to determine the ouput file
+        of the PointFinder run.
+        ----------
+        Output:
+            - str: the correct method name
+        ----------
+        """
+        if self.file_type == "FASTQ":
+            return "kma"
+        else:
+            return "blastn"
+
     def get_path_to_pointfinder_file(self) -> str:
         """
         Little helper function that combines the path to the
         PointFinder file with the hits information.
         The file name is based on the sample name and method used.
+        PointFinder has a odd way of naming the output files,
+        and therefore this function is used to create the correct name.
+        *Code out of PointFinder's main script:
+        file_fullpath =
+            out_path
+            + "/"
+            + sample_name
+            + "_" + method
+            + "_"
+            + output_files[i]
+        The above code is sort of reproduced in this function.
         ----------
         Output:
             - str: path to the PointFinder file
@@ -155,9 +182,8 @@ class ParsingManager:
             self.pattern.creation_dict["SNP_output_dir"]
             + self.sample_name.split(".")[0].split("_")[0]
             + "_"
-            + "kma"
-            if self.file_type == "FASTQ"
-            else "blastn" + "_results.tsv"
+            + self._get_correct_method_name()
+            + "_results.tsv"
         )
 
     def _create_snp_parser(self):
@@ -171,16 +197,13 @@ class ParsingManager:
             - SNPParser: SNP parser object
         ----------
         """
-        # TODO: fix the right output file name passing
-        # file_fullpath = out_path + "/" + sample_name + "_" + method + "_" + output_files[i]
-        # out_path: output path (/ ?)
-        # method: 'kma' OR 'blastn'
-        # output_files: 'results.tsv'
-
-        # path_to_snp_file: str = self.get_path_to_pointfinder_file()
+        logging.info(self.get_path_to_pointfinder_file())
         logging.debug("Setting up the SNP parser object...")
         return SNPParser(
-            self.pattern.pattern, self.sample_name, self.file_type
+            self.pattern.pattern,
+            self.sample_name,
+            self.file_type,
+            self.get_path_to_pointfinder_file(),
         )
 
     def _run_genes(self) -> None:

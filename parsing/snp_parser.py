@@ -24,6 +24,9 @@ from typing import Any
 
 import pandas as pd
 from pandas.core.api import DataFrame as DataFrame
+from preprocessing.exceptions.snp_detection_exceptions import (
+    PointFinderScriptError,
+)
 
 
 class SNPParser:
@@ -47,6 +50,7 @@ class SNPParser:
         config_options: dict[str, Any],
         input_sequence_sample: str,
         file_type: str,
+        pointfinder_output_filename: str,
     ) -> None:
         """
         Constructor for the SNPParser class.
@@ -62,6 +66,7 @@ class SNPParser:
         self.config_options: dict[str, Any] = config_options
         self.input_sequence_sample: str = input_sequence_sample
         self.file_type: str = file_type
+        self.pointfinder_output_filename: str = pointfinder_output_filename
         self.data_frame: DataFrame = pd.DataFrame()
 
     def read_run_output(self, filename: str) -> None:
@@ -203,14 +208,18 @@ class SNPParser:
         """
         logging.info("Parsing the SNP results...")
         try:
-            # TODO: use right file name
             self.read_run_output(
-                "/Users/mvandestreek/Desktop/salm-simulation/pointfinder/output-dir/test_blastn_results.tsv"
+                self.pointfinder_output_filename
+                # "/Users/mvandestreek/Desktop/salm-simulation/pointfinder/output-dir/test_blastn_results.tsv"
             )
-        except FileNotFoundError:
+        except FileNotFoundError as e:
             logging.error(
-                "File containing query results not found, exiting..."
+                "PointFinder's report not found: %s",
+                self.pointfinder_output_filename,
             )
+            raise PointFinderScriptError(
+                self.pointfinder_output_filename
+            ) from e
         except pd.errors.EmptyDataError:
             logging.warning(
                 "No content in the query file, found no hits "
