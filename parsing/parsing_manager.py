@@ -216,6 +216,9 @@ class ParsingManager:
         logging.debug("Running the gene parser...")
         parser = self._prepare_gene_parser()
         parser.parse()
+        if parser.data_frame.empty:
+            logging.warning("Gene report is empty, skipping...")
+            return
         self.write_report(parser.output_report, "report", self.sample_name)
 
     def process_reports(
@@ -262,6 +265,9 @@ class ParsingManager:
         """
         parser = self._create_snp_parser()
         parser.parse()
+        if parser.data_frame.empty:
+            logging.warning("SNP report is empty, skipping...")
+            return
         self.write_report(parser.output_report, "report", self.sample_name)
 
     def _run_both(self) -> None:
@@ -278,8 +284,20 @@ class ParsingManager:
         snp_parser = self._create_snp_parser()
         snp_parser.parse()
         # Define the reports and check their content
-        gene_report = gene_parser.output_report
-        snp_report = snp_parser.output_report
+        # Check if parsers generated any data
+        gene_report = (
+            gene_parser.output_report
+            if not gene_parser.data_frame.empty
+            else pd.DataFrame()
+        )
+        snp_report = (
+            snp_parser.output_report
+            if not snp_parser.data_frame.empty
+            else pd.DataFrame()
+        )
+
+        logging.debug("Gene report has %d entries", len(gene_report))
+        logging.debug("SNP report has %d entries", len(snp_report))
         # Process the reports
         logging.info("Parsing process finished, processing reports...")
         return self.process_reports(gene_report, snp_report)
@@ -368,9 +386,18 @@ class ParsingManager:
         """
         logging.debug("Writing the %s...", suffix)
         file_name = f"{input_sequence_sample}_{suffix}.csv"
-        report.to_csv(
-            file_name,
-            sep=",",
-            index=False,
-        )
-        logging.info("Successfully wrote %s...", file_name)
+        if report.empty:
+            logging.info("Skipping writing %s as report is empty", file_name)
+            return
+        elif len(report) <= 1:
+            logging.warning(
+                "Report %s contains only %d row(s)", file_name, len(report)
+            )
+            return
+        else:
+            report.to_csv(
+                file_name,
+                sep=",",
+                index=False,
+            )
+            logging.info("Successfully wrote %s...", file_name)
