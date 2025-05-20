@@ -389,15 +389,10 @@ class ParsingManager:
         if report.empty:
             logging.info("Skipping writing %s as report is empty", file_name)
             return
-        elif len(report) <= 1:
-            logging.warning(
-                "Report %s contains only %d row(s)", file_name, len(report)
-            )
-            return
-        else:
-            report.to_csv(
-                file_name,
-                sep=",",
-                index=False,
-            )
-            logging.info("Successfully wrote %s...", file_name)
+
+        report.to_csv(
+            file_name,
+            sep=",",
+            index=False,
+        )
+        logging.info("Successfully wrote %s...", file_name)
