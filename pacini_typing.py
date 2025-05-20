@@ -549,21 +549,11 @@ class PaciniTyping:
         ----------
         """
         search_mode: str = self.option["config"]["search_mode"]
-        if search_mode == "both":
-            gene_output_dir: str = pattern.pattern["global_settings"][
-                "run_output"
-            ]
-            snp_output_dir: str = pattern.pattern["global_settings"][
+        if search_mode in ["both", "SNPs"]:
+            snp_output_dir = pattern.pattern["global_settings"][
                 "SNP_output_dir"
             ]
-        elif search_mode == "SNPs":
-            snp_output_dir: str = pattern.pattern["global_settings"][
-                "SNP_output_dir"
-            ]
-        elif search_mode == "genes":
-            gene_output_dir: str = pattern.pattern["global_settings"][
-                "run_output"
-            ]
+        gene_output_dir: str = pattern.pattern["global_settings"]["run_output"]
 
         if self.input_args.save_intermediates:
             if search_mode == "both":
@@ -575,6 +565,7 @@ class PaciniTyping:
                     snp_output_dir,
                     f"{self.sample_name}_intermediates_SNP.tar.gz",
                 )
+                self.delete_intermediates(gene_output_dir)
             elif search_mode == "genes":
                 self.save_intermediates(
                     gene_output_dir,
