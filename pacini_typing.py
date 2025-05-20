@@ -548,17 +548,46 @@ class PaciniTyping:
             - pattern: The configuration file options
         ----------
         """
-        gene_output_dir: str = pattern.pattern["global_settings"]["run_output"]
-        snp_output_dir: str = pattern.pattern["global_settings"][
-            "SNP_output_dir"
-        ]
-        # TODO: fix search modes differences
+        search_mode: str = self.option["config"]["search_mode"]
+        if search_mode == "both":
+            gene_output_dir: str = pattern.pattern["global_settings"][
+                "run_output"
+            ]
+            snp_output_dir: str = pattern.pattern["global_settings"][
+                "SNP_output_dir"
+            ]
+        elif search_mode == "SNPs":
+            snp_output_dir: str = pattern.pattern["global_settings"][
+                "SNP_output_dir"
+            ]
+        elif search_mode == "genes":
+            gene_output_dir: str = pattern.pattern["global_settings"][
+                "run_output"
+            ]
 
         if self.input_args.save_intermediates:
-            self.handle_intermediate_saving(gene_output_dir, snp_output_dir)
+            if search_mode == "both":
+                self.handle_intermediate_saving(
+                    gene_output_dir, snp_output_dir
+                )
+            elif search_mode == "SNPs":
+                self.save_intermediates(
+                    snp_output_dir,
+                    f"{self.sample_name}_intermediates_SNP.tar.gz",
+                )
+            elif search_mode == "genes":
+                self.save_intermediates(
+                    gene_output_dir,
+                    f"{self.sample_name}_intermediates_gene.tar.gz",
+                )
         else:
-            self.delete_intermediates(gene_output_dir)
-            self.delete_intermediates(snp_output_dir)
+            if search_mode == "both":
+                self.delete_intermediates(gene_output_dir)
+                self.delete_intermediates(snp_output_dir)
+            elif search_mode == "SNPs":
+                self.delete_intermediates(snp_output_dir)
+            elif search_mode == "genes":
+                self.delete_intermediates(gene_output_dir)
 
     def handle_makedatabase_option(self) -> None:
         """
