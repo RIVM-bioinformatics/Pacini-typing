@@ -14,3 +14,4 @@ accepted_input_extensions:
   - .fasta.gz
   - .scaffold.fasta
   - .result.fasta
+  - .fa
