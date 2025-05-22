@@ -39,6 +39,8 @@ BLAST_COLUMNS = {
     "bitscore": "bit score",
     "qcovs": "percentage coverage",
     "qseq": "alignment sequence in query",
+    "slen": "subject length",
+    "gaps": "number of gaps",
 }
 
 
@@ -74,7 +76,11 @@ class FASTAParser(ParserStrategy):
         data_frame = pd.read_csv(filename + ".tsv", sep="\t", header=None)
         data_frame.columns = list(BLAST_COLUMNS.keys())
         data_frame["pident"] = data_frame["pident"].astype(float)
-        data_frame["qcovs"] = data_frame["qcovs"].astype(float)
+        data_frame["coverage_pct"] = (
+            100
+            * (data_frame["length"] - data_frame["gaps"])
+            / data_frame["slen"]
+        )
 
         return data_frame
 

@@ -62,6 +62,8 @@ class BLASTn(Enum):
         "bitscore",  # bit score
         "qcovhsp",  # query coverage per HSP
         "qseq",  # aligned part of query sequence
+        "slen",  # length of the subject sequence
+        "gaps",  # number of gaps
     ]
 
     @staticmethod

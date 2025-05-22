@@ -136,6 +136,7 @@ class ParsingManager:
             FASTAParser() if self.file_type == "FASTA" else FASTQParser(),
             self.pattern.creation_dict["output"],
             self.sample_name,
+            self.file_type,
         )
         self.add_filters_to_parser()
 

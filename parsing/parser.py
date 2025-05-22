@@ -52,6 +52,7 @@ class Parser:
         strategy: ParserStrategy,
         query_run_filename: str,
         input_sequence_sample: str = "",
+        file_type: str = "",
     ):
         """
         Constructor for the Parser class
@@ -69,6 +70,7 @@ class Parser:
         self.strategy = strategy
         self.query_run_filename = query_run_filename
         self.input_sequence_sample = input_sequence_sample
+        self.file_type = file_type
         self.data_frame = pd.DataFrame()
         self.filters: list[Filter] = []
         self.output_report: pd.DataFrame = pd.DataFrame()
@@ -136,12 +138,14 @@ class Parser:
             "Type/Genes": self.config_options["metadata"]["type"],
             "Mode": "Gene",
             "Hits": item.iloc[columns.index("hit")].split(":")[0],
-            "Percentage Identity": item.iloc[
-                columns.index("percentage identity")
-            ],
-            "Percentage Coverage": item.iloc[
-                columns.index("percentage coverage")
-            ],
+            "Percentage Identity": round(
+                item.iloc[columns.index("percentage identity")], 3
+            ),
+            "Percentage Coverage": (
+                round(item["coverage_pct"], 3)
+                if self.file_type == "FASTA"
+                else item.iloc[columns.index("percentage coverage")]
+            ),
             significance_type: item.iloc[value_column],
         }
 
