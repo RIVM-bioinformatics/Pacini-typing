@@ -27,7 +27,7 @@ import logging
 from typing import Any, Type
 
 from queries.gene_query_runner import GeneQueryRunner
-from queries.SNP_query_runnner import SNPQueryRunner
+from queries.snp_query_runnner import SNPQueryRunner
 
 
 def run_query(
