@@ -9,4 +9,4 @@ iniconfig~=2.0.0
 packaging~=24.1
 future~=0.18.2
 pandas~=2.2.3
-.
+cgecore~=2.0.1
