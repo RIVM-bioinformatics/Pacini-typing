@@ -122,9 +122,7 @@ class HandleSearchModes:
         ----------
         """
         checker: PointFinderReferenceChecker = PointFinderReferenceChecker(
-            database_builder["SNP_database_path"]
-            + "/"
-            + database_builder["species"]
+            database_builder["path_snps"] + "/" + database_builder["species"]
         )
         return checker.validate()
 
@@ -150,7 +148,7 @@ class HandleSearchModes:
                 "already tried to create it, exiting..."
             )
             raise InvalidSNPDatabaseError(
-                self.pattern.creation_dict["SNP_database_path"]
+                self.pattern.creation_dict["path_snps"]
                 + "/"
                 + self.pattern.creation_dict["species"]
             )
@@ -163,7 +161,7 @@ class HandleSearchModes:
         from the handle_snp_search_mode.
         """
         custom_database_builder: dict[str, Any] = {
-            "database_path": self.pattern.creation_dict["SNP_database_path"]
+            "database_path": self.pattern.creation_dict["path_snps"]
             + "/"
             + self.pattern.creation_dict["species"],
             "database_name": self.pattern.creation_dict["species"],
@@ -226,7 +224,7 @@ class HandleSearchModes:
         ----------
         """
         custom_database_builder["input_fasta_file"] = (
-            f"{self.pattern.creation_dict['SNP_database_path']}/"
+            f"{self.pattern.creation_dict['path_snps']}/"
             f"{self.pattern.creation_dict['species']}/genes.fasta"
         )
         custom_database_builder["database_type"] = "FASTQ"

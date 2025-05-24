@@ -24,6 +24,7 @@ from typing import Any
 
 import pandas as pd
 from pandas.core.api import DataFrame as DataFrame
+
 from preprocessing.exceptions.snp_detection_exceptions import (
     PointFinderScriptError,
 )

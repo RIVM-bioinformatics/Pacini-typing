@@ -57,13 +57,13 @@ class PointFinder(Enum):
         """
         return [
             "python",
-            option["PointFinder_script_path"],
+            option["pointfinder_script_path"],
             "--inputfiles",
             *option["input_file_list"],
             "--out_path",
-            option["SNP_output_dir"],
+            option["run_output_snps"],
             PointFinder.DATABASE_PATH_OPTION.value,
-            option["SNP_database_path"],
+            option["path_snps"],
             PointFinder.DATABASE_SUBDIR_OPTION.value,
             option["species"],
             "--method",

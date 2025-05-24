@@ -61,7 +61,7 @@ class SNPQueryRunner(BaseQueryRunner):
         """
         super().__init__(run_options)
         self.check_pointfinder_existence(
-            self.run_options["PointFinder_script_path"]
+            self.run_options["pointfinder_script_path"]
         )
         self.query = PointFinder.get_query(option=self.run_options)
         self.version_command = PointFinder.get_version_command()

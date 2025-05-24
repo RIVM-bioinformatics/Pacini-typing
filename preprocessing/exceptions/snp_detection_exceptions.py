@@ -134,4 +134,3 @@ class PointFinderReportError(Exception):
                 without the use of any special characters
         ----------------------------------------------------
                 """
-    

@@ -160,11 +160,11 @@ class ReadConfigPattern:
                     "Missing key %s in global settings, exiting...", key
                 )
                 raise YAMLStructureError(self.config_file)
-            if "SNP_output_dir" not in self.pattern[
+            if "run_output_snps" not in self.pattern[
                 "global_settings"
             ] and self.search_mode in {"SNPs", "both"}:
                 logging.error(
-                    "Missing key SNP_output_dir in global settings, exiting..."
+                    "Missing key run_output_snps in global settings, exiting..."
                 )
                 raise YAMLStructureError(self.config_file)
             if "run_output" not in self.pattern[
@@ -233,22 +233,18 @@ class ReadConfigPattern:
         that will return the required parameters.
         These getter functions also validate the variables.
         """
-        self.creation_dict["SNP_database_path"] = self.pattern["database"][
-            "SNP_database_path"
-        ]
+        self.creation_dict["path_snps"] = self.pattern["database"]["path_snps"]
         self.creation_dict["species"] = self.pattern["database"]["species"]
         self.creation_dict["method"] = (
             "blastn" if self.input_file_type == "FASTA" else "kma"
         )
         self.creation_dict["method_path"] = self.get_method_path()
-        self.creation_dict["SNP_output_dir"] = self.get_output_dir()
-        self.creation_dict["PointFinder_script_path"] = (
+        self.creation_dict["run_output_snps"] = self.get_output_dir()
+        self.creation_dict["pointfinder_script_path"] = (
             self.get_pointfinder_script_path()
         )
         self.creation_dict["SNP_list"] = self.get_snp_list()
-        self.creation_dict["pointfinder_genes_file"] = (
-            self.get_pointfinder_genes_file()
-        )
+        self.creation_dict["target_snps_file"] = self.get_target_snps_file()
 
     def get_method_path(self) -> str:
         """
@@ -277,7 +273,7 @@ class ReadConfigPattern:
             - str: Path to the output directory
         ----------
         """
-        path: str = self.pattern["global_settings"]["SNP_output_dir"]
+        path: str = self.pattern["global_settings"]["run_output_snps"]
         path = path if path.endswith("/") else path + "/"
         if os.path.exists(path) and os.path.isdir(path):
             return path
@@ -296,7 +292,7 @@ class ReadConfigPattern:
             - str: Path to the PointFinder script
         ----------
         """
-        path: str = self.pattern["metadata"]["PointFinder_script_path"]
+        path: str = self.pattern["metadata"]["pointfinder_script_path"]
         if path.endswith("PointFinder.py"):
             return path
         else:
@@ -448,16 +444,14 @@ class ReadConfigPattern:
             )
             raise IncorrectSNPConfiguration(self.config_file)
 
-    def validate_pointfinder_genes_file(
-        self, pointfinder_genes_file: str
-    ) -> str:
+    def validate_target_snps_file(self, target_snps_file: str) -> str:
         """
         Little helper function that checks if the PointFinder genes file
         exists. If it does, it returns the path to the file.
         If it does not, it raises an error.
         ----------
         Input:
-            - pointfinder_genes_file: str
+            - target_snps_file: str
                 Path to the PointFinder genes file
         Output:
             - str: Path to the PointFinder genes file
@@ -466,16 +460,16 @@ class ReadConfigPattern:
                 is not found
         ----------
         """
-        if os.path.exists(pointfinder_genes_file):
-            return pointfinder_genes_file
+        if os.path.exists(target_snps_file):
+            return target_snps_file
         else:
             logging.error(
                 "PointFinder genes file %s not found, exiting...",
-                pointfinder_genes_file,
+                target_snps_file,
             )
             raise IncorrectSNPConfiguration(self.config_file)
 
-    def get_pointfinder_genes_file(self) -> str:
+    def get_target_snps_file(self) -> str:
         """
         Function that returns the path to the PointFinder genes file
         from the pattern. The path is not checked for correctness,
@@ -487,8 +481,8 @@ class ReadConfigPattern:
         ----------
         """
         try:
-            pointfinder_genes_file: str = self.pattern["database"][
-                "pointfinder_genes_file"
+            target_snps_file: str = self.pattern["database"][
+                "target_snps_file"
             ]
         except KeyError as e:
             logging.error(
@@ -496,4 +490,4 @@ class ReadConfigPattern:
                 self.config_file,
             )
             raise IncorrectSNPConfiguration(self.config_file) from e
-        return self.validate_pointfinder_genes_file(pointfinder_genes_file)
+        return self.validate_target_snps_file(target_snps_file)

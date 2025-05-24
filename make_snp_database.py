@@ -56,7 +56,7 @@ class SNPDatabaseBuilder:
         - __init__: Constructor of the class
         - check_and_create_directory: Check if the output directory exists
             and create it if it does not.
-        - _get_snp_database_path: Get the SNP database path
+        - _get_path_snps: Get the SNP database path
         - _write_gene_headers: Write the gene headers to the genes.txt file
         - _create_individual_gene_files: Create the individual gene files
             required for the PointFinder database (*.fsa)
@@ -83,16 +83,14 @@ class SNPDatabaseBuilder:
                 for the database builder.
         ----------
         """
-        self.pointfinder_genes_file: str = arg_options[
-            "pointfinder_genes_file"
-        ]
-        self.SNP_database_path: str = arg_options["SNP_database_path"]
-        self.SNP_database_path = self._get_snp_database_path()
+        self.target_snps_file: str = arg_options["target_snps_file"]
+        self.path_snps: str = arg_options["path_snps"]
+        self.path_snps = self._get_path_snps()
         self.species: str = arg_options["species"]
         self.SNP_list: list[dict[str, str]] = arg_options["SNP_list"]
         # Use the InputFileInspector class to check
-        # the validity of the pointfinder_genes_file
-        InputFileInspector([self.pointfinder_genes_file])
+        # the validity of the target_snps_file
+        InputFileInspector([self.target_snps_file])
         # Start the database creation process
         self.check_and_create_directory()
         self.build_gene_database()
@@ -105,25 +103,23 @@ class SNPDatabaseBuilder:
         for the SNP database if it does not exist.
         otherwise, it will just return.
         """
-        if not os.path.exists(f"{self.SNP_database_path}/{self.species}"):
-            os.makedirs(
-                f"{self.SNP_database_path}/{self.species}", exist_ok=True
-            )
+        if not os.path.exists(f"{self.path_snps}/{self.species}"):
+            os.makedirs(f"{self.path_snps}/{self.species}", exist_ok=True)
 
-    def _get_snp_database_path(self) -> str:
+    def _get_path_snps(self) -> str:
         """
         Function that constructs the right path for the SNP database.
         The path is constructed by removing the trailing
-        slash from the SNP_database_path if it exists.
+        slash from the path_snps if it exists.
         ----------
         Output:
             - str: The SNP database path without the trailing slash
         ----------
         """
-        if self.SNP_database_path.endswith("/"):
-            return self.SNP_database_path[:-1]
+        if self.path_snps.endswith("/"):
+            return self.path_snps[:-1]
         else:
-            return self.SNP_database_path
+            return self.path_snps
 
     def _write_gene_headers(self, headers: list[str]) -> None:
         """
@@ -139,7 +135,7 @@ class SNPDatabaseBuilder:
         ----------
         """
         with open(
-            f"{self.SNP_database_path}/{self.species}/genes.txt",
+            f"{self.path_snps}/{self.species}/genes.txt",
             "w",
             encoding="utf-8",
         ) as txt_file:
@@ -162,7 +158,7 @@ class SNPDatabaseBuilder:
         for header, sequence in gene_info.items():
             gene_id: str = header.lstrip(">")
             with open(
-                f"{self.SNP_database_path}/{self.species}/{gene_id}.fsa",
+                f"{self.path_snps}/{self.species}/{gene_id}.fsa",
                 "w",
                 encoding="utf-8",
             ) as gene_file:
@@ -172,7 +168,7 @@ class SNPDatabaseBuilder:
 
     def build_gene_database(self) -> None:
         """
-        Function that opens the pointfinder_genes_file and performs two
+        Function that opens the target_snps_file and performs two
         operations:
             1. Constructs a dictionary with the gene ID (header) as key and the
                 gene sequence as value.
@@ -182,7 +178,7 @@ class SNPDatabaseBuilder:
         ----------
         """
         gene_info: dict[str, str] = {}
-        with open(self.pointfinder_genes_file, "r", encoding="utf-8") as file:
+        with open(self.target_snps_file, "r", encoding="utf-8") as file:
             for line in file:
                 if line.startswith(">"):
                     header = line.strip()
@@ -260,7 +256,7 @@ class SNPDatabaseBuilder:
         and holds the information for all mutations.
         """
         with open(
-            f"{self.SNP_database_path}/{self.species}/resistens-overview.txt",
+            f"{self.path_snps}/{self.species}/resistens-overview.txt",
             "w",
             encoding="utf-8",
         ) as file:
@@ -275,7 +271,7 @@ class SNPDatabaseBuilder:
         error if it is not present.
         """
         open(
-            f"{self.SNP_database_path}/{self.species}/RNA_genes.txt",
+            f"{self.path_snps}/{self.species}/RNA_genes.txt",
             "w",
             encoding="utf-8",
         ).close()

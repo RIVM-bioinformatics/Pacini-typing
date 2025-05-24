@@ -180,7 +180,7 @@ class ParsingManager:
         ----------
         """
         return (
-            self.pattern.creation_dict["SNP_output_dir"]
+            self.pattern.creation_dict["run_output_snps"]
             + self.sample_name.split(".")[0].split("_")[0]
             + "_"
             + self._get_correct_method_name()

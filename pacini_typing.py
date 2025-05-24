@@ -468,32 +468,32 @@ class PaciniTyping:
         return pattern
 
     def handle_intermediate_saving(
-        self, gene_output_dir: str, snp_output_dir: str
+        self, gene_output_dir: str, run_output_snps: str
     ) -> None:
         """
         Little helper function that contains some logic for saving
         intermediate files. In some sitations, the gene_output_dir
-        or snp_output_dir are the same or subdirectories of each other.
+        or run_output_snps are the same or subdirectories of each other.
         Therefore, this checking is helpful to avoid wrong saving.
         ----------
         Input:
             - gene_output_dir: The output directory of the gene run
-            - snp_output_dir: The output directory of the SNP run
+            - run_output_snps: The output directory of the SNP run
         ----------
         """
-        if gene_output_dir == snp_output_dir:
+        if gene_output_dir == run_output_snps:
             self.save_intermediates(gene_output_dir)
-        elif snp_output_dir.startswith(gene_output_dir):
+        elif run_output_snps.startswith(gene_output_dir):
             self.save_intermediates(gene_output_dir)
-        elif gene_output_dir.startswith(snp_output_dir):
-            self.save_intermediates(snp_output_dir)
+        elif gene_output_dir.startswith(run_output_snps):
+            self.save_intermediates(run_output_snps)
         else:
             self.save_intermediates(
                 gene_output_dir,
                 f"{self.sample_name}_intermediates_gene.tar.gz",
             )
             self.save_intermediates(
-                snp_output_dir, f"{self.sample_name}_intermediates_SNP.tar.gz"
+                run_output_snps, f"{self.sample_name}_intermediates_SNP.tar.gz"
             )
 
     def save_intermediates(
@@ -550,19 +550,19 @@ class PaciniTyping:
         """
         search_mode: str = self.option["config"]["search_mode"]
         if search_mode in ["both", "SNPs"]:
-            snp_output_dir = pattern.pattern["global_settings"][
-                "SNP_output_dir"
+            run_output_snps = pattern.pattern["global_settings"][
+                "run_output_snps"
             ]
         gene_output_dir: str = pattern.pattern["global_settings"]["run_output"]
 
         if self.input_args.save_intermediates:
             if search_mode == "both":
                 self.handle_intermediate_saving(
-                    gene_output_dir, snp_output_dir
+                    gene_output_dir, run_output_snps
                 )
             elif search_mode == "SNPs":
                 self.save_intermediates(
-                    snp_output_dir,
+                    run_output_snps,
                     f"{self.sample_name}_intermediates_SNP.tar.gz",
                 )
                 self.delete_intermediates(gene_output_dir)
@@ -574,9 +574,9 @@ class PaciniTyping:
         else:
             if search_mode == "both":
                 self.delete_intermediates(gene_output_dir)
-                self.delete_intermediates(snp_output_dir)
+                self.delete_intermediates(run_output_snps)
             elif search_mode == "SNPs":
-                self.delete_intermediates(snp_output_dir)
+                self.delete_intermediates(run_output_snps)
             elif search_mode == "genes":
                 self.delete_intermediates(gene_output_dir)
 
