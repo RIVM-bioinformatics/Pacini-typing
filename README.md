@@ -183,13 +183,73 @@ There are three pre-defined configuration schemes available in the `config` dire
 
 The schemes for _Vibrio cholerae_ are based on the real genetic patterns of the pandemic serotypes O1 and O139. The scheme for _Yersinia pestis_ is an example of how a configuration file can be structured.
 
-Example configuration file for the O139 serotype of _Vibrio cholerae_:
+Example configuration file for _Yersinia pestis_ related variants:
 
 ```yaml
 %YAML 1.2
+---
+metadata:
+  # Metadata information that will be used in the output report
+  filename: "Yersinia.yaml"
+  id: "YP-01"
+  type: "Y. pestis related variants"
+  description: "Genetic pattern run config file for Yersinia pestis related variants"
+  date_created: "2025-05-24"
+  # Path to the PointFinder script location,
+  # if not available, it will be installed here automatically
+  pointfinder_script_path: "/my_own_path/to/pacini_typing/pacini_typing/PointFinder.py"
 
-# TODO: explain the SNPs fields very briefly
+database:
+  # Name and path of the gene database
+  name: "YP-01"
+  path: "databases/YP-01"
+  # Multi-fasta file with genes you want to search for
+  target_genes_file: "/my_own_path/to/fasta/genes.fasta"
+  # Multi-fasta file with genes in which the SNPs are located
+  target_snps_file: "/my_own_path/to/fasta/SNPs.fasta"
+  path_snps: "/my_own_path/to/database"
+  species: "Yersinia"
+  
+global_settings:
+  # Output directory for the run, mainly for genes
+  run_output: "output/"
+  # Custom output directory for SNPs, only required if search mode is SNPs or both
+  run_output_snps: "output/snp/"
+  # Percentage identity and coverage thresholds for the search of genes  
+  perc_ident: 95.0
+  perc_cov: 80.0
+
+pattern:
+  # Searchable genes under 'gene' fields,
+  # SNPs under 'SNP' fields
+  - gene: "rfbV"
+  - gene: "ctxA"
+  - gene: "ctxB"
+  # The name of the gene in which the SNP is located
+  - SNP: "myGene"
+    # The reference nucleotide sequence of the SNP (must be 3 nucleotides)
+    ref: "TTT"
+    # The alternative amino acid
+    alt: "X"
+    # The CODON position of the SNP in the gene
+    pos: 123
 ```
+
+Let's take a closer look at the SNP field, since this is a bit more complex:
+
+```yaml
+- SNP: "myGene"
+    ref: "TTT"
+    alt: "X"
+    pos: 123
+```
+
+* **SNP**: The name of the gene in which the SNP is located.
+* ***ref**: The reference nucleotide sequence of the SNP. **Must** be a codon (3 nucleotides).
+* **alt**: The alternative amino acid that you want to search for. (1 letter amino acid code)
+* **pos**: The position of the **CODON** in the gene where the SNP is located. This is not the position of the nucleotide, but the position of the codon in the gene. Very important, since SNPs are very sensitive to the position of the codon in the gene.
+
+_Please note that there is also a field for **PointFinder's script**. This is due to the fact that PointFinder is not available via Pip or Conda, so it must be installed manually. If the script is not found at the specified path, Pacini-typing will try to install it automatically in the specified path. This is done by a `wget` command in the `snp_query_runner.py` script of the application._
 
 [Back to top](#pacini-typing)
 
