@@ -175,7 +175,7 @@ class SNPParser:
             "Configuration": self.config_options["metadata"]["filename"],
             "Type/Genes": self.config_options["metadata"]["type"],
             "Mode": "SNP",
-            "Hits": item["Mutation"],
+            "Hits": item["Mutation"].split(" ")[1],
             "Reference nucleotide": ref_nucl,
             "Alternative nucleotide": alt_nucl,
             "Position": pos,
@@ -209,10 +209,7 @@ class SNPParser:
         """
         logging.info("Parsing the SNP results...")
         try:
-            self.read_run_output(
-                self.pointfinder_output_filename
-                # "/Users/mvandestreek/Desktop/salm-simulation/pointfinder/output-dir/test_blastn_results.tsv"
-            )
+            self.read_run_output(self.pointfinder_output_filename)
         except FileNotFoundError as e:
             logging.error(
                 "PointFinder's report not found: %s",
