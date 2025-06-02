@@ -1,5 +1,60 @@
 # Changelog
 
+## [2.0.0](https://github.com/RIVM-bioinformatics/Pacini-typing/compare/v1.6.4...v2.0.0) (2025-06-02)
+
+
+### ⚠ BREAKING CHANGES
+
+* Updated coverage calculation for blastn reports in multiple files (was not fully correct)
+* Fixed a bug where the identity threshold was not used correctly.
+
+### Features
+
+* Add search mode argument to main parser ([6c421fe](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/6c421fe2a83ec2ce17796004daa6cb24cb4ee835))
+* Added cgecore (2.0.1) dependency to environments configs ([b8eca27](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/b8eca2713ac643229dc76c596cdfe3ebe4d97d65))
+* Added the automatic downloading of PointFinder script (if not exists) ([1080834](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/1080834ebbaa50cf0171f761bfef421f00ee1ea1))
+* Changed the QueryRunner class into a Template Design Pattern to share same functionality/recipe for SNP expansion ([16ae667](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/16ae667c0132156e32cde8c2b0b6c633d2c91671))
+* Created a codon translation enum for translating purposes ([84a0220](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/84a02205bf3aee7ede2d1470c42d7f2ec4e3b1ac))
+* Created an additional GENE database check within the SNP database check only for FASTQ ([06a9dd1](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/06a9dd1c7406b4fac29a1b118c4c4b2728a71f6d))
+* Created class PointFinderReferenceChecker for the validation of PointFinder reference database and corresponding custom error exceptions ([45044f8](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/45044f87aaf3f9eb81ab39a62fdeaba80d8987fe))
+* Created HandleSearchModes class for managing search modes and database validation (still some TODO statements) ([fb14d3a](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/fb14d3a34478393e1e7f02a234e6c926f8a5d2f6))
+* Created new validation functionality for the SNP pattern in configuration file ([d176caa](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/d176caa512c3b32122e9b56f0669e370bd662b27))
+* Created version tool logging functionality for PointFinder ([e2d624f](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/e2d624f69a00352fa928286260c8ff6d92b7f113))
+* Developed the runner Enum for PointFinder with the right command preparation (still with example present) ([6152eb7](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/6152eb7d9dcb10be94f8dde606802249d451d8fe))
+* Enhanced ReadConfigPattern and PointFinder for SNP database handling ([9f8bc91](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/9f8bc913e331c3ebbdeba4585ae51dcfadc431d7))
+* Enhanced the ParsingManager class to support the search modes SNPs and both ([12904fb](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/12904fb78220f493612414b468e739620ca26e3c))
+* Implemented PointFinders database creation functionality ([de1fe4a](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/de1fe4a25bdca78d5e2cc2eb8e4682336459b24f))
+* Implemented SNPParser class for parsing PointFinders data and generating output reports ([65e675b](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/65e675b382b63c8b58091603ba3ed8a3f5d79736))
+* Introduced a new column in the output reports ("mode") to easily spot if a found hit is a gene or SNP ([1f76fb3](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/1f76fb3384bfc653b9aa64889ee1bf826354ccc3))
+* Pull request [#35](https://github.com/RIVM-bioinformatics/Pacini-typing/issues/35) of 'dev' branch with new SNP-functionality, output report, configuration file, README, and more ([0c75e90](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/0c75e903cc304646e23a10699c136df7d6d1e140))
+* Pull request of 'dev' branch with new SNP-functionality, output report, configuration file, README, and more ([0c75e90](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/0c75e903cc304646e23a10699c136df7d6d1e140))
+* WIP - Prepared the reading config pattern class to better fit SNP-related tasks ([6c6273a](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/6c6273ac5ebb7d50831efafa3ea19617016d3f1f))
+* WIP - started implementing the SNP query runner class for SNP-related operations ([aa8d2c4](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/aa8d2c4e6a691a5e5d48f7f4d5a3ea1750aa7c4e))
+
+
+### Bug Fixes
+
+* Corrected comparison operator to accept same values ([51cab2c](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/51cab2c8b2fdf892b9ae35e503f089b4ea344832))
+* Corrected mutation format in SNP hits column of output report ([75bf687](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/75bf687ed4c707e42fb1a4ff095dd59ccb5ac984))
+* Fixed a bug in the validation of the pointfinder database where genes where checked in one file but had to be checked for indivudual files ([59b5fab](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/59b5fabb7b9a983829e10f20590ae2142ca6c75a))
+* Fixed a bug where it was possible to provide fasta out flag for search mode SNPs ([dffb44a](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/dffb44a3b0f5075559c24fc60f1343688b515123))
+* Fixed a bug where the identity threshold was not used correctly. ([ccbda83](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/ccbda83fe1b33d695f636a3d1139d78643ab5198))
+* Fixed a bug where the index column in combined reports was wrong ([16ea985](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/16ea985923c181207f05b4be8fe3b9c9020181f8))
+* Fixed a bug where the retrieval of non existing reports caused errors ([8ce44a1](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/8ce44a19295e4bef77e50d6a5ceec4ea4d65fc4a))
+* Fixed a bug where the SNP directory was saved in wrong search mode ([bc3d6da](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/bc3d6da374e03414e4a694a9d37c8a58238d0596))
+* Fixed a bug where unknown mutations where also placed in the output report (wrong flag for this purpose) ([470d27a](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/470d27a135c75fd5580af35800bb5c727d37e3f1))
+* Fixed a small error where the logging of the tool version could continue if output was None ([ee76ff1](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/ee76ff134c90d3b868a04e69d7f4ecd88860ff8f))
+* Fixed an error that raises an error in the initial SNP database check (before even trying to create it) ([aff4a43](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/aff4a43f3f69cee153c7c489d0246b6967b66153))
+* Updated coverage calculation for blastn reports in multiple files (was not fully correct) ([8b95526](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/8b95526d31fab78f53c9ef5d6b63ecbe010d9d2f))
+* Updated error messages for better debugging (errors where not displaying the topic or location of error) ([4ba1cca](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/4ba1cca4263c7c5c4b88dff0411cae2c982f4b6e))
+
+
+### Documentation
+
+* **queries:** Improved the documentation in the queries module to better explain the new PointFinder expansion and introduction of design pattern ([2e4a7db](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/2e4a7db1d7537adacb40d150515c5be1ff0b3f1f))
+* Update README to include information about SNP-detection ([48a42bd](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/48a42bd2ab61dd7a608f18b363bcbdc5ae78c0d2))
+* Updated class docstring for gene query runner class ([a1364ec](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/a1364ec62645a4849e483d72815f467b0d516e84))
+
 ## [1.6.4](https://github.com/RIVM-bioinformatics/Pacini-typing/compare/v1.6.3...v1.6.4) (2025-01-20)
 
 
