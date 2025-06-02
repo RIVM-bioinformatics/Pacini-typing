@@ -52,6 +52,7 @@ class Parser:
         strategy: ParserStrategy,
         query_run_filename: str,
         input_sequence_sample: str = "",
+        file_type: str = "",
     ):
         """
         Constructor for the Parser class
@@ -69,8 +70,10 @@ class Parser:
         self.strategy = strategy
         self.query_run_filename = query_run_filename
         self.input_sequence_sample = input_sequence_sample
+        self.file_type = file_type
         self.data_frame = pd.DataFrame()
         self.filters: list[Filter] = []
+        self.output_report: pd.DataFrame = pd.DataFrame()
 
     def add_filter(self, filter_pattern: Filter) -> None:
         """
@@ -133,13 +136,16 @@ class Parser:
             "Input": self.input_sequence_sample,
             "Configuration": self.config_options["metadata"]["filename"],
             "Type/Genes": self.config_options["metadata"]["type"],
+            "Mode": "Gene",
             "Hits": item.iloc[columns.index("hit")].split(":")[0],
-            "Percentage Identity": item.iloc[
-                columns.index("percentage identity")
-            ],
-            "Percentage Coverage": item.iloc[
-                columns.index("percentage coverage")
-            ],
+            "Percentage Identity": round(
+                item.iloc[columns.index("percentage identity")], 3
+            ),
+            "Percentage Coverage": (
+                round(item["coverage_pct"], 3)
+                if self.file_type == "FASTA"
+                else item.iloc[columns.index("percentage coverage")]
+            ),
             significance_type: item.iloc[value_column],
         }
 
@@ -171,26 +177,6 @@ class Parser:
             )
 
         return pd.DataFrame(output_records)
-
-    def write_report(self, report: pd.DataFrame, suffix: str) -> None:
-        """
-        Function that writes a given DataFrame to a csv file.
-        The pandas DataFrame is created by other methods,
-        and passed to this method to write it to a file.
-        ----------
-        Input:
-            - report: the DataFrame to write
-            - suffix: suffix to add to the filename
-        ----------
-        """
-        logging.debug("Writing the %s...", suffix)
-        file_name = f"{self.input_sequence_sample}_{suffix}.csv"
-        report.to_csv(
-            file_name,
-            sep=",",
-            index=False,
-        )
-        logging.info("Successfully wrote %s...", file_name)
 
     def construct_list_of_genes(self) -> list[str]:
         """
@@ -250,7 +236,7 @@ class Parser:
             self.apply_filters()
 
         if not self.data_frame.empty:
-            self.write_report(self.create_output_report(), "report")
+            self.output_report = self.create_output_report()
             if self.config_options.get("fasta_out", False):
                 self.write_fasta_out()
         else:

@@ -59,5 +59,5 @@ class PercentageIdentityFilter(Filter):
         ----------
         """
         if self.parse_type == "FASTA":
-            return data_frame[data_frame["pident"] > 99]
-        return data_frame[data_frame["Template_Identity"] > 99]
+            return data_frame[data_frame["pident"] >= self.threshold]
+        return data_frame[data_frame["Template_Identity"] >= self.threshold]

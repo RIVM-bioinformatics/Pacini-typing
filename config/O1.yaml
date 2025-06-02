@@ -11,12 +11,13 @@ database:
   name: "VIB-O1"
   path: "databases/VIB-O1"
   target_genes_file: "config/VIB-O1.fasta"
-  run_output: "output/"
 
-pattern:
+global_settings:
+  run_output: "output/"
   perc_ident: 99.8
   perc_cov: 100.0
-  genes:
-    - gene_name: "rfbV"
-    - gene_name: "ctxA"
-    - gene_name: "ctxB"
+
+pattern:
+  - gene: "rfbV"
+  - gene: "ctxA"
+  - gene: "ctxB"

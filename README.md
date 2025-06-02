@@ -9,7 +9,7 @@
 
 <!-- [![CodeFactor](https://www.codefactor.io/repository/github/rivm-bioinformatics/Pacini-typing/badge)](https://www.codefactor.io/repository/github/rivm-bioinformatics/Pacini-typing)   -->
 
-Pylint output: Your code has been rated at 9.96/10 (previous run: 7.68/10, +2.27)
+Pylint output: Your code has been rated at 9.34/10
 
 <div align="center">
     <h1>Pacini-typing</h1>
@@ -25,15 +25,21 @@ Pylint output: Your code has been rated at 9.96/10 (previous run: 7.68/10, +2.27
 * **Organization:**         Rijksinstituut voor Volksgezondheid en Milieu (RIVM)
 * **Department:**           Infectieziekteonderzoek, Diagnostiek en Laboratorium Surveillance (IDS)
 * **Start date:**           02 - 09 - 2024
-* **Commissioned by:**      Roxanne Wolthuis & Boas van der Putten
+* **Commissioned by:**      Roxanne Wolthuis & Boas van der Putten & Sohana Singh
 
 ## About this project
 
-The Pacini project is a software application which can be used to detect genetic sequences in bacteria using a configuration schema.
+Pacini-typing is a user-friendly application for the detection of **DNA sequences** and **SNPs** in both FASTA and FASTQ files. The application is designed to be used in a Linux-like environment and is easily executable via a YAML-based configuration scheme.
 
-With these genetic sequences, the application can determine whether the sequence is actually present in the bacteria and create a simple (CSV) report of the findings
+> Pacini-typing is not limited to bacterial genomes, although is was primarily developed with **Yersinia pestis** and **Vibrio cholerae** as first real use cases. Performance in other species is not yet validated, but the application is designed to be flexible.
 
->_Pacini-typing was mainly build around the detection of genetic sequences in **Vibrio cholerae**_
+**Quick start command of the application:**
+
+```bash
+pacini_typing --config path_to_config_file.yaml --input file_1.fastq file_2.fastq --search_mode SNPs
+```
+
+The structure of configuration file is explained [here](#configuration-file) and the search modes are explained [here](#modes-of-pacini-typing).
 
 ## Table of Contents
 
@@ -43,7 +49,9 @@ With these genetic sequences, the application can determine whether the sequence
 * [Prerequisites](#prerequisites)
 * [Complete list of required packages](#complete-list-of-required-packages)
 * [Installation](#installation)
-* [(very) Brief Overview of Pacini-typing](#very-brief-overview-of-pacini-typing)
+* [Modes of Pacini-typing](#modes-of-pacini-typing)
+* [Configuration file](#configuration-file)
+* [Approach](#approach)
 * [Getting Started](#getting-started)
 * [Parameters \& Usage](#parameters--usage)
 * [Output](#output)
@@ -85,6 +93,7 @@ The following Tools are required:
 | blast      | >=2.16.0|
 | kma        | >=1.4.15|
 | pytest     | >=8.3.3 |
+| cgecore    | >=2.0.1 |
 
 ## Installation
 
@@ -149,93 +158,116 @@ conda activate pacini-typing
 
 [Back to top](#pacini-typing)
 
-## (very) Brief Overview of Pacini-typing
+## Modes of Pacini-typing
 
-Based on:
+Pacini-typing accepts both assembled FASTA contigs and paired-end FASTQ files as input. The application can be executed using the following three search modes:
 
-* Genetic Patterns
-* Methods of Detection
-* Parsing and Reporting
+1. `genes`: Search for genes in the input genome(s)
+2. `SNPs`: Search for SNPs in the input genome(s)
+3. `both`: Search for both genes and SNPs in the input genome(s)
 
-### Genetic Patterns
+In addition, Pacini-typing does have two subcommands which can be used manually to (1) create a gene reference database and (2) run a query against the gene reference database. These subcommands are `makedatabase` and `query`, respectively. More information about these subcommands can be found in the [Parameters & Usage](#parameters--usage) section.
 
-This application stands out from a series of similar applications because genetic detection is defined in a set of rules in a configuration file. This allows the user to define their own rules for genetic detection.
+## Configuration file
 
-The application if therefore well suited for the detection of genetic variants in bacteria for which no other software is available.
-
-> **Important note**: The application was build around _Vibrio cholerae_. The application is not limited to this bacteria, but the application is mainly focused on this.
+The configuration file of Pacini-typing delivers the required information to run in a easy-to-use manner. The configuration file is a YAML-based file with paths to the input files, database location and the genetic threshold values to use for a specific run.
 
 > There two pre-defined genetic patterns for _Vibrio cholerae_ available in the `config` directory of the repository. These patterns can be used detect the pandemic serotypes O1 and O139 of _Vibrio cholerae_.
-> A user can also create their own genetic pattern by creating a YAML configuration file of the same structure.
+>
 
-Example of a YAML configuration file with gene group, this file defines the genetic pattern for the O139 serogroup of _Vibrio cholerae_:
+There are three pre-defined configuration schemes available in the `config` directory of the repository:
+
+1. `O1-scheme.yaml`: Configuration file for the O1 serotype of _Vibrio cholerae_
+2. `O139-scheme.yaml`: Configuration file for the O139 serotype of _Vibrio cholerae_
+3. `Yersinia-pestis-scheme.yaml`: **EXAMPLE** Configuration file for _Yersinia pestis_ (since sharing pandemic-related genes is not allowed at the time of writing, this file is only an example and does not contain any real genes)
+
+The schemes for _Vibrio cholerae_ are based on the real genetic patterns of the pandemic serotypes O1 and O139. The scheme for _Yersinia pestis_ is an example of how a configuration file can be structured.
+
+Example configuration file for _Yersinia pestis_ related variants:
 
 ```yaml
 %YAML 1.2
 ---
-# The metadata must always be present, exactly as shown below.
-# The fields are used in the final output reports.
 metadata:
-  id: "VIB-O139"
-  name: "O139 Gene group"
-  type: "V. cholerae O139 Genes"
-  description: "Genetic pattern run config file for Vibrio cholerae O139 serogroup"
-  date_created: "2024-11-06"
+  # Metadata information that will be used in the output report
+  filename: "Yersinia.yaml"
+  id: "YP-01"
+  type: "Y. pestis related variants"
+  description: "Genetic pattern run config file for Yersinia pestis related variants"
+  date_created: "2025-05-24"
+  # Path to the PointFinder script location,
+  # if not available, it will be installed here automatically
+  pointfinder_script_path: "/my_own_path/to/pacini_typing/pacini_typing/PointFinder.py"
 
-# The database section is used to define the database to be used in the run.
-# You can specify a target genes file to be used in the run.
-# The target genes file should contain the sequences of the genes you want to detect.
-# Format in Multi-FASTA format.
-# The run_output field is used to specify the output directory for the intermediate files.
 database:
-  name: "VIB-O139"
-  path: "databases"
-  target_genes_file: "config/VIB-O139.fasta"
+  # Name and path of the gene database
+  name: "YP-01"
+  path: "databases/YP-01"
+  # Multi-fasta file with genes you want to search for
+  target_genes_file: "/my_own_path/to/fasta/genes.fasta"
+  # Multi-fasta file with genes in which the SNPs are located
+  target_snps_file: "/my_own_path/to/fasta/SNPs.fasta"
+  path_snps: "/my_own_path/to/database"
+  species: "Yersinia"
+  
+global_settings:
+  # Output directory for the run, mainly for genes
   run_output: "output/"
+  # Custom output directory for SNPs, only required if search mode is SNPs or both
+  run_output_snps: "output/snp/"
+  # Percentage identity and coverage thresholds for the search of genes  
+  perc_ident: 95.0
+  perc_cov: 80.0
 
-# This section is most important in creating filters for the genes.
-# The perc_ident and perc_cov fields are used for all genes in the 'genes' section.
 pattern:
-  perc_ident: 99.8
-  perc_cov: 100.0
-  genes:
-    - gene_name: "wbfZ"
-    - gene_name: "ctxA"
-    - gene_name: "ctxB"
+  # Searchable genes under 'gene' fields,
+  # SNPs under 'SNP' fields
+  - gene: "rfbV"
+  - gene: "ctxA"
+  - gene: "ctxB"
+  # The name of the gene in which the SNP is located
+  - SNP: "myGene"
+    # The reference nucleotide sequence of the SNP (must be 3 nucleotides)
+    ref: "TTT"
+    # The alternative amino acid
+    alt: "X"
+    # The CODON position of the SNP in the gene
+    pos: 123
 ```
 
-The usage of a configuration file consists of the following operations:
+Let's take a closer look at the SNP field, since this is a bit more complex:
 
-1. Creating a reference database
-2. Running a query against the reference database
-3. Parsing the results and creating a report
+```yaml
+- SNP: "myGene"
+    ref: "TTT"
+    alt: "X"
+    pos: 123
+```
 
-The first two steps can also be achieved independently by running the application with the `makedatabase` or `query` subcommands. Only the parsing and reporting steps are done by the configuration file, because this requires a genetic pattern.
+* **SNP**: The name of the gene in which the SNP is located.
+* ***ref**: The reference nucleotide sequence of the SNP. **Must** be a codon (3 nucleotides).
+* **alt**: The alternative amino acid that you want to search for. (1 letter amino acid code)
+* **pos**: The position of the **CODON** in the gene where the SNP is located. This is not the position of the nucleotide, but the position of the codon in the gene. Very important, since SNPs are very sensitive to the position of the codon in the gene.
 
-More information about these subcommands can be found in the [Parameters & Usage](#parameters--usage) section.
-
-[Back to top](#pacini-typing)
-
-### Methods of Detection
-
-Pacini-typing can accept different types of input data. This data can be used to determine the genetic variants of the bacteria. The following data is supported:
-
-1. **Assembled FASTA contigs**
-2. **Paired-end FASTQ-files**
-
-This means, Pacini-typing accepts **1** Assembled FASTA file or **2** Paired end FASTQ files.
-
-Assembled FASTA files can directly be used by _BLAST_ to determine given genes. Paired FASTQ files are processed by a tool called _K-mer Alignment (KMA)_. These tool generate almost the same output, but via different names and formats. Both tool require different calls to the application as well.
-
-The output of both tools is placed in a tab separated file. These tsv files are not exactly identical, but the application creates a unified output file from these files.
+_Please note that there is also a field for **PointFinder's script**. This is due to the fact that PointFinder is not available via Pip or Conda, so it must be installed manually. If the script is not found at the specified path, Pacini-typing will try to install it automatically in the specified path. This is done by a `wget` command in the `snp_query_runner.py` script of the application._
 
 [Back to top](#pacini-typing)
 
-### Parsing and Calculation of Pathogenicity
+## Approach
 
-With all hits and results from the detection methods, the application parser the results and determines if the hits are actually present in the input file(s).
+Global steps of the application are:
 
-The main logic for this operation is present in the `parsing` module of the application. Additionally, this folder contains the usage of two design patterns:
+1. **Validating the input**: Check if the input files are valid and if the configuration file is valid.
+2. **Checking the availability of the required database**: Check if the database (gene, SNPs or both databses) are available in the specified path. This checking also includes the database structure.
+3. **Creating the database**: If the database is not available, Pacini-typing will try to create the database.
+4. **Check again if the database is available**: If any of the required databases are not available, the application will exit with an error.
+5. **Running the query**: If the database is available, the application will prepare the query and execute it against the correct reference database.
+6. **Parsing the results**: The application will parse the results of the query. For genes, this process includes filtering according to the threshold values in the configuration file (coverage and identity).
+7. **Creating the output**: Pacini-typing will create a (CSV) output report and, based on the user input, a FASTA file with the found sequences, a log file or a zip containing all intermediate files of a run will be created as well.
+
+### Parsing operations
+
+The main logic for the parsing operation is present in the `parsing` module of the application. Additionally, this folder contains the usage of two design patterns:
 
 1. **Strategy Pattern**
 2. **Filter Pattern**
@@ -264,9 +296,10 @@ See the [Parameters & Usage](#parameters--usage) section for more information on
 * ```-h, --help``` Shows the help of the pipeline.
 
 ```bash
-usage: pacini_typing [-h] [-v] [-V] [-c File] [-i File [File ...]] [--save-intermediates]
-              [--log-file] [-t Threads] [-f]
-              {makedatabase,query} ...
+usage: Pacini-typing [-h] [-v] [-V] [-c File] [-i File [File ...]]
+                     [--save-intermediates] [--log-file] [-t Threads] [-f]
+                     [-m {SNPs,genes,both}]
+                     {makedatabase,query} ...
 
 Bacterial Genotyping Tool for RIVM IDS-Bioinformatics
 
@@ -290,9 +323,12 @@ options:
   -t Threads, --threads Threads
                         Number of threads to use (rounded to the nearest integer)
   -f, --fasta-out       Write found sequences to a FASTA output file
+  -m {SNPs,genes,both}, --search_mode {SNPs,genes,both}
+                        Search mode to use. SNPs, genes or both.
+                        Default is genes.
 
 operations:
-  For more information on a specific command, type: Pacini.py <command> -h
+  For more information on a specific command, type: pacini_typing <command> -h
 
   {makedatabase,query}
     makedatabase        Create a new reference database
@@ -307,7 +343,7 @@ Pacini-typing can be used at two different ways. This could either be:
 
 >* Using a pre-defined configuration file to run the application
 
->* Manually creating a reference database and manually search for genetic variations, this consists of running `pacini_typing` with an additional subcommands `makedatabase` or `query`.
+>* Manually creating a (gene) reference database and manually search for genes, this consists of running `pacini_typing` with an additional subcommands `makedatabase` or `query`.
 
 One of these two methods must be used to run the application.
 
@@ -356,6 +392,7 @@ pacini_typing query -db_path [path_to_database_directory] -db_name [name_of_data
 
 ### Optional parameters
 
+* ```-m, --search_mode``` Search mode to use. Choose between `SNPs`, `genes` or `both`. Default is `genes`.
 * ```-v, --verbose``` Increase output verbosity
 * ```-V, --version``` Show program's version number and exit
 * ```--save-intermediates``` Save intermediate files of the run
@@ -375,39 +412,37 @@ pacini_typing --config [path_to_config_file.yaml] --input [path_to_input_file.ex
 
 ## Output
 
-The output of Pacini-typing consists of three files:
+The output of Pacini-typing consists of four possible files, depending on the parameters used:
 
 1. `{prefix}_report.csv`: report of found genetic variations
 
-Example:
+> This report is created if Pacini-typing founds a hit that is above the defined threshold values in the configuration file.
+
+Example (for `--search_mode genes`):
 
 ```csv
-ID,Input,Schema,Type/Gene,Hits
-1,ERR976461,O1-scheme.yaml,V. cholerae O1 related genes,rfbV
-2,ERR976461,O1-scheme.yaml,V. cholerae O1 related genes,ctxA
+ID,Input,Configuration,Type/Genes,Mode,Hits,Percentage Identity,Percentage Coverage,e-value
+1,ERR976461,O1-scheme.yaml,V. cholerae O1 related genes,Gene,rfbV,100.0,100.0,1e-26
+1,ERR976461,O1-scheme.yaml,V. cholerae O1 related genes,Gene,ctxA,100.0,100.0,1e-26
 ```
 
-All hits in this report are filtered based on the values in the configuration file. Every line in the report represents a hit.
-
-2. `{prefix}_hits_report.csv`: CSV file containing information about the hits
-
-Example:
+Example (for `--search_mode SNPs`):
 
 ```csv
-ID,hit,percentage identity,percentage coverage,p-value
-1,rfbV_O1,100.0,100.0,1e-26
-2,ctxA,100.0,100.0,1e-26
+ID,Input,Configuration,Type/Genes,Mode,Hits,Reference nucleotide,Alternative nucleotide,Position,Amino acid change
+1,SAMN00115171,Yersinia.yaml,Y. pestis related variants,SNP,group_1234 p.V1I,CCC,CTC,1,V1I
+2,SAMN00115171,Yersinia.yaml,Y. pestis related variants,SNP,group_5678 p.E7K,AAA,AAG,7,E7K
 ```
 
-The hits report also contains hits there are filed based on the values in the configuration file. Every line in the main report represents a line in the hits report.
+> The above report does not contain any real hits, but is an example of how the report looks like. `Position` refers to the position of the **CODON** in the sequence, not the position of the nucleotide. `Amino acid change` is formatted as `p.<original amino acid><position><new amino acid>`, e.g. `p.V1I` means that the original amino acid is `V` at position `1` and the new amino acid is `I`.
 
-3. (optional with --log-file) `pacini_typing.log`: Log file containing information about the run
+2. (optional with --log-file) `pacini_typing.log`: Log file containing information about the run
 
 This optional log file contains the output of the application. This file can be used to debug the application.
 
-4. (optional with --fasta-out) `{prefix}_sequences.fasta`: FASTA file containing the found sequences
+3. (optional with --fasta-out) `{prefix}_sequences.fasta`: FASTA file containing the found sequences
 
-This file contains the found sequences of the hits in the input file. So not the sequence of search, but the actual sequence that was found in the input file. The sequences are written in FASTA format.
+This file contains the found sequences of the (gene) hits in the input file. Not the sequence of search, but the actual sequence that was found in the input file. The sequences are written in FASTA format.
 
 Example:
 
@@ -421,6 +456,8 @@ AATTTTACTTGATGCACCTACGGGTTATTCGCCACAAAAATGAGAATAAAATGAAAGTATTGCATGTATA
 ```
 
 > **Note**: The prefix of the output files is the same as the prefix of the input file.
+
+4. (optional with --save-intermediates) `{prefix}_intermediates_<SNP/gene>.tar.gz`: Tarball containing all intermediate files of the run.
 
 [Back to top](#pacini-typing)
 
@@ -500,7 +537,6 @@ If encoutering any issues:
 
 ## Future Ideas
 
-* Implement a SNP detection method
 * Implement biological typing based on the configuration file
 
 ## License

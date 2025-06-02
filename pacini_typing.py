@@ -44,8 +44,6 @@ See the README.md file for more specific information.
 ----------
 """
 
-from __future__ import annotations
-
 __author__ = "Mark van de Streek"
 __date__ = "2024-09-27"
 __all__ = ["PaciniTyping", "main"]
@@ -60,7 +58,8 @@ import tarfile
 from typing import Any
 
 import preprocessing.argsparse.build_parser
-from makedatabase import DatabaseBuilder
+from handle_search_modes import HandleSearchModes
+from make_gene_database import GeneDatabaseBuilder
 from parsing.parsing_manager import ParsingManager
 from parsing.read_config_pattern import ReadConfigPattern
 from preprocessing.exceptions.determine_input_type_exceptions import (
@@ -72,7 +71,7 @@ from preprocessing.exceptions.validate_database_exceptions import (
 from preprocessing.validation.determine_input_type import InputFileInspector
 from preprocessing.validation.validate_database import check_for_database_path
 from preprocessing.validation.validating_input_arguments import ArgsValidator
-from queries.query_runner import QueryRunner
+from queries.query_runners import run_gene_query
 
 logging.basicConfig(
     level=logging.INFO,
@@ -94,8 +93,6 @@ class PaciniTyping:
         - run_makedatabase: Run the makedatabase operation
         - get_file_type: Get file type of input file(s)
         - check_valid_option_with_args: Check if file type is correct
-        - check_valid_database_path: Check if the database exists
-        - run_query: Run the query operation
         - initialize_config_pattern: Initialize the ReadConfigPattern class
         - save_intermediates: Save intermediate files in a zip archive
         - delete_intermediates: Delete intermediate files
@@ -113,7 +110,7 @@ class PaciniTyping:
         Constructor for the PaciniTyping class.
         The constructor accepts the input arguments from argparse.
         All arguments and additional information are
-        stored in the self.option variable and
+        stored in the self.option variable, and
         other variables are set for type hinting.
         ----------
         Input:
@@ -203,6 +200,7 @@ class PaciniTyping:
             "input": self.input_args.input,
             "config_path": self.input_args.config,
             "fasta_out": self.input_args.fasta_out,
+            "search_mode": self.input_args.search_mode,
         }
 
     def setup_logging(self) -> None:
@@ -358,10 +356,10 @@ class PaciniTyping:
     def run_makedatabase(self, database_creation_args: dict[str, Any]) -> None:
         """
         Function that runs the makedatabase operation.
-        The DatabaseBuilder of the makedatabase.py is called.
+        The DatabaseBuilder of the make_gene_database.py is called.
         """
         logging.info("Creating the reference database...")
-        DatabaseBuilder(database_creation_args)
+        GeneDatabaseBuilder(database_creation_args)
 
     def get_file_type(self) -> None:
         """
@@ -408,7 +406,7 @@ class PaciniTyping:
             )
             raise InvalidSequencingTypesError(self.option["input_file_list"])
 
-    def check_valid_database_path(
+    def check_valid_gene_database_path(
         self, database_builder: dict[str, Any]
     ) -> bool:
         """
@@ -427,26 +425,6 @@ class PaciniTyping:
         logging.debug("Checking if the database exists...")
         return check_for_database_path(database_builder)
 
-    def run_query(self, query_runner_builder: dict[str, Any]) -> None:
-        """
-        Function that runs the query with the QueryRunner class.
-        The QueryRunner class is set as a variable and run.
-        The variable is then used to get the runtime of the query operation.
-        The query_runner_builder dictionary is required for the re-use with
-        different parameters.
-        ----------
-        Input:
-            - query_runner_builder: Dictionary with all necessary information
-        ----------
-        """
-        logging.info("Starting the query running related options...")
-        runner = QueryRunner(query_runner_builder)
-        runner.run()
-        logging.info(
-            "Command raised no errors, runtime: %s seconds",
-            runner.get_runtime(),
-        )
-
     def initialize_config_pattern(self) -> ReadConfigPattern:
         """
         Function that initializes the ReadConfigPattern class.
@@ -462,6 +440,7 @@ class PaciniTyping:
         pattern = ReadConfigPattern(
             self.option["config"]["config_path"],
             self.file_type,
+            self.option["config"]["search_mode"],
         )
         # Additionally, the query input and output must be set.
         # The output is not specified by the user, because
@@ -472,8 +451,9 @@ class PaciniTyping:
         pattern.creation_dict["input_file_list"] = self.option["config"][
             "input"
         ]
+        pattern.creation_dict["file_type"] = self.file_type
         pattern.creation_dict["output"] = (
-            pattern.pattern["database"]["run_output"] + self.sample_name
+            pattern.pattern["global_settings"]["run_output"] + self.sample_name
         )
 
         pattern.creation_dict["input_fasta_file"] = os.path.join(
@@ -487,28 +467,118 @@ class PaciniTyping:
 
         return pattern
 
-    def save_intermediates(self) -> None:
+    def handle_intermediate_saving(
+        self, gene_output_dir: str, run_output_snps: str
+    ) -> None:
+        """
+        Little helper function that contains some logic for saving
+        intermediate files. In some sitations, the gene_output_dir
+        or run_output_snps are the same or subdirectories of each other.
+        Therefore, this checking is helpful to avoid wrong saving.
+        ----------
+        Input:
+            - gene_output_dir: The output directory of the gene run
+            - run_output_snps: The output directory of the SNP run
+        ----------
+        """
+        if gene_output_dir == run_output_snps:
+            self.save_intermediates(gene_output_dir)
+        elif run_output_snps.startswith(gene_output_dir):
+            self.save_intermediates(gene_output_dir)
+        elif gene_output_dir.startswith(run_output_snps):
+            self.save_intermediates(run_output_snps)
+        else:
+            self.save_intermediates(
+                gene_output_dir,
+                f"{self.sample_name}_intermediates_gene.tar.gz",
+            )
+            self.save_intermediates(
+                run_output_snps, f"{self.sample_name}_intermediates_SNP.tar.gz"
+            )
+
+    def save_intermediates(
+        self,
+        output_dir: str,
+        zip_name: str | None = None,
+    ) -> None:
         """
         Function that saves intermediate files in a zip archive.
         The zip archive is named after the sample name.
         The zip format is .tar.gz.
+        ----------
+        Input:
+            - output_dir: The output directory of the run
+        ----------
         """
+        if zip_name is None:
+            zip_name = f"{self.sample_name}_intermediates.tar.gz"
         logging.info("Saving intermediate files in a zip archive...")
-        with tarfile.open(
-            f"{self.sample_name}_intermediates.tar.gz", "w:gz"
-        ) as tar:
-            tar.add(self.output_dir, arcname=os.path.basename(self.output_dir))
+        with tarfile.open(zip_name, "w:gz") as tar:
+            tar.add(output_dir, arcname=os.path.basename(output_dir))
         # Call the delete_intermediates function to
         # remove the original output directory
         logging.debug("Saved intermediate files in a zip...")
-        self.delete_intermediates()
+        self.delete_intermediates(output_dir)
 
-    def delete_intermediates(self) -> None:
+    def delete_intermediates(self, output_dir: str) -> None:
         """
-        Function that removes the intermediate files of the application.
+        Function that removes the intermediate files of a run,
+        using the shutil module.
+        ----------
+        Input:
+            - output_dir: The output directory of the run
+                (either gene or SNP)
+        ----------
         """
-        logging.debug("Deleting intermediate files...")
-        shutil.rmtree(self.output_dir)
+        logging.debug("Deleting intermediate files if they exist...")
+        if os.path.exists(output_dir):
+            shutil.rmtree(output_dir)
+        else:
+            logging.debug(
+                "Directory %s does not exist, skipping deletion", output_dir
+            )
+
+    def save_or_delete_intermediate(self, pattern: ReadConfigPattern):
+        """
+        Function that determines if the intermediate files of the run
+        should be saved or deleted.
+        The actual saving or deleting is delegated to other functions.
+        ----------
+        Input:
+            - pattern: The configuration file options
+        ----------
+        """
+        search_mode: str = self.option["config"]["search_mode"]
+        if search_mode in ["both", "SNPs"]:
+            run_output_snps = pattern.pattern["global_settings"][
+                "run_output_snps"
+            ]
+        gene_output_dir: str = pattern.pattern["global_settings"]["run_output"]
+
+        if self.input_args.save_intermediates:
+            if search_mode == "both":
+                self.handle_intermediate_saving(
+                    gene_output_dir, run_output_snps
+                )
+            elif search_mode == "SNPs":
+                self.save_intermediates(
+                    run_output_snps,
+                    f"{self.sample_name}_intermediates_SNP.tar.gz",
+                )
+                self.delete_intermediates(gene_output_dir)
+            elif search_mode == "genes":
+                self.save_intermediates(
+                    gene_output_dir,
+                    f"{self.sample_name}_intermediates_gene.tar.gz",
+                )
+        else:
+            if search_mode == "both":
+                self.delete_intermediates(gene_output_dir)
+                self.delete_intermediates(run_output_snps)
+            elif search_mode == "SNPs":
+                self.delete_intermediates(run_output_snps)
+            elif search_mode == "genes":
+                self.delete_intermediates(gene_output_dir)
 
     def handle_makedatabase_option(self) -> None:
         """
@@ -549,30 +619,20 @@ class PaciniTyping:
         """
         Function that handles the calling of all the config
         related operations.
-        The config file is being read and database is checked
-        right before the query searching is called.
-        If the database does not exist, the method is trying to create it.
-        Finally, the database is checked again and
-        the query operation is started.
+        The reading of the config file is first delegated to the
+        ReadConfigPattern class.
+        Then, the handler object is created with the pattern and
+        the main self.option variable, of which the search mode
+        is extracted.
+        The handler object makes sure the databases are checked,
+        and the query is executed in the correct runner.
         """
         pattern: ReadConfigPattern = self.initialize_config_pattern()
-        if not self.check_valid_database_path(pattern.creation_dict):
-            logging.debug("Database does not exist, creating the database...")
-            # Re-use the run_makedatabase() method with right params
-            self.run_makedatabase(pattern.creation_dict)
-        logging.debug("Checking if the database was successfully created...")
-        if not self.check_valid_database_path(pattern.creation_dict):
-            raise InvalidDatabaseError(
-                pattern.creation_dict["database_name"],
-                pattern.creation_dict["file_type"],
-            )
-        else:
-            logging.debug("Database exists, starting the query operation...")
-            self.handle_config_option_parse_query(pattern)
+        handler: HandleSearchModes = HandleSearchModes(pattern, self.option)
+        handler.handle()
+        self.filter_and_parse_results(pattern)
 
-    def handle_config_option_parse_query(
-        self, pattern: ReadConfigPattern
-    ) -> None:
+    def filter_and_parse_results(self, pattern: ReadConfigPattern) -> None:
         """
         Function that handles the parsing of the genetic variation
         that is found by the query operation.
@@ -584,19 +644,15 @@ class PaciniTyping:
             - pattern: The configuration file options
         ----------
         """
-        self.run_query(pattern.creation_dict)
         logging.info("Starting the parsing operation...")
         ParsingManager(
             pattern,
             self.file_type,
             self.sample_name,
+            self.option["config"]["search_mode"],
         )
-        # Define the output directory for further usage
-        self.output_dir = pattern.pattern["database"]["run_output"]
-        if self.input_args.save_intermediates:
-            self.save_intermediates()
-        else:
-            self.delete_intermediates()
+        # Determine if the intermediate files should be saved or deleted
+        self.save_or_delete_intermediate(pattern)
 
     def handle_query_option(self) -> None:
         """
@@ -620,8 +676,8 @@ class PaciniTyping:
             "output": self.option["query"]["output"],
             "threads": self.threads,
         }
-        if self.check_valid_database_path(query_builder):
-            self.run_query(query_builder)
+        if self.check_valid_gene_database_path(query_builder):
+            run_gene_query(query_builder)
         else:
             raise InvalidDatabaseError(
                 query_builder["database_name"],

@@ -81,7 +81,7 @@ def fastq_options() -> dict[str, str]:
 
 @skip_in_ci
 def test_create_database_file_list_fasta(
-    fasta_options: dict[str, str]
+    fasta_options: dict[str, str],
 ) -> None:
     """
     Test that the function returns the correct list of database files for FASTA files.
@@ -105,7 +105,7 @@ def test_create_database_file_list_fasta(
 
 @skip_in_ci
 def test_create_database_file_list_fastq(
-    fastq_options: dict[str, str]
+    fastq_options: dict[str, str],
 ) -> None:
     """
     Test that the function returns the correct list of database files for FASTQ files.
@@ -176,7 +176,7 @@ def test_check_for_database_path_valid(fasta_options: dict[str, str]) -> None:
 @skip_in_ci
 @mock.patch("os.path.exists", return_value=False)
 def test_check_for_database_path_invalid(
-    fasta_options: dict[str, str]
+    fasta_options: dict[str, str],
 ) -> None:
     """
     Test that the function raises a SystemExit when
@@ -250,7 +250,7 @@ def test_run_method_raises_invalid_database_error() -> None:
     pacini_typing.check_valid_option_with_args = lambda: None
 
     # Mock check_valid_database_path to return False
-    pacini_typing.check_valid_database_path = lambda x: False
+    pacini_typing.check_valid_gene_database_path = lambda x: False
 
     with pytest.raises(InvalidDatabaseError):
         pacini_typing.run()

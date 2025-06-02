@@ -41,7 +41,9 @@ def test_read_config_good() -> None:
     The configuration file is read and the pattern is
     checked if it is the same as the expected pattern.
     """
-    config = read_config_pattern.ReadConfigPattern("config/O139.yaml", "fasta")
+    config = read_config_pattern.ReadConfigPattern(
+        "config/O139.yaml", "fasta", "genes"
+    )
     assert len(config.pattern) > 1
     with open(
         "test_data/expected_output/expected_O139_config.json",
@@ -57,7 +59,9 @@ def test_read_config_file_error() -> None:
     The reading function of the class should raise a FileNotFoundError
     """
     with pytest.raises(FileNotFoundError):
-        read_config_pattern.ReadConfigPattern("parsing/O100.yaml", "fasta")
+        read_config_pattern.ReadConfigPattern(
+            "parsing/O100.yaml", "fasta", "genes"
+        )
 
 
 def test_read_config_wrong_structure_yaml() -> None:
@@ -69,10 +73,12 @@ def test_read_config_wrong_structure_yaml() -> None:
     """
     with pytest.raises(YAMLLoadingError):
         read_config_pattern.ReadConfigPattern(
-            "test_data/wrong_files/wrong_constructed_O1.yaml", "fasta"
+            "test_data/wrong_files/wrong_constructed_O1.yaml", "fasta", "genes"
         )
         read_config_pattern.ReadConfigPattern(
-            "test_data/wrong_files/wrong_constructed_O139.yaml", "fasta"
+            "test_data/wrong_files/wrong_constructed_O139.yaml",
+            "fasta",
+            "genes",
         )
 
 
@@ -84,10 +90,10 @@ def test_validate_config_keys_structure_error() -> None:
     """
     with pytest.raises(YAMLStructureError):
         read_config_pattern.ReadConfigPattern(
-            "test_data/wrong_files/wrong_keys_O1.yaml", "fasta"
+            "test_data/wrong_files/wrong_keys_O1.yaml", "fasta", "genes"
         )
         read_config_pattern.ReadConfigPattern(
-            "test_data/wrong_files/wrong_keys_O139.yaml", "fasta"
+            "test_data/wrong_files/wrong_keys_O139.yaml", "fasta", "genes"
         )
 
 
@@ -99,10 +105,14 @@ def test_validate_pattern_keys_structure_error() -> None:
     """
     with pytest.raises(YAMLStructureError):
         read_config_pattern.ReadConfigPattern(
-            "test_data/wrong_files/wrong_pattern_keys_O1.yaml", "fasta"
+            "test_data/wrong_files/wrong_pattern_keys_O1.yaml",
+            "fasta",
+            "genes",
         )
         read_config_pattern.ReadConfigPattern(
-            "test_data/wrong_files/wrong_pattern_keys_O139.yaml", "fasta"
+            "test_data/wrong_files/wrong_pattern_keys_O139.yaml",
+            "fasta",
+            "genes",
         )
 
 
@@ -112,7 +122,9 @@ def test_construct_params_dict() -> None:
     The function should fill the creation_dict with the correct
     parameters.
     """
-    config = read_config_pattern.ReadConfigPattern("config/O1.yaml", "fastq")
+    config = read_config_pattern.ReadConfigPattern(
+        "config/O1.yaml", "fastq", "genes"
+    )
     assert (
         config.pattern["database"]["path"]
         == config.creation_dict["database_path"]

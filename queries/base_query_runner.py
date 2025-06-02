@@ -7,54 +7,49 @@
     “GitHub Copilot: Your AI pair programmer” (GPT-3). GitHub, Inc.
     https://github.com/features/copilot
 
-This module is responsible for running the
-right query against the reference database.
-
-The query is prepared by the respective runner
-(BLASTn or KMA) and is then run by the QueryRunner
-class.
-The actual shell code will be executed by the
-execute function of the command_utils.py module.
+Abstract base class for the different query runners.
+Both runners (genes and SNPs) are quite similar, but
+differ in the preparing and extracting of version number.
+This class defines the shared methods and variables and also
+defines the abstract methods that require custom implementation.
 """
 
-from __future__ import annotations
 
 __author__ = "Mark van de Streek"
-__date__ = "2024-10-02"
-__all__ = ["QueryRunner"]
+__date__ = "2025-04-30"
+__all__ = ["BaseQueryRunner"]
 
 import logging
 import os
-import re
 import time
-from typing import Any
+from abc import ABC, abstractmethod
 
 from command_utils import CommandInvoker, ShellCommand
-from queries.blast_runner import BLASTn
-from queries.kma_runner import KMA
 
 
-class QueryRunner:
+class BaseQueryRunner(ABC):
     """
-    Main class that runs the input query against the reference database.
-    The query is prepared by the prepare_query method from the respective runner.
+    Abstract base class for the different query runners.
+    Both runners (genes and SNPs) share the same recipe,
+    and therefore this class is used to counteract duplicate code.
     ----------
     Methods:
-        - __init__: Constructor for the QueryRunner class
+        - __init__: Constructor for the QueryRunner class (with shared variables)
         - check_output_dir: Method that checks if the output directory exists
-        - extract_version_number: Method that extracts the version number from the tool output
+        - (ABSTRACT) extract_version_number: Method that extracts the version number
+            from the tool output
         - log_tool_version: Method that logs the version of the tool used
         - run: Method that runs the query
         - get_runtime: Method that returns the runtime of the query
     ----------
     """
 
-    def __init__(self, run_options: dict[str, Any]) -> None:
+    def __init__(self, run_options: dict[str, str]) -> None:
         """
-        Constructor of the QueryRunner class.
-        The constructor calls the prepare_query method based on
-        the input type (FASTA/FASTQ).
-        The arguments are coming from the input dictionary.
+        Constructor of the base class.
+        The shared variables are initialized here and
+        the arguments are coming from the input dictionary.
+        The output directory is checked for existence.
         ----------
         Input:
             - run_options: dictionary with the input files,
@@ -62,19 +57,11 @@ class QueryRunner:
         ----------
         """
         self.run_options = run_options
-        self.version_command: list[str] = []
         self.start_time: float = 0.0
         self.stop_time: float = 0.0
+        self.query: list[str] = []
+        self.version_command: list[str] = []
         self.check_output_dir()
-        if self.run_options["file_type"] == "FASTA":
-            self.query = BLASTn.get_query(option=self.run_options)
-            logging.info("Getting the BLAST version...")
-            self.version_command = BLASTn.get_version_command()
-        elif self.run_options["file_type"] == "FASTQ":
-            self.query = KMA.get_query(option=self.run_options)
-            logging.info("Getting the KMA version...")
-            self.version_command = KMA.get_version_command()
-        self.log_tool_version()
 
     def check_output_dir(self) -> bool:
         """
@@ -95,23 +82,20 @@ class QueryRunner:
         logging.debug("Output directory exists...")
         return True
 
-    @staticmethod
-    def extract_version_number(stdout: str) -> str | None:
+    @abstractmethod
+    def extract_version_number(self, stdout: str) -> str | None:
         """
-        Method that extracts the version number from the tool output.
-        The method uses a regular expression to extract the version number.
+        Abstract method that extracts the version number
+        from the tool output.
         ----------
         Input:
-            - stdout: str: the output of the tool
+            - stdout: the output of the version command
         Output:
             - str: the version number of the tool or
                 None if not found
         ----------
         """
-        version_pattern = r"(\d+\.\d+\.\d+)"
-        match = re.search(version_pattern, stdout)
-
-        return match.group(1) if match else None
+        pass
 
     def log_tool_version(self) -> None:
         """
@@ -119,17 +103,22 @@ class QueryRunner:
         The method calls the get_version_command method
         from the respective runner.
         This logging functionality was developed at RIVM's request
+
+        *The extraction of the version number is a abstract method
         """
         stdout, stderr = CommandInvoker(
             ShellCommand(cmd=self.version_command, capture=True)
         ).execute()
-        logging.info("Version tool: %s", self.extract_version_number(stdout))
+        if stdout:
+            logging.info(
+                "Version tool: %s", self.extract_version_number(stdout)
+            )
 
     def run(self) -> None:
         """
-        The query is already prepared in the constructor.
-        This function runs the query.
-        The runtime is started and stopped to calculate the runtime.
+        The query is already prepared and this
+        function runs the query. The runtime is started
+        and stopped to calculate the runtime.
         (calculation is done in the get_runtime method)
         """
         logging.debug("Starting the query operation...")

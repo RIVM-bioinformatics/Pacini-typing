@@ -54,3 +54,34 @@ class InvalidDatabaseError(Exception):
             - python3 pacini_typing.py makedatabase -h
         ----------------------------------------------------
                 """
+
+
+class InvalidSNPDatabaseError(Exception):
+    """
+    Raised when an invalid SNP database is provided.
+    """
+
+    def __init__(self, database_path: str) -> None:
+        """
+        Initialize the exception with the database path.
+        ----------
+        Input:
+            - database_path: path to the database
+        ----------
+        """
+        self.database_path = database_path
+
+    def __str__(self) -> str:
+        return f"""
+        ---------------------------------------------------
+        ERROR: SNP database invalid or not found
+        ---------------------------------------------------
+        The following provided SNP database is not valid:
+            - Path: {self.database_path}
+        ---------------------------------------------------
+        SUGGESTION:
+            - Make sure the SNP database path is correct
+            - Make sure all required files are present
+            - Make sure the SNP database is in the correct format
+        -----------------------------------------------------
+        """

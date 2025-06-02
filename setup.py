@@ -16,6 +16,7 @@ __date__ = "2024-11-06"
 __all__ = ["get_version"]
 
 from setuptools import find_packages, setup
+
 from command_utils import CommandInvoker, ShellCommand
 
 
@@ -48,7 +49,14 @@ setup(
     long_description=open("README.md", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
     include_package_data=True,
-    py_modules=["pacini_typing", "makedatabase", "command_utils"],
+    py_modules=[
+        "pacini_typing",
+        "make_gene_database",
+        "command_utils",
+        "handle_search_modes",
+        "make_snp_database",
+        "codon_table_enum",
+    ],
     entry_points={
         "console_scripts": [
             "pacini_typing = pacini_typing:main",

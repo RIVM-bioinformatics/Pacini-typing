@@ -1,0 +1,47 @@
+%YAML 1.2
+---
+metadata:
+  # Metadata information that will be used in the output report
+  filename: "Yersinia.yaml"
+  id: "YP-01"
+  type: "Y. pestis related variants"
+  description: "Genetic pattern run config file for Yersinia pestis related variants"
+  date_created: "2025-05-24"
+  # Path to the PointFinder script location,
+  # if not available, it will be installed here automatically
+  pointfinder_script_path: "/my_own_path/to/pacini_typing/pacini_typing/PointFinder.py"
+
+database:
+  # Name and path of the gene database
+  name: "YP-01"
+  path: "databases/YP-01"
+  # Multi-fasta file with genes you want to search for
+  target_genes_file: "/my_own_path/to/fasta/genes.fasta"
+  # Multi-fasta file with genes in which the SNPs are located
+  target_snps_file: "/my_own_path/to/fasta/SNPs.fasta"
+  path_snps: "/my_own_path/to/database"
+  species: "Yersinia"
+  
+global_settings:
+  # Output directory for the run, mainly for genes
+  run_output: "output/"
+  # Custom output directory for SNPs, only required if search mode is SNPs or both
+  run_output_snps: "output/snp/"
+  # Percentage identity and coverage thresholds for the search of genes  
+  perc_ident: 95.0
+  perc_cov: 80.0
+
+pattern:
+  # Searchable genes under 'gene' fields,
+  # SNPs under 'SNP' fields
+  - gene: "rfbV"
+  - gene: "ctxA"
+  - gene: "ctxB"
+  # The name of the gene in which the SNP is located
+  - SNP: "myGene"
+    # The reference nucleotide sequence of the SNP (must be 3 nucleotides)
+    ref: "TTT"
+    # The alternative amino acid
+    alt: "X"
+    # The CODON position of the SNP in the gene
+    pos: 123
