@@ -23,6 +23,9 @@ Operations are performed in the following order:
         - Get file type of input file(s)
         - Start the query related operations
         - Start the config related operations
+            - Config pattern is initialized
+            - Different search modes are handled (genes/SNPs/both)
+            - Results are filtered and parsed
 
 The run() function is the main method of the class.
 This function can accept arguments on two ways:
@@ -472,9 +475,10 @@ class PaciniTyping:
     ) -> None:
         """
         Little helper function that contains some logic for saving
-        intermediate files. In some sitations, the gene_output_dir
+        intermediate files. In some situations, the gene_output_dir
         or run_output_snps are the same or subdirectories of each other.
         Therefore, this checking is helpful to avoid wrong saving.
+        The actual saving is delegated to the save_intermediates function.
         ----------
         Input:
             - gene_output_dir: The output directory of the gene run
@@ -508,6 +512,8 @@ class PaciniTyping:
         ----------
         Input:
             - output_dir: The output directory of the run
+            - zip_name: The name of the zip file to save the intermediates
+                (only used if gene and SNP output directories are different)
         ----------
         """
         if zip_name is None:
@@ -549,6 +555,7 @@ class PaciniTyping:
         ----------
         """
         search_mode: str = self.option["config"]["search_mode"]
+        # Determine if the run_output_snps directory is needed
         if search_mode in ["both", "SNPs"]:
             run_output_snps = pattern.pattern["global_settings"][
                 "run_output_snps"
@@ -619,13 +626,9 @@ class PaciniTyping:
         """
         Function that handles the calling of all the config
         related operations.
-        The reading of the config file is first delegated to the
-        ReadConfigPattern class.
-        Then, the handler object is created with the pattern and
-        the main self.option variable, of which the search mode
-        is extracted.
-        The handler object makes sure the databases are checked,
-        and the query is executed in the correct runner.
+        The reading of the config file is delegated, the
+        HandleSearchModes is initialized and executed, and
+        finally the filtering and parsing of the results is delegated.
         """
         pattern: ReadConfigPattern = self.initialize_config_pattern()
         handler: HandleSearchModes = HandleSearchModes(pattern, self.option)
@@ -644,7 +647,7 @@ class PaciniTyping:
             - pattern: The configuration file options
         ----------
         """
-        logging.info("Starting the parsing operation...")
+        logging.info("Starting the filter and parsing operations...")
         ParsingManager(
             pattern,
             self.file_type,
