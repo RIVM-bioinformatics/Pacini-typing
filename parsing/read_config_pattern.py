@@ -47,7 +47,7 @@ RQUIRED_GLOBAL_SETTINGS_KEYS = [
 
 class ReadConfigPattern:
     """
-    Class for reading the configuration file containing the pattern
+    Class for reading the configuration file containing the pattern.
     All necessary information will be extracted from the configuration file
     The options can then be used to run the analysis
     ----------
@@ -67,16 +67,23 @@ class ReadConfigPattern:
         search_mode: str,
     ) -> None:
         """
-        Constructor for the ReadConfigPattern class
-        It accepts the configuration file and the input file type
-        The pattern variable is initialized as an empty dictionary
-        the pattern is placed in this pattern variable.
-        The creation_dict is used for database operations and
-        running the query, so that not the entire pattern will be passed around
+        Constructor for the ReadConfigPattern class.
+        The configuration file, input file type, and search mode
+        are initialized here.
+        The process of reading the configuration file
+        is first started.
+        The creation_dict is constructed to first store the required
+        parameters for the database creation and subsequently
+        to add parameters for SNP detection.
+
+        If the search mode is SNPs or both,
+        additional parameters for SNP detection are added
+        and validated.
         ----------
         Input:
-            - config_file: str
-            - input_file_type: str
+            - config_file: path to the configuration file
+            - input_file_type: input file type (FASTA/FASTQ)
+            - search_mode: search mode (SNPs, genes, or both)
         ----------
         """
         self.config_file = config_file
@@ -319,7 +326,7 @@ class ReadConfigPattern:
             "pos": 2
             },
         ]
-        The delegates the validation of every single entry to the
+        This function delegates the validation of every single entry to the
         _validate_snp_entry function.
         The function checks if the list is a list of dictionaries
         and if the dictionaries contain the required keys.
@@ -331,12 +338,7 @@ class ReadConfigPattern:
             - IncorrectSNPConfiguration: If the SNP list is not valid
         ----------
         """
-        if not isinstance(snp_list, list):
-            logging.error(
-                "SNP list is not a list in configuration file, exiting..."
-            )
-            raise IncorrectSNPConfiguration(self.config_file)
-
+        self.validate_snp_list_type(snp_list)
         required_keys: set[str] = {"SNP", "ref", "alt", "pos"}
         for index, entry in enumerate(snp_list):
             if not isinstance(entry, dict):
@@ -344,14 +346,53 @@ class ReadConfigPattern:
                     "SNP entry in configuration file is not a dictionary, exiting..."
                 )
                 raise IncorrectSNPConfiguration(self.config_file)
-            missing: set[str] = required_keys - entry.keys()
-            if missing:
-                logging.error(
-                    "SNP entry in configuration file has missing keys: %s, exiting..."
-                )
-                raise IncorrectSNPConfiguration(self.config_file)
-            self._validate_snp_entry(index, entry)
+            self.validate_snp_keys(required_keys, index, entry)
         return True
+
+    def validate_snp_list_type(self, snp_list: Any) -> None:
+        """
+        Function that validates the type of the SNP list
+        in the configuration file.
+        -----------
+        Input:
+            - snp_list: The SNP list to be validated
+        Raises:
+            - IncorrectSNPConfiguration: If the SNP list is not a list
+        -----------
+        """
+        if not isinstance(snp_list, list):
+            logging.error(
+                "SNP list is not a list in configuration file, exiting..."
+            )
+            raise IncorrectSNPConfiguration(self.config_file)
+
+    def validate_snp_keys(
+        self, required_keys: set[str], index: int, entry: dict[str, str | int]
+    ) -> None:
+        """
+        Function that validates the keys of a single SNP entry.
+        It checks if the required keys are present in the entry
+        and then delegates the validation process of the entry
+        to the _validate_snp_entry function.
+        ----------
+        Input:
+            - required_keys: set[str]
+                The set of required keys for the SNP entry
+            - index: int
+                The index of the entry in the SNP list
+            - entry: dict[str, str | int]
+                The SNP entry to be validated
+        Raises:
+            - IncorrectSNPConfiguration: If the entry is not valid
+        ----------
+        """
+        missing: set[str] = required_keys - entry.keys()
+        if missing:
+            logging.error(
+                "SNP entry in configuration file has missing keys: %s, exiting..."
+            )
+            raise IncorrectSNPConfiguration(self.config_file)
+        self._validate_snp_entry(index, entry)
 
     def _validate_snp_entry(
         self, index: int, entry: dict[str, str | int]
