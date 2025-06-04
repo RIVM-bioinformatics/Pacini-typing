@@ -62,9 +62,12 @@ class FASTAParser(ParserStrategy):
 
     def read_output(self, filename: str) -> pd.DataFrame:
         """
-        Function that his responsible for reading the output of
+        Function that is responsible for reading the output of
         the BLAST search and placing the results in a pandas data frame.
         The data frame is also formatted with the right column names.
+        Finally, an additional column is added to the data frame
+        that contains the percentage coverage
+            (since blast does not output this by default).
         ----------
         Input:
             - filename: the name of the file to read

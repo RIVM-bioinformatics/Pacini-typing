@@ -9,6 +9,15 @@
 
 This script is responsible for building a database using either KMA or BLAST.
 See the class and methods for specific information about the working.
+
+Module that creates a GENE database for either KMA or BLAST.
+For this operation, a reference FASTA file is required
+and some input arguments, like the database path,
+database name, and database type. Using the database type variable,
+the script decides whether to create a KMA or BLAST database.
+
+The user can also create this database using a subcommand, more about this
+specific subcommand can be found in the README.md file of this repository.
 """
 
 __author__ = "Mark van de Streek"
@@ -20,6 +29,7 @@ import os
 from typing import Any, Tuple
 
 from command_utils import CommandInvoker, ShellCommand
+from preprocessing.validation.determine_input_type import InputFileInspector
 
 
 class GeneDatabaseBuilder:
@@ -53,6 +63,7 @@ class GeneDatabaseBuilder:
         self.database_name: str = arg_options["database_name"]
         self.database_type: str = arg_options["database_type"]
         self.input_fasta_file: str = arg_options["input_fasta_file"]
+        InputFileInspector([self.input_fasta_file])
         self.build_database()
 
     def build_database(self) -> None:

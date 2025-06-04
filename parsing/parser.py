@@ -7,10 +7,14 @@
     “GitHub Copilot: Your AI pair programmer” (GPT-3). GitHub, Inc.
     https://github.com/features/copilot
 
-This script is the main implementation of the strategy pattern.
-This script is therefore delegating the reading, filtering
-and writing of the found hits to the specific strategy.
-An incoming parameter is used to define the strategy.
+Gene parsing module that is responsible for parsing gene-related
+queries. This module is also the implementation of the strategy pattern.
+The script parses the output and constructs a report with the correct
+information. The report is NOT written to a file, this is done in the
+parsing manager (an extra check is performed there).
+
+However, this module does write the FASTA output if the user
+specified the --fasta-out option.
 """
 
 __author__ = "Mark van de Streek"
@@ -151,13 +155,16 @@ class Parser:
 
     def create_output_report(self) -> pd.DataFrame:
         """
-        Function that creates a filtered output report
+        Function that creates a filtered output report for GENE search
         This report holds the information to check the results.
         Output example:
-        ID,Input,Configuration,Type/Genes,Hits,Percentage Identity,Percentage Coverage
-        1,SAMPLE123,O1-scheme.yaml,V. cholerae O1 related genes,rfbV,100.0,1.0
-        2,SAMPLE123,O1-scheme.yaml,V. cholerae O1 related genes,ctxA,100.0,1.0
-        3,SAMPLE123,O1-scheme.yaml,V. cholerae O1 related genes,ctxB,100.0,1.0
+        ID,Input,Configuration,Type/Genes,Mode,Hits,Percentage Identity,Percentage Coverage,e-value
+        1,SAMPLE123,O1-scheme.yaml,V. cholerae O1 related genes,Gene,rfbV,100.0,100.0,7.75e-150
+        2,SAMPLE123,O1-scheme.yaml,V. cholerae O1 related genes,Gene,ctxA,100.0,100.0,7.75e-150
+        3,SAMPLE123,O1-scheme.yaml,V. cholerae O1 related genes,Gene,ctxB,100.0,100.0,7.75e-150
+
+        The report is created by iterating over the DataFrame and constructing
+        a record for each hit, this operation is done in the construct_report_record function.
         ----------
         Output:
             - output report to write to a csv file
@@ -168,7 +175,6 @@ class Parser:
         columns, significance_type, value_column = (
             self.strategy.get_hits_report_info()
         )
-
         for index, (_, item) in enumerate(self.data_frame.iterrows(), start=1):
             output_records.append(
                 self.construct_report_record(
