@@ -7,9 +7,10 @@
     “GitHub Copilot: Your AI pair programmer” (GPT-3). GitHub, Inc.
     https://github.com/features/copilot
 
-Module that is responsible for creating PointFinder's SNP database.
+Module that is responsible for creating a custom PointFinder's SNP database.
 This operation is done using multiple functions and consists of a couple
 key steps:
+
 1. Create the output directory for the SNP database
 2. Validate the input genes file containing the gene sequences
     in which the mutation is present
@@ -22,13 +23,23 @@ key steps:
 The validation of the input genes file is done using the
 earlier developed InputFileInspector class, which
 is also used to validate the input FASTA sequence files.
+
+While the gene database is more easier to create and understand,
+PointFinder's SNP database is more complex and requires a strict format.
+
+The resistens-overview.txt file is the key file for the SNP database and
+will look like this:
+
+#Gene_ID	Gene_name	Codon_pos	Ref_nuc	Ref_codon	Res_codon	Resistance	PMID
+retF	retF	31	GTG	V	A	Custom	-
+fcgG	fcgG	94	CTA	L	I	Custom	-
 """
 
 __author__ = "Mark van de Streek"
 __date__ = "2025-05-15"
 __all__ = ["SNPDatabaseBuilder"]
 
-# Define the headers for the resistens-overview.txt file
+# Define the required headers for the resistens-overview.txt file
 RESISTENS_OVERVIEW_HEADERS = [
     "#Gene_ID",  # Gene ID
     "Gene_name",  # Gene name
@@ -40,6 +51,7 @@ RESISTENS_OVERVIEW_HEADERS = [
     "PMID",  # PMID(s) (comma-separated if multiple)
 ]
 
+import logging
 import os
 from typing import Any
 
@@ -77,23 +89,24 @@ class SNPDatabaseBuilder:
         Constructor for the DatabaseBuilder class.
         The constructor initializes the class attributes
         and calls the methods to create the database.
+        The InputFileInspector class is used to validate
+        the input target_snps_file (genes in which the mutations are present).
         ----------
         Input:
             - arg_options: dictionary with the input arguments
                 for the database builder.
         ----------
         """
+        logging.info("Creating SNP reference database...")
         self.target_snps_file: str = arg_options["target_snps_file"]
         self.path_snps: str = arg_options["path_snps"]
         self.path_snps = self._get_path_snps()
         self.species: str = arg_options["species"]
         self.SNP_list: list[dict[str, str]] = arg_options["SNP_list"]
-        # Use the InputFileInspector class to check
-        # the validity of the target_snps_file
         InputFileInspector([self.target_snps_file])
         # Start the database creation process
         self.check_and_create_directory()
-        self.build_gene_database()
+        self.generate_gene_file_structure()
         self.create_resistens_overview_file()
         self.create_RNA_file()
 
@@ -101,7 +114,7 @@ class SNPDatabaseBuilder:
         """
         Function that creates the output directory
         for the SNP database if it does not exist.
-        otherwise, it will just return.
+        If not exists, nothing happens.
         """
         if not os.path.exists(f"{self.path_snps}/{self.species}"):
             os.makedirs(f"{self.path_snps}/{self.species}", exist_ok=True)
@@ -134,6 +147,9 @@ class SNPDatabaseBuilder:
                 to the genes.txt file.
         ----------
         """
+        logging.debug(
+            "Writing gene headers to genes.txt file for SNP database..."
+        )
         with open(
             f"{self.path_snps}/{self.species}/genes.txt",
             "w",
@@ -155,6 +171,7 @@ class SNPDatabaseBuilder:
             and the gene sequence as value.
         ----------
         """
+        logging.debug("Creating individual gene files for SNP database...")
         for header, sequence in gene_info.items():
             gene_id: str = header.lstrip(">")
             with open(
@@ -166,7 +183,7 @@ class SNPDatabaseBuilder:
                 for i in range(0, len(sequence), 70):
                     gene_file.write(sequence[i : i + 70] + "\n")
 
-    def build_gene_database(self) -> None:
+    def generate_gene_file_structure(self) -> None:
         """
         Function that opens the target_snps_file and performs two
         operations:
@@ -177,6 +194,10 @@ class SNPDatabaseBuilder:
                 ending with `.fsa`
         ----------
         """
+        logging.info(
+            "Writing gene headers and creating individual gene"
+            "files for SNP database..."
+        )
         gene_info: dict[str, str] = {}
         with open(self.target_snps_file, "r", encoding="utf-8") as file:
             for line in file:
@@ -255,6 +276,9 @@ class SNPDatabaseBuilder:
         This is the key file for PointFinder's reference database
         and holds the information for all mutations.
         """
+        logging.info(
+            "Creating main resistens-overview.txt file for SNP database..."
+        )
         with open(
             f"{self.path_snps}/{self.species}/resistens-overview.txt",
             "w",
@@ -270,6 +294,10 @@ class SNPDatabaseBuilder:
         to have it in the database. PointFinder will raise an
         error if it is not present.
         """
+        logging.info(
+            "Creating RNA_genes.txt file for SNP database "
+            "(required by PointFinder)..."
+        )
         open(
             f"{self.path_snps}/{self.species}/RNA_genes.txt",
             "w",
