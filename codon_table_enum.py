@@ -109,19 +109,17 @@ class CodonTable(Enum):
     GGG = ("G", "Glycine")
 
     def __init__(self, short: str, full: str):
+        """
+        Constructor for the CodonTable class.
+        Initializes the short and full names of the amino acid.
+        ----------
+        Input:
+            - short: Short name of the amino acid (1-letter code)
+            - full: Full name of the amino acid
+        ----------
+        """
         self._short = short
         self._full = full
-
-    def __str__(self):
-        """
-        String representation of the class.
-        Used for debugging and logging purposes.
-        ----------
-        Output:
-            - String representation of the class
-        ----------
-        """
-        return f"{self.name}: {self.short} ({self.full})"
 
     @property
     def short(self) -> str:

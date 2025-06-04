@@ -35,9 +35,6 @@ class SNPQueryRunner(BaseQueryRunner):
     The class follows a command pattern, since the gene and
     SNP queries are following the same recipe, but only the
     some (small) parts are different.
-
-    *PointFinder doesn't have a version command,
-    so logging the version number is not possible.
     ----------
     Methods:
         - __init__: Constructor of the SNPQueryRunner class
@@ -53,6 +50,9 @@ class SNPQueryRunner(BaseQueryRunner):
         The checking of the PointFinder existence is additionally
         to the BaseQueryRunner abstract class and is only required
         for the SNP-related operations.
+
+        In addition to the GeneQueryRunner, this class also has
+        a method to download the PointFinder script.
         ----------
         Input:
             - run_options: dictionary with the input files,

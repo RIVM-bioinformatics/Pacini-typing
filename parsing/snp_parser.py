@@ -10,6 +10,9 @@
 Module that contains the SNPParser class. This class is responsible
 for reading, parsing and creating the output report for the SNPs.
 
+Filtering is not required for this parser, since PointFinder simply
+returns the SNPs that are found in the input sequence.
+
 *Please note this class is not following the strategy pattern like
 the other parsers. This is due the bigger differences in the parsing.
 """
@@ -23,7 +26,6 @@ import logging
 from typing import Any
 
 import pandas as pd
-from pandas.core.api import DataFrame as DataFrame
 
 from preprocessing.exceptions.snp_detection_exceptions import (
     PointFinderScriptError,
@@ -68,7 +70,7 @@ class SNPParser:
         self.input_sequence_sample: str = input_sequence_sample
         self.file_type: str = file_type
         self.pointfinder_output_filename: str = pointfinder_output_filename
-        self.data_frame: DataFrame = pd.DataFrame()
+        self.data_frame: pd.DataFrame = pd.DataFrame()
 
     def read_run_output(self, filename: str) -> None:
         """
@@ -102,12 +104,11 @@ class SNPParser:
             - codon_output: The character(s) change output of PointFinder
         Output:
             - tuple: A tuple containing the reference and alternative
+        ----------
         """
         # Handle special cases first
         if codon_output == "frameshift":
             return "frameshift", "frameshift"
-
-        # Handle all other cases
         if "->" in codon_output:
             ref, alt = codon_output.split("->")
         elif "-" in codon_output and not codon_output.startswith("del"):
@@ -117,7 +118,7 @@ class SNPParser:
             ref = parts[1] if len(parts) > 1 and parts[0] == "" else parts[0]
             alt = "-"
         else:
-            # Default
+            # Default case when no special characters are present
             ref, alt = codon_output, codon_output
 
         return ref.strip(), alt.strip()
@@ -182,7 +183,7 @@ class SNPParser:
             "Amino acid change": f"{ref_aa}{pos}{alt_aa}",
         }
 
-    def create_output_report(self):
+    def create_output_report(self) -> pd.DataFrame:
         """
         Function that creates the content for the output report.
         For every line in PointFinder's output, a record is created

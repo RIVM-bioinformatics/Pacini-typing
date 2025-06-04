@@ -25,7 +25,7 @@ from typing import Any
 
 class KMA(Enum):
     """
-    Enum class to store K-mer alignment options and flags.
+    Enum class to store K-mer alignment (KMA) options and flags.
     With this Enum class, the options are stored in a more structured way
     and could be changed very easily.
     ----------

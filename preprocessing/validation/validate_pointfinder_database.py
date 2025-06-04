@@ -7,9 +7,18 @@
     “GitHub Copilot: Your AI pair programmer” (GPT-3). GitHub, Inc.
     https://github.com/features/copilot
 
-Script that checks the structure and vadidity of the PointFinder reference database.
+Script that checks the structure and validity of
+the PointFinder reference database.
 The existence of the database is checked, as well as the contents of some files
 and the matching of genes in all required files.
+
+The PointFinderReferenceChecker class is used to check:
+
+1. Path to the database
+2. Existence of the required files
+    (genes.txt, resistens-overview.txt, RNA_genes.txt)
+3. Presence of individual FASTA files for each gene in genes.txt
+4. Matching of genes in resistens-overview.txt and genes.txt
 """
 
 __author__ = "Mark van de Streek"
@@ -125,6 +134,9 @@ class PointFinderReferenceChecker:
             - False if the file is not correct
         ----------
         """
+        logging.info(
+            "Checking the resistens-overview.txt file for required fields..."
+        )
         required_fields: list[str] = [
             "#Gene_ID",
             "Gene_name",
@@ -135,7 +147,6 @@ class PointFinderReferenceChecker:
             "Resistance",
             "PMID",
         ]
-        logging.debug(self.resistance_overview)
         df: pd.DataFrame = pd.read_csv(
             self.resistance_overview, sep="\t", encoding="utf-8"
         )
@@ -180,7 +191,7 @@ class PointFinderReferenceChecker:
     ) -> list[str] | None:
         """
         Little helper function to create a list of missing genes
-        from the genes that are not present in the to be checked list.
+        from the genes that are not present in the available genes list.
         If no missing genes are found, the function returns None.
         ----------
         Input:
@@ -210,6 +221,7 @@ class PointFinderReferenceChecker:
             - False if all lists are None
         ----------
         """
+        logging.debug("Checking for missing genes in the database files...")
         has_missing_genes = False
         for file_name, missing_genes in checks.items():
             if missing_genes:
@@ -225,16 +237,20 @@ class PointFinderReferenceChecker:
     def check_matching_genes_file(self) -> bool:
         """
         Function that checks if the genes listed in
-        `genes.txt` are present as individual .fsa files
+        genes.txt are present as individual .fsa files
         in the database directory. Also checks if the
-        genes present in the `resistens-overview.txt` file
-        are also present in the `genes.txt` file.
+        genes present in the resistens-overview.txt file
+        are also present in the genes.txt file.
         ----------
         Output:
             - True if all genes are present
             - False if any gene is missing
         ----------
         """
+        logging.info(
+            "Checking if the matching of genes "
+            "in the SNP database is correct..."
+        )
         genes_list: list[str] = self.get_gene_names()
         # retrieve the list of .fsa files in the database directory
         fsa_files = [
@@ -242,6 +258,9 @@ class PointFinderReferenceChecker:
             for f in os.listdir(self.path)
             if f.endswith(".fsa")
         ]
+        # Perform two checks:
+        # 1. Check if all genes in resistens-overview.txt are in genes.txt
+        # 2. Check if all genes in genes.txt have a corresponding .fsa file
         checks: dict[str, list[str] | None] = {
             "resistens-overview.txt": self.create_missing_genes_list(
                 target_genes=self.unique_genes_resistens_overview,

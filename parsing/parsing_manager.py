@@ -10,6 +10,9 @@
 ParsingManager class which, as the name suggests, manages the parsing process.
 It initializes the parser object, adds the right filters to the parser,
 and starts the parsing process.
+
+The parsing of genes and SNPs is quite different,
+but comes together in this class.
 """
 
 __author__ = "Mark van de Streek"
@@ -37,6 +40,11 @@ class ParsingManager:
     operations. It's a caller class that prepares
     the right parsers objects and adds the right filters
     to the classes.
+
+    The correct parsers are determined based on the search mode,
+    which can be either "genes", "SNPs", or "both". After these
+    parser are executed, this class checks if the reports should be
+    concatenated or not. If both reports are empty, a warning is logged.
     ----------
     Methods:
         - __init__: Constructor to initialize the config file
@@ -48,7 +56,6 @@ class ParsingManager:
             SNPs or both
         - _run_snps: Function that handles the parsing process for SNPs
         - _run_both: Function that handles the parsing process for both genes and SNPs
-        - set_parser: Function that initializes the parser object
         - get_config_gene_names: Function that retrieves the gene names
         - get_config_identity: Function that retrieves the identity
         - get_config_coverage: Function that retrieves the coverage
@@ -67,9 +74,9 @@ class ParsingManager:
         """
         Constructor of the ParsingManager class.
         This constructor initializes some of the incoming arguments
-        and calls the set_parser, add_filters_to_parser, and parse methods.
-        The parse method is the method of the Parser object which will start
-        the actual parsing process.
+        The handlers are defined as a dictionary,
+        which maps the search mode to the right handler function.
+        "both" search mode uses both _run_genes and _run_snps methods
         ----------
         Input:
             - pattern: ReadConfigPattern: the config file object
@@ -220,6 +227,8 @@ class ParsingManager:
         if parser.data_frame.empty:
             logging.warning("Gene report is empty, skipping...")
             return
+        # Search mode was genes if the code reaches this point,
+        # so we can write the report write away without checking
         self.write_report(parser.output_report, "report", self.sample_name)
 
     def process_reports(
@@ -252,6 +261,7 @@ class ParsingManager:
             final_report = pd.concat(
                 [gene_report, snp_report], ignore_index=True
             )
+            # Reset the index of the final report
             if "ID" in final_report.columns:
                 final_report["ID"] = range(1, len(final_report) + 1)
 
@@ -302,19 +312,6 @@ class ParsingManager:
         # Process the reports
         logging.info("Parsing process finished, processing reports...")
         return self.process_reports(gene_report, snp_report)
-
-    def set_parser(self) -> None:
-        """
-        Function that initializes the parser object.
-        The incoming arguments are used to initialize the parser.
-        """
-        logging.debug("Setting up parser object...")
-        self.parser = Parser(
-            self.pattern.pattern,
-            FASTAParser() if self.file_type == "FASTA" else FASTQParser(),
-            self.pattern.creation_dict["output"],
-            self.sample_name,
-        )
 
     def get_config_gene_names(self) -> list[str]:
         """
@@ -387,6 +384,7 @@ class ParsingManager:
         """
         logging.debug("Writing the %s...", suffix)
         file_name = f"{input_sequence_sample}_{suffix}.csv"
+        # last check to see if the report is empty
         if report.empty:
             logging.info("Skipping writing %s as report is empty", file_name)
             return

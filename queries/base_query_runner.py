@@ -14,7 +14,6 @@ This class defines the shared methods and variables and also
 defines the abstract methods that require custom implementation.
 """
 
-
 __author__ = "Mark van de Streek"
 __date__ = "2025-04-30"
 __all__ = ["BaseQueryRunner"]
@@ -32,6 +31,7 @@ class BaseQueryRunner(ABC):
     Abstract base class for the different query runners.
     Both runners (genes and SNPs) share the same recipe,
     and therefore this class is used to counteract duplicate code.
+    The code that is shared between the two runners is placed here.
     ----------
     Methods:
         - __init__: Constructor for the QueryRunner class (with shared variables)

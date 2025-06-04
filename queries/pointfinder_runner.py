@@ -37,7 +37,7 @@ class PointFinder(Enum):
     DATABASE_PATH_OPTION = "--databasePath"
     # PointFinder requires the database path and a species.
     # The 'species' is actually the subdirname of the specific
-    # database that is used. The could therfore be a bit misleading.
+    # database that is used. This could therfore be a bit misleading.
     DATABASE_SUBDIR_OPTION = "--species"
 
     @staticmethod
@@ -80,7 +80,7 @@ class PointFinder(Enum):
         so the version number is extracted from a request.
 
         *The logging of the version number is a wish of the RIVM
-        team, but is not a big requirement for Pacini-typing.
+        Bioinformatics team.
         ----------
         Output:
             - list with the version command
@@ -89,6 +89,6 @@ class PointFinder(Enum):
         return [
             "curl",
             "-s",
-            # Request to the PointFinder API and retrieve the commit dates
+            # Request to the BitBucket API and retrieve the commit dates
             "https://api.bitbucket.org/2.0/repositories/genomicepidemiology/pointfinder/filehistory/master/PointFinder.py?fields=values.commit.date",
         ]

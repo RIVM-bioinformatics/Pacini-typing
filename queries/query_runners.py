@@ -7,8 +7,8 @@
     “GitHub Copilot: Your AI pair programmer” (GPT-3). GitHub, Inc.
     https://github.com/features/copilot
 
-Simple module that holds the running methods for the gene and SNP queries.
-The functions of this module are reused in multiple modules, including tests.
+Simple module that handles the execution of the query runners for
+either genes or SNPS.
 
 The run_gene_query and run_snp_query functions are both calling the
 run_query function, only with a different class. The run_query function
@@ -43,7 +43,7 @@ def run_query(
     ----------
     Input:
         - query_runner_class: The QueryRunner class to instantiate and run.
-        - query_runner_builder: Dictionary with all necessary information.
+        - query_runner_builder: Dictionary with all necessary arguments.
     ----------
     """
     logging.info("Starting the query running related options...")

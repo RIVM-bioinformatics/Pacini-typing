@@ -23,17 +23,17 @@ import logging
 from typing import Any
 
 from make_gene_database import GeneDatabaseBuilder
+from make_snp_database import SNPDatabaseBuilder
 from parsing.read_config_pattern import ReadConfigPattern
 from preprocessing.exceptions.validate_database_exceptions import (
     InvalidDatabaseError,
     InvalidSNPDatabaseError,
 )
 from preprocessing.validation.validate_database import check_for_database_path
-from queries.query_runners import run_gene_query, run_snp_query
 from preprocessing.validation.validate_pointfinder_database import (
     PointFinderReferenceChecker,
 )
-from make_snp_database import SNPDatabaseBuilder
+from queries.query_runners import run_gene_query, run_snp_query
 
 
 class HandleSearchModes:
@@ -138,6 +138,10 @@ class HandleSearchModes:
                 successfully or does not exist.
         ----------
         """
+        logging.debug(
+            "Checking if the SNP database exists"
+            "and trying to create it if it does not exist..."
+        )
         if not self.check_valid_SNP_database(self.pattern.creation_dict):
             SNPDatabaseBuilder(self.pattern.creation_dict)
         if not self.check_valid_SNP_database(self.pattern.creation_dict):
@@ -159,6 +163,9 @@ class HandleSearchModes:
         This option requires an additional GENE database check and/or creation.
         Therefore, the functionality is separated
         from the handle_snp_search_mode.
+        KMA requires a indexed gene database to search for SNPs in FASTQ files,
+        this is why we need to check if the gene database exists here.
+        Blastn can directly search for SNPs in FASTA files.
         """
         custom_database_builder: dict[str, Any] = {
             "database_path": self.pattern.creation_dict["path_snps"]
@@ -188,6 +195,26 @@ class HandleSearchModes:
             else:
                 run_snp_query(self.pattern.creation_dict)
 
+    def create_genes_database(
+        self, custom_database_builder: dict[str, Any]
+    ) -> None:
+        """
+        Little helper function that creates the gene database
+        for the SNP database. it's confusing, but the PointFinder database
+        requires a gene database only when the file type is FASTQ.
+        The developed class is used for this purpose, with different params.
+        ----------
+        Input:
+            - custom_database_builder: Dictionary with necessary information
+        ----------
+        """
+        custom_database_builder["input_fasta_file"] = (
+            f"{self.pattern.creation_dict['path_snps']}/"
+            f"{self.pattern.creation_dict['species']}/genes.fasta"
+        )
+        custom_database_builder["database_type"] = "FASTQ"
+        GeneDatabaseBuilder(custom_database_builder)
+
     def handle_gene_search_mode(self) -> None:
         """
         Main function that handles the gene related search mode,
@@ -209,26 +236,6 @@ class HandleSearchModes:
         else:
             logging.debug("Database exists, starting the query operation...")
             run_gene_query(self.pattern.creation_dict)
-
-    def create_genes_database(
-        self, custom_database_builder: dict[str, Any]
-    ) -> None:
-        """
-        Little helper function that creates the gene database
-        for the SNP database. it's confusing, but the PointFinder database
-        requires a gene database only when the file type is FASTQ.
-        The developed class is used for this purpose, with different params.
-        ----------
-        Input:
-            - custom_database_builder: Dictionary with necessary information
-        ----------
-        """
-        custom_database_builder["input_fasta_file"] = (
-            f"{self.pattern.creation_dict['path_snps']}/"
-            f"{self.pattern.creation_dict['species']}/genes.fasta"
-        )
-        custom_database_builder["database_type"] = "FASTQ"
-        GeneDatabaseBuilder(custom_database_builder)
 
     def handle_snp_search_mode(self) -> None:
         """
@@ -262,7 +269,16 @@ class HandleSearchModes:
         related operations. The function simply checks which
         search mode is selected and calls the right function(s).
         """
+        logging.info("Handling search modes...")
         if self.search_mode in ["genes", "both"]:
+            logging.debug(
+                "Search mode is set to 'genes' or 'both', "
+                "handling gene search mode..."
+            )
             self.handle_gene_search_mode()
         if self.search_mode in ["snps", "both"]:
+            logging.debug(
+                "Search mode is set to 'snps' or 'both', "
+                "handling SNP search mode..."
+            )
             self.handle_snp_search_mode()
