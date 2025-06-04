@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.0.1](https://github.com/RIVM-bioinformatics/Pacini-typing/compare/v2.0.0...v2.0.1) (2025-06-04)
+
+
+### Documentation
+
+* Improved documentation/commenting across multiple modules for clarity ([dba9185](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/dba9185c837bb45f3e735c7ea18a968341d2ad46))
+* Improved documentation/commenting in files ([e5fd8d3](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/e5fd8d3d91f2f6a315517f43a55f1ce34a9cd5dc))
+
 ## [2.0.0](https://github.com/RIVM-bioinformatics/Pacini-typing/compare/v1.6.4...v2.0.0) (2025-06-02)
 
 
