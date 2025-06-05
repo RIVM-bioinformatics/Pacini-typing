@@ -31,7 +31,7 @@ Pylint output: Your code has been rated at 9.35/10
 
 Pacini-typing is a user-friendly application for the detection of **DNA sequences** and **SNPs** in both FASTA and FASTQ files. The application is designed to be used in a Linux-like environment and is easily executable via a YAML-based configuration scheme.
 
-> Pacini-typing is not limited to bacterial genomes, although is was primarily developed with **Yersinia pestis** and **Vibrio cholerae** as first real use cases. Performance in other species is not yet validated, but the application is designed to be flexible.
+> Pacini-typing is not limited to bacterial genomes, although it was primarily developed with **Yersinia pestis** and **Vibrio cholerae** as first real use cases. Performance in other species is not yet validated but the application is designed to be flexible.
 
 **Quick start command of the application:**
 
@@ -39,32 +39,34 @@ Pacini-typing is a user-friendly application for the detection of **DNA sequence
 pacini_typing --config path_to_config_file.yaml --input file_1.fastq file_2.fastq --search_mode SNPs
 ```
 
-The structure of configuration file is explained [here](#configuration-file) and the search modes are explained [here](#modes-of-pacini-typing).
+The structure of the `YAML` configuration file is explained [here](#configuration-file) and the search modes are explained [here](#modes-of-pacini-typing).
 
 ## Table of Contents
 
-* [Application information](#application-information)
-* [About this project](#about-this-project)
-* [Table of Contents](#table-of-contents)
-* [Prerequisites](#prerequisites)
-* [Complete list of required packages](#complete-list-of-required-packages)
-* [Installation](#installation)
-* [Modes of Pacini-typing](#modes-of-pacini-typing)
-* [Configuration file](#configuration-file)
-* [Approach](#approach)
-* [Getting Started](#getting-started)
-* [Parameters \& Usage](#parameters--usage)
-* [Output](#output)
-* [Example Run of Pacini-typing](#example-run-of-pacini-typing)
-* [Testing](#testing)
-* [Issues](#issues)
-* [Future Ideas](#future-ideas)
-* [License](#license)
-* [Contact](#contact)
+- [Application information](#application-information)
+- [About this project](#about-this-project)
+- [Table of Contents](#table-of-contents)
+- [Prerequisites](#prerequisites)
+- [Complete list of packages](#complete-list-of-packages)
+- [Installation](#installation)
+- [Modes of Pacini-typing](#modes-of-pacini-typing)
+- [Configuration file](#configuration-file)
+- [Approach](#approach)
+- [Getting Started](#getting-started)
+- [Parameters \& Usage](#parameters--usage)
+- [Output](#output)
+- [Example Run of Pacini-typing](#example-run-of-pacini-typing)
+- [Testing](#testing)
+- [Issues](#issues)
+- [Future Ideas](#future-ideas)
+- [License](#license)
+- [Contact](#contact)
 
 ## Prerequisites
 
->All required packages are available in a pre-defined conda environment. Steps to install this environment can be found in the [Automatic installation of the required packages](#automatic-installation-of-the-required-packages) section.
+>All required packages are available in a pre-defined conda environment. Steps to install this environment are found in the [Automatic installation of the required packages](#automatic-installation-of-the-required-packages) section.
+
+Pacini-typing requires:
 
 * Linux-like environment with (mini) conda installed
 * Python 3.10 or higher (developed on 3.12)
@@ -74,15 +76,16 @@ The following Python packages are required:
 1. pip=>24.2
 2. pyyaml=>6.0.2
 3. setuptools=>75.1.0
+4. cgecore=>2.0.1
 
 The following Tools are required:
 
 1. blast=>2.16.0
-   1. The makeblastdb subcommand of BLAST must be available as well
 2. kma=>1.4.15
-   1. The kma_index subcommand of KMA must be available as well
 
-## Complete list of required packages
+The subcommands of **blast** (`makeblastdb`) and **kma** (`kma_index`) are also required in the PATH of the system. They will be installed automatically by the conda environment.
+
+## Complete list of packages
 
 | Package    | Version |
 |------------|---------|
@@ -99,7 +102,7 @@ The following Tools are required:
 
 ### 🐍 Conda installation
 
-Pacini-typing can be installed using the conda/mamba package manager. The package is available on the bioconda channel, under the name [_pacini_typing_](https://anaconda.org/bioconda/pacini_typing).
+Pacini-typing can be installed using the conda/mamba package manager. The package is available on the bioconda channel, under the name [__pacini_typing__](https://anaconda.org/bioconda/pacini_typing).
 
 ```bash
 conda install bioconda::pacini_typing
@@ -107,7 +110,7 @@ conda install bioconda::pacini_typing
 
 ### 💻 Other installation methods
 
-Manual installation of the application can be done by cloning the repository and installing the requirements. The following steps can be followed:
+Manual installation of the application is achieved by cloning the repository and installing the requirements:
 
 1. Clone the repository.
 
@@ -121,17 +124,17 @@ git clone https://github.com/RIVM-bioinformatics/Pacini-typing.git
 cd Pacini-typing
 ```
 
-At this point, the repository is cloned to your system. It is advised to install the required packages. This can be done by following the steps in the section [Installation of the required packages](#installation-of-the-required-packages) or by installing the required packages manually listed in the [Prerequisites](#prerequisites) section.
+At this point, the repository is cloned to your system. It is advised to install the required packages. This is achieved by following the steps in the section [Installation of the required packages](#installation-of-the-required-packages) or by installing the required packages manually listed in the [Prerequisites](#prerequisites) section.
 
-1. Install the package.
+3. Install the package.
 
 ```bash
 pip install .
 ```
 
-Pacini-typing is now installed on your system. After installation, the application can be run by calling `pacini_typing` or `Pacini-typing` in every directory.
+Pacini-typing is now installed on your system. After installation, the application executed by calling `pacini_typing` or `Pacini-typing`.
 
-Additionally, the application can be run by calling the original `pacini_typing.py` script in the `pacini_typing` directory with the following command:
+Additionally, the application can also be executed by calling the original `pacini_typing.py` script in the `pacini_typing` directory with the following command:
 
 ```bash
 python3 directory_of_clone/pacini_typing.py --help
@@ -139,7 +142,7 @@ python3 directory_of_clone/pacini_typing.py --help
 
 #### Installation of the required packages
 
-For both macOS and Linux users, a complete conda environment, containing all the required packages, can be found in the root of the repository.
+For both macOS and Linux users, a complete conda environment, containing all required packages, is found in the root of the repository.
 
 To install the environment, run the following command:
 
@@ -160,28 +163,25 @@ conda activate pacini-typing
 
 ## Modes of Pacini-typing
 
-Pacini-typing accepts both assembled FASTA contigs and paired-end FASTQ files as input. The application can be executed using the following three search modes:
+Pacini-typing accepts both assembled FASTA contigs and paired-end FASTQ files as input. The application is executed using the following three search modes:
 
 1. `genes`: Search for genes in the input genome(s)
 2. `SNPs`: Search for SNPs in the input genome(s)
 3. `both`: Search for both genes and SNPs in the input genome(s)
 
-In addition, Pacini-typing does have two subcommands which can be used manually to (1) create a gene reference database and (2) run a query against the gene reference database. These subcommands are `makedatabase` and `query`, respectively. More information about these subcommands can be found in the [Parameters & Usage](#parameters--usage) section.
+In addition, Pacini-typing has two subcommands which can be used to (1) manually create a gene reference database or (2) manually run a query against the gene reference database. These subcommands are named `makedatabase` and `query`, respectively. More information about these subcommands is found in the [Parameters & Usage](#parameters--usage) section.
 
 ## Configuration file
 
-The configuration file of Pacini-typing delivers the required information to run in a easy-to-use manner. The configuration file is a YAML-based file with paths to the input files, database location and the genetic threshold values to use for a specific run.
+The configuration file of Pacini-typing delivers the required information to run in a easy-to-use manner. The configuration file is a YAML-based file with paths to input files, database locations, and genetic threshold to use for a specific run.
 
-> There two pre-defined genetic patterns for _Vibrio cholerae_ available in the `config` directory of the repository. These patterns can be used detect the pandemic serotypes O1 and O139 of _Vibrio cholerae_.
->
+Three pre-defined configuration schemes are available in the `config` directory of the repository:
 
-There are three pre-defined configuration schemes available in the `config` directory of the repository:
-
-1. `O1-scheme.yaml`: Configuration file for the O1 serotype of _Vibrio cholerae_
-2. `O139-scheme.yaml`: Configuration file for the O139 serotype of _Vibrio cholerae_
+1. `O1-scheme.yaml`: Configuration file for pandemic serotype O1 of _Vibrio cholerae_
+2. `O139-scheme.yaml`: Configuration file for pandemic serotype O139 of _Vibrio cholerae_
 3. `Yersinia-pestis-scheme.yaml`: **EXAMPLE** Configuration file for _Yersinia pestis_ (since sharing pandemic-related genes is not allowed at the time of writing, this file is only an example and does not contain any real genes)
 
-The schemes for _Vibrio cholerae_ are based on the real genetic patterns of the pandemic serotypes O1 and O139. The scheme for _Yersinia pestis_ is an example of how a configuration file can be structured.
+> The schemes for _Vibrio cholerae_ are based on real genetic patterns. These patterns, including gene sequences (`O1/O139.fasta`), can be used detect pandemic serotypes O1 and O139 of _Vibrio cholerae_.
 
 Example configuration file for _Yersinia pestis_ related variants:
 
@@ -208,6 +208,7 @@ database:
   # Multi-fasta file with genes in which the SNPs are located
   target_snps_file: "/my_own_path/to/fasta/SNPs.fasta"
   path_snps: "/my_own_path/to/database"
+  # Species of the SNP database, used for naming
   species: "Yersinia"
   
 global_settings:
@@ -244,12 +245,12 @@ Let's take a closer look at the SNP field, since this is a bit more complex:
     pos: 123
 ```
 
-* **SNP**: The name of the gene in which the SNP is located.
-* ***ref**: The reference nucleotide sequence of the SNP. **Must** be a codon (3 nucleotides).
+* **SNP**: The name of the gene in which the SNP is located (genes are defined in the `target_snps_file`).
+* **ref**: The reference nucleotide sequence of the SNP. **Must** be a codon (3 nucleotides).
 * **alt**: The alternative amino acid that you want to search for. (1 letter amino acid code)
-* **pos**: The position of the **CODON** in the gene where the SNP is located. This is not the position of the nucleotide, but the position of the codon in the gene. Very important, since SNPs are very sensitive to the position of the codon in the gene.
+* **pos**: The position of the **CODON** in the gene where the SNP is located. This is not the position of the nucleotide but the position of the codon in the gene. Very important since SNPs are very sensitive to the position of the codon in the gene.
 
-_Please note that there is also a field for **PointFinder's script**. This is due to the fact that PointFinder is not available via Pip or Conda, so it must be installed manually. If the script is not found at the specified path, Pacini-typing will try to install it automatically in the specified path. This is done by a `wget` command in the `snp_query_runner.py` script of the application._
+_Please note that there is also a field for **PointFinder's script**. This is due to the fact that PointFinder is not available via Pip or Conda and must be installed manually. If the script is not found at the specified path, Pacini-typing will try to install it automatically in the specified path. This is performed by a `wget` command in the `snp_query_runner.py` script of the application._
 
 [Back to top](#pacini-typing)
 
@@ -267,7 +268,7 @@ Global steps of the application are:
 
 ### Parsing operations
 
-The main logic for the parsing operation is present in the `parsing` module of the application. Additionally, this folder contains the usage of two design patterns:
+The main logic for the parsing operation is present in the `parsing` module of the application. Additionally, this module contains the usage of two design patterns:
 
 1. **Strategy Pattern**
 2. **Filter Pattern**
@@ -277,9 +278,16 @@ The strategy pattern is used define overarching features required for both metho
 
 The filter pattern is used to filter the hits based on the values in the configuration file. All specific filters are inheriting from the `filter_pattern.py` base class.
 
+Filters can easily be added by creating a new class that inherits from the `Filter` base class and implementing the single method `apply()` of the base class. Currently, two filters are implemented:
+
+1. `coverage_filter.py`: Filters the hits based on the percentage coverage value in the configuration file.
+2. `identity_filter.py`: Filters the hits based on the percentage identity value in the configuration file.
+
+The main SNP parsing methodology is implemented in the `snp_parser.py` file. Since this operation is quite different from the gene parsing, it is not using the strategy pattern. PointFinder's results also do not need to be filtered.
+
 ## Getting Started
 
-To get started with the application, you can run the following command to see the help of the application:
+To get started with the application, you can run the following command to get the help of the application:
 
 ```bash
 python pacini_typing.py --help
@@ -339,7 +347,7 @@ See github.com/RIVM-Bioinformatics for more information
 
 ### Required parameters
 
-Pacini-typing can be used at two different ways. This could either be:
+Pacini-typing can be used in two different ways. This could either be:
 
 >* Using a pre-defined configuration file to run the application
 
@@ -347,13 +355,13 @@ Pacini-typing can be used at two different ways. This could either be:
 
 One of these two methods must be used to run the application.
 
-> Note: Manually searching for genetic variations does not result in parsing and creating output reports. This is only possible when using a pre-defined configuration file.
+**Note:** Manually searching for genetic variations does not result in parsing and creating output reports. This is only possible when using a configuration file (`--config`).
 
-#### Pre-defined configuration file required parameters
+#### Configuration file required parameters
 
 * ```-c, --config``` path to the configuration file
 
-* ```-i, --input``` path to the input file(s). It can accept 1 or 2 files. If providing 2 files, separate them with a space:
+* ```-i, --input``` path to the input file(s). Either accepts 1 or 2 files. If providing 2 files, separate them with a space:
 
 ```bash
 pacini_typing --input file_1.ext file_2.ext
@@ -392,7 +400,7 @@ pacini_typing query -db_path [path_to_database_directory] -db_name [name_of_data
 
 ### Optional parameters
 
-* ```-m, --search_mode``` Search mode to use. Choose between `SNPs`, `genes` or `both`. Default is `genes`.
+* ```-m, --search_mode``` Search mode to use. Choose between `SNPs`, `genes` or `both`. **Default** is `genes`.
 * ```-v, --verbose``` Increase output verbosity
 * ```-V, --version``` Show program's version number and exit
 * ```--save-intermediates``` Save intermediate files of the run
@@ -403,6 +411,26 @@ pacini_typing query -db_path [path_to_database_directory] -db_name [name_of_data
 > **Note**: The `--save-intermediates` and `--fasta-out` parameters can not be used in combination with the `makedatabase` or `query` subcommands.
 
 In the `accept_arguments.yaml` file in the `config` directory, the accepted extensions for the input files are defined. These can be changed by the user.
+
+In `config/accept_arguments.yaml`, the accepted extensions for genome files are defined. These extensions can be changed by the user. The default extensions are:
+
+```yaml
+accepted_input_extensions:
+  - .fq
+  - .fastq
+  - .fq.gz
+  - .fastq.gz
+  - .fna
+  - .fsa
+  - .fasta
+  - .tar.gz
+  - .fasta.gz
+  - .scaffold.fasta
+  - .result.fasta
+  - .fa
+```
+
+*Zipped files are automatically unzipped by Pacini-typing, so the user does not have to worry about this. The application will automatically detect the file type and parse it accordingly.*
 
 ### The base command to run this program
 
@@ -416,7 +444,7 @@ The output of Pacini-typing consists of four possible files, depending on the pa
 
 1. `{prefix}_report.csv`: report of found genetic variations
 
-> This report is created if Pacini-typing founds a hit that is above the defined threshold values in the configuration file.
+> This report is the main output of Pacini-typing and is created when hit(s) are found and they meet the thresholds in the configuration file.
 
 Example (for `--search_mode genes`):
 
@@ -434,15 +462,15 @@ ID,Input,Configuration,Type/Genes,Mode,Hits,Reference nucleotide,Alternative nuc
 2,SAMN00115171,Yersinia.yaml,Y. pestis related variants,SNP,group_5678 p.E7K,AAA,AAG,7,E7K
 ```
 
-> The above report does not contain any real hits, but is an example of how the report looks like. `Position` refers to the position of the **CODON** in the sequence, not the position of the nucleotide. `Amino acid change` is formatted as `p.<original amino acid><position><new amino acid>`, e.g. `p.V1I` means that the original amino acid is `V` at position `1` and the new amino acid is `I`.
+> The `Amino acid change` column is formatted as `p.<original amino acid><position><new amino acid>`, i.e., `p.V1I` means that amino acid `V` at position `1` was mutated into the new amino acid `I`.
 
-2. (optional with --log-file) `pacini_typing.log`: Log file containing information about the run
+1. (optional with --log-file) `pacini_typing.log`: Log file containing information about the run
 
-This optional log file contains the output of the application. This file can be used to debug the application.
+This optional log file contains the log output of the application. This file can be used to debug the application.
 
 3. (optional with --fasta-out) `{prefix}_sequences.fasta`: FASTA file containing the found sequences
 
-This file contains the found sequences of the (gene) hits in the input file. Not the sequence of search, but the actual sequence that was found in the input file. The sequences are written in FASTA format.
+This file contains the found sequences of the (gene) hits in the input file. Not the sequence of search but the actual sequence that were found in the input genome file(s). The sequences are written in FASTA format.
 
 Example:
 
@@ -457,11 +485,13 @@ AATTTTACTTGATGCACCTACGGGTTATTCGCCACAAAAATGAGAATAAAATGAAAGTATTGCATGTATA
 
 > **Note**: The prefix of the output files is the same as the prefix of the input file.
 
-4. (optional with --save-intermediates) `{prefix}_intermediates_<SNP/gene>.tar.gz`: Tarball containing all intermediate files of the run.
+4. (optional with --save-intermediates) `{prefix}_intermediates_<SNP/gene>.tar.gz`: Tarball containing all intermediate files of the run, this includes raw BLAST, KMA or PointFinder reports.
 
 [Back to top](#pacini-typing)
 
 ## Example Run of Pacini-typing
+
+Based on:
 
 * Input
 * Run
@@ -489,10 +519,13 @@ CCCFFFFFHHHGHJJJJJJIJJJJJHIJJJJJC1:FHIIIIIJJIIJFIJGHIJJJJJJJIGIJJJJIJJ
 
 ### Run
 
+Search for O1-related genes in the input FASTQ files using the pre-defined `O1.yaml` configuration file:
+
 ```bash
 pacini_typing \
-  --i input_file.ext \ # 1 FASTA file OR 2 FASTQ files
-  --config path_to_config_file.yaml
+  --i ERR976461_1.fastq ERR976461_2.fastq \
+  --config config/O1.yaml
+  --search_mode genes
 ```
 
 ## Testing
@@ -520,7 +553,7 @@ def test_example():
     # Test code
 ```
 
-When cloning the repository, the tests must be skipped as well. This can be done by running the following command:
+When cloning/downloading the repository, these tests must be skipped too. This is achieved by running the following command:
 
 ```bash
 CI=true pytest -v tests/
@@ -537,7 +570,21 @@ If encoutering any issues:
 
 ## Future Ideas
 
-* Implement biological typing based on the configuration file
+**Implement biological typing based on the configuration file**: A user can specify a biological type in the configuration file. Pacini-typing automatically processes the biological type in a report. This way the user can easily see which biological type is present in the entered genome(s). This is especially useful for microbiologists.
+
+For example, the following configuration file can be used to specify pandemic cholera:
+
+```yaml
+types:
+  name: "Pandemic cholera"
+  targets:
+    - one_of: ['rfbV:O1', 'wbfZ:O139']
+    - one_of: ['ctxA', 'ctxB']
+    - all_of: 
+    - not: ['']
+```
+
+But this is still a future idea of the application.
 
 ## License
 
