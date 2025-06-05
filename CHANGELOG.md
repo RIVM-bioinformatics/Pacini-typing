@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.0.2](https://github.com/RIVM-bioinformatics/Pacini-typing/compare/v2.0.1...v2.0.2) (2025-06-05)
+
+
+### Documentation
+
+* pull request [#39](https://github.com/RIVM-bioinformatics/Pacini-typing/issues/39) - Updated the README with clarity, fixed typos, and future ideas ([e67678f](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/e67678fe0db1a7f02614a8a3d9350298dad3e237))
+* Updated the README with clarity and fixed typos ([fce48ec](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/fce48ece53b47437b541137338a0a683f6ae77ab))
+
 ## [2.0.1](https://github.com/RIVM-bioinformatics/Pacini-typing/compare/v2.0.0...v2.0.1) (2025-06-04)
 
 
