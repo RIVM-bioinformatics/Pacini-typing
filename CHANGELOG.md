@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.0.1](https://github.com/RIVM-bioinformatics/Pacini-typing/compare/v3.0.0...v3.0.1) (2026-02-26)
+
+
+### Bug Fixes
+
+* replace pkg_resources with importlib.metadata for version retrieval ([6dcc3fb](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/6dcc3fb615db809d3d99a863b82d11949197dcdc))
+
 ## [3.0.0](https://github.com/RIVM-bioinformatics/Pacini-typing/compare/v2.0.2...v3.0.0) (2026-02-26)
 
 
