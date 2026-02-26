@@ -69,7 +69,7 @@ The structure of the `YAML` configuration file is explained [here](#configuratio
 Pacini-typing requires:
 
 * Linux-like environment with (mini) conda installed
-* Python 3.10 or higher (developed on 3.12)
+* Python 3.12 or higher (developed on 3.12)
 
 The following Python packages are required:
 

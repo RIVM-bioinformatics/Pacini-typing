@@ -48,6 +48,7 @@ setup(
     packages=find_packages(),
     long_description=open("README.md", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
+    python_requires=">=3.12",
     include_package_data=True,
     py_modules=[
         "pacini_typing",
