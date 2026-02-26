@@ -18,7 +18,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="pacini_typing",
-    version="3.0.0",
+    version="3.0.1",
     author="Mark van de Streek",
     author_email="ids-bioinformatics@rivm.nl",
     packages=find_packages(),
