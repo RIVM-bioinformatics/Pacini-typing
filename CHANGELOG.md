@@ -1,5 +1,16 @@
 # Changelog
 
+## [3.0.0](https://github.com/RIVM-bioinformatics/Pacini-typing/compare/v2.0.2...v3.0.0) (2026-02-26)
+
+
+### ⚠ BREAKING CHANGES
+
+* update Python version requirement to 3.12 or higher
+
+### Features
+
+* update Python version requirement to 3.12 or higher ([7a0bba1](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/7a0bba1e01b99d534272c155e151c81ae754bcb7))
+
 ## [2.0.2](https://github.com/RIVM-bioinformatics/Pacini-typing/compare/v2.0.1...v2.0.2) (2025-06-05)
 
 
