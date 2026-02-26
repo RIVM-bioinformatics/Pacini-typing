@@ -20,8 +20,7 @@ __all__ = ["main"]
 
 import argparse
 from argparse import RawTextHelpFormatter
-
-import pkg_resources
+from importlib.metadata import version as get_version
 
 from preprocessing.argsparse.args_makedatabase import (
     build_makedatabase_command,
@@ -69,7 +68,7 @@ def main(givenargs: list[str]) -> argparse.Namespace:
         "-V",
         "--version",
         action="version",
-        version=pkg_resources.get_distribution("pacini_typing").version,
+        version=get_version("pacini_typing"),
     )
 
     parser.add_argument(
@@ -129,9 +128,7 @@ def main(givenargs: list[str]) -> argparse.Namespace:
         type=str,
         choices=["SNPs", "genes", "both"],
         default="genes",
-        help=(
-            "Search mode to use. SNPs, genes or both.\n" "Default is genes.\n"
-        ),
+        help=("Search mode to use. SNPs, genes or both.\n" "Default is genes.\n"),
     )
 
     subparsers = parser.add_subparsers(
@@ -161,9 +158,7 @@ def main(givenargs: list[str]) -> argparse.Namespace:
             )
     else:
         if args.config or args.input:
-            parser.error(
-                "--config or --input cannot be used with subcommands."
-            )
+            parser.error("--config or --input cannot be used with subcommands.")
         if args.fasta_out or args.save_intermediates:
             parser.error(
                 "--fasta-out and --save-intermediates cannot be used with subcommands."
