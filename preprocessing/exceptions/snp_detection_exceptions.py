@@ -88,7 +88,7 @@ class IncorrectSNPConfiguration(Exception):
     def __str__(self) -> str:
         return f"""
         ---------------------------------------------------
-        ERROR: Incorrect SNP cosnfiguration in config file
+        ERROR: Incorrect SNP configuration in config file
         ---------------------------------------------------
         The following SNP configuration file is incorrect:
             - Path: {self.config_path}
@@ -129,7 +129,7 @@ class PointFinderReportError(Exception):
             - Read the above log message for the exact
                 file name and see if the file exists
             - Most likely the PointFinder's script named
-                the report file incosistently
+                the report file inconsistently
             - Change input file name of the FASTA or FASTQ,
                 without the use of any special characters
         ----------------------------------------------------
