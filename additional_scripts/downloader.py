@@ -22,6 +22,7 @@ __author__ = "Mark van de Streek"
 __date__ = "2024-11-19"
 __all__ = ["download_fastq"]
 
+import shlex
 import subprocess
 from multiprocessing import Pool
 
@@ -38,10 +39,10 @@ def download_fastq(accession: str):
       accession: The accession number.
     """
 
-    cmd = f"fasterq-dump --split-files --outdir {OUTPUT_DIR} {accession}"
+    cmd = ["fasterq-dump", "--split-files", "--outdir", OUTPUT_DIR, accession]
     try:
-        print(cmd)
-        subprocess.run(cmd, shell=True, check=True)
+        print(shlex.join(cmd))
+        subprocess.run(cmd, check=True)
         print(f"Downloaded files for {accession}")
     except subprocess.CalledProcessError as e:
         with open(LOG_FILE, "a", encoding="utf-8") as error_log:

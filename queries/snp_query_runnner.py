@@ -20,6 +20,10 @@ __all__ = ["SNPQueryRunner"]
 import json
 import logging
 import os
+import shutil
+import tempfile
+import time
+from pathlib import Path
 
 from command_utils import CommandInvoker, ShellCommand
 from queries.base_query_runner import BaseQueryRunner
@@ -114,3 +118,40 @@ class SNPQueryRunner(BaseQueryRunner):
             ).execute()
         else:
             logging.debug("PointFinder script already exists, skipping download...")
+
+    def run(self) -> None:
+        """
+        Override ABC's run() to create temporary symlinks/copies for
+        input files before invoking PointFinder. This circumvents issues
+        with filenames containing spaces in PointFinder.py, which is an
+        external script/dependency.
+        """
+        tmp_dir = None
+        symlink_map: dict[str, str] = {}
+        try:
+            # ? make tempdir in run output if possible
+            out_dir = self.run_options.get("run_output_snps") or tempfile.gettempdir()
+            tmp_dir = tempfile.mkdtemp(prefix="pf_input_", dir=out_dir if os.path.isdir(out_dir) else None)
+            # ? make symlinks (or copies on fail) for any input files containing spaces; housekeeping via a map
+            for input_file in self.run_options.get("input_file_list", []):
+                if " " in input_file:
+                    src = Path(input_file)
+                    dest = Path(tmp_dir) / src.name.replace(" ", "_")
+                    try:
+                        os.symlink(src, dest)
+                    except OSError:
+                        shutil.copy(src, dest)
+                    symlink_map[input_file] = str(dest)
+            # ? in self.query, replace input files containing spaces with their symlinked/copied underscored version
+            prepared_query = [symlink_map.get(arg, arg) for arg in self.query]
+
+            logging.debug("Starting the SNP query via PointFinder")
+            self.start_time = time.time()
+            CommandInvoker(ShellCommand(cmd=prepared_query, capture=True)).execute()
+            self.stop_time = time.time()
+        finally:  # ? cleanup any created symlinks/copies and the tempdir
+            if tmp_dir and os.path.isdir(tmp_dir):
+                try:
+                    shutil.rmtree(tmp_dir)
+                except Exception:
+                    logging.debug("Could not remove temporary PointFinder input dir %s", tmp_dir)
