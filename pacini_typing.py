@@ -60,17 +60,15 @@ import sys
 import tarfile
 from typing import Any
 
+import pandas as pd
+
 import preprocessing.argsparse.build_parser
 from handle_search_modes import HandleSearchModes
 from make_gene_database import GeneDatabaseBuilder
 from parsing.parsing_manager import ParsingManager
 from parsing.read_config_pattern import ReadConfigPattern
-from preprocessing.exceptions.determine_input_type_exceptions import (
-    InvalidSequencingTypesError,
-)
-from preprocessing.exceptions.validate_database_exceptions import (
-    InvalidDatabaseError,
-)
+from preprocessing.exceptions.determine_input_type_exceptions import InvalidSequencingTypesError
+from preprocessing.exceptions.validate_database_exceptions import InvalidDatabaseError
 from preprocessing.validation.determine_input_type import InputFileInspector
 from preprocessing.validation.validate_database import check_for_database_path
 from preprocessing.validation.validating_input_arguments import ArgsValidator
@@ -269,8 +267,7 @@ class PaciniTyping:
         See the unzip_gz_files function for more information.
         """
         logging.debug("Checking for .gz files in the input list...")
-        gz_files = [file for file in self.option["input_file_list"] if file.endswith(".gz")]
-        if gz_files:
+        if gz_files := [file for file in self.option["input_file_list"] if file.endswith(".gz")]:
             logging.info("Found files that need to be unzipped, unzipping...")
             self.unzip_gz_files(gz_files)
 
@@ -436,9 +433,7 @@ class PaciniTyping:
             - run_output_snps: The output directory of the SNP run
         ----------
         """
-        if gene_output_dir == run_output_snps:
-            self.save_intermediates(gene_output_dir)
-        elif run_output_snps.startswith(gene_output_dir):
+        if gene_output_dir == run_output_snps or run_output_snps.startswith(gene_output_dir):
             self.save_intermediates(gene_output_dir)
         elif gene_output_dir.startswith(run_output_snps):
             self.save_intermediates(run_output_snps)
@@ -503,7 +498,7 @@ class PaciniTyping:
         """
         search_mode: str = self.option["config"]["search_mode"]
         # Determine if the run_output_snps directory is needed
-        if search_mode in ["both", "SNPs"]:
+        if search_mode in {"both", "SNPs"}:
             run_output_snps = pattern.pattern["global_settings"]["run_output_snps"]
         gene_output_dir: str = pattern.pattern["global_settings"]["run_output"]
 
@@ -624,9 +619,11 @@ class PaciniTyping:
                 query_builder["file_type"],
             )
 
-    def run(self) -> None:
+    def split_flow_and_execute(self) -> None:
         """
-        Run method of the PaciniTyping class.
+        Run method of the PaciniTyping class: it handles the different
+        flows and executes the appropriate operations.
+
         This method calls all other methods in the correct order.
         After all preprocessing actions are done,
         this function will split if the makedatabase option is selected.
@@ -635,16 +632,72 @@ class PaciniTyping:
         self.parse_all_args()
         self.setup_logging()
         self.get_input_filenames()
+
+        # ? only make database and exit: for the "makedatabase" CLI option
+        if self.option["makedatabase"]:
+            self.validate_input()
+            self.handle_makedatabase_option()
+            return
+
+        # ? multiple/glob-samples flow
+        if self.option["config"] and len(self.option.get("input_file_list", [])) > 1:
+            self.execute_multiple_inputs()
+            return
+
+        # ? single-sample flow
+        self.execute()
+
+    def validate_input(self) -> None:
+        "Validate the input files"
         self.retrieve_sample_name()
         self.check_for_unzip_files()
         self.validate_file_arguments()
 
-        if self.option["makedatabase"]:
-            self.handle_makedatabase_option()
-        else:
-            self.get_file_type()
-            self.check_valid_option_with_args()
-            self.handle_config_or_query_option()
+    def execute_multiple_inputs(self) -> None:
+        """
+        Process multiple input files and write results to `combined.csv`.
+
+        For every input file in `self.option['input_file_list']` the method
+        sets per-sample options, runs the normal `execute()` flow and
+        collects the per-sample report filenames. At the end it concatenates
+        any found reports into `combined.csv` (hardcoded name).
+        """
+        # TODO Mark, ik heb wat moeite de logica door de code goed te overzien, als jij deze code kan reviewen
+        # TODO en jouw mening kan geven over de hacky implementaties en hoe dit verbetert kan worden dan graag!
+        results_files: list[str] = []
+
+        for input_file in list(self.option["input_file_list"]):
+            # set per-sample inputs
+            self.option["config"]["input"] = [input_file]  # TODO bit hacky, both values are needed for backwards comp? Merge?
+            self.option["input_file_list"] = [input_file]  # TODO bit hacky, both values are needed for backwards comp? Merge?
+            self.execute()
+            # TODO bit hacky, this is the expected output filename for this sample, but should be handled more graciously
+            results_files.append(f"{self.sample_name}_report.csv")
+
+        # Combine per-sample reports into combined.csv (if any; built on the above hacky assumption)
+        # TODO the hardcoded combined.csv should/could be a CLI arg?
+        dfs: list[pd.DataFrame] = []
+        for rf in results_files:
+            # ? if pacini finds no SNPs/genes, it will not write a report, hence the continue
+            if not os.path.exists(rf):
+                continue
+            try:
+                dfs.append(pd.read_csv(rf))
+            except Exception:
+                logging.warning("Could not read report %s, skipping", rf)
+        if not dfs:
+            logging.info("No per-sample reports found to combine")
+            return
+        combined = pd.concat(dfs, ignore_index=True)
+        combined.to_csv("combined.csv", index=False)
+        logging.info("Wrote combined.csv with %d rows", len(combined))
+
+    def execute(self) -> None:
+        "Execute the analysis"
+        self.validate_input()
+        self.get_file_type()
+        self.check_valid_option_with_args()
+        self.handle_config_or_query_option()
 
 
 def main(provided_args: list[str] | None = None) -> None:
@@ -665,7 +718,7 @@ def main(provided_args: list[str] | None = None) -> None:
         args = preprocessing.argsparse.build_parser.main(sys.argv[1:])
 
     pacini_typing = PaciniTyping(args)
-    pacini_typing.run()
+    pacini_typing.split_flow_and_execute()
     logging.info("Pacini-typing pipeline has finished successfully!")
 
 

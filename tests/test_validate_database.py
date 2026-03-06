@@ -32,14 +32,8 @@ from unittest import mock
 import pytest
 
 from pacini_typing import PaciniTyping
-from preprocessing.exceptions.validate_database_exceptions import (
-    InvalidDatabaseError,
-)
-from preprocessing.validation.validate_database import (
-    check_for_database_existence,
-    check_for_database_path,
-    create_database_file_list,
-)
+from preprocessing.exceptions.validate_database_exceptions import InvalidDatabaseError
+from preprocessing.validation.validate_database import check_for_database_existence, check_for_database_path, create_database_file_list
 
 skip_in_ci = pytest.mark.skipif(
     os.getenv("CI") == "true",
@@ -249,4 +243,4 @@ def test_run_method_raises_invalid_database_error() -> None:
     pacini_typing.check_valid_gene_database_path = lambda x: False
 
     with pytest.raises(InvalidDatabaseError):
-        pacini_typing.run()
+        pacini_typing.split_flow_and_execute()
