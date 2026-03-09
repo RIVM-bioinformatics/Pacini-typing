@@ -80,6 +80,22 @@
             ],
             "console": "integratedTerminal",
             "justMyCode": true,
-        }
+        },
+        {
+            "name": "test.yersinia.SNPs",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "pacini_typing.py",
+            "args": [
+                "--config",
+                "test_data/Yersinia.yaml",
+                "--input",
+                "test_data/vibrio_genes.fasta", // pass simple vibrio genes for testing purposes
+                "--search_mode",
+                "both",
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": true,
+        },
     ]
 }
