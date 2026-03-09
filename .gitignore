@@ -23,16 +23,6 @@ venv.bak/
 .dmypy.json
 dmypy.json
 
-.idea/
-*.fastq
-*.fasta
-.DS_Store
-*.fq
-README.md.bak
-pylint_output.txt
 
-*.csv
-
-.pylintrc
-.vscode/
-.coverage*
+databases/
+refdir/
