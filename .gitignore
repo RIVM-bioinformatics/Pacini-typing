@@ -30,9 +30,9 @@ dmypy.json
 *.fq
 README.md.bak
 pylint_output.txt
-refdir/
+
 *.csv
-test_data/
+
 .pylintrc
 .vscode/
 .coverage*

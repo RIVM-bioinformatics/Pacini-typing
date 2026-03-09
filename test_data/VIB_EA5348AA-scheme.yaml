@@ -1,0 +1,27 @@
+%YAML 1.2
+---
+metadata:
+  filename: "VIB_EA5348AA-scheme.yaml"
+  id: "VIB_EA5348AA"
+  type: "V. cholerae O1 Genes"
+  description: "Genetic pattern run config file for Vibrio cholerae O1 serogroup"
+  date_created: "2024-11-06"
+
+database:
+  name: "VIB-O1"
+  path: "databases/VIB-O1"
+  target_genes_file: "/home/streevdm/Pacini-typing/test_data/VIB_EA5348AA_genes.fasta"
+  run_output: "myoutput/"
+  SNP_database_path: "/Users/mvandestreek/Desktop/salm-simulation/example_db"
+  species: "Yersinia"
+
+global_settings:
+  run_output: "myoutput/"
+  # SNP output only required if search mode is SNPs or both
+  SNP_output_dir: "output/snp/"
+  perc_ident: 99
+  perc_cov: 80
+
+pattern:
+  - gene: "my_test_gene"
+
