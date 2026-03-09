@@ -9,13 +9,17 @@ metadata:
   pointfinder_script_path: "/home/streevdm/Pacini-typing/config/PointFinder.py"
 
 database:
-  name: "VIB-O1"
-  path: "databases/VIB-O1"
-  path_snps: "databases/SNP/VIB-O1"
-
+  # name of the database prefix files
+  name: "YP"
+  # database path for genes-related database (blast/kma)
+  path: "databases/YP"
+  # database path for SNP-related database (pointfinder)
+  path_snps: "databases/SNP/YP"
+  # list of genes to build reference database from
   target_genes_file: "config/VIB-O1.fasta"
+  # list of genes in which the SNPs of interest are placed in
   target_snps_file: "config/VIB-O1.fasta"
-  
+  # species of the SNP (used as prefix database name)
   species: "Yersinia"
   
 
@@ -30,7 +34,7 @@ pattern:
   - gene: "rfbV"
   - gene: "ctxA"
   - gene: "ctxB"
-  - SNP: "salmonella_gene"
+  - SNP: "rfbV_O1"
     ref: "ATG"
     alt: "L"
     pos: 1
