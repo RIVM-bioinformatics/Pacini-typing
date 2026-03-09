@@ -1,0 +1,85 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "test.all",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "debug_runner.py",
+            "args": [
+                "test_all"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": true,
+        },
+        {
+            "name": "test.e2e",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "debug_runner.py",
+            "args": [
+                "test_e2e"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": true,
+        },
+        {
+            "name": "test.e2e.config",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "debug_runner.py",
+            "args": [
+                "test_e2e_config"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": true,
+        },
+        {
+            "name": "test.e2e.non_paired",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "debug_runner.py",
+            "args": [
+                "test_e2e_non_paired"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": true,
+        },
+        {
+            "name": "test.e2e.paired",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "debug_runner.py",
+            "args": [
+                "test_e2e_paired"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": true,
+        },
+        {
+            "name": "test.e2e.makedatabase",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "debug_runner.py",
+            "args": [
+                "test_e2e_makedatabase"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": true,
+        },
+        {
+            "name": "test.runners",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "debug_runner.py",
+            "args": [
+                "test_runners"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": true,
+        }
+    ]
+}
