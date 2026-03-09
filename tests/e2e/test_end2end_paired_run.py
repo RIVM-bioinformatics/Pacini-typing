@@ -81,9 +81,9 @@ def setup_teardown_paired_input() -> Generator[list[str], None, None]:
         "--output",
         RUN_OUTPUT,
         "--database_path",
-        "./refdir/",
+        "refdir/",
         "--database_name",
-        "mykma",
+        "mydb",
     ]
     dir_path = "test_full_run/"
     os.mkdir(dir_path)

@@ -75,7 +75,7 @@ def setup_teardown_config_input() -> Generator[list[str], None, None]:
     args = [
         "--verbose",
         "--config",
-        "test_data/test_O1.yaml",
+        "test_data/VIB_EA5348AA-scheme.yaml",
         "--fasta-out",
         "--input",
         FASTA_FILE,

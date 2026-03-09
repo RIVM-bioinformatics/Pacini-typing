@@ -37,8 +37,8 @@ from tests.e2e.check_tool_existence import check_tools
 
 FASTA_FILE = "test_data/VIB_EA5348AA_AS.fasta"
 RUN_OUTPUT = "test_full_run/myresults"
-DATABASE_PATH = "./refdir/"
-DATABASE_NAME = "my_blast_db"
+DATABASE_PATH = "refdir/"
+DATABASE_NAME = "mydb"
 
 skip_in_ci = pytest.mark.skipif(
     os.getenv("CI") == "true",
