@@ -58,6 +58,7 @@ import os
 import shutil
 import sys
 import tarfile
+from pathlib import Path
 from typing import Any
 
 import pandas as pd
@@ -194,6 +195,8 @@ class PaciniTyping:
             "config_path": self.input_args.config,
             "fasta_out": self.input_args.fasta_out,
             "search_mode": self.input_args.search_mode,
+            "output_report": self.input_args.output_report,
+            "tmp_dir": self.input_args.tmp_dir,
         }
 
     def setup_logging(self) -> None:
@@ -404,10 +407,19 @@ class PaciniTyping:
         # Additionally, the query input and output must be set.
         # The output is not specified by the user, because
         # this is based on the input files.
+        user_specified_tempdir = self.option["config"]["tmp_dir"]
+        if user_specified_tempdir != Path("."):
+            # override config output definition to use specified tmpdir
+            pattern.pattern["global_settings"]["run_output"] = Path(user_specified_tempdir) / "gene"
+            pattern.pattern["global_settings"]["run_output_snps"] = Path(user_specified_tempdir) / "snps"
+        # sync both dicts
+        pattern.creation_dict["run_output"] = pattern.pattern["global_settings"]["run_output"]
+        pattern.creation_dict["run_output_snps"] = pattern.pattern["global_settings"]["run_output_snps"]
+
         logging.debug("Setting additional information for the configuration...")
         pattern.creation_dict["input_file_list"] = self.option["config"]["input"]
         pattern.creation_dict["file_type"] = self.file_type
-        pattern.creation_dict["output"] = pattern.pattern["global_settings"]["run_output"] + self.sample_name
+        pattern.creation_dict["output"] = Path(pattern.pattern["global_settings"]["run_output"]) / self.sample_name
 
         pattern.creation_dict["input_fasta_file"] = os.path.join(
             os.path.dirname(self.option["run_path"]),
@@ -438,36 +450,34 @@ class PaciniTyping:
         elif gene_output_dir.startswith(run_output_snps):
             self.save_intermediates(run_output_snps)
         else:
-            self.save_intermediates(
-                gene_output_dir,
-                f"{self.sample_name}_intermediates_gene.tar.gz",
-            )
+            self.save_intermediates(gene_output_dir, f"{self.sample_name}_intermediates_gene.tar.gz")
             self.save_intermediates(run_output_snps, f"{self.sample_name}_intermediates_SNP.tar.gz")
 
-    def save_intermediates(
-        self,
-        output_dir: str,
-        zip_name: str | None = None,
-    ) -> None:
+    def save_intermediates(self, output_dir: str, archive_name: str | None = None) -> None:
         """
-        Function that saves intermediate files in a zip archive.
-        The zip archive is named after the sample name.
-        The zip format is .tar.gz.
+        Function that saves intermediate files in a .tar.gz archive named
+        after the sample name. Its destination is determined by
+        self.option["config"]["output_report"].
         ----------
         Input:
             - output_dir: The output directory of the run
-            - zip_name: The name of the zip file to save the intermediates
+            - archive_name: The name of the .tar.gz file to save the intermediates
                 (only used if gene and SNP output directories are different)
         ----------
         """
-        if zip_name is None:
-            zip_name = f"{self.sample_name}_intermediates.tar.gz"
+        if archive_name is None:
+            archive_name = f"{self.sample_name}_intermediates.tar.gz"
+
+        if output_report_dir := self.option["config"]["output_report"]:
+            os.makedirs(output_report_dir, exist_ok=True)
+            archive_name = os.path.join(output_report_dir, archive_name)
+
         logging.info("Saving intermediate files in a zip archive...")
-        with tarfile.open(zip_name, "w:gz") as tar:
+        with tarfile.open(archive_name, "w:gz") as tar:
             tar.add(output_dir, arcname=os.path.basename(output_dir))
         # Call the delete_intermediates function to
         # remove the original output directory
-        logging.debug("Saved intermediate files in a zip...")
+        logging.debug("Saved intermediate files in a zip: %s", archive_name)
         self.delete_intermediates(output_dir)
 
     def delete_intermediates(self, output_dir: str) -> None:
@@ -497,25 +507,17 @@ class PaciniTyping:
         ----------
         """
         search_mode: str = self.option["config"]["search_mode"]
-        # Determine if the run_output_snps directory is needed
-        if search_mode in {"both", "SNPs"}:
-            run_output_snps = pattern.pattern["global_settings"]["run_output_snps"]
+        run_output_snps: str = pattern.pattern["global_settings"]["run_output_snps"]
         gene_output_dir: str = pattern.pattern["global_settings"]["run_output"]
 
         if self.input_args.save_intermediates:
             if search_mode == "both":
                 self.handle_intermediate_saving(gene_output_dir, run_output_snps)
             elif search_mode == "SNPs":
-                self.save_intermediates(
-                    run_output_snps,
-                    f"{self.sample_name}_intermediates_SNP.tar.gz",
-                )
+                self.save_intermediates(run_output_snps, f"{self.sample_name}_intermediates_SNP.tar.gz")
                 self.delete_intermediates(gene_output_dir)
             elif search_mode == "genes":
-                self.save_intermediates(
-                    gene_output_dir,
-                    f"{self.sample_name}_intermediates_gene.tar.gz",
-                )
+                self.save_intermediates(gene_output_dir, f"{self.sample_name}_intermediates_gene.tar.gz")
         else:
             if search_mode == "both":
                 self.delete_intermediates(gene_output_dir)
@@ -587,6 +589,7 @@ class PaciniTyping:
             self.file_type,
             self.sample_name,
             self.option["config"]["search_mode"],
+            output_report_dir=self.option["config"]["output_report"],
         )
         # Determine if the intermediate files should be saved or deleted
         self.save_or_delete_intermediate(pattern)
@@ -660,25 +663,28 @@ class PaciniTyping:
         For every input file in `self.option['input_file_list']` the method
         sets per-sample options, runs the normal `execute()` flow and
         collects the per-sample report filenames. At the end it concatenates
-        any found reports into `combined.csv` (hardcoded name).
+        any found reports into `combined_report.csv` (hardcoded name) into
+        the `output_report` directory.
         """
-        # TODO Mark, ik heb wat moeite de logica door de code goed te overzien, als jij deze code kan reviewen
-        # TODO en jouw mening kan geven over de hacky implementaties en hoe dit verbetert kan worden dan graag!
-        results_files: list[str] = []
+        results_files: list[str | Path] = []
+        report_dir = str(self.option["config"]["output_report"])
+        combined_report_file = Path(report_dir) / "combined_report.csv"
 
         for input_file in list(self.option["input_file_list"]):
             # set per-sample inputs
-            self.option["config"]["input"] = [input_file]  # TODO bit hacky, both values are needed for backwards comp? Merge?
-            self.option["input_file_list"] = [input_file]  # TODO bit hacky, both values are needed for backwards comp? Merge?
+            self.option["config"]["input"] = [input_file]  # ? used to infer whether fasta or fastq was supplied (# TODO have to double check)
+            # TODO doesn't iterating over input_file_list cause issues with paired files? Then you want to process both together?
+            # TODO test a FQ input run
+            self.option["input_file_list"] = [input_file]  # ? contains the list of files
             self.execute()
-            # TODO bit hacky, this is the expected output filename for this sample, but should be handled more graciously
-            results_files.append(f"{self.sample_name}_report.csv")
+            results_files.append(Path(report_dir) / f"{self.sample_name}_report.csv")
 
+        # TODO Mark: dit hieronder afsplitsen naar parser module, dat hierboven kan hier blijven staan
         # Combine per-sample reports into combined.csv (if any; built on the above hacky assumption)
-        # TODO the hardcoded combined.csv should/could be a CLI arg?
         dfs: list[pd.DataFrame] = []
         for rf in results_files:
             # ? if pacini finds no SNPs/genes, it will not write a report, hence the continue
+            # TODO remove this logic after that is fixed in the next commit --> we decided that this is undesired behaviour, should always generate something
             if not os.path.exists(rf):
                 continue
             try:
@@ -689,8 +695,9 @@ class PaciniTyping:
             logging.info("No per-sample reports found to combine")
             return
         combined = pd.concat(dfs, ignore_index=True)
-        combined.to_csv("combined.csv", index=False)
-        logging.info("Wrote combined.csv with %d rows", len(combined))
+
+        combined.to_csv(combined_report_file, index=False)
+        logging.info("Wrote %s with %d rows", combined_report_file, len(combined))
 
     def execute(self) -> None:
         "Execute the analysis"

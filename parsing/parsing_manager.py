@@ -20,6 +20,8 @@ __date__ = "2024-12-02"
 __all__ = ["ParsingManager"]
 
 import logging
+import os
+from pathlib import Path
 from typing import Any
 
 import pandas as pd
@@ -70,6 +72,7 @@ class ParsingManager:
         file_type: str,
         sample_name: str,
         search_mode: str,
+        output_report_dir: Path | str | None = None,
     ) -> None:
         """
         Constructor of the ParsingManager class.
@@ -89,9 +92,10 @@ class ParsingManager:
         self.file_type = file_type
         self.sample_name = sample_name
         self.search_mode: str = search_mode
+        self.output_report_dir: Path | None = Path(output_report_dir) if output_report_dir else None
         # Define the gene parser as a class variable,
         # since this is easier for adding filters and operations
-        self.parser = pd.DataFrame()
+        self.parser: Parser
         # define the handler functions for the right search mode
         self.handlers: dict[str, Any] = {
             "genes": self._run_genes,
@@ -151,22 +155,19 @@ class ParsingManager:
         """
         Basic helper function that formats the correct
         method name according to the file type.
-        This name is used to determine the ouput file
+        This name is used to determine the output file
         of the PointFinder run.
         ----------
         Output:
             - str: the correct method name
         ----------
         """
-        if self.file_type == "FASTQ":
-            return "kma"
-        else:
-            return "blastn"
+        return "kma" if self.file_type == "FASTQ" else "blastn"
 
-    def get_path_to_pointfinder_file(self) -> str:
+    def get_path_to_pointfinder_output_file(self) -> str:
         """
         Little helper function that combines the path to the
-        PointFinder file with the hits information.
+        PointFinder output file containing the hits information.
         The file name is based on the sample name and method used.
         PointFinder has a odd way of naming the output files,
         and therefore this function is used to create the correct name.
@@ -181,16 +182,12 @@ class ParsingManager:
         The above code is sort of reproduced in this function.
         ----------
         Output:
-            - str: path to the PointFinder file
+            - str: path to the PointFinder output file
         ----------
         """
-        return (
-            self.pattern.creation_dict["run_output_snps"]
-            + self.sample_name.split(".")[0].split("_")[0]
-            + "_"
-            + self._get_correct_method_name()
-            + "_results.tsv"
-        )
+        sample_prefix = self.sample_name.split(".")[0].split("_")[0]
+        filename = f"{sample_prefix}_{self._get_correct_method_name()}_results.tsv"
+        return os.path.join(self.pattern.creation_dict["run_output_snps"], filename)
 
     def _create_snp_parser(self):
         """
@@ -203,13 +200,13 @@ class ParsingManager:
             - SNPParser: SNP parser object
         ----------
         """
-        logging.info(self.get_path_to_pointfinder_file())
+        logging.info(self.get_path_to_pointfinder_output_file())
         logging.debug("Setting up the SNP parser object...")
         return SNPParser(
             self.pattern.pattern,
             self.sample_name,
             self.file_type,
-            self.get_path_to_pointfinder_file(),
+            self.get_path_to_pointfinder_output_file(),
         )
 
     def _run_genes(self) -> None:
@@ -257,7 +254,7 @@ class ParsingManager:
             if "ID" in final_report.columns:
                 final_report["ID"] = range(1, len(final_report) + 1)
 
-        ParsingManager.write_report(final_report, "report", self.sample_name)
+        self.write_report(final_report, "report", self.sample_name)
 
     def _run_snps(self) -> None:
         """
@@ -288,8 +285,8 @@ class ParsingManager:
         snp_parser.parse()
         # Define the reports and check their content
         # Check if parsers generated any data
-        gene_report = gene_parser.output_report if not gene_parser.data_frame.empty else pd.DataFrame()
-        snp_report = snp_parser.output_report if not snp_parser.data_frame.empty else pd.DataFrame()
+        gene_report = pd.DataFrame() if gene_parser.data_frame.empty else gene_parser.output_report
+        snp_report = pd.DataFrame() if snp_parser.data_frame.empty else snp_parser.output_report
 
         logging.debug("Gene report has %d entries", len(gene_report))
         logging.debug("SNP report has %d entries", len(snp_report))
@@ -343,8 +340,7 @@ class ParsingManager:
         self.parser.add_filter(CoverageFilter(self.get_config_coverage(), self.file_type))
         logging.debug("Filters: %s successfully added", self.parser.filters)
 
-    @staticmethod
-    def write_report(report: pd.DataFrame, suffix: str, input_sequence_sample: str) -> None:
+    def write_report(self, report: pd.DataFrame, suffix: str, input_sequence_sample: str) -> None:
         """
         Function that writes a given DataFrame to a csv file.
         The pandas DataFrame is created by other methods,
@@ -356,7 +352,11 @@ class ParsingManager:
         ----------
         """
         logging.debug("Writing the %s...", suffix)
-        file_name = f"{input_sequence_sample}_{suffix}.csv"
+        if self.output_report_dir is not None:
+            self.output_report_dir.mkdir(parents=True, exist_ok=True)
+            file_name = Path(self.output_report_dir) / f"{input_sequence_sample}_{suffix}.csv"
+        else:
+            file_name = Path(f"{input_sequence_sample}_{suffix}.csv")
         # last check to see if the report is empty
         if report.empty:
             logging.info("Skipping writing %s as report is empty", file_name)
