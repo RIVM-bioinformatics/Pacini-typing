@@ -157,6 +157,7 @@ class PaciniTyping:
             "option": self.input_args.options,
             "verbose": self.input_args.verbose,
             "run_path": os.path.abspath(__file__).rsplit(".", 1)[0],
+            "config": None,
             "query": None,
             "makedatabase": None,
         }
@@ -411,20 +412,26 @@ class PaciniTyping:
         if user_specified_tempdir != Path("."):
             # override config output definition to use specified tmpdir
             pattern.pattern["global_settings"]["run_output"] = Path(user_specified_tempdir) / "gene"
-            pattern.pattern["global_settings"]["run_output_snps"] = Path(user_specified_tempdir) / "snps"
+            if self.option["config"]["search_mode"] in {"SNPs", "both"}:
+                pattern.pattern["global_settings"]["run_output_snps"] = Path(user_specified_tempdir) / "snps"
         # sync both dicts
         pattern.creation_dict["run_output"] = pattern.pattern["global_settings"]["run_output"]
-        pattern.creation_dict["run_output_snps"] = pattern.pattern["global_settings"]["run_output_snps"]
+        if "run_output_snps" in pattern.pattern["global_settings"]:
+            pattern.creation_dict["run_output_snps"] = pattern.pattern["global_settings"]["run_output_snps"]
 
         logging.debug("Setting additional information for the configuration...")
         pattern.creation_dict["input_file_list"] = self.option["config"]["input"]
         pattern.creation_dict["file_type"] = self.file_type
-        pattern.creation_dict["output"] = Path(pattern.pattern["global_settings"]["run_output"]) / self.sample_name
+        pattern.creation_dict["output"] = str(Path(pattern.pattern["global_settings"]["run_output"]) / self.sample_name)
 
-        pattern.creation_dict["input_fasta_file"] = os.path.join(
-            os.path.dirname(self.option["run_path"]),
-            pattern.creation_dict["input_fasta_file"],
-        )
+        run_root = Path(os.path.dirname(self.option["run_path"]))
+        config_fasta = Path(pattern.creation_dict["input_fasta_file"])
+        if not config_fasta.is_absolute():
+            config_fasta = run_root / config_fasta
+        elif not os.path.exists(config_fasta) and "test_data" in config_fasta.parts:
+            test_data_idx = config_fasta.parts.index("test_data")
+            config_fasta = run_root / Path(*config_fasta.parts[test_data_idx:])
+        pattern.creation_dict["input_fasta_file"] = str(config_fasta)
         # Set threads for creation operations (makeblastdb/query)
         pattern.creation_dict["threads"] = self.threads
         # Store the fasta-output option in the pattern object
@@ -507,25 +514,27 @@ class PaciniTyping:
         ----------
         """
         search_mode: str = self.option["config"]["search_mode"]
-        run_output_snps: str = pattern.pattern["global_settings"]["run_output_snps"]
         gene_output_dir: str = pattern.pattern["global_settings"]["run_output"]
 
         if self.input_args.save_intermediates:
-            if search_mode == "both":
-                self.handle_intermediate_saving(gene_output_dir, run_output_snps)
-            elif search_mode == "SNPs":
+            if search_mode == "SNPs":
+                run_output_snps = pattern.pattern["global_settings"]["run_output_snps"]
                 self.save_intermediates(run_output_snps, f"{self.sample_name}_intermediates_SNP.tar.gz")
                 self.delete_intermediates(gene_output_dir)
+            elif search_mode == "both":
+                run_output_snps = pattern.pattern["global_settings"]["run_output_snps"]
+                self.handle_intermediate_saving(gene_output_dir, run_output_snps)
             elif search_mode == "genes":
                 self.save_intermediates(gene_output_dir, f"{self.sample_name}_intermediates_gene.tar.gz")
-        else:
-            if search_mode == "both":
-                self.delete_intermediates(gene_output_dir)
-                self.delete_intermediates(run_output_snps)
-            elif search_mode == "SNPs":
-                self.delete_intermediates(run_output_snps)
-            elif search_mode == "genes":
-                self.delete_intermediates(gene_output_dir)
+        elif search_mode == "SNPs":
+            run_output_snps = pattern.pattern["global_settings"]["run_output_snps"]
+            self.delete_intermediates(run_output_snps)
+        elif search_mode == "both":
+            run_output_snps = pattern.pattern["global_settings"]["run_output_snps"]
+            self.delete_intermediates(gene_output_dir)
+            self.delete_intermediates(run_output_snps)
+        elif search_mode == "genes":
+            self.delete_intermediates(gene_output_dir)
 
     def handle_makedatabase_option(self) -> None:
         """
@@ -643,7 +652,7 @@ class PaciniTyping:
             return
 
         # ? multiple/glob-samples flow
-        if self.option["config"] and len(self.option.get("input_file_list", [])) > 1:
+        if self.option.get("config") and len(self.option.get("input_file_list", [])) > 2:
             self.execute_multiple_inputs()
             return
 
@@ -672,28 +681,19 @@ class PaciniTyping:
 
         for input_file in list(self.option["input_file_list"]):
             # set per-sample inputs
-            self.option["config"]["input"] = [input_file]  # ? used to infer whether fasta or fastq was supplied (# TODO have to double check)
-            # TODO doesn't iterating over input_file_list cause issues with paired files? Then you want to process both together?
-            # TODO test a FQ input run
+            self.option["config"]["input"] = [input_file]  # ? used to infer whether fasta or fastq was supplied
             self.option["input_file_list"] = [input_file]  # ? contains the list of files
             self.execute()
             results_files.append(Path(report_dir) / f"{self.sample_name}_report.csv")
 
-        # TODO Mark: dit hieronder afsplitsen naar parser module, dat hierboven kan hier blijven staan
-        # Combine per-sample reports into combined.csv (if any; built on the above hacky assumption)
+        # ? Combine per-sample reports into combined.csv (if any; built on the above hacky assumption)
         dfs: list[pd.DataFrame] = []
         for rf in results_files:
-            # ? if pacini finds no SNPs/genes, it will not write a report, hence the continue
-            # TODO remove this logic after that is fixed in the next commit --> we decided that this is undesired behaviour, should always generate something
             if not os.path.exists(rf):
-                continue
-            try:
-                dfs.append(pd.read_csv(rf))
-            except Exception:
-                logging.warning("Could not read report %s, skipping", rf)
+                raise FileNotFoundError(f"Expected report file {rf} not found, cannot combine results.")
+            dfs.append(pd.read_csv(rf))
         if not dfs:
-            logging.info("No per-sample reports found to combine")
-            return
+            raise ValueError("No report files found to combine, cannot create combined report.")
         combined = pd.concat(dfs, ignore_index=True)
 
         combined.to_csv(combined_report_file, index=False)

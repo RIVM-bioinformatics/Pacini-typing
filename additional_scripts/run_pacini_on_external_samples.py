@@ -17,10 +17,7 @@ samples_dir = "location_of_samples_dir"
 sample_list = "location_of_sample_list"
 pacini_tool_location = "location_of_pacini_typing_tool"
 
-# TODO harmonize internal and external sample scripts?
 
-
-# TODO use command_utils.py?
 def run_pacini_on_all_samples():
     """
     Function that loops through all samples dirs and runs pacini with the

@@ -19,10 +19,7 @@ samples_dir = "location_of_samples_dir"
 sample_list = "location_of_sample_list"
 pacini_typing_tool = "location_of_pacini_typing_tool"
 
-# TODO harmonize internal and external sample scripts?
 
-
-# TODO use command_utils.py?
 def clean_failed_runs():
     """
     Function that checks for failed runs by verifying the existence

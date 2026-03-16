@@ -90,7 +90,7 @@ class BLASTn(Enum):
             BLASTn.OUTPUT_OPTION.value,
             option["output"] + ".tsv",
             BLASTn.OUTPUT_FORMAT_OPTION.value,
-            f"'{BLASTn.OUTPUT_FORMAT.value} {" ".join(BLASTn.FORMATS.value)}'",
+            f"{BLASTn.OUTPUT_FORMAT.value} {" ".join(BLASTn.FORMATS.value)}",
             "-num_threads",
             str(option["threads"]),
         ]

@@ -169,7 +169,7 @@ def test_blast_prepare_query(setup_query_input: Dict[str, Any]) -> None:
         "-out",
         "./dummy/path.tsv",
         "-outfmt",
-        f"'6 {" ".join(BLASTn.FORMATS.value)}'",
+        f"6 {" ".join(BLASTn.FORMATS.value)}",
         "-num_threads",
         "6",
     ]
@@ -195,7 +195,7 @@ def test_blast_get_query_different(setup_query_input: Dict[str, Any]) -> None:
         "-out",
         "./dummy/path.tsv",
         "-outfmt",
-        f"'6 {" ".join(BLASTn.FORMATS.value)}'",
+        f"6 {" ".join(BLASTn.FORMATS.value)}",
         "-num_threads",
         "6",
     ]
