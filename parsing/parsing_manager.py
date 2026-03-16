@@ -35,6 +35,28 @@ from parsing.read_config_pattern import ReadConfigPattern
 from parsing.snp_parser import SNPParser
 from preprocessing.exceptions.parsing_exceptions import HandlingError
 
+# ? col names used in the final report, slight diffs between gene and SNP version, hence a base
+BASE_REPORT_COLUMNS = [
+    "ID",
+    "Input",
+    "Configuration",
+    "Type/Genes",
+    "Mode",
+    "Hits",
+]
+GENE_REPORT_COLUMNS = [
+    *BASE_REPORT_COLUMNS,
+    "Percentage Identity",
+    "Percentage Coverage",
+]
+SNP_REPORT_COLUMNS = [
+    *BASE_REPORT_COLUMNS,
+    "Reference nucleotide",
+    "Alternative nucleotide",
+    "Position",
+    "Amino acid change",
+]
+
 
 class ParsingManager:
     """
@@ -220,7 +242,8 @@ class ParsingManager:
         parser = self._prepare_gene_parser()
         parser.parse()
         if parser.data_frame.empty:
-            logging.warning("Gene report is empty, skipping...")
+            logging.warning("Gene report is empty, writing empty report...")
+            self.write_report(self.create_empty_report_frame(), "report", self.sample_name)
             return
         # Search mode was genes if the code reaches this point,
         # so we can write the report write away without checking
@@ -239,7 +262,8 @@ class ParsingManager:
         ----------
         """
         if gene_report.empty and snp_report.empty:
-            logging.warning("Both gene and SNP reports are empty, skipping...")
+            logging.warning("Both gene and SNP reports are empty, writing empty report...")
+            self.write_report(self.create_empty_report_frame(), "report", self.sample_name)
             return
         if gene_report.empty:
             final_report = snp_report
@@ -266,9 +290,41 @@ class ParsingManager:
         parser = self._create_snp_parser()
         parser.parse()
         if parser.data_frame.empty:
-            logging.warning("SNP report is empty, skipping...")
+            logging.warning("SNP report is empty, writing empty report...")
+            self.write_report(self.create_empty_report_frame(), "report", self.sample_name)
             return
         self.write_report(parser.output_report, "report", self.sample_name)
+
+    def get_expected_report_columns(self) -> list[str]:
+        """
+        Return the expected report headers for the active search mode.
+
+        For gene reports the final significance column depends on the
+        parser strategy: `e-value` for FASTA and `p-value` for FASTQ.
+        """
+        if self.search_mode == "genes":
+            significance_col = "e-value" if self.file_type == "FASTA" else "p-value"
+            return [*GENE_REPORT_COLUMNS, significance_col]
+        if self.search_mode == "SNPs":
+            return list(SNP_REPORT_COLUMNS)
+        if self.search_mode == "both":
+            significance_col = "e-value" if self.file_type == "FASTA" else "p-value"
+            return [*GENE_REPORT_COLUMNS, significance_col, *SNP_REPORT_COLUMNS[6:]]
+        raise HandlingError(f"Unexpected search mode: {self.search_mode}")
+
+    def create_empty_report_frame(self) -> pd.DataFrame:
+        """
+        Create a one-row empty report with NA values, sample name and ID of 1.
+
+        This ensures a report file is always written even when no hits are found.
+        This improves compatibility with Snakemake. The NA's help differentiate
+        between "not tested" and "tested but found no hits" downstream of Pacini.
+        """
+        columns = self.get_expected_report_columns()
+        empty_row: dict[str, Any] = {column: pd.NA for column in columns}
+        empty_row["Input"] = self.sample_name
+        empty_row["ID"] = 1
+        return pd.DataFrame([empty_row], columns=columns)
 
     def _run_both(self) -> None:
         """
@@ -357,10 +413,10 @@ class ParsingManager:
             file_name = Path(self.output_report_dir) / f"{input_sequence_sample}_{suffix}.csv"
         else:
             file_name = Path(f"{input_sequence_sample}_{suffix}.csv")
-        # last check to see if the report is empty
+
         if report.empty:
-            logging.info("Skipping writing %s as report is empty", file_name)
-            return
+            # TODO with this commit an empty report shouldn't happen anymore, added guard clause just in case, to be removed in next commit
+            raise HandlingError("Report is empty, this should not happen, check the previous logs for more info")
 
         report.to_csv(
             file_name,

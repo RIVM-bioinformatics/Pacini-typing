@@ -73,8 +73,7 @@ class BaseQueryRunner(ABC):
         ----------
         """
         logging.debug("Checking if the output directory exists...")
-        output_dir = os.path.dirname(self.run_options["output"])
-        if output_dir:
+        if output_dir := os.path.dirname(self.run_options["output"]):
             if not os.path.exists(output_dir):
                 os.makedirs(output_dir)
                 logging.debug("New output directory created: %s", output_dir)
