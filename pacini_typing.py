@@ -652,7 +652,9 @@ class PaciniTyping:
             return
 
         # ? multiple/glob-samples flow
-        if self.option.get("config") and len(self.option.get("input_file_list", [])) > 2:
+        input_files = self.option.get("input_file_list", [])
+        is_two_fastq_files = len(input_files) == 2 and all(file.lower().endswith((".fq", ".fastq", ".fq.gz", ".fastq.gz")) for file in input_files)
+        if self.option.get("config") and len(input_files) >= 2 and not is_two_fastq_files:
             self.execute_multiple_inputs()
             return
 
