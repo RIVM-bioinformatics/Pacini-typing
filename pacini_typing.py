@@ -690,11 +690,22 @@ class PaciniTyping:
         results_files: list[str | Path] = []
         report_dir = str(self.option["config"]["output_report"])
         combined_report_file = Path(report_dir) / "combined_report.csv"
+        input_files = list(self.option["input_file_list"])
 
-        for input_file in list(self.option["input_file_list"]):
+        fastq_exts = (".fq", ".fastq", ".fq.gz", ".fastq.gz")
+        input_groups: list[list[str]]
+        if input_files and all(file.lower().endswith(fastq_exts) for file in input_files):
+            input_files = sorted(input_files)
+            if len(input_files) % 2 != 0:
+                raise InvalidSequencingTypesError(input_files)
+            input_groups = [input_files[i : i + 2] for i in range(0, len(input_files), 2)]
+        else:
+            input_groups = [[input_file] for input_file in input_files]
+
+        for input_group in input_groups:
             # set per-sample inputs
-            self.option["config"]["input"] = [input_file]  # ? used to infer whether fasta or fastq was supplied
-            self.option["input_file_list"] = [input_file]  # ? contains the list of files
+            self.option["config"]["input"] = input_group
+            self.option["input_file_list"] = input_group
             self.execute()
             results_files.append(Path(report_dir) / f"{self.sample_name}_report.csv")
 
