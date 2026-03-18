@@ -400,20 +400,30 @@ class PaciniTyping:
         ----------
         """
         logging.debug("Initializing the configuration file...")
+        user_specified_tempdir = self.option["config"]["tmp_dir"]
+        user_specified_reportdir = self.option["config"]["output_report"]
+        run_output_override = None
+        run_output_snps_override = None
+        if user_specified_tempdir != Path("."):
+            run_output_override = Path(user_specified_tempdir) / "gene"
+            if self.option["config"]["search_mode"] in {"SNPs", "both"}:
+                run_output_snps_override = Path(user_specified_tempdir) / "snps"
+        elif user_specified_reportdir != Path("."):
+            run_output_override = Path(user_specified_reportdir) / "gene"
+            if self.option["config"]["search_mode"] in {"SNPs", "both"}:
+                run_output_snps_override = Path(user_specified_reportdir) / "snps"
+
         pattern = ReadConfigPattern(
             self.option["config"]["config_path"],
             self.file_type,
             self.option["config"]["search_mode"],
+            run_output_override=run_output_override,
+            run_output_snps_override=run_output_snps_override,
         )
+
         # Additionally, the query input and output must be set.
         # The output is not specified by the user, because
         # this is based on the input files.
-        user_specified_tempdir = self.option["config"]["tmp_dir"]
-        if user_specified_tempdir != Path("."):
-            # override config output definition to use specified tmpdir
-            pattern.pattern["global_settings"]["run_output"] = Path(user_specified_tempdir) / "gene"
-            if self.option["config"]["search_mode"] in {"SNPs", "both"}:
-                pattern.pattern["global_settings"]["run_output_snps"] = Path(user_specified_tempdir) / "snps"
         # sync both dicts
         pattern.creation_dict["run_output"] = pattern.pattern["global_settings"]["run_output"]
         if "run_output_snps" in pattern.pattern["global_settings"]:

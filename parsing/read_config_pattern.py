@@ -24,6 +24,7 @@ __all__ = ["ReadConfigPattern"]
 import logging
 import os
 import shutil
+from pathlib import Path
 from typing import Any
 
 import yaml
@@ -58,6 +59,8 @@ class ReadConfigPattern:
         config_file: str,
         input_file_type: str,
         search_mode: str,
+        run_output_override: str | Path | None = None,
+        run_output_snps_override: str | Path | None = None,
     ) -> None:
         """
         Constructor for the ReadConfigPattern class.
@@ -84,8 +87,11 @@ class ReadConfigPattern:
         self.pattern: dict[Any, Any] = {}
         self.creation_dict: dict[str, Any] = {}
         self.search_mode: str = search_mode
+        self.run_output_override = run_output_override
+        self.run_output_snps_override = run_output_snps_override
         # Start the process
         self.read_config()
+        self.apply_output_overrides()
         self.validate_config_keys()
         self.validate_global_settings()
         self.validate_pattern_keys()
@@ -134,6 +140,15 @@ class ReadConfigPattern:
         logging.debug("Validating keys of config file...")
         if missing_keys := [key for key in REQUIRED_KEYS if key not in self.pattern]:
             raise YAMLStructureError(f"The following required keys are missing in {self.config_file}: {missing_keys}")
+
+    def apply_output_overrides(self) -> None:
+        """Apply CLI-provided output directory overrides to global settings."""
+        if "global_settings" not in self.pattern:
+            return
+        if self.run_output_override is not None:
+            self.pattern["global_settings"]["run_output"] = str(self.run_output_override)
+        if self.run_output_snps_override is not None:
+            self.pattern["global_settings"]["run_output_snps"] = str(self.run_output_snps_override)
 
     def validate_global_settings(self) -> None:
         """
