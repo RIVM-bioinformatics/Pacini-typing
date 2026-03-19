@@ -87,7 +87,7 @@ class SNPQueryRunner(BaseQueryRunner):
             data = json.loads(stdout)
             return data["values"][0]["commit"]["date"]
         except Exception:
-            logging.error("Error extracting version number from PointFinder," " returning 'Not available'...")
+            logging.error("Error extracting version number from PointFinder, returning 'Not available'...")
             # The program should not crash if a version number could not
             # be extracted, but the error should be logged.
             return "Not available"
@@ -119,6 +119,32 @@ class SNPQueryRunner(BaseQueryRunner):
         else:
             logging.debug("PointFinder script already exists, skipping download...")
 
+    # TODO The two methods below are a fix for that we appear to be using an incorrect command in PointFinder.py
+    # TODO to run KMA for paired .fq input data (the -ipe flag should be used for paired input, but we build on
+    # TODO PointFinder.py that uses the -i [single_input] flag). Are my assumptions correct? Please review.
+    # TODO Has this been validated for paired FASTQ inputs? This was not possible due to time constraints, but KMA
+    # TODO should be wrapped into Pacini directly and use kma -i for single input and kma with -ipe for paired fqs.
+    @staticmethod
+    def _replace_inputfiles_args(query: list[str], input_files: list[str]) -> list[str]:
+        """Replace values passed to --inputfiles with a new list of files."""
+        if "--inputfiles" not in query:
+            return query
+        start = query.index("--inputfiles") + 1
+        stop = start
+        while stop < len(query) and not query[stop].startswith("-"):  # ? break at next CLI flag (either -[something] or --[something])
+            stop += 1
+        return query[:start] + input_files + query[stop:]
+
+    # TODO see comment above _replace_inputfiles_args()
+    @staticmethod
+    def _merge_input_files(input_files: list[str], output_file: str) -> str:
+        """Concatenate input files into a single temporary file for PointFinder/KMA compatibility."""
+        with open(output_file, "wb") as out_handle:
+            for input_file in input_files:
+                with open(input_file, "rb") as in_handle:
+                    shutil.copyfileobj(in_handle, out_handle)
+        return output_file
+
     def run(self) -> None:
         """
         Override ABC's run() to create temporary symlinks/copies for
@@ -144,6 +170,18 @@ class SNPQueryRunner(BaseQueryRunner):
                     symlink_map[input_file] = str(dest)
             # ? in self.query, replace input files containing spaces with their symlinked/copied underscored version
             prepared_query = [symlink_map.get(arg, arg) for arg in self.query]
+
+            # TODO see comment above _replace_inputfiles_args(), please review, are my assumptions correct? Has this been validated for paired fq inputs?
+            # ? PointFinder runs KMA with the assumption that there is only 1 input file. Block below merges paired FASTQ into one temporary file to fulfill this assumption.
+            input_files = [symlink_map.get(file, file) for file in self.run_options.get("input_file_list", [])]
+            if self.run_options.get("method") == "kma" and len(input_files) == 2:
+                merged_suffix = ".fastq.gz" if all(file.endswith(".gz") for file in input_files) else ".fastq"
+                # ? Keep the merged basename aligned with the sample prefix that ParsingManager uses to build the expected PointFinder output filename.
+                sample_prefix = Path(input_files[0]).name.split(".")[0].split("_")[0]
+                merged_file = str(Path(tmp_dir) / f"{sample_prefix}{merged_suffix}")
+                self._merge_input_files(input_files=input_files, output_file=merged_file)
+                prepared_query = self._replace_inputfiles_args(prepared_query, [merged_file])
+                logging.debug("Merged paired FASTQ inputs %s into temporary file: %s", input_files, merged_file)
 
             logging.debug("Starting the SNP query via PointFinder")
             self.start_time = time.time()

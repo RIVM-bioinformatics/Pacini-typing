@@ -326,7 +326,7 @@ class PaciniTyping:
         if argsvalidator.validate():
             logging.info("Input arguments have been validated, found no issues...")
         else:
-            logging.error("Error while validation the input arguments, " "please check the above logs for more information.")
+            logging.error("Error while validation the input arguments, please check the above logs for more information.")
             sys.exit(1)
 
     def run_makedatabase(self, database_creation_args: dict[str, Any]) -> None:
@@ -368,7 +368,7 @@ class PaciniTyping:
         if (len(self.option["input_file_list"]) == 1 and self.file_type == "FASTQ") or (
             len(self.option["input_file_list"]) == 2 and self.file_type == "FASTA"
         ):
-            logging.error("Only FASTA files are allowed for single files " "and only FASTQ files are allowed for paired files.")
+            logging.error("Only FASTA files are allowed for single files and only FASTQ files are allowed for paired files.")
             raise InvalidSequencingTypesError(self.option["input_file_list"])
 
     def check_valid_gene_database_path(self, database_builder: dict[str, Any]) -> bool:
@@ -662,14 +662,34 @@ class PaciniTyping:
             return
 
         # ? multiple/glob-samples flow
-        input_files = self.option.get("input_file_list", [])
-        is_two_fastq_files = len(input_files) == 2 and all(file.lower().endswith((".fq", ".fastq", ".fq.gz", ".fastq.gz")) for file in input_files)
-        if self.option.get("config") and len(input_files) >= 2 and not is_two_fastq_files:
+        if self.should_execute_multiple_inputs():
             self.execute_multiple_inputs()
             return
 
         # ? single-sample flow
         self.execute()
+
+    def should_execute_multiple_inputs(self) -> bool:
+        """
+        Return True when input should be treated as a multi-sample batch
+        instead of a single paired sample.
+
+        Pacini supports batching unrelated FASTA samples and paired FASTQ
+        files. Paired FASTQ input and mixed FASTA/FASTQ input must stay on
+        the normal execution path so the existing paired validation can
+        reject invalid combinations.
+        """
+        input_files = self.option.get("input_file_list", [])
+        if not self.option.get("config") or len(input_files) < 2:
+            return False
+
+        lower_input_files = [file.lower() for file in input_files]
+        fastq_exts = (".fq", ".fastq", ".fq.gz", ".fastq.gz")
+        fasta_exts = (".fa", ".fasta", ".fna", ".fa.gz", ".fasta.gz", ".fna.gz")
+
+        if all(file.endswith(fastq_exts) for file in lower_input_files):
+            return len(input_files) > 2
+        return all((file.endswith(fasta_exts) for file in lower_input_files))
 
     def validate_input(self) -> None:
         "Validate the input files"

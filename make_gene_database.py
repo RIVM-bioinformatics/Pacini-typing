@@ -78,16 +78,15 @@ class GeneDatabaseBuilder:
         ----------
         """
         self.full_database_path = os.path.join(self.database_path, self.database_name)
-        if not os.path.exists(self.full_database_path):
-            if self.database_type == "FASTQ":
-                if not os.path.exists(self.database_path):
-                    logging.debug("Database path for FASTQ (KMA) does not exist," "creating path for it automatically")
-                    os.makedirs(self.database_path, exist_ok=True)
-                self.create_kma_database()
-            else:
-                self.create_blast_database()
-        else:
+        if os.path.exists(self.full_database_path):
             logging.info("Database already exists in the specified path")
+        elif self.database_type == "FASTQ":
+            if not os.path.exists(self.database_path):
+                logging.debug("Database path for FASTQ (KMA) does not exist, creating path for it automatically")
+                os.makedirs(self.database_path, exist_ok=True)
+            self.create_kma_database()
+        else:
+            self.create_blast_database()
 
     def create_kma_database(self) -> Tuple[str, str] | bool:
         """

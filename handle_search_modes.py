@@ -20,19 +20,15 @@ __date__ = "2025-05-07"
 __all__ = ["HandleSearchModes"]
 
 import logging
+import os
 from typing import Any
 
 from make_gene_database import GeneDatabaseBuilder
 from make_snp_database import SNPDatabaseBuilder
 from parsing.read_config_pattern import ReadConfigPattern
-from preprocessing.exceptions.validate_database_exceptions import (
-    InvalidDatabaseError,
-    InvalidSNPDatabaseError,
-)
+from preprocessing.exceptions.validate_database_exceptions import InvalidDatabaseError, InvalidSNPDatabaseError
 from preprocessing.validation.validate_database import check_for_database_path
-from preprocessing.validation.validate_pointfinder_database import (
-    PointFinderReferenceChecker,
-)
+from preprocessing.validation.validate_pointfinder_database import PointFinderReferenceChecker
 from queries.query_runners import run_gene_query, run_snp_query
 
 
@@ -132,13 +128,13 @@ class HandleSearchModes:
                 successfully or does not exist.
         ----------
         """
-        logging.debug("Checking if the SNP database exists" "and trying to create it if it does not exist...")
+        logging.debug("Checking if the SNP database exists and trying to create it if it does not exist...")
         if not self.check_valid_SNP_database(self.pattern.creation_dict):
             SNPDatabaseBuilder(self.pattern.creation_dict)
         if not self.check_valid_SNP_database(self.pattern.creation_dict):
             # Check again if the SNP database was created, and raise an
             # error if it was not created successfully.
-            logging.error("SNP database not valid, " "already tried to create it, exiting...")
+            logging.error("SNP database not valid, already tried to create it, exiting...")
             raise InvalidSNPDatabaseError(self.pattern.creation_dict["path_snps"] + "/" + self.pattern.creation_dict["species"])
 
     def handle_fastq_snp_query(self) -> None:
@@ -160,7 +156,7 @@ class HandleSearchModes:
         if self.check_valid_gene_database_path(custom_database_builder):
             run_snp_query(self.pattern.creation_dict)
         else:
-            logging.warning("Gene database does not exist inside SNP database, " "trying to create it...")
+            logging.warning("Gene database does not exist inside SNP database, trying to create it...")
             self.create_genes_database(custom_database_builder)
             if not self.check_valid_gene_database_path(custom_database_builder):
                 raise InvalidDatabaseError(
@@ -181,9 +177,8 @@ class HandleSearchModes:
             - custom_database_builder: Dictionary with necessary information
         ----------
         """
-        custom_database_builder["input_fasta_file"] = (
-            f"{self.pattern.creation_dict['path_snps']}/" f"{self.pattern.creation_dict['species']}/genes.fasta"
-        )
+        genes_fasta = f"{self.pattern.creation_dict['path_snps']}/{self.pattern.creation_dict['species']}/genes.fasta"
+        custom_database_builder["input_fasta_file"] = genes_fasta if os.path.exists(genes_fasta) else self.pattern.creation_dict["target_snps_file"]
         custom_database_builder["database_type"] = "FASTQ"
         GeneDatabaseBuilder(custom_database_builder)
 
@@ -205,9 +200,8 @@ class HandleSearchModes:
                 self.pattern.creation_dict["database_name"],
                 self.pattern.creation_dict["file_type"],
             )
-        else:
-            logging.debug("Database exists, starting the query operation...")
-            run_gene_query(self.pattern.creation_dict)
+        logging.debug("Database exists, starting the query operation...")
+        run_gene_query(self.pattern.creation_dict)
 
     def handle_snp_search_mode(self) -> None:
         """
@@ -239,8 +233,8 @@ class HandleSearchModes:
         """
         logging.info("Handling search modes...")
         if self.search_mode in ["genes", "both"]:
-            logging.debug("Search mode is set to 'genes' or 'both', " "handling gene search mode...")
+            logging.debug("Search mode is set to 'genes' or 'both', handling gene search mode...")
             self.handle_gene_search_mode()
         if self.search_mode in ["snps", "both"]:
-            logging.debug("Search mode is set to 'snps' or 'both', " "handling SNP search mode...")
+            logging.debug("Search mode is set to 'snps' or 'both', handling SNP search mode...")
             self.handle_snp_search_mode()

@@ -219,7 +219,7 @@ class Parser:
         except FileNotFoundError:
             logging.error("File containing query results not found, exiting...")
         except pd.errors.EmptyDataError:
-            logging.warning("No content in the query file, found no hits " "in the input files")
+            logging.warning("No content in the query file, found no hits in the input files")
         logging.debug("Results were read successfully, filtering...")
         if not self.data_frame.empty:
             self.apply_filters()

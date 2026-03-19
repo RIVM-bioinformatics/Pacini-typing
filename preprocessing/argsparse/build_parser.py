@@ -146,7 +146,7 @@ def main(givenargs: list[str]) -> argparse.Namespace:
         type=str,
         choices=["SNPs", "genes", "both"],
         default="genes",
-        help=("Search mode to use. SNPs, genes or both.\n" "Default is genes.\n"),
+        help=("Search mode to use. SNPs, genes or both.\nDefault is genes.\n"),
     )
 
     subparsers = parser.add_subparsers(
@@ -164,7 +164,7 @@ def main(givenargs: list[str]) -> argparse.Namespace:
     # to ensure that the user has provided the correct arguments
 
     if args.fasta_out and args.search_mode == "SNPs":
-        parser.error("--fasta-out cannot be used with --search_mode SNPs. " "Please use this option only when searching for genes.")
+        parser.error("--fasta-out cannot be used with --search_mode SNPs. Please use this option only when searching for genes.")
 
     if args.options:
         if args.config or args.input:

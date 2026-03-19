@@ -44,7 +44,7 @@ def check_for_database_existence(arg_options: dict[str, Any]) -> bool:
     logging.debug("Checking if all required database files are present...")
     for db_file in db_files:
         if not os.path.exists(arg_options["database_path"] + db_file):
-            logging.warning("Database does not exist, " "the program will try to create it or exit...")
+            logging.warning("Database does not exist, the program will try to create it or exit...")
             return False
     return True
 
@@ -84,9 +84,9 @@ def check_for_database_path(arg_options: dict[str, Any]) -> bool:
     ----------
     """
     if not arg_options["database_path"].endswith("/"):
-        logging.warning("The database path does not end with a forward slash. " "Appending it to run checks.")
+        logging.warning("The database path does not end with a forward slash. Appending it to run checks.")
         arg_options["database_path"] += "/"
     if not os.path.exists(arg_options["database_path"]):
-        logging.warning("Database does not exist, " "the program will try to create it or exit...")
+        logging.warning("Database does not exist, the program will try to create it or exit...")
         return False
     return check_for_database_existence(arg_options)

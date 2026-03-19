@@ -129,10 +129,7 @@ class SNPDatabaseBuilder:
             - str: The SNP database path without the trailing slash
         ----------
         """
-        if self.path_snps.endswith("/"):
-            return self.path_snps[:-1]
-        else:
-            return self.path_snps
+        return self.path_snps[:-1] if self.path_snps.endswith("/") else self.path_snps
 
     def _write_gene_headers(self, headers: list[str]) -> None:
         """
@@ -181,6 +178,29 @@ class SNPDatabaseBuilder:
                 for i in range(0, len(sequence), 70):
                     gene_file.write(sequence[i : i + 70] + "\n")
 
+    def _create_genes_fasta(self, gene_info: dict[str, str]) -> None:
+        """
+        Function that creates a combined genes.fasta file in the
+        SNP database directory. The validator expects this file to
+        be present as part of the PointFinder-compatible structure.
+        ----------
+        Input:
+            - gene_info: dictionary with the gene ID as key
+                and the gene sequence as value.
+        ----------
+        """
+        logging.debug("Creating combined genes.fasta file for SNP database...")
+        with open(
+            f"{self.path_snps}/{self.species}/genes.fasta",
+            "w",
+            encoding="utf-8",
+        ) as genes_fasta:
+            for header, sequence in gene_info.items():
+                gene_id: str = header.lstrip(">")
+                genes_fasta.write(f">{gene_id}\n")
+                for i in range(0, len(sequence), 70):
+                    genes_fasta.write(sequence[i : i + 70] + "\n")
+
     def generate_gene_file_structure(self) -> None:
         """
         Function that opens the target_snps_file and performs two
@@ -192,18 +212,25 @@ class SNPDatabaseBuilder:
                 ending with `.fsa`
         ----------
         """
-        logging.info("Writing gene headers and creating individual gene" "files for SNP database...")
+        logging.info("Writing gene headers and creating individual gene files for SNP database...")
         gene_info: dict[str, str] = {}
+        header: str | None = None
         with open(self.target_snps_file, "r", encoding="utf-8") as file:
-            for line in file:
-                if line.startswith(">"):
-                    header = line.strip()
+            for line_number, line in enumerate(file, start=1):
+                stripped_line: str = line.strip()
+                if not stripped_line:
+                    continue
+                if stripped_line.startswith(">"):
+                    header = stripped_line
                     gene_info[header] = ""
+                elif header is None:
+                    raise ValueError(f"Invalid SNP FASTA file: found sequence data before header at line {line_number} in {self.target_snps_file}")
                 else:
-                    gene_info[header] += line.strip()
+                    gene_info[header] += stripped_line
 
         self._write_gene_headers(list(gene_info.keys()))
         self._create_individual_gene_files(gene_info)
+        self._create_genes_fasta(gene_info)
 
     def construct_resistens_overview_record(self, mutation: dict[str, str]) -> dict[str, str]:
         """
@@ -279,9 +306,12 @@ class SNPDatabaseBuilder:
         to have it in the database. PointFinder will raise an
         error if it is not present.
         """
-        logging.info("Creating RNA_genes.txt file for SNP database " "(required by PointFinder)...")
-        open(
-            f"{self.path_snps}/{self.species}/RNA_genes.txt",
-            "w",
-            encoding="utf-8",
-        ).close()
+        logging.info("Creating RNA_genes.txt file for SNP database (required by PointFinder)...")
+        output_dir: str = os.path.join(self.path_snps, self.species)
+        os.makedirs(output_dir, exist_ok=True)
+        output_file: str = os.path.join(output_dir, "RNA_genes.txt")
+
+        with open(output_file, "w", encoding="utf-8"):
+            pass
+
+        logging.debug("Created RNA file at: %s", output_file)

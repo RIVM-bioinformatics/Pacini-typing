@@ -31,16 +31,8 @@ from typing import Generator
 import pytest
 
 from pacini_typing import main
-from preprocessing.exceptions.determine_input_type_exceptions import (
-    InvalidFastaOrFastqError,
-    InvalidSequenceError,
-    InvalidSequencingTypesError,
-)
-from preprocessing.exceptions.validation_exceptions import (
-    FileNotExistsError,
-    InvalidFileExtensionError,
-    InvalidPairedError,
-)
+from preprocessing.exceptions.determine_input_type_exceptions import InvalidFastaOrFastqError, InvalidSequenceError, InvalidSequencingTypesError
+from preprocessing.exceptions.validation_exceptions import FileNotExistsError, InvalidFileExtensionError, InvalidPairedError
 
 
 @pytest.fixture()
@@ -54,13 +46,11 @@ def setup_args() -> Generator[list[str], None, None]:
         - args: list of arguments for the test
     ----------
     """
-    args = [
+    yield [
         "--config",
         "config/O1.yaml",
         "--input",
     ]
-
-    yield args
     # If a test is not failing,
     # clean up the files created during the test
     cleanup_files("databases/")
@@ -221,23 +211,27 @@ def test_wrong_fastq_input(setup_args: list[str]):
         main(setup_args)
 
 
-def test_wrong_fasta_input(setup_args: list[str]):
+def test_correct_two_fasta_input(setup_args: list[str]):
     """
-    Test if the InvalidPairedError is raised when
-    the wrong amount of input files are provided.
+    Test if two unrelated FASTA files are treated as
+    separate samples in config mode.
     ----------
     Input:
         - setup_args: list of arguments for the test
     ----------
     """
+    if os.path.exists("combined_report.csv"):
+        os.remove("combined_report.csv")
+
     setup_args.extend(
         [
             "test_data/wrong_files/VIB_EA5348AA_AS.fasta",
             "test_data/wrong_files/vibrio_genes.fasta",
         ]
     )
-    with pytest.raises(InvalidPairedError):
-        main(setup_args)
+    main(setup_args)
+
+    assert os.path.exists("combined_report.csv")
 
 
 def test_wrong_fasta_with_fastq_names(setup_args: list[str]):

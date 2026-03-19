@@ -52,7 +52,7 @@ class PointFinderReferenceChecker:
         """
         self.unique_genes_resistens_overview: list[str] = []
         self.path: str = path_to_database
-        self.resistance_overview: str = self.path + "/resistens-overview.txt"
+        self.resistance_overview: str = f"{self.path}/resistens-overview.txt"
 
     def check_path_directory(self) -> bool:
         """
@@ -67,12 +67,10 @@ class PointFinderReferenceChecker:
         if os.path.exists(self.path):
             if os.path.isdir(self.path):
                 return True
-            else:
-                logging.debug("Path: %s exists but is not a directory.", self.path)
-                return False
+            logging.debug("Path: %s exists but is not a directory.", self.path)
         else:
             logging.debug("Path: %s does not exist.", self.path)
-            return False
+        return False
 
     def check_folder_structure(self) -> bool:
         """
@@ -100,7 +98,7 @@ class PointFinderReferenceChecker:
         ]
         for file in required_files:
             if not os.path.isfile(os.path.join(self.path, file)):
-                logging.debug("Missing required file: %s", file)
+                logging.debug("Missing required Pointfinder file: %s", file)
                 return False
         logging.debug("Database folder seems to be correct, checking files next...")
         return True
@@ -143,7 +141,7 @@ class PointFinderReferenceChecker:
         ]
         df: pd.DataFrame = pd.read_csv(self.resistance_overview, sep="\t", encoding="utf-8")
         self.unique_genes_resistens_overview = df["#Gene_ID"].unique().tolist()
-        if not all(field in df.columns for field in required_fields):
+        if any(field not in df.columns for field in required_fields):
             missing_fields = [field for field in required_fields if field not in df.columns]
             logging.debug("Missing required fields: %s", missing_fields)
             return False
@@ -151,10 +149,7 @@ class PointFinderReferenceChecker:
         if rows < 1:
             logging.info("resistens-overview.txt does not contain any data rows.")
             return False
-        logging.debug(
-            "resistens-overview.txt contains the required fields, " "amount of rows in the file: %s",
-            rows,
-        )
+        logging.debug("resistens-overview.txt contains the required fields, amount of rows in the file: %s", rows)
         return True
 
     def get_gene_names(self) -> list[str]:
@@ -185,7 +180,7 @@ class PointFinderReferenceChecker:
         ----------
         """
         missing_genes: list[str] = [gene for gene in target_genes if gene not in available_genes]
-        return missing_genes if missing_genes else None
+        return missing_genes or None
 
     def check_missing_genes(self, checks: dict[str, list[str] | None]) -> bool:
         """
@@ -228,7 +223,7 @@ class PointFinderReferenceChecker:
             - False if any gene is missing
         ----------
         """
-        logging.info("Checking if the matching of genes " "in the SNP database is correct...")
+        logging.info("Checking if the matching of genes in the SNP database is correct...")
         genes_list: list[str] = self.get_gene_names()
         # retrieve the list of .fsa files in the database directory
         fsa_files = [f.replace(".fsa", "") for f in os.listdir(self.path) if f.endswith(".fsa")]
@@ -260,8 +255,11 @@ class PointFinderReferenceChecker:
             - False if any check failed
         ----------
         """
-        if not self.check_path_directory() and not self.check_folder_structure():
-            logging.warning("Path to the reference database does not exists or" "does not have the correct structure")
+        if not self.check_path_directory():
+            logging.warning("Path to the reference database does not exist or is not a directory")
+            return False
+        if not self.check_folder_structure():
+            logging.warning("Reference database directory is missing required PointFinder files")
             return False
         if not self.check_resistens_overview_file():
             logging.warning("resistens-overview.txt file is not correct")

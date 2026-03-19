@@ -27,9 +27,7 @@ from typing import Any
 
 import pandas as pd
 
-from preprocessing.exceptions.snp_detection_exceptions import (
-    PointFinderScriptError,
-)
+from preprocessing.exceptions.snp_detection_exceptions import PointFinderReportError
 
 
 class SNPParser:
@@ -208,12 +206,9 @@ class SNPParser:
         try:
             self.read_run_output(self.pointfinder_output_filename)
         except FileNotFoundError as e:
-            logging.error(
-                "PointFinder's report not found: %s",
-                self.pointfinder_output_filename,
-            )
-            raise PointFinderScriptError(self.pointfinder_output_filename) from e
+            logging.error("PointFinder's report not found: %s", self.pointfinder_output_filename)
+            raise PointFinderReportError(self.pointfinder_output_filename) from e
         except pd.errors.EmptyDataError:
-            logging.warning("No content in the query file, found no hits " "in the input files")
+            logging.warning("No content in the query file, found no hits in the input files")
         if not self.data_frame.empty:
             self.output_report = self.create_output_report()

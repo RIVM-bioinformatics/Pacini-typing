@@ -41,11 +41,7 @@ from io import StringIO
 
 import pytest
 
-from preprocessing.exceptions.determine_input_type_exceptions import (
-    InvalidFastaOrFastqError,
-    InvalidSequenceError,
-    InvalidSequencingTypesError,
-)
+from preprocessing.exceptions.determine_input_type_exceptions import InvalidFastaOrFastqError, InvalidSequenceError, InvalidSequencingTypesError
 from preprocessing.validation.determine_input_type import InputFileInspector
 
 skip_in_ci = pytest.mark.skipif(
@@ -68,7 +64,7 @@ def setup_valid_data() -> dict[str, str]:
         "valid_fasta": ">header1\nACTGACTG\n>header2\nGTACTGAC\n",
         "invalid_fasta_no_header": "ACTGACTG\nGTACTGAC\n",
         "invalid_fasta_invalid_sequence": ">header1\nACTGXCTG\n",
-        "valid_fastq": ("@header1\nACTGACTG\n+\nB@@FDFFF\n" "@header2\nGTACTGAC\n+\nB@@FDFFF\n"),
+        "valid_fastq": ("@header1\nACTGACTG\n+\nB@@FDFFF\n@header2\nGTACTGAC\n+\nB@@FDFFF\n"),
         "invalid_fastq_missing_plus": ("@header1\nACTGACTG\nINVALID_LINE\n!~@#$%^&*\n"),
         "invalid_fastq_length_mismatch": ("@header1\nACTGACTG\n+\n!~@#\n"),
     }

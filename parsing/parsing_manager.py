@@ -208,8 +208,25 @@ class ParsingManager:
         ----------
         """
         sample_prefix = self.sample_name.split(".")[0].split("_")[0]
-        filename = f"{sample_prefix}_{self._get_correct_method_name()}_results.tsv"
-        return os.path.join(self.pattern.creation_dict["run_output_snps"], filename)
+        method_name = self._get_correct_method_name()
+        output_dir = self.pattern.creation_dict["run_output_snps"]
+        filename = f"{sample_prefix}_{method_name}_results.tsv"
+        expected_path = os.path.join(output_dir, filename)
+        if os.path.isfile(expected_path):
+            return expected_path
+
+        # ? Fallback for when input names are transformed upstream (i.e., merged temporary FASTQ input for KMA with paired fq input)
+        fallback_name = f"pf_{method_name}_results.tsv"
+        fallback_path = os.path.join(output_dir, fallback_name)
+        if os.path.isfile(fallback_path):
+            logging.warning(
+                "Expected PointFinder output %s not found; using fallback report %s",
+                expected_path,
+                fallback_path,
+            )
+            return fallback_path
+
+        return expected_path
 
     def _create_snp_parser(self):
         """

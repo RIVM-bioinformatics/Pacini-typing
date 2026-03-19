@@ -188,7 +188,7 @@ class ReadConfigPattern:
         """
         first_key: str = next(iter(entry))
         if first_key not in {"gene", "SNP"}:
-            logging.error("Found invalid first key in pattern" " (only gene or SNP allowed), exiting...")
+            logging.error("Found invalid first key in pattern (only gene or SNP allowed), exiting...")
             raise YAMLStructureError(self.config_file)
 
     def validate_pattern_keys(self) -> None:
@@ -280,7 +280,7 @@ class ReadConfigPattern:
         path: str = self.pattern["metadata"]["pointfinder_script_path"]
         if path.endswith("PointFinder.py"):
             return path
-        logging.error("The PointFinder script is incorrectly specified or " "missing in the config file, exiting...")
+        logging.error("The PointFinder script is incorrectly specified or missing in the config file, exiting...")
         raise PointFinderScriptError(path)
 
     def validate_SNP_list(self, snp_list: list[dict[str, str | int]]) -> bool:
