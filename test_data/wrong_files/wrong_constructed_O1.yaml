@@ -10,7 +10,7 @@ metadata:
 database:
   name: "VIB-O1"
   - path: "databases/VIB-O1"
-  target_genes_file: "/Users/mvandestreek/Developer/pacini_typing/test_data/vibrio_genes.fasta"
+  target_genes_file: "/home/streevdm/Pacini-typing/test_data/vibrio_genes.fasta"
   run_output: "myoutput/"
   SNP_database_path: "/Users/mvandestreek/Desktop/salm-simulation/example_db"
   species: "Yersinia"

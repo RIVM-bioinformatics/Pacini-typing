@@ -36,8 +36,8 @@ from pacini_typing import main
 from preprocessing.validation import validating_input_arguments
 from tests.e2e.check_tool_existence import check_tools
 
-INPUT_FILE = "test_data/vibrio_genes.fasta"
-DATABASE_PATH = "./refdir/"
+INPUT_FILE = "test_data/VIB_EA5348AA_genes.fasta"
+DATABASE_PATH = "refdir/"
 DATABASE_NAME = "mydb"
 
 # Expected file extensions for KMA and BLAST databases
