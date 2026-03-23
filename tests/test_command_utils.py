@@ -46,9 +46,7 @@ def temp_files() -> Generator[Tuple[TextIO, TextIO], None, None]:
     """
     stdout_file = "test_stdout.txt"
     stderr_file = "test_stderr.txt"
-    with open(stdout_file, "w", encoding="utf-8") as stdout_f, open(
-        stderr_file, "w", encoding="utf-8"
-    ) as stderr_f:
+    with open(stdout_file, "w", encoding="utf-8") as stdout_f, open(stderr_file, "w", encoding="utf-8") as stderr_f:
         yield stdout_f, stderr_f
     os.remove(stdout_file)
     os.remove(stderr_file)
@@ -71,9 +69,7 @@ def test_execute_no_capture_output() -> None:
     """
     Test the execute function without capturing the output.
     """
-    result = CommandInvoker(
-        ShellCommand(cmd=["echo", "Hello World"], capture=False)
-    ).execute()
+    result = CommandInvoker(ShellCommand(cmd=["echo", "Hello World"], capture=False)).execute()
 
     assert result is True
 
@@ -109,9 +105,7 @@ def test_execute_failing_command_allow_fail_false() -> None:
     The function makes sure that the command fails and raises an exception.
     """
     with pytest.raises(SubprocessError):
-        CommandInvoker(
-            ShellCommand(cmd=["ls", "xyz"], allow_fail=False)
-        ).execute()
+        CommandInvoker(ShellCommand(cmd=["ls", "xyz"], allow_fail=False)).execute()
 
 
 def test_execute_failing_command_allow_fail_true() -> None:
@@ -119,7 +113,5 @@ def test_execute_failing_command_allow_fail_true() -> None:
     Test the execute function with a failing command
     and allow_fail=True.
     """
-    result = CommandInvoker(
-        ShellCommand(cmd=["false"], allow_fail=True)
-    ).execute()
+    result = CommandInvoker(ShellCommand(cmd=["false"], allow_fail=True)).execute()
     assert result is False

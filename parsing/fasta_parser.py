@@ -79,11 +79,7 @@ class FASTAParser(ParserStrategy):
         data_frame = pd.read_csv(filename + ".tsv", sep="\t", header=None)
         data_frame.columns = list(BLAST_COLUMNS.keys())
         data_frame["pident"] = data_frame["pident"].astype(float)
-        data_frame["coverage_pct"] = (
-            100
-            * (data_frame["length"] - data_frame["gaps"])
-            / data_frame["slen"]
-        )
+        data_frame["coverage_pct"] = 100 * (data_frame["length"] - data_frame["gaps"]) / data_frame["slen"]
 
         return data_frame
 
@@ -99,9 +95,7 @@ class FASTAParser(ParserStrategy):
             - list with gene names
         ----------
         """
-        return [
-            gene.split(":")[0] for gene in data_frame["sseqid"].values.tolist()
-        ]
+        return [gene.split(":")[0] for gene in data_frame["sseqid"].values.tolist()]
 
     def get_hits_report_info(self) -> tuple[list[str], str, Any]:
         """
@@ -163,9 +157,7 @@ class FASTAParser(ParserStrategy):
         """
         logging.debug("Extracting sequences from BLAST output...")
         if data_frame is not None:
-            query_sequences: dict[str, str] = {
-                row["sseqid"]: row["qseq"] for _, row in data_frame.iterrows()
-            }
+            query_sequences: dict[str, str] = {row["sseqid"]: row["qseq"] for _, row in data_frame.iterrows()}
         else:
             logging.error("No data frame found in FASTA parser, exiting...")
             raise EmptySequenceError()

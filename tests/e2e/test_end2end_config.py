@@ -117,9 +117,7 @@ def test_config_run(setup_teardown_config_input: list[str]) -> None:
     ----------
     """
     main(setup_teardown_config_input)
-    CommandInvoker(
-        ShellCommand(["mv", "VIB_EA5348AA_AS_*", DIR_PATH], capture=True)
-    ).execute()
+    CommandInvoker(ShellCommand(["mv", "VIB_EA5348AA_AS_*", DIR_PATH], capture=True)).execute()
 
     for output_file in OUTPUT:
         assert os.path.exists(f"{DIR_PATH}{output_file}")
@@ -132,9 +130,7 @@ def check_file_contents(file: str) -> None:
     The checking is done by comparing the output file data
     with the expected output data.
     """
-    expected_output: pd.DataFrame = pd.read_csv(
-        f"test_data/expected_output/expected_config_{file}", sep="\t"
-    )
+    expected_output: pd.DataFrame = pd.read_csv(f"test_data/expected_output/expected_config_{file}", sep="\t")
     run_output: pd.DataFrame = pd.read_csv(f"{DIR_PATH}{file}", sep="\t")
 
     # Ignore the last column, beacuse of the difference:
@@ -161,9 +157,7 @@ def test_config_paired_run(setup_teardown_config_input: list[str]) -> None:
     setup_teardown_config_input[-1] = FASTQ_1
     setup_teardown_config_input.append(FASTQ_2)
     main(setup_teardown_config_input)
-    CommandInvoker(
-        ShellCommand(["mv", "VIB_EA5348AA_AS_*", DIR_PATH], capture=True)
-    ).execute()
+    CommandInvoker(ShellCommand(["mv", "VIB_EA5348AA_AS_*", DIR_PATH], capture=True)).execute()
 
     for output_file in OUTPUT:
         assert os.path.exists(f"{DIR_PATH}{output_file}")

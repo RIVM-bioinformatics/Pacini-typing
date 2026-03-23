@@ -147,9 +147,7 @@ class SNPDatabaseBuilder:
                 to the genes.txt file.
         ----------
         """
-        logging.debug(
-            "Writing gene headers to genes.txt file for SNP database..."
-        )
+        logging.debug("Writing gene headers to genes.txt file for SNP database...")
         with open(
             f"{self.path_snps}/{self.species}/genes.txt",
             "w",
@@ -194,10 +192,7 @@ class SNPDatabaseBuilder:
                 ending with `.fsa`
         ----------
         """
-        logging.info(
-            "Writing gene headers and creating individual gene"
-            "files for SNP database..."
-        )
+        logging.info("Writing gene headers and creating individual gene" "files for SNP database...")
         gene_info: dict[str, str] = {}
         with open(self.target_snps_file, "r", encoding="utf-8") as file:
             for line in file:
@@ -210,9 +205,7 @@ class SNPDatabaseBuilder:
         self._write_gene_headers(list(gene_info.keys()))
         self._create_individual_gene_files(gene_info)
 
-    def construct_resistens_overview_record(
-        self, mutation: dict[str, str]
-    ) -> dict[str, str]:
+    def construct_resistens_overview_record(self, mutation: dict[str, str]) -> dict[str, str]:
         """
         Basic function that constructs a single record for the
         resistens-overview.txt file given the mutation information.
@@ -259,13 +252,7 @@ class SNPDatabaseBuilder:
         lines: list[str] = ["\t".join(RESISTENS_OVERVIEW_HEADERS) + "\n"]
         for mutation in self.SNP_list:
             record = self.construct_resistens_overview_record(mutation)
-            lines.append(
-                "\t".join(
-                    str(record[key.lstrip("#")])
-                    for key in RESISTENS_OVERVIEW_HEADERS
-                )
-                + "\n"
-            )
+            lines.append("\t".join(str(record[key.lstrip("#")]) for key in RESISTENS_OVERVIEW_HEADERS) + "\n")
 
         return lines
 
@@ -276,9 +263,7 @@ class SNPDatabaseBuilder:
         This is the key file for PointFinder's reference database
         and holds the information for all mutations.
         """
-        logging.info(
-            "Creating main resistens-overview.txt file for SNP database..."
-        )
+        logging.info("Creating main resistens-overview.txt file for SNP database...")
         with open(
             f"{self.path_snps}/{self.species}/resistens-overview.txt",
             "w",
@@ -294,10 +279,7 @@ class SNPDatabaseBuilder:
         to have it in the database. PointFinder will raise an
         error if it is not present.
         """
-        logging.info(
-            "Creating RNA_genes.txt file for SNP database "
-            "(required by PointFinder)..."
-        )
+        logging.info("Creating RNA_genes.txt file for SNP database " "(required by PointFinder)...")
         open(
             f"{self.path_snps}/{self.species}/RNA_genes.txt",
             "w",

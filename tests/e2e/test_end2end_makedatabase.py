@@ -145,9 +145,7 @@ def test_make_kma_database(setup_teardown: list[str]) -> None:
     compare_result_with_expected_files(KMA_EXTENSIONS, "fastq")
 
 
-def compare_result_with_expected_files(
-    extensions: list[str], database_type: str
-) -> None:
+def compare_result_with_expected_files(extensions: list[str], database_type: str) -> None:
     """
     Function to compare the files created by KMA with the expected files.
     It checks if the files are created successfully
@@ -159,9 +157,7 @@ def compare_result_with_expected_files(
     for extension in extensions:
         expected_file = f"test_data/expected_databases/expected_{database_type}_db{extension}"
         output_file = f"{DATABASE_PATH}{DATABASE_NAME}{extension}"
-        assert validating_input_arguments.ArgsValidator.create_sha_hash(
-            expected_file
-        ) == validating_input_arguments.ArgsValidator.create_sha_hash(
+        assert validating_input_arguments.ArgsValidator.create_sha_hash(expected_file) == validating_input_arguments.ArgsValidator.create_sha_hash(
             output_file
         )
 
@@ -182,6 +178,4 @@ def test_make_blast_database(setup_teardown: list[str]) -> None:
     setup_teardown[-1] = "fasta"
     main(setup_teardown)
     for blast_extension in BLAST_EXTENSIONS:
-        assert os.path.exists(
-            f"{DATABASE_PATH}{DATABASE_NAME}{blast_extension}"
-        )
+        assert os.path.exists(f"{DATABASE_PATH}{DATABASE_NAME}{blast_extension}")

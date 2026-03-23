@@ -138,9 +138,7 @@ def test_check_for_database_existence(options: dict[str, str]) -> None:
 
 @skip_in_ci
 @mock.patch("os.path.exists")
-def test_check_for_database_existence_missing_file(
-    mock_exists, fasta_options: dict[str, str]
-) -> None:
+def test_check_for_database_existence_missing_file(mock_exists, fasta_options: dict[str, str]) -> None:
     """
     Test that the function raises a SystemExit when the database files are missing.
     ----------
@@ -191,9 +189,7 @@ def test_check_for_database_path_invalid(
 
 @skip_in_ci
 @mock.patch("os.path.exists", return_value=True)
-def test_check_for_database_path_append_slash(
-    mock, fasta_options: dict[str, str]
-) -> None:
+def test_check_for_database_path_append_slash(mock, fasta_options: dict[str, str]) -> None:
     """
     Test that the function appends a slash to the database path if it does not end with one.
     ----------

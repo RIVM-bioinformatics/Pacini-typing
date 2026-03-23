@@ -118,9 +118,7 @@ class ParsingManager:
         try:
             handler = self.handlers[self.search_mode]
         except KeyError as exc:
-            logging.error(
-                "No handler found for search mode %s", self.search_mode
-            )
+            logging.error("No handler found for search mode %s", self.search_mode)
             raise HandlingError(self.search_mode) from exc
         handler()
 
@@ -231,9 +229,7 @@ class ParsingManager:
         # so we can write the report write away without checking
         self.write_report(parser.output_report, "report", self.sample_name)
 
-    def process_reports(
-        self, gene_report: pd.DataFrame, snp_report: pd.DataFrame
-    ) -> None:
+    def process_reports(self, gene_report: pd.DataFrame, snp_report: pd.DataFrame) -> None:
         """
         Function that processes the reports of either genes, SNPs or both.
         If both reports are empty, a warning is logged and the function
@@ -255,12 +251,8 @@ class ParsingManager:
             final_report = gene_report
             logging.info("SNP report is empty, writing gene report only...")
         else:
-            logging.info(
-                "Found both gene and SNP reports, concatenating and writing..."
-            )
-            final_report = pd.concat(
-                [gene_report, snp_report], ignore_index=True
-            )
+            logging.info("Found both gene and SNP reports, concatenating and writing...")
+            final_report = pd.concat([gene_report, snp_report], ignore_index=True)
             # Reset the index of the final report
             if "ID" in final_report.columns:
                 final_report["ID"] = range(1, len(final_report) + 1)
@@ -296,16 +288,8 @@ class ParsingManager:
         snp_parser.parse()
         # Define the reports and check their content
         # Check if parsers generated any data
-        gene_report = (
-            gene_parser.output_report
-            if not gene_parser.data_frame.empty
-            else pd.DataFrame()
-        )
-        snp_report = (
-            snp_parser.output_report
-            if not snp_parser.data_frame.empty
-            else pd.DataFrame()
-        )
+        gene_report = gene_parser.output_report if not gene_parser.data_frame.empty else pd.DataFrame()
+        snp_report = snp_parser.output_report if not snp_parser.data_frame.empty else pd.DataFrame()
 
         logging.debug("Gene report has %d entries", len(gene_report))
         logging.debug("SNP report has %d entries", len(snp_report))
@@ -322,10 +306,7 @@ class ParsingManager:
             - list with gene names
         ----------
         """
-        return [
-            item["gene_name"]
-            for item in self.pattern.pattern["pattern"]["gene"]
-        ]
+        return [item["gene_name"] for item in self.pattern.pattern["pattern"]["gene"]]
 
     def get_config_identity(self) -> float:
         """
@@ -358,20 +339,12 @@ class ParsingManager:
         getter functions.
         """
         logging.info("Adding filters to Parser object...")
-        self.parser.add_filter(
-            PercentageIdentityFilter(
-                self.get_config_identity(), self.file_type
-            )
-        )
-        self.parser.add_filter(
-            CoverageFilter(self.get_config_coverage(), self.file_type)
-        )
+        self.parser.add_filter(PercentageIdentityFilter(self.get_config_identity(), self.file_type))
+        self.parser.add_filter(CoverageFilter(self.get_config_coverage(), self.file_type))
         logging.debug("Filters: %s successfully added", self.parser.filters)
 
     @staticmethod
-    def write_report(
-        report: pd.DataFrame, suffix: str, input_sequence_sample: str
-    ) -> None:
+    def write_report(report: pd.DataFrame, suffix: str, input_sequence_sample: str) -> None:
         """
         Function that writes a given DataFrame to a csv file.
         The pandas DataFrame is created by other methods,

@@ -51,9 +51,7 @@ def compare_first_column_csv(file1: str, file2: str) -> bool:
         - bool: True if the two files are the same, False otherwise
     ----------
     """
-    with open(file1, "r", encoding="utf-8") as f1, open(
-        file2, "r", encoding="utf-8"
-    ) as f2:
+    with open(file1, "r", encoding="utf-8") as f1, open(file2, "r", encoding="utf-8") as f2:
         csv1 = csv.reader(f1)
         csv2 = csv.reader(f2)
         for row1, row2 in zip(csv1, csv2):
@@ -109,9 +107,7 @@ def sort_meta_data_into_sample_folder(meta_data_file: str, output_dir: str):
 
 if __name__ == "__main__":
     create_dirs(sample_file="secrid_path_to_sample.csv")
-    if not compare_first_column_csv(
-        file1="secrid_path_to_sample.csv", file2="secrid_path_to_sample.csv"
-    ):
+    if not compare_first_column_csv(file1="secrid_path_to_sample.csv", file2="secrid_path_to_sample.csv"):
         sys.exit("The samples are not the same, please check the files")
 
     sort_downloaded_files(

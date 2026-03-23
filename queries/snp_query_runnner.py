@@ -13,7 +13,6 @@ using the BaseQueryRunner class as a base. The query is prepared
 by the PointFinder runner and is then executed by the command invoker.
 """
 
-
 __author__ = "Mark van de Streek"
 __date__ = "2025-05-12"
 __all__ = ["SNPQueryRunner"]
@@ -60,9 +59,7 @@ class SNPQueryRunner(BaseQueryRunner):
         ----------
         """
         super().__init__(run_options)
-        self.check_pointfinder_existence(
-            self.run_options["pointfinder_script_path"]
-        )
+        self.check_pointfinder_existence(self.run_options["pointfinder_script_path"])
         self.query = PointFinder.get_query(option=self.run_options)
         self.version_command = PointFinder.get_version_command()
         self.log_tool_version()
@@ -86,10 +83,7 @@ class SNPQueryRunner(BaseQueryRunner):
             data = json.loads(stdout)
             return data["values"][0]["commit"]["date"]
         except Exception:
-            logging.error(
-                "Error extracting version number from PointFinder,"
-                " returning 'Not available'..."
-            )
+            logging.error("Error extracting version number from PointFinder," " returning 'Not available'...")
             # The program should not crash if a version number could not
             # be extracted, but the error should be logged.
             return "Not available"
@@ -119,6 +113,4 @@ class SNPQueryRunner(BaseQueryRunner):
                 )
             ).execute()
         else:
-            logging.debug(
-                "PointFinder script already exists, skipping download..."
-            )
+            logging.debug("PointFinder script already exists, skipping download...")

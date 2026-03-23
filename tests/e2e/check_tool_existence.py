@@ -34,9 +34,7 @@ def check_tools(required_tools: list[str]) -> None:
     """
     missing_tools = [tool for tool in required_tools if not is_tool(tool)]
     if missing_tools:
-        pytest.fail(
-            f"Skipping tests because the following tools are missing: {', '.join(missing_tools)}"
-        )
+        pytest.fail(f"Skipping tests because the following tools are missing: {', '.join(missing_tools)}")
 
 
 def is_tool(name: str) -> bool:

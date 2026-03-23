@@ -91,9 +91,7 @@ class ArgsValidator:
         if ext in self.config["accepted_input_extensions"]:
             return True
         logging.error("Error in vile extension, Exiting...")
-        raise InvalidFileExtensionError(
-            file, self.config["accepted_input_extensions"]
-        )
+        raise InvalidFileExtensionError(file, self.config["accepted_input_extensions"])
 
     @staticmethod
     def get_file_extension(file_extension: list[str]) -> str:
@@ -165,13 +163,9 @@ class ArgsValidator:
         ----------
         """
         logging.debug("Comparing paired input files using a hash...")
-        if self.create_sha_hash(
-            self.input_file_list[0]
-        ) == self.create_sha_hash(self.input_file_list[1]):
+        if self.create_sha_hash(self.input_file_list[0]) == self.create_sha_hash(self.input_file_list[1]):
             logging.error("Paired content is the same, exiting...")
-            raise InvalidPairedError(
-                self.input_file_list[0], self.input_file_list[1]
-            )
+            raise InvalidPairedError(self.input_file_list[0], self.input_file_list[1])
         logging.debug("Files Hashes are not identical, continuing...")
 
     @staticmethod
@@ -207,10 +201,7 @@ class ArgsValidator:
         ----------
         """
         logging.debug("Paired files supplied, checking similarity...")
-        if (
-            self.option["input_file_list"][0]
-            == self.option["input_file_list"][1]
-        ):
+        if self.option["input_file_list"][0] == self.option["input_file_list"][1]:
             logging.error("Error in validating paired names, exiting...")
             raise InvalidPairedError(
                 self.option["input_file_list"][0],
@@ -230,10 +221,7 @@ class ArgsValidator:
         logging.debug("Checking if the paired input contains valid names...")
         pattern1 = re.compile(r".+(_1|R1).+")
         pattern2 = re.compile(r".+(_2|R2).+")
-        if not (
-            pattern1.search(self.option["input_file_list"][0])
-            and pattern2.search(self.option["input_file_list"][1])
-        ):
+        if not (pattern1.search(self.option["input_file_list"][0]) and pattern2.search(self.option["input_file_list"][1])):
             logging.error("Error in validating paired names, exiting...")
             raise InvalidPairedError(
                 self.option["input_file_list"][0],
@@ -257,12 +245,8 @@ class ArgsValidator:
             - ValidationError: if the checks do not pass
         ----------
         """
-        logging.debug(
-            "Checking file existence and valid extension for file: %s", file
-        )
-        if self.check_file_existence(file) and self.validate_file_extensions(
-            file
-        ):
+        logging.debug("Checking file existence and valid extension for file: %s", file)
+        if self.check_file_existence(file) and self.validate_file_extensions(file):
             return True
         raise ValidationError()
 
@@ -277,9 +261,7 @@ class ArgsValidator:
         ----------
         """
         if len(self.input_file_list) == 2:
-            if len(self.input_file_list) == 2 and all(
-                self.run_file_checks(file) for file in self.input_file_list
-            ):
+            if len(self.input_file_list) == 2 and all(self.run_file_checks(file) for file in self.input_file_list):
                 self.check_for_same_name()
                 self.compare_paired_files()
                 self.check_paired_names()

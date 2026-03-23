@@ -69,12 +69,8 @@ class FASTQParser(ParserStrategy):
         logging.debug("Reading KMA output file: %s...", filename)
         data_frame = pd.read_csv(filename, sep="\t", header=0)
         data_frame.columns = list(KMA_COLUMNS.keys())
-        data_frame["Template_Identity"] = data_frame[
-            "Template_Identity"
-        ].astype(float)
-        data_frame["Template_Coverage"] = data_frame[
-            "Template_Coverage"
-        ].astype(float)
+        data_frame["Template_Identity"] = data_frame["Template_Identity"].astype(float)
+        data_frame["Template_Coverage"] = data_frame["Template_Coverage"].astype(float)
         return data_frame
 
     def extract_gene_list(self, data_frame: pd.DataFrame) -> list[str]:

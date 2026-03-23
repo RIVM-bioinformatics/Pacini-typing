@@ -146,22 +146,15 @@ def main(givenargs: list[str]) -> argparse.Namespace:
     # to ensure that the user has provided the correct arguments
 
     if args.fasta_out and args.search_mode == "SNPs":
-        parser.error(
-            "--fasta-out cannot be used with --search_mode SNPs. "
-            "Please use this option only when searching for genes."
-        )
+        parser.error("--fasta-out cannot be used with --search_mode SNPs. " "Please use this option only when searching for genes.")
 
     if not args.options:
         if not args.config or not args.input:
-            parser.error(
-                "Both --config and --input must be provided if no subcommand is specified."
-            )
+            parser.error("Both --config and --input must be provided if no subcommand is specified.")
     else:
         if args.config or args.input:
             parser.error("--config or --input cannot be used with subcommands.")
         if args.fasta_out or args.save_intermediates:
-            parser.error(
-                "--fasta-out and --save-intermediates cannot be used with subcommands."
-            )
+            parser.error("--fasta-out and --save-intermediates cannot be used with subcommands.")
 
     return args

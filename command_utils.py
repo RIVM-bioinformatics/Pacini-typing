@@ -145,16 +145,8 @@ class ShellCommand(Command):
                 " ".join(self.cmd) if isinstance(self.cmd, list) else self.cmd,
                 shell=True,
                 cwd=self.directory,
-                stdout=(
-                    self.stdout_file
-                    if self.stdout_file
-                    else (subprocess.PIPE if self.capture else None)
-                ),
-                stderr=(
-                    self.stderr_file
-                    if self.stderr_file
-                    else (subprocess.PIPE if self.capture else None)
-                ),
+                stdout=(self.stdout_file if self.stdout_file else (subprocess.PIPE if self.capture else None)),
+                stderr=(self.stderr_file if self.stderr_file else (subprocess.PIPE if self.capture else None)),
                 text=True,
                 check=True,
             )

@@ -161,8 +161,6 @@ def compare_additional_files() -> None:
         ],
         EXPECTED_FILES[1:],
     ):
-        assert validating_input_arguments.ArgsValidator.create_sha_hash(
-            output_file
-        ) == validating_input_arguments.ArgsValidator.create_sha_hash(
+        assert validating_input_arguments.ArgsValidator.create_sha_hash(output_file) == validating_input_arguments.ArgsValidator.create_sha_hash(
             expected_file
         )

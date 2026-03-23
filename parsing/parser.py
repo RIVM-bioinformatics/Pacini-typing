@@ -142,13 +142,9 @@ class Parser:
             "Type/Genes": self.config_options["metadata"]["type"],
             "Mode": "Gene",
             "Hits": item.iloc[columns.index("hit")].split(":")[0],
-            "Percentage Identity": round(
-                item.iloc[columns.index("percentage identity")], 3
-            ),
+            "Percentage Identity": round(item.iloc[columns.index("percentage identity")], 3),
             "Percentage Coverage": (
-                round(item["coverage_pct"], 3)
-                if self.file_type == "FASTA"
-                else item.iloc[columns.index("percentage coverage")]
+                round(item["coverage_pct"], 3) if self.file_type == "FASTA" else item.iloc[columns.index("percentage coverage")]
             ),
             significance_type: item.iloc[value_column],
         }
@@ -172,15 +168,9 @@ class Parser:
         """
         logging.debug("Creating the output report...")
         output_records: list[dict[str, Any]] = []
-        columns, significance_type, value_column = (
-            self.strategy.get_hits_report_info()
-        )
+        columns, significance_type, value_column = self.strategy.get_hits_report_info()
         for index, (_, item) in enumerate(self.data_frame.iterrows(), start=1):
-            output_records.append(
-                self.construct_report_record(
-                    index, item, columns, significance_type, value_column
-                )
-            )
+            output_records.append(self.construct_report_record(index, item, columns, significance_type, value_column))
 
         return pd.DataFrame(output_records)
 
@@ -212,9 +202,7 @@ class Parser:
             config_options=self.config_options,
             input_sequence_sample=self.input_sequence_sample,
             list_of_genes=self.construct_list_of_genes(),
-            data_frame=(
-                self.data_frame if self.strategy.requires_dataframe() else None
-            ),
+            data_frame=(self.data_frame if self.strategy.requires_dataframe() else None),
         )
 
     def parse(self) -> None:
@@ -229,14 +217,9 @@ class Parser:
         try:
             self.read_run_output()
         except FileNotFoundError:
-            logging.error(
-                "File containing query results not found, exiting..."
-            )
+            logging.error("File containing query results not found, exiting...")
         except pd.errors.EmptyDataError:
-            logging.warning(
-                "No content in the query file, found no hits "
-                "in the input files"
-            )
+            logging.warning("No content in the query file, found no hits " "in the input files")
         logging.debug("Results were read successfully, filtering...")
         if not self.data_frame.empty:
             self.apply_filters()
@@ -246,6 +229,4 @@ class Parser:
             if self.config_options.get("fasta_out", False):
                 self.write_fasta_out()
         else:
-            logging.warning(
-                "There were no hits left after filtering, no reports were created..."
-            )
+            logging.warning("There were no hits left after filtering, no reports were created...")

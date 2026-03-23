@@ -76,9 +76,7 @@ class HandleSearchModes:
         self.search_mode: str = self.option["config"]["search_mode"].lower()
         self.file_type: str = self.pattern.creation_dict["file_type"]
 
-    def check_valid_gene_database_path(
-        self, database_builder: dict[str, Any]
-    ) -> bool:
+    def check_valid_gene_database_path(self, database_builder: dict[str, Any]) -> bool:
         """
         Function that calls the validation operation for the database.
         This function is responsible for checking if the database exists.
@@ -109,9 +107,7 @@ class HandleSearchModes:
         logging.info("Creating the reference database...")
         GeneDatabaseBuilder(database_creation_args)
 
-    def check_valid_SNP_database(
-        self, database_builder: dict[str, Any]
-    ) -> bool:
+    def check_valid_SNP_database(self, database_builder: dict[str, Any]) -> bool:
         """
         Function that delegates the validating process of the
         SNP database. This validation process is done by the
@@ -121,9 +117,7 @@ class HandleSearchModes:
             - database_builder: Dictionary with all necessary information
         ----------
         """
-        checker: PointFinderReferenceChecker = PointFinderReferenceChecker(
-            database_builder["path_snps"] + "/" + database_builder["species"]
-        )
+        checker: PointFinderReferenceChecker = PointFinderReferenceChecker(database_builder["path_snps"] + "/" + database_builder["species"])
         return checker.validate()
 
     def validate_or_create_SNP_database(self) -> None:
@@ -138,24 +132,14 @@ class HandleSearchModes:
                 successfully or does not exist.
         ----------
         """
-        logging.debug(
-            "Checking if the SNP database exists"
-            "and trying to create it if it does not exist..."
-        )
+        logging.debug("Checking if the SNP database exists" "and trying to create it if it does not exist...")
         if not self.check_valid_SNP_database(self.pattern.creation_dict):
             SNPDatabaseBuilder(self.pattern.creation_dict)
         if not self.check_valid_SNP_database(self.pattern.creation_dict):
             # Check again if the SNP database was created, and raise an
             # error if it was not created successfully.
-            logging.error(
-                "SNP database not valid, "
-                "already tried to create it, exiting..."
-            )
-            raise InvalidSNPDatabaseError(
-                self.pattern.creation_dict["path_snps"]
-                + "/"
-                + self.pattern.creation_dict["species"]
-            )
+            logging.error("SNP database not valid, " "already tried to create it, exiting...")
+            raise InvalidSNPDatabaseError(self.pattern.creation_dict["path_snps"] + "/" + self.pattern.creation_dict["species"])
 
     def handle_fastq_snp_query(self) -> None:
         """
@@ -168,26 +152,17 @@ class HandleSearchModes:
         Blastn can directly search for SNPs in FASTA files.
         """
         custom_database_builder: dict[str, Any] = {
-            "database_path": self.pattern.creation_dict["path_snps"]
-            + "/"
-            + self.pattern.creation_dict["species"],
+            "database_path": self.pattern.creation_dict["path_snps"] + "/" + self.pattern.creation_dict["species"],
             "database_name": self.pattern.creation_dict["species"],
             "file_type": self.file_type,
         }
-        logging.debug(
-            "Checking if the gene database exists for the FASTQ file type..."
-        )
+        logging.debug("Checking if the gene database exists for the FASTQ file type...")
         if self.check_valid_gene_database_path(custom_database_builder):
             run_snp_query(self.pattern.creation_dict)
         else:
-            logging.warning(
-                "Gene database does not exist inside SNP database, "
-                "trying to create it..."
-            )
+            logging.warning("Gene database does not exist inside SNP database, " "trying to create it...")
             self.create_genes_database(custom_database_builder)
-            if not self.check_valid_gene_database_path(
-                custom_database_builder
-            ):
+            if not self.check_valid_gene_database_path(custom_database_builder):
                 raise InvalidDatabaseError(
                     custom_database_builder["database_name"],
                     custom_database_builder["file_type"],
@@ -195,9 +170,7 @@ class HandleSearchModes:
             else:
                 run_snp_query(self.pattern.creation_dict)
 
-    def create_genes_database(
-        self, custom_database_builder: dict[str, Any]
-    ) -> None:
+    def create_genes_database(self, custom_database_builder: dict[str, Any]) -> None:
         """
         Little helper function that creates the gene database
         for the SNP database. it's confusing, but the PointFinder database
@@ -209,8 +182,7 @@ class HandleSearchModes:
         ----------
         """
         custom_database_builder["input_fasta_file"] = (
-            f"{self.pattern.creation_dict['path_snps']}/"
-            f"{self.pattern.creation_dict['species']}/genes.fasta"
+            f"{self.pattern.creation_dict['path_snps']}/" f"{self.pattern.creation_dict['species']}/genes.fasta"
         )
         custom_database_builder["database_type"] = "FASTQ"
         GeneDatabaseBuilder(custom_database_builder)
@@ -249,18 +221,14 @@ class HandleSearchModes:
         self.validate_or_create_SNP_database()
         logging.info("SNP database exists, starting the query operation...")
         if self.file_type == "FASTQ":
-            logging.info(
-                "File type is FASTQ, starting additional validation steps..."
-            )
+            logging.info("File type is FASTQ, starting additional validation steps...")
             # File type is FASTQ, PointFinder requires again a indexed
             # database, so we can reuse our own creation class to achieve
             # this. The database is created in the same directory as the
             # SNP database, but with the name of the species (as required)
             self.handle_fastq_snp_query()
         else:
-            logging.info(
-                "File type is FASTA, starting the SNP query operation..."
-            )
+            logging.info("File type is FASTA, starting the SNP query operation...")
             run_snp_query(self.pattern.creation_dict)
 
     def handle(self) -> None:
@@ -271,14 +239,8 @@ class HandleSearchModes:
         """
         logging.info("Handling search modes...")
         if self.search_mode in ["genes", "both"]:
-            logging.debug(
-                "Search mode is set to 'genes' or 'both', "
-                "handling gene search mode..."
-            )
+            logging.debug("Search mode is set to 'genes' or 'both', " "handling gene search mode...")
             self.handle_gene_search_mode()
         if self.search_mode in ["snps", "both"]:
-            logging.debug(
-                "Search mode is set to 'snps' or 'both', "
-                "handling SNP search mode..."
-            )
+            logging.debug("Search mode is set to 'snps' or 'both', " "handling SNP search mode...")
             self.handle_snp_search_mode()

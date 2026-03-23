@@ -153,16 +153,8 @@ class PaciniTyping:
         """
         logging.debug("Parsing general attributes...")
         self.option = {
-            "database_path": (
-                self.input_args.database_path
-                if hasattr(self.input_args, "database_path")
-                else None
-            ),
-            "database_name": (
-                self.input_args.database_name
-                if hasattr(self.input_args, "database_name")
-                else None
-            ),
+            "database_path": (self.input_args.database_path if hasattr(self.input_args, "database_path") else None),
+            "database_name": (self.input_args.database_name if hasattr(self.input_args, "database_name") else None),
             "option": self.input_args.options,
             "verbose": self.input_args.verbose,
             "run_path": os.path.abspath(__file__).rsplit(".", 1)[0],
@@ -215,9 +207,7 @@ class PaciniTyping:
         a log file is created with the name pacini_typing.log.
         """
         logging.debug("Setting up logging-level")
-        logging.getLogger().setLevel(
-            self.option["verbose"] and logging.DEBUG or logging.INFO
-        )
+        logging.getLogger().setLevel(self.option["verbose"] and logging.DEBUG or logging.INFO)
         if self.input_args.log_file:
             logging.debug("--log-file option selected, setting up log file...")
             file_handler = logging.FileHandler("pacini_typing.log")
@@ -269,13 +259,7 @@ class PaciniTyping:
         The sample name is the first part of the filename.
         """
         logging.debug("Retrieving the sample name from the input file...")
-        self.sample_name = (
-            self.option["input_file_list"][0]
-            .split("/")[-1]
-            .split(".")[0]
-            .replace("_1", "")
-            .replace("_pR1", "")
-        )
+        self.sample_name = self.option["input_file_list"][0].split("/")[-1].split(".")[0].replace("_1", "").replace("_pR1", "")
 
     def check_for_unzip_files(self) -> None:
         """
@@ -285,11 +269,7 @@ class PaciniTyping:
         See the unzip_gz_files function for more information.
         """
         logging.debug("Checking for .gz files in the input list...")
-        gz_files = [
-            file
-            for file in self.option["input_file_list"]
-            if file.endswith(".gz")
-        ]
+        gz_files = [file for file in self.option["input_file_list"] if file.endswith(".gz")]
         if gz_files:
             logging.info("Found files that need to be unzipped, unzipping...")
             self.unzip_gz_files(gz_files)
@@ -319,10 +299,7 @@ class PaciniTyping:
                 logging.error("Error while unzipping file %s: %s", file, e)
                 sys.exit(1)
         logging.debug("Updating input file list with unzipped files")
-        self.option["input_file_list"] = [
-            file[:-3] if file in gz_files else file
-            for file in self.option["input_file_list"]
-        ]
+        self.option["input_file_list"] = [file[:-3] if file in gz_files else file for file in self.option["input_file_list"]]
 
     def validate_file_arguments(self) -> None:
         """
@@ -346,14 +323,9 @@ class PaciniTyping:
         logging.debug("Validating the input arguments...")
         argsvalidator = ArgsValidator(self.option)
         if argsvalidator.validate():
-            logging.info(
-                "Input arguments have been validated, found no issues..."
-            )
+            logging.info("Input arguments have been validated, found no issues...")
         else:
-            logging.error(
-                "Error while validation the input arguments, "
-                "please check the above logs for more information."
-            )
+            logging.error("Error while validation the input arguments, " "please check the above logs for more information.")
             sys.exit(1)
 
     def run_makedatabase(self, database_creation_args: dict[str, Any]) -> None:
@@ -374,9 +346,7 @@ class PaciniTyping:
         See validation/determine_input_type.py for more information.
         """
         logging.debug("Determining the file type of the input file(s)...")
-        self.file_type = InputFileInspector(
-            self.option["input_file_list"]
-        ).get_file_type()
+        self.file_type = InputFileInspector(self.option["input_file_list"]).get_file_type()
         logging.info(
             "The input file type has been determined: %s",
             self.file_type,
@@ -393,25 +363,14 @@ class PaciniTyping:
             - InvalidSequencingTypesError: Wrong file type for input arguments
         ----------
         """
-        logging.debug(
-            "Checking if the file type is correct for the input arguments..."
-        )
-        if (
-            len(self.option["input_file_list"]) == 1
-            and self.file_type == "FASTQ"
-        ) or (
-            len(self.option["input_file_list"]) == 2
-            and self.file_type == "FASTA"
+        logging.debug("Checking if the file type is correct for the input arguments...")
+        if (len(self.option["input_file_list"]) == 1 and self.file_type == "FASTQ") or (
+            len(self.option["input_file_list"]) == 2 and self.file_type == "FASTA"
         ):
-            logging.error(
-                "Only FASTA files are allowed for single files "
-                "and only FASTQ files are allowed for paired files."
-            )
+            logging.error("Only FASTA files are allowed for single files " "and only FASTQ files are allowed for paired files.")
             raise InvalidSequencingTypesError(self.option["input_file_list"])
 
-    def check_valid_gene_database_path(
-        self, database_builder: dict[str, Any]
-    ) -> bool:
+    def check_valid_gene_database_path(self, database_builder: dict[str, Any]) -> bool:
         """
         Function that calls the validation operation for the database.
         This function is responsible for checking if the database exists.
@@ -448,16 +407,10 @@ class PaciniTyping:
         # Additionally, the query input and output must be set.
         # The output is not specified by the user, because
         # this is based on the input files.
-        logging.debug(
-            "Setting additional information for the configuration..."
-        )
-        pattern.creation_dict["input_file_list"] = self.option["config"][
-            "input"
-        ]
+        logging.debug("Setting additional information for the configuration...")
+        pattern.creation_dict["input_file_list"] = self.option["config"]["input"]
         pattern.creation_dict["file_type"] = self.file_type
-        pattern.creation_dict["output"] = (
-            pattern.pattern["global_settings"]["run_output"] + self.sample_name
-        )
+        pattern.creation_dict["output"] = pattern.pattern["global_settings"]["run_output"] + self.sample_name
 
         pattern.creation_dict["input_fasta_file"] = os.path.join(
             os.path.dirname(self.option["run_path"]),
@@ -470,9 +423,7 @@ class PaciniTyping:
 
         return pattern
 
-    def handle_intermediate_saving(
-        self, gene_output_dir: str, run_output_snps: str
-    ) -> None:
+    def handle_intermediate_saving(self, gene_output_dir: str, run_output_snps: str) -> None:
         """
         Little helper function that contains some logic for saving
         intermediate files. In some situations, the gene_output_dir
@@ -496,9 +447,7 @@ class PaciniTyping:
                 gene_output_dir,
                 f"{self.sample_name}_intermediates_gene.tar.gz",
             )
-            self.save_intermediates(
-                run_output_snps, f"{self.sample_name}_intermediates_SNP.tar.gz"
-            )
+            self.save_intermediates(run_output_snps, f"{self.sample_name}_intermediates_SNP.tar.gz")
 
     def save_intermediates(
         self,
@@ -540,9 +489,7 @@ class PaciniTyping:
         if os.path.exists(output_dir):
             shutil.rmtree(output_dir)
         else:
-            logging.debug(
-                "Directory %s does not exist, skipping deletion", output_dir
-            )
+            logging.debug("Directory %s does not exist, skipping deletion", output_dir)
 
     def save_or_delete_intermediate(self, pattern: ReadConfigPattern):
         """
@@ -557,16 +504,12 @@ class PaciniTyping:
         search_mode: str = self.option["config"]["search_mode"]
         # Determine if the run_output_snps directory is needed
         if search_mode in ["both", "SNPs"]:
-            run_output_snps = pattern.pattern["global_settings"][
-                "run_output_snps"
-            ]
+            run_output_snps = pattern.pattern["global_settings"]["run_output_snps"]
         gene_output_dir: str = pattern.pattern["global_settings"]["run_output"]
 
         if self.input_args.save_intermediates:
             if search_mode == "both":
-                self.handle_intermediate_saving(
-                    gene_output_dir, run_output_snps
-                )
+                self.handle_intermediate_saving(gene_output_dir, run_output_snps)
             elif search_mode == "SNPs":
                 self.save_intermediates(
                     run_output_snps,
@@ -595,9 +538,7 @@ class PaciniTyping:
         The run_makedatabase() method is re-used by other modules later on,
         that's why this pattern is defined in this helper function.
         """
-        logging.info(
-            "Defining all necessary information for the database creation..."
-        )
+        logging.info("Defining all necessary information for the database creation...")
         database_builder = {
             "database_path": self.option["database_path"],
             "database_name": self.option["database_name"],
@@ -617,9 +558,7 @@ class PaciniTyping:
         else:
             # The query option is not selected,
             # which means the config is selected.
-            logging.info(
-                "Config option selected, starting the configuration..."
-            )
+            logging.info("Config option selected, starting the configuration...")
             self.handle_config_option()
 
     def handle_config_option(self) -> None:
@@ -668,9 +607,7 @@ class PaciniTyping:
             - InvalidDatabaseError: Database existence check failed
         ----------
         """
-        logging.debug(
-            "Defining all necessary information for the query operation..."
-        )
+        logging.debug("Defining all necessary information for the query operation...")
         query_builder: dict[str, Any] = {
             "file_type": self.file_type,
             "input_file_list": self.option["input_file_list"],

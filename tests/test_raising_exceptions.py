@@ -251,8 +251,6 @@ def test_wrong_fasta_with_fastq_names(setup_args: list[str]):
         - setup_args: list of arguments for the test
     ----------
     """
-    setup_args.extend(
-        ["test_data/wrong_files/VIB_1.fq", "test_data/wrong_files/VIB_2.fq"]
-    )
+    setup_args.extend(["test_data/wrong_files/VIB_1.fq", "test_data/wrong_files/VIB_2.fq"])
     with pytest.raises(InvalidSequencingTypesError):
         main(setup_args)
