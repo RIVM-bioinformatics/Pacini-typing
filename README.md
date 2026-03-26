@@ -87,16 +87,16 @@ The subcommands of **blast** (`makeblastdb`) and **kma** (`kma_index`) are also 
 
 ## Complete list of packages
 
-| Package    | Version |
-|------------|---------|
-| pip        | >=24.2  |
-| pyyaml     | >=6.0.2 |
-| setuptools | >=75.1.0|
-| pandas     | >=2.2.3 |
-| blast      | >=2.16.0|
-| kma        | >=1.4.15|
-| pytest     | >=8.3.3 |
-| cgecore    | >=2.0.1 |
+| Package    | Version  |
+| ---------- | -------- |
+| pip        | >=24.2   |
+| pyyaml     | >=6.0.2  |
+| setuptools | >=75.1.0 |
+| pandas     | >=2.2.3  |
+| blast      | >=2.16.0 |
+| kma        | >=1.4.15 |
+| pytest     | >=8.3.3  |
+| cgecore    | >=2.0.1  |
 
 ## Installation
 
@@ -303,10 +303,10 @@ See the [Parameters & Usage](#parameters--usage) section for more information on
 
 * ```-h, --help``` Shows the help of the pipeline.
 
-```bash
+```text
 usage: Pacini-typing [-h] [-v] [-V] [-c File] [-i File [File ...]]
-                     [--save-intermediates] [--log-file] [-t Threads] [-f]
-                     [-m {SNPs,genes,both}]
+                     [-o Directory] [--tmp-dir Directory] [--save-intermediates]
+                     [--log-file] [-t Threads] [-f] [-m {SNPs,genes,both}]
                      {makedatabase,query} ...
 
 Bacterial Genotyping Tool for RIVM IDS-Bioinformatics
@@ -326,6 +326,9 @@ options:
                         Path to predefined configuration file
   -i File [File ...], --input File [File ...]
                         Path to input file(s). Accepts 1 fasta file or 2 fastq files
+  -o Directory, --output-report Directory
+                        Path to output directory (default: current directory)
+  --tmp-dir Directory   Path to temporary directory (default: current directory)
   --save-intermediates  Save intermediate files of the run
   --log-file            Save log file of the run
   -t Threads, --threads Threads
