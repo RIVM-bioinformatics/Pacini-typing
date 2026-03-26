@@ -34,6 +34,10 @@ from pacini_typing import main
 from preprocessing.exceptions.determine_input_type_exceptions import InvalidFastaOrFastqError, InvalidSequenceError, InvalidSequencingTypesError
 from preprocessing.exceptions.validation_exceptions import FileNotExistsError, InvalidFileExtensionError, InvalidPairedError
 
+skip_in_ci = pytest.mark.skipif(
+    os.getenv("CI") == "true",
+    reason="Test online (GitHub Action) not available due to dependencies",
+)
 
 @pytest.fixture()
 def setup_args() -> Generator[list[str], None, None]:
@@ -210,7 +214,7 @@ def test_wrong_fastq_input(setup_args: list[str]):
     with pytest.raises(InvalidSequencingTypesError):
         main(setup_args)
 
-
+@skip_in_ci
 def test_correct_two_fasta_input(setup_args: list[str]):
     """
     Test if two unrelated FASTA files are treated as
