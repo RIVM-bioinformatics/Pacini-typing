@@ -319,14 +319,14 @@ class ParsingManager:
         For gene reports the final significance column depends on the
         parser strategy: `e-value` for FASTA and `p-value` for FASTQ.
         """
+        get_significance_col = lambda: "e-value" if self.file_type == "FASTA" else "p-value"
+
         if self.search_mode == "genes":
-            significance_col = "e-value" if self.file_type == "FASTA" else "p-value"
-            return [*GENE_REPORT_COLUMNS, significance_col]
+            return [*GENE_REPORT_COLUMNS, get_significance_col()]
         if self.search_mode == "SNPs":
-            return list(SNP_REPORT_COLUMNS)
+            return SNP_REPORT_COLUMNS
         if self.search_mode == "both":
-            significance_col = "e-value" if self.file_type == "FASTA" else "p-value"
-            return [*GENE_REPORT_COLUMNS, significance_col, *SNP_REPORT_COLUMNS[6:]]
+            return [*GENE_REPORT_COLUMNS, get_significance_col(), *SNP_REPORT_COLUMNS[6:]]
         raise HandlingError(f"Unexpected search mode: {self.search_mode}")
 
     def create_empty_report_frame(self) -> pd.DataFrame:
@@ -432,7 +432,6 @@ class ParsingManager:
             file_name = Path(f"{input_sequence_sample}_{suffix}.csv")
 
         if report.empty:
-            # TODO with this commit an empty report shouldn't happen anymore, added guard clause just in case, to be removed in next commit
             raise HandlingError("Report is empty, this should not happen, check the previous logs for more info")
 
         report.to_csv(
