@@ -52,7 +52,7 @@ class PointFinderReferenceChecker:
         """
         self.unique_genes_resistens_overview: list[str] = []
         self.path: str = path_to_database
-        self.resistance_overview: str = self.path + "/resistens-overview.txt"
+        self.resistance_overview: str = f"{self.path}/resistens-overview.txt"
 
     def check_path_directory(self) -> bool:
         """
@@ -67,14 +67,10 @@ class PointFinderReferenceChecker:
         if os.path.exists(self.path):
             if os.path.isdir(self.path):
                 return True
-            else:
-                logging.debug(
-                    "Path: %s exists but is not a directory.", self.path
-                )
-                return False
+            logging.debug("Path: %s exists but is not a directory.", self.path)
         else:
             logging.debug("Path: %s does not exist.", self.path)
-            return False
+        return False
 
     def check_folder_structure(self) -> bool:
         """
@@ -102,11 +98,9 @@ class PointFinderReferenceChecker:
         ]
         for file in required_files:
             if not os.path.isfile(os.path.join(self.path, file)):
-                logging.debug("Missing required file: %s", file)
+                logging.debug("Missing required Pointfinder file: %s", file)
                 return False
-        logging.debug(
-            "Database folder seems to be correct, checking files next..."
-        )
+        logging.debug("Database folder seems to be correct, checking files next...")
         return True
 
     def check_resistens_overview_file(self) -> bool:
@@ -134,9 +128,7 @@ class PointFinderReferenceChecker:
             - False if the file is not correct
         ----------
         """
-        logging.info(
-            "Checking the resistens-overview.txt file for required fields..."
-        )
+        logging.info("Checking the resistens-overview.txt file for required fields...")
         required_fields: list[str] = [
             "#Gene_ID",
             "Gene_name",
@@ -147,27 +139,17 @@ class PointFinderReferenceChecker:
             "Resistance",
             "PMID",
         ]
-        df: pd.DataFrame = pd.read_csv(
-            self.resistance_overview, sep="\t", encoding="utf-8"
-        )
+        df: pd.DataFrame = pd.read_csv(self.resistance_overview, sep="\t", encoding="utf-8")
         self.unique_genes_resistens_overview = df["#Gene_ID"].unique().tolist()
-        if not all(field in df.columns for field in required_fields):
-            missing_fields = [
-                field for field in required_fields if field not in df.columns
-            ]
+        if any(field not in df.columns for field in required_fields):
+            missing_fields = [field for field in required_fields if field not in df.columns]
             logging.debug("Missing required fields: %s", missing_fields)
             return False
         rows = len(df)
         if rows < 1:
-            logging.info(
-                "resistens-overview.txt does not contain any data rows."
-            )
+            logging.info("resistens-overview.txt does not contain any data rows.")
             return False
-        logging.debug(
-            "resistens-overview.txt contains the required fields, "
-            "amount of rows in the file: %s",
-            rows,
-        )
+        logging.debug("resistens-overview.txt contains the required fields, amount of rows in the file: %s", rows)
         return True
 
     def get_gene_names(self) -> list[str]:
@@ -181,14 +163,10 @@ class PointFinderReferenceChecker:
             - genes_list: list of gene names
         ----------
         """
-        with open(
-            self.path + "/genes.txt", "r", encoding="utf-8"
-        ) as genes_txt_file:
+        with open(self.path + "/genes.txt", "r", encoding="utf-8") as genes_txt_file:
             return [line.strip() for line in genes_txt_file if line.strip()]
 
-    def create_missing_genes_list(
-        self, target_genes: list[str], available_genes: list[str]
-    ) -> list[str] | None:
+    def create_missing_genes_list(self, target_genes: list[str], available_genes: list[str]) -> list[str] | None:
         """
         Little helper function to create a list of missing genes
         from the genes that are not present in the available genes list.
@@ -201,10 +179,8 @@ class PointFinderReferenceChecker:
             - missing_genes: list of missing genes
         ----------
         """
-        missing_genes: list[str] = [
-            gene for gene in target_genes if gene not in available_genes
-        ]
-        return missing_genes if missing_genes else None
+        missing_genes: list[str] = [gene for gene in target_genes if gene not in available_genes]
+        return missing_genes or None
 
     def check_missing_genes(self, checks: dict[str, list[str] | None]) -> bool:
         """
@@ -247,17 +223,10 @@ class PointFinderReferenceChecker:
             - False if any gene is missing
         ----------
         """
-        logging.info(
-            "Checking if the matching of genes "
-            "in the SNP database is correct..."
-        )
+        logging.info("Checking if the matching of genes in the SNP database is correct...")
         genes_list: list[str] = self.get_gene_names()
         # retrieve the list of .fsa files in the database directory
-        fsa_files = [
-            f.replace(".fsa", "")
-            for f in os.listdir(self.path)
-            if f.endswith(".fsa")
-        ]
+        fsa_files = [f.replace(".fsa", "") for f in os.listdir(self.path) if f.endswith(".fsa")]
         # Perform two checks:
         # 1. Check if all genes in resistens-overview.txt are in genes.txt
         # 2. Check if all genes in genes.txt have a corresponding .fsa file
@@ -266,9 +235,7 @@ class PointFinderReferenceChecker:
                 target_genes=self.unique_genes_resistens_overview,
                 available_genes=genes_list,
             ),
-            ".fsa files": self.create_missing_genes_list(
-                target_genes=genes_list, available_genes=fsa_files
-            ),
+            ".fsa files": self.create_missing_genes_list(target_genes=genes_list, available_genes=fsa_files),
         }
         # Check if any of the lists in the dictionary
         # are not None and log the missing genes
@@ -288,14 +255,11 @@ class PointFinderReferenceChecker:
             - False if any check failed
         ----------
         """
-        if (
-            not self.check_path_directory()
-            and not self.check_folder_structure()
-        ):
-            logging.warning(
-                "Path to the reference database does not exists or"
-                "does not have the correct structure"
-            )
+        if not self.check_path_directory():
+            logging.warning("Path to the reference database does not exist or is not a directory")
+            return False
+        if not self.check_folder_structure():
+            logging.warning("Reference database directory is missing required PointFinder files")
             return False
         if not self.check_resistens_overview_file():
             logging.warning("resistens-overview.txt file is not correct")

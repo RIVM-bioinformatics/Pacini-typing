@@ -24,22 +24,16 @@ __all__ = ["ReadConfigPattern"]
 import logging
 import os
 import shutil
+from pathlib import Path
 from typing import Any
 
 import yaml
 
-from preprocessing.exceptions.parsing_exceptions import (
-    YAMLLoadingError,
-    YAMLStructureError,
-)
-from preprocessing.exceptions.snp_detection_exceptions import (
-    IncorrectSNPConfiguration,
-    PathError,
-    PointFinderScriptError,
-)
+from preprocessing.exceptions.parsing_exceptions import YAMLLoadingError, YAMLStructureError
+from preprocessing.exceptions.snp_detection_exceptions import IncorrectSNPConfiguration, PathError, PointFinderScriptError
 
 REQUIRED_KEYS = ["metadata", "database", "global_settings", "pattern"]
-RQUIRED_GLOBAL_SETTINGS_KEYS = [
+REQUIRED_GLOBAL_SETTINGS_KEYS = [
     "perc_ident",
     "perc_cov",
 ]
@@ -65,6 +59,8 @@ class ReadConfigPattern:
         config_file: str,
         input_file_type: str,
         search_mode: str,
+        run_output_override: str | Path | None = None,
+        run_output_snps_override: str | Path | None = None,
     ) -> None:
         """
         Constructor for the ReadConfigPattern class.
@@ -91,8 +87,11 @@ class ReadConfigPattern:
         self.pattern: dict[Any, Any] = {}
         self.creation_dict: dict[str, Any] = {}
         self.search_mode: str = search_mode
+        self.run_output_override = run_output_override
+        self.run_output_snps_override = run_output_snps_override
         # Start the process
         self.read_config()
+        self.apply_output_overrides()
         self.validate_config_keys()
         self.validate_global_settings()
         self.validate_pattern_keys()
@@ -121,9 +120,7 @@ class ReadConfigPattern:
                 self.pattern = yaml.safe_load(file)
         except FileNotFoundError as e:
             logging.error("Config file not found, exiting...")
-            raise FileNotFoundError(
-                f"File {self.config_file} not found"
-            ) from e
+            raise FileNotFoundError(f"File {self.config_file} not found") from e
         except yaml.YAMLError as e:
             logging.error("Error loading YAML file, exiting...")
             raise YAMLLoadingError(self.config_file) from e
@@ -141,50 +138,42 @@ class ReadConfigPattern:
         ----------
         """
         logging.debug("Validating keys of config file...")
-        missing_keys = [
-            key for key in REQUIRED_KEYS if key not in self.pattern
-        ]
-        if missing_keys:
-            raise YAMLStructureError(
-                f"The following required keys are missing in {self.config_file}: {missing_keys}"
-            )
+        if missing_keys := [key for key in REQUIRED_KEYS if key not in self.pattern]:
+            raise YAMLStructureError(f"The following required keys are missing in {self.config_file}: {missing_keys}")
+
+    def apply_output_overrides(self) -> None:
+        """Apply CLI-provided output directory overrides to global settings."""
+        if "global_settings" not in self.pattern:
+            return
+        if self.run_output_override is not None:
+            self.pattern["global_settings"]["run_output"] = str(self.run_output_override)
+        if self.run_output_snps_override is not None:
+            self.pattern["global_settings"]["run_output_snps"] = str(self.run_output_snps_override)
 
     def validate_global_settings(self) -> None:
         """
         Function that validates the global settings of the configuration file
         If the keys are not present, a custom error is raised.
         The keys that are required are stored in the
-        RQUIRED_GLOBAL_SETTINGS_KEYS variable.
+        REQUIRED_GLOBAL_SETTINGS_KEYS variable.
         ----------
         Raises:
             - YAMLStructureError: If the keys are not present
         ----------
         """
         logging.debug("Validating global settings of config file...")
-        for key in RQUIRED_GLOBAL_SETTINGS_KEYS:
+        for key in REQUIRED_GLOBAL_SETTINGS_KEYS:
             if key not in self.pattern["global_settings"]:
-                logging.error(
-                    "Missing key %s in global settings, exiting...", key
-                )
+                logging.error("Missing key %s in global settings, exiting...", key)
                 raise YAMLStructureError(self.config_file)
-            if "run_output_snps" not in self.pattern[
-                "global_settings"
-            ] and self.search_mode in {"SNPs", "both"}:
-                logging.error(
-                    "Missing key run_output_snps in global settings, exiting..."
-                )
+            if "run_output_snps" not in self.pattern["global_settings"] and self.search_mode in {"SNPs", "both"}:
+                logging.error("Missing key run_output_snps in global settings, exiting...")
                 raise YAMLStructureError(self.config_file)
-            if "run_output" not in self.pattern[
-                "global_settings"
-            ] and self.search_mode in {"genes", "both"}:
-                logging.error(
-                    "Missing key run_output in global settings, exiting..."
-                )
+            if "run_output" not in self.pattern["global_settings"] and self.search_mode in {"genes", "both"}:
+                logging.error("Missing key run_output in global settings, exiting...")
                 raise YAMLStructureError(self.config_file)
 
-    def _validate_first_pattern_keys(
-        self, entry: dict[str, str | int]
-    ) -> None:
+    def _validate_first_pattern_keys(self, entry: dict[str, str | int]) -> None:
         """
         Function that validates the first key of the pattern,
         which should be either "gene" or "SNP".
@@ -198,18 +187,15 @@ class ReadConfigPattern:
         ----------
         """
         first_key: str = next(iter(entry))
-        if not (first_key == "gene" or first_key == "SNP"):
-            logging.error(
-                "Found invalid first key in pattern"
-                " (only gene or SNP allowed), exiting..."
-            )
+        if first_key not in {"gene", "SNP"}:
+            logging.error("Found invalid first key in pattern (only gene or SNP allowed), exiting...")
             raise YAMLStructureError(self.config_file)
 
     def validate_pattern_keys(self) -> None:
         """
         This function checks the specific keys that
         are required for the genetic pattern to be valid.
-        If the constriuction is not valid, a custom error is raised.
+        If the construction is not valid, a custom error is raised.
         ----------
         Raises:
             - YAMLStructureError: If the keys are not present
@@ -242,14 +228,10 @@ class ReadConfigPattern:
         """
         self.creation_dict["path_snps"] = self.pattern["database"]["path_snps"]
         self.creation_dict["species"] = self.pattern["database"]["species"]
-        self.creation_dict["method"] = (
-            "blastn" if self.input_file_type == "FASTA" else "kma"
-        )
+        self.creation_dict["method"] = "blastn" if self.input_file_type == "FASTA" else "kma"
         self.creation_dict["method_path"] = self.get_method_path()
         self.creation_dict["run_output_snps"] = self.get_output_dir()
-        self.creation_dict["pointfinder_script_path"] = (
-            self.get_pointfinder_script_path()
-        )
+        self.creation_dict["pointfinder_script_path"] = self.get_pointfinder_script_path()
         self.creation_dict["SNP_list"] = self.get_snp_list()
         self.creation_dict["target_snps_file"] = self.get_target_snps_file()
 
@@ -263,9 +245,7 @@ class ReadConfigPattern:
             - str: Path to the executable
         ----------
         """
-        path: str | None = shutil.which(
-            "blastn" if self.input_file_type == "FASTA" else "kma"
-        )
+        path: str | None = shutil.which("blastn" if self.input_file_type == "FASTA" else "kma")
         if path:
             return path
         raise PathError
@@ -281,12 +261,10 @@ class ReadConfigPattern:
         ----------
         """
         path: str = self.pattern["global_settings"]["run_output_snps"]
-        path = path if path.endswith("/") else path + "/"
-        if os.path.exists(path) and os.path.isdir(path):
-            return path
-        else:
+        path = path if path.endswith("/") else f"{path}/"
+        if not os.path.exists(path) or not os.path.isdir(path):
             os.makedirs(path, exist_ok=True)
-            return path
+        return path
 
     def get_pointfinder_script_path(self) -> str:
         """
@@ -302,12 +280,8 @@ class ReadConfigPattern:
         path: str = self.pattern["metadata"]["pointfinder_script_path"]
         if path.endswith("PointFinder.py"):
             return path
-        else:
-            logging.error(
-                "The PointFinder script is incorrectly specified or "
-                "missing in the config file, exiting..."
-            )
-            raise PointFinderScriptError(path)
+        logging.error("The PointFinder script is incorrectly specified or missing in the config file, exiting...")
+        raise PointFinderScriptError(path)
 
     def validate_SNP_list(self, snp_list: list[dict[str, str | int]]) -> bool:
         """
@@ -342,9 +316,7 @@ class ReadConfigPattern:
         required_keys: set[str] = {"SNP", "ref", "alt", "pos"}
         for index, entry in enumerate(snp_list):
             if not isinstance(entry, dict):
-                logging.error(
-                    "SNP entry in configuration file is not a dictionary, exiting..."
-                )
+                logging.error("SNP entry in configuration file is not a dictionary, exiting...")
                 raise IncorrectSNPConfiguration(self.config_file)
             self.validate_snp_keys(required_keys, index, entry)
         return True
@@ -361,14 +333,10 @@ class ReadConfigPattern:
         -----------
         """
         if not isinstance(snp_list, list):
-            logging.error(
-                "SNP list is not a list in configuration file, exiting..."
-            )
+            logging.error("SNP list is not a list in configuration file, exiting...")
             raise IncorrectSNPConfiguration(self.config_file)
 
-    def validate_snp_keys(
-        self, required_keys: set[str], index: int, entry: dict[str, str | int]
-    ) -> None:
+    def validate_snp_keys(self, required_keys: set[str], index: int, entry: dict[str, str | int]) -> None:
         """
         Function that validates the keys of a single SNP entry.
         It checks if the required keys are present in the entry
@@ -386,17 +354,12 @@ class ReadConfigPattern:
             - IncorrectSNPConfiguration: If the entry is not valid
         ----------
         """
-        missing: set[str] = required_keys - entry.keys()
-        if missing:
-            logging.error(
-                "SNP entry in configuration file has missing keys: %s, exiting..."
-            )
+        if missing := required_keys - entry.keys():
+            logging.error("SNP entry in configuration file has missing keys: %s, exiting...")
             raise IncorrectSNPConfiguration(self.config_file)
         self._validate_snp_entry(index, entry)
 
-    def _validate_snp_entry(
-        self, index: int, entry: dict[str, str | int]
-    ) -> None:
+    def _validate_snp_entry(self, index: int, entry: dict[str, str | int]) -> None:
         """
         Function that validates a single SNP entry of the SNP list.
         The entry should be a dictionary with the following keys:
@@ -422,20 +385,9 @@ class ReadConfigPattern:
             entry["pos"],
         )
         if not (
-            isinstance(snp, str)
-            and snp
-            and isinstance(ref, str)
-            and ref
-            and isinstance(alt, str)
-            and alt
-            and isinstance(pos, int)
-            and pos >= 1
+            isinstance(snp, str) and snp and isinstance(ref, str) and ref and isinstance(alt, str) and alt and isinstance(pos, int) and pos >= 1
         ):
-            logging.error(
-                "SNP entry %d is not valid in configuration file %s",
-                index,
-                self.config_file,
-            )
+            logging.error("SNP entry %d is not valid in configuration file %s", index, self.config_file)
             raise IncorrectSNPConfiguration(self.config_file)
 
     def get_snp_list(self) -> list[dict[str, str | int]]:
@@ -471,19 +423,11 @@ class ReadConfigPattern:
         """
         SNP_list: list[dict[str, str | int]] = self.pattern["pattern"]
         # Remove dictionaries from the list that are having 'gene' as first key
-        SNP_list = [
-            entry
-            for entry in SNP_list
-            if not next(iter(entry)).startswith("gene")
-        ]
+        SNP_list = [entry for entry in SNP_list if not next(iter(entry)).startswith("gene")]
         if self.validate_SNP_list(SNP_list):
             return SNP_list
-        else:
-            logging.error(
-                "SNP list is not valid in configuration file %s",
-                self.config_file,
-            )
-            raise IncorrectSNPConfiguration(self.config_file)
+        logging.error("SNP list is not valid in configuration file %s", self.config_file)
+        raise IncorrectSNPConfiguration(self.config_file)
 
     def validate_target_snps_file(self, target_snps_file: str) -> str:
         """
@@ -503,12 +447,8 @@ class ReadConfigPattern:
         """
         if os.path.exists(target_snps_file):
             return target_snps_file
-        else:
-            logging.error(
-                "PointFinder genes file %s not found, exiting...",
-                target_snps_file,
-            )
-            raise IncorrectSNPConfiguration(self.config_file)
+        logging.error("PointFinder genes file %s not found, exiting...", target_snps_file)
+        raise IncorrectSNPConfiguration(self.config_file)
 
     def get_target_snps_file(self) -> str:
         """
@@ -522,13 +462,8 @@ class ReadConfigPattern:
         ----------
         """
         try:
-            target_snps_file: str = self.pattern["database"][
-                "target_snps_file"
-            ]
+            target_snps_file: str = self.pattern["database"]["target_snps_file"]
         except KeyError as e:
-            logging.error(
-                "PointFinder genes file not found in configuration file %s",
-                self.config_file,
-            )
+            logging.error("PointFinder genes file not found in configuration file %s", self.config_file)
             raise IncorrectSNPConfiguration(self.config_file) from e
         return self.validate_target_snps_file(target_snps_file)

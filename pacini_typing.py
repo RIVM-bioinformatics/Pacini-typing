@@ -58,19 +58,18 @@ import os
 import shutil
 import sys
 import tarfile
+from pathlib import Path
 from typing import Any
+
+import pandas as pd
 
 import preprocessing.argsparse.build_parser
 from handle_search_modes import HandleSearchModes
 from make_gene_database import GeneDatabaseBuilder
 from parsing.parsing_manager import ParsingManager
 from parsing.read_config_pattern import ReadConfigPattern
-from preprocessing.exceptions.determine_input_type_exceptions import (
-    InvalidSequencingTypesError,
-)
-from preprocessing.exceptions.validate_database_exceptions import (
-    InvalidDatabaseError,
-)
+from preprocessing.exceptions.determine_input_type_exceptions import InvalidSequencingTypesError
+from preprocessing.exceptions.validate_database_exceptions import InvalidDatabaseError
 from preprocessing.validation.determine_input_type import InputFileInspector
 from preprocessing.validation.validate_database import check_for_database_path
 from preprocessing.validation.validating_input_arguments import ArgsValidator
@@ -153,19 +152,12 @@ class PaciniTyping:
         """
         logging.debug("Parsing general attributes...")
         self.option = {
-            "database_path": (
-                self.input_args.database_path
-                if hasattr(self.input_args, "database_path")
-                else None
-            ),
-            "database_name": (
-                self.input_args.database_name
-                if hasattr(self.input_args, "database_name")
-                else None
-            ),
+            "database_path": (self.input_args.database_path if hasattr(self.input_args, "database_path") else None),
+            "database_name": (self.input_args.database_name if hasattr(self.input_args, "database_name") else None),
             "option": self.input_args.options,
             "verbose": self.input_args.verbose,
             "run_path": os.path.abspath(__file__).rsplit(".", 1)[0],
+            "config": None,
             "query": None,
             "makedatabase": None,
         }
@@ -204,6 +196,8 @@ class PaciniTyping:
             "config_path": self.input_args.config,
             "fasta_out": self.input_args.fasta_out,
             "search_mode": self.input_args.search_mode,
+            "output_report": self.input_args.output_report,
+            "tmp_dir": self.input_args.tmp_dir,
         }
 
     def setup_logging(self) -> None:
@@ -215,9 +209,7 @@ class PaciniTyping:
         a log file is created with the name pacini_typing.log.
         """
         logging.debug("Setting up logging-level")
-        logging.getLogger().setLevel(
-            self.option["verbose"] and logging.DEBUG or logging.INFO
-        )
+        logging.getLogger().setLevel(self.option["verbose"] and logging.DEBUG or logging.INFO)
         if self.input_args.log_file:
             logging.debug("--log-file option selected, setting up log file...")
             file_handler = logging.FileHandler("pacini_typing.log")
@@ -269,13 +261,7 @@ class PaciniTyping:
         The sample name is the first part of the filename.
         """
         logging.debug("Retrieving the sample name from the input file...")
-        self.sample_name = (
-            self.option["input_file_list"][0]
-            .split("/")[-1]
-            .split(".")[0]
-            .replace("_1", "")
-            .replace("_pR1", "")
-        )
+        self.sample_name = self.option["input_file_list"][0].split("/")[-1].split(".")[0].replace("_1", "").replace("_pR1", "")
 
     def check_for_unzip_files(self) -> None:
         """
@@ -285,12 +271,7 @@ class PaciniTyping:
         See the unzip_gz_files function for more information.
         """
         logging.debug("Checking for .gz files in the input list...")
-        gz_files = [
-            file
-            for file in self.option["input_file_list"]
-            if file.endswith(".gz")
-        ]
-        if gz_files:
+        if gz_files := [file for file in self.option["input_file_list"] if file.endswith(".gz")]:
             logging.info("Found files that need to be unzipped, unzipping...")
             self.unzip_gz_files(gz_files)
 
@@ -319,10 +300,7 @@ class PaciniTyping:
                 logging.error("Error while unzipping file %s: %s", file, e)
                 sys.exit(1)
         logging.debug("Updating input file list with unzipped files")
-        self.option["input_file_list"] = [
-            file[:-3] if file in gz_files else file
-            for file in self.option["input_file_list"]
-        ]
+        self.option["input_file_list"] = [file[:-3] if file in gz_files else file for file in self.option["input_file_list"]]
 
     def validate_file_arguments(self) -> None:
         """
@@ -346,14 +324,9 @@ class PaciniTyping:
         logging.debug("Validating the input arguments...")
         argsvalidator = ArgsValidator(self.option)
         if argsvalidator.validate():
-            logging.info(
-                "Input arguments have been validated, found no issues..."
-            )
+            logging.info("Input arguments have been validated, found no issues...")
         else:
-            logging.error(
-                "Error while validation the input arguments, "
-                "please check the above logs for more information."
-            )
+            logging.error("Error while validation the input arguments, please check the above logs for more information.")
             sys.exit(1)
 
     def run_makedatabase(self, database_creation_args: dict[str, Any]) -> None:
@@ -374,9 +347,7 @@ class PaciniTyping:
         See validation/determine_input_type.py for more information.
         """
         logging.debug("Determining the file type of the input file(s)...")
-        self.file_type = InputFileInspector(
-            self.option["input_file_list"]
-        ).get_file_type()
+        self.file_type = InputFileInspector(self.option["input_file_list"]).get_file_type()
         logging.info(
             "The input file type has been determined: %s",
             self.file_type,
@@ -393,25 +364,14 @@ class PaciniTyping:
             - InvalidSequencingTypesError: Wrong file type for input arguments
         ----------
         """
-        logging.debug(
-            "Checking if the file type is correct for the input arguments..."
-        )
-        if (
-            len(self.option["input_file_list"]) == 1
-            and self.file_type == "FASTQ"
-        ) or (
-            len(self.option["input_file_list"]) == 2
-            and self.file_type == "FASTA"
+        logging.debug("Checking if the file type is correct for the input arguments...")
+        if (len(self.option["input_file_list"]) == 1 and self.file_type == "FASTQ") or (
+            len(self.option["input_file_list"]) == 2 and self.file_type == "FASTA"
         ):
-            logging.error(
-                "Only FASTA files are allowed for single files "
-                "and only FASTQ files are allowed for paired files."
-            )
+            logging.error("Only FASTA files are allowed for single files and only FASTQ files are allowed for paired files.")
             raise InvalidSequencingTypesError(self.option["input_file_list"])
 
-    def check_valid_gene_database_path(
-        self, database_builder: dict[str, Any]
-    ) -> bool:
+    def check_valid_gene_database_path(self, database_builder: dict[str, Any]) -> bool:
         """
         Function that calls the validation operation for the database.
         This function is responsible for checking if the database exists.
@@ -440,29 +400,48 @@ class PaciniTyping:
         ----------
         """
         logging.debug("Initializing the configuration file...")
+        user_specified_tempdir = self.option["config"]["tmp_dir"]
+        user_specified_reportdir = self.option["config"]["output_report"]
+        run_output_override = None
+        run_output_snps_override = None
+        if user_specified_tempdir != Path("."):
+            run_output_override = Path(user_specified_tempdir) / "gene"
+            if self.option["config"]["search_mode"] in {"SNPs", "both"}:
+                run_output_snps_override = Path(user_specified_tempdir) / "snps"
+        elif user_specified_reportdir != Path("."):
+            run_output_override = Path(user_specified_reportdir) / "gene"
+            if self.option["config"]["search_mode"] in {"SNPs", "both"}:
+                run_output_snps_override = Path(user_specified_reportdir) / "snps"
+
         pattern = ReadConfigPattern(
             self.option["config"]["config_path"],
             self.file_type,
             self.option["config"]["search_mode"],
+            run_output_override=run_output_override,
+            run_output_snps_override=run_output_snps_override,
         )
+
         # Additionally, the query input and output must be set.
         # The output is not specified by the user, because
         # this is based on the input files.
-        logging.debug(
-            "Setting additional information for the configuration..."
-        )
-        pattern.creation_dict["input_file_list"] = self.option["config"][
-            "input"
-        ]
-        pattern.creation_dict["file_type"] = self.file_type
-        pattern.creation_dict["output"] = (
-            pattern.pattern["global_settings"]["run_output"] + self.sample_name
-        )
+        # sync both dicts
+        pattern.creation_dict["run_output"] = pattern.pattern["global_settings"]["run_output"]
+        if "run_output_snps" in pattern.pattern["global_settings"]:
+            pattern.creation_dict["run_output_snps"] = pattern.pattern["global_settings"]["run_output_snps"]
 
-        pattern.creation_dict["input_fasta_file"] = os.path.join(
-            os.path.dirname(self.option["run_path"]),
-            pattern.creation_dict["input_fasta_file"],
-        )
+        logging.debug("Setting additional information for the configuration...")
+        pattern.creation_dict["input_file_list"] = self.option["config"]["input"]
+        pattern.creation_dict["file_type"] = self.file_type
+        pattern.creation_dict["output"] = str(Path(pattern.pattern["global_settings"]["run_output"]) / self.sample_name)
+
+        run_root = Path(os.path.dirname(self.option["run_path"]))
+        config_fasta = Path(pattern.creation_dict["input_fasta_file"])
+        if not config_fasta.is_absolute():
+            config_fasta = run_root / config_fasta
+        elif not os.path.exists(config_fasta) and "test_data" in config_fasta.parts:
+            test_data_idx = config_fasta.parts.index("test_data")
+            config_fasta = run_root / Path(*config_fasta.parts[test_data_idx:])
+        pattern.creation_dict["input_fasta_file"] = str(config_fasta)
         # Set threads for creation operations (makeblastdb/query)
         pattern.creation_dict["threads"] = self.threads
         # Store the fasta-output option in the pattern object
@@ -470,9 +449,7 @@ class PaciniTyping:
 
         return pattern
 
-    def handle_intermediate_saving(
-        self, gene_output_dir: str, run_output_snps: str
-    ) -> None:
+    def handle_intermediate_saving(self, gene_output_dir: str, run_output_snps: str) -> None:
         """
         Little helper function that contains some logic for saving
         intermediate files. In some situations, the gene_output_dir
@@ -485,45 +462,39 @@ class PaciniTyping:
             - run_output_snps: The output directory of the SNP run
         ----------
         """
-        if gene_output_dir == run_output_snps:
-            self.save_intermediates(gene_output_dir)
-        elif run_output_snps.startswith(gene_output_dir):
+        if gene_output_dir == run_output_snps or run_output_snps.startswith(gene_output_dir):
             self.save_intermediates(gene_output_dir)
         elif gene_output_dir.startswith(run_output_snps):
             self.save_intermediates(run_output_snps)
         else:
-            self.save_intermediates(
-                gene_output_dir,
-                f"{self.sample_name}_intermediates_gene.tar.gz",
-            )
-            self.save_intermediates(
-                run_output_snps, f"{self.sample_name}_intermediates_SNP.tar.gz"
-            )
+            self.save_intermediates(gene_output_dir, f"{self.sample_name}_intermediates_gene.tar.gz")
+            self.save_intermediates(run_output_snps, f"{self.sample_name}_intermediates_SNP.tar.gz")
 
-    def save_intermediates(
-        self,
-        output_dir: str,
-        zip_name: str | None = None,
-    ) -> None:
+    def save_intermediates(self, output_dir: str, archive_name: str | None = None) -> None:
         """
-        Function that saves intermediate files in a zip archive.
-        The zip archive is named after the sample name.
-        The zip format is .tar.gz.
+        Function that saves intermediate files in a .tar.gz archive named
+        after the sample name. Its destination is determined by
+        self.option["config"]["output_report"].
         ----------
         Input:
             - output_dir: The output directory of the run
-            - zip_name: The name of the zip file to save the intermediates
+            - archive_name: The name of the .tar.gz file to save the intermediates
                 (only used if gene and SNP output directories are different)
         ----------
         """
-        if zip_name is None:
-            zip_name = f"{self.sample_name}_intermediates.tar.gz"
+        if archive_name is None:
+            archive_name = f"{self.sample_name}_intermediates.tar.gz"
+
+        if output_report_dir := self.option["config"]["output_report"]:
+            os.makedirs(output_report_dir, exist_ok=True)
+            archive_name = os.path.join(output_report_dir, archive_name)
+
         logging.info("Saving intermediate files in a zip archive...")
-        with tarfile.open(zip_name, "w:gz") as tar:
+        with tarfile.open(archive_name, "w:gz") as tar:
             tar.add(output_dir, arcname=os.path.basename(output_dir))
         # Call the delete_intermediates function to
         # remove the original output directory
-        logging.debug("Saved intermediate files in a zip...")
+        logging.debug("Saved intermediate files in a zip: %s", archive_name)
         self.delete_intermediates(output_dir)
 
     def delete_intermediates(self, output_dir: str) -> None:
@@ -540,9 +511,7 @@ class PaciniTyping:
         if os.path.exists(output_dir):
             shutil.rmtree(output_dir)
         else:
-            logging.debug(
-                "Directory %s does not exist, skipping deletion", output_dir
-            )
+            logging.debug("Directory %s does not exist, skipping deletion", output_dir)
 
     def save_or_delete_intermediate(self, pattern: ReadConfigPattern):
         """
@@ -555,37 +524,27 @@ class PaciniTyping:
         ----------
         """
         search_mode: str = self.option["config"]["search_mode"]
-        # Determine if the run_output_snps directory is needed
-        if search_mode in ["both", "SNPs"]:
-            run_output_snps = pattern.pattern["global_settings"][
-                "run_output_snps"
-            ]
         gene_output_dir: str = pattern.pattern["global_settings"]["run_output"]
 
         if self.input_args.save_intermediates:
-            if search_mode == "both":
-                self.handle_intermediate_saving(
-                    gene_output_dir, run_output_snps
-                )
-            elif search_mode == "SNPs":
-                self.save_intermediates(
-                    run_output_snps,
-                    f"{self.sample_name}_intermediates_SNP.tar.gz",
-                )
+            if search_mode == "SNPs":
+                run_output_snps = pattern.pattern["global_settings"]["run_output_snps"]
+                self.save_intermediates(run_output_snps, f"{self.sample_name}_intermediates_SNP.tar.gz")
                 self.delete_intermediates(gene_output_dir)
+            elif search_mode == "both":
+                run_output_snps = pattern.pattern["global_settings"]["run_output_snps"]
+                self.handle_intermediate_saving(gene_output_dir, run_output_snps)
             elif search_mode == "genes":
-                self.save_intermediates(
-                    gene_output_dir,
-                    f"{self.sample_name}_intermediates_gene.tar.gz",
-                )
-        else:
-            if search_mode == "both":
-                self.delete_intermediates(gene_output_dir)
-                self.delete_intermediates(run_output_snps)
-            elif search_mode == "SNPs":
-                self.delete_intermediates(run_output_snps)
-            elif search_mode == "genes":
-                self.delete_intermediates(gene_output_dir)
+                self.save_intermediates(gene_output_dir, f"{self.sample_name}_intermediates_gene.tar.gz")
+        elif search_mode == "SNPs":
+            run_output_snps = pattern.pattern["global_settings"]["run_output_snps"]
+            self.delete_intermediates(run_output_snps)
+        elif search_mode == "both":
+            run_output_snps = pattern.pattern["global_settings"]["run_output_snps"]
+            self.delete_intermediates(gene_output_dir)
+            self.delete_intermediates(run_output_snps)
+        elif search_mode == "genes":
+            self.delete_intermediates(gene_output_dir)
 
     def handle_makedatabase_option(self) -> None:
         """
@@ -595,9 +554,7 @@ class PaciniTyping:
         The run_makedatabase() method is re-used by other modules later on,
         that's why this pattern is defined in this helper function.
         """
-        logging.info(
-            "Defining all necessary information for the database creation..."
-        )
+        logging.info("Defining all necessary information for the database creation...")
         database_builder = {
             "database_path": self.option["database_path"],
             "database_name": self.option["database_name"],
@@ -617,9 +574,7 @@ class PaciniTyping:
         else:
             # The query option is not selected,
             # which means the config is selected.
-            logging.info(
-                "Config option selected, starting the configuration..."
-            )
+            logging.info("Config option selected, starting the configuration...")
             self.handle_config_option()
 
     def handle_config_option(self) -> None:
@@ -653,6 +608,7 @@ class PaciniTyping:
             self.file_type,
             self.sample_name,
             self.option["config"]["search_mode"],
+            output_report_dir=self.option["config"]["output_report"],
         )
         # Determine if the intermediate files should be saved or deleted
         self.save_or_delete_intermediate(pattern)
@@ -668,9 +624,7 @@ class PaciniTyping:
             - InvalidDatabaseError: Database existence check failed
         ----------
         """
-        logging.debug(
-            "Defining all necessary information for the query operation..."
-        )
+        logging.debug("Defining all necessary information for the query operation...")
         query_builder: dict[str, Any] = {
             "file_type": self.file_type,
             "input_file_list": self.option["input_file_list"],
@@ -687,9 +641,11 @@ class PaciniTyping:
                 query_builder["file_type"],
             )
 
-    def run(self) -> None:
+    def split_flow_and_execute(self) -> None:
         """
-        Run method of the PaciniTyping class.
+        Run method of the PaciniTyping class: it handles the different
+        flows and executes the appropriate operations.
+
         This method calls all other methods in the correct order.
         After all preprocessing actions are done,
         this function will split if the makedatabase option is selected.
@@ -698,16 +654,100 @@ class PaciniTyping:
         self.parse_all_args()
         self.setup_logging()
         self.get_input_filenames()
+
+        # ? only make database and exit: for the "makedatabase" CLI option
+        if self.option["makedatabase"]:
+            self.validate_input()
+            self.handle_makedatabase_option()
+            return
+
+        # ? multiple/glob-samples flow
+        if self.should_execute_multiple_inputs():
+            self.execute_multiple_inputs()
+            return
+
+        # ? single-sample flow
+        self.execute()
+
+    def should_execute_multiple_inputs(self) -> bool:
+        """
+        Return True when input should be treated as a multi-sample batch
+        instead of a single paired sample.
+
+        Pacini supports batching unrelated FASTA samples and paired FASTQ
+        files. Paired FASTQ input and mixed FASTA/FASTQ input must stay on
+        the normal execution path so the existing paired validation can
+        reject invalid combinations.
+        """
+        input_files = self.option.get("input_file_list", [])
+        if not self.option.get("config") or len(input_files) < 2:
+            return False
+
+        lower_input_files = [file.lower() for file in input_files]
+        fastq_exts = (".fq", ".fastq", ".fq.gz", ".fastq.gz")
+        fasta_exts = (".fa", ".fasta", ".fna", ".fa.gz", ".fasta.gz", ".fna.gz")
+
+        if all(file.endswith(fastq_exts) for file in lower_input_files):
+            return len(input_files) > 2
+        return all((file.endswith(fasta_exts) for file in lower_input_files))
+
+    def validate_input(self) -> None:
+        "Validate the input files"
         self.retrieve_sample_name()
         self.check_for_unzip_files()
         self.validate_file_arguments()
 
-        if self.option["makedatabase"]:
-            self.handle_makedatabase_option()
+    def execute_multiple_inputs(self) -> None:
+        """
+        Process multiple input files and write results to `combined.csv`.
+
+        For every input file in `self.option['input_file_list']` the method
+        sets per-sample options, runs the normal `execute()` flow and
+        collects the per-sample report filenames. At the end it concatenates
+        any found reports into `combined_report.csv` (hardcoded name) into
+        the `output_report` directory.
+        """
+        results_files: list[str | Path] = []
+        report_dir = str(self.option["config"]["output_report"])
+        combined_report_file = Path(report_dir) / "combined_report.csv"
+        input_files = list(self.option["input_file_list"])
+
+        fastq_exts = (".fq", ".fastq", ".fq.gz", ".fastq.gz")
+        input_groups: list[list[str]]
+        if input_files and all(file.lower().endswith(fastq_exts) for file in input_files):
+            input_files = sorted(input_files)
+            if len(input_files) % 2 != 0:
+                raise InvalidSequencingTypesError(input_files)
+            input_groups = [input_files[i : i + 2] for i in range(0, len(input_files), 2)]
         else:
-            self.get_file_type()
-            self.check_valid_option_with_args()
-            self.handle_config_or_query_option()
+            input_groups = [[input_file] for input_file in input_files]
+
+        for input_group in input_groups:
+            # set per-sample inputs
+            self.option["config"]["input"] = input_group
+            self.option["input_file_list"] = input_group
+            self.execute()
+            results_files.append(Path(report_dir) / f"{self.sample_name}_report.csv")
+
+        # ? Combine per-sample reports into combined.csv (if any; built on the above hacky assumption)
+        dfs: list[pd.DataFrame] = []
+        for rf in results_files:
+            if not os.path.exists(rf):
+                raise FileNotFoundError(f"Expected report file {rf} not found, cannot combine results.")
+            dfs.append(pd.read_csv(rf))
+        if not dfs:
+            raise ValueError("No report files found to combine, cannot create combined report.")
+        combined = pd.concat(dfs, ignore_index=True)
+
+        combined.to_csv(combined_report_file, index=False)
+        logging.info("Wrote %s with %d rows", combined_report_file, len(combined))
+
+    def execute(self) -> None:
+        "Execute the analysis"
+        self.validate_input()
+        self.get_file_type()
+        self.check_valid_option_with_args()
+        self.handle_config_or_query_option()
 
 
 def main(provided_args: list[str] | None = None) -> None:
@@ -728,7 +768,7 @@ def main(provided_args: list[str] | None = None) -> None:
         args = preprocessing.argsparse.build_parser.main(sys.argv[1:])
 
     pacini_typing = PaciniTyping(args)
-    pacini_typing.run()
+    pacini_typing.split_flow_and_execute()
     logging.info("Pacini-typing pipeline has finished successfully!")
 
 

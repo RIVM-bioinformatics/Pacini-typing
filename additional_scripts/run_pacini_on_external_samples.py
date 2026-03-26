@@ -11,6 +11,7 @@ Python script that runs pacini-typing on all external (public) samples.
 """
 
 import os
+import subprocess
 
 samples_dir = "location_of_samples_dir"
 sample_list = "location_of_sample_list"
@@ -28,9 +29,25 @@ def run_pacini_on_all_samples():
             sample1 = f"{samples_dir}/{line}/{line}_1.fastq.gz"
             sample2 = f"{samples_dir}/{line}/{line}_2.fastq.gz"
             if os.path.isfile(sample1) and os.path.isfile(sample2):
-                os.system(
-                    f"python3 {pacini_tool_location}/pacini_typing.py -v query -p {sample1} {sample2} -db_name mykma -db_path {pacini_tool_location}/refdir/ -o {samples_dir}/{line}/Pacini_run.tsv"
-                )
+                cmd = [
+                    "python3",
+                    f"{pacini_tool_location}/pacini_typing.py",
+                    "-v",
+                    "query",
+                    "-p",
+                    sample1,
+                    sample2,
+                    "-db_name",
+                    "mykma",
+                    "-db_path",
+                    f"{pacini_tool_location}/refdir/",
+                    "-o",
+                    f"{samples_dir}/{line}/Pacini_run.tsv",
+                ]
+                try:
+                    subprocess.run(cmd, check=True)
+                except subprocess.CalledProcessError:
+                    print(f"Pacini failed for sample {line}")
 
 
 def get_hits():
@@ -46,9 +63,9 @@ def get_hits():
                 with open(res_file, "r") as res:
                     for line in res:
                         if line.startswith("Template"):
-                            print("\t".join(line.split("\t")[0:5]))
+                            print("\t".join(line.split("\t")[:5]))
                         if line.startswith("wbfZ_"):
-                            print("\t".join(line.split("\t")[0:5]))
+                            print("\t".join(line.split("\t")[:5]))
                             print()
 
 

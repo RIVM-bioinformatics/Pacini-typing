@@ -17,7 +17,9 @@ See the functions for more information.
 import csv
 import json
 import os
+import shutil
 import sys
+from pathlib import Path
 
 
 def create_dirs(sample_file: str):
@@ -32,7 +34,8 @@ def create_dirs(sample_file: str):
     """
     with open(sample_file, "r", encoding="utf-8") as file:
         for i in file:
-            os.system(f"mkdir {i}")
+            if dir_name := i.strip():
+                Path(dir_name).mkdir(parents=True, exist_ok=True)
 
 
 def compare_first_column_csv(file1: str, file2: str) -> bool:
@@ -51,9 +54,7 @@ def compare_first_column_csv(file1: str, file2: str) -> bool:
         - bool: True if the two files are the same, False otherwise
     ----------
     """
-    with open(file1, "r", encoding="utf-8") as f1, open(
-        file2, "r", encoding="utf-8"
-    ) as f2:
+    with open(file1, "r", encoding="utf-8") as f1, open(file2, "r", encoding="utf-8") as f2:
         csv1 = csv.reader(f1)
         csv2 = csv.reader(f2)
         for row1, row2 in zip(csv1, csv2):
@@ -80,8 +81,13 @@ def sort_downloaded_files(output_dir: str, samples_file: str):
             for root, dirs, files in os.walk(output_dir):
                 for file in files:
                     if i in file:
-                        print(f"mv {output_dir}/{file} {output_dir}/{i}/")
-                        os.system(f"mv {output_dir}/{file} {i}")
+                        src = os.path.join(output_dir, file)
+                        dst = os.path.join(output_dir, i)
+                        print(f"mv {src} {dst}/")
+                        try:
+                            shutil.move(src, dst)
+                        except Exception:
+                            print(f"Could not move {src} to {dst}")
 
 
 def sort_meta_data_into_sample_folder(meta_data_file: str, output_dir: str):
@@ -109,9 +115,7 @@ def sort_meta_data_into_sample_folder(meta_data_file: str, output_dir: str):
 
 if __name__ == "__main__":
     create_dirs(sample_file="secrid_path_to_sample.csv")
-    if not compare_first_column_csv(
-        file1="secrid_path_to_sample.csv", file2="secrid_path_to_sample.csv"
-    ):
+    if not compare_first_column_csv(file1="secrid_path_to_sample.csv", file2="secrid_path_to_sample.csv"):
         sys.exit("The samples are not the same, please check the files")
 
     sort_downloaded_files(

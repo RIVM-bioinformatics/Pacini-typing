@@ -44,6 +44,7 @@ __date__ = "2024-11-01"
 __all__ = ["ShellCommand", "CommandInvoker", "Command"]
 
 import logging
+import shlex
 import subprocess
 from abc import ABC, abstractmethod
 from pathlib import Path
@@ -140,35 +141,22 @@ class ShellCommand(Command):
         ----------
         """
         try:
-            logging.info("running command: '%s'", " ".join(self.cmd))
+            cmd_to_run = self.cmd if isinstance(self.cmd, str) else list(self.cmd)
+            logging.info("running command: '%s'", shlex.join(cmd_to_run) if isinstance(cmd_to_run, list) else cmd_to_run)
             result = subprocess.run(
-                " ".join(self.cmd) if isinstance(self.cmd, list) else self.cmd,
-                shell=True,
+                cmd_to_run,
+                shell=isinstance(cmd_to_run, str),  # ? must be true only for string and false for a list
                 cwd=self.directory,
-                stdout=(
-                    self.stdout_file
-                    if self.stdout_file
-                    else (subprocess.PIPE if self.capture else None)
-                ),
-                stderr=(
-                    self.stderr_file
-                    if self.stderr_file
-                    else (subprocess.PIPE if self.capture else None)
-                ),
+                stdout=(self.stdout_file or (subprocess.PIPE if self.capture else None)),
+                stderr=(self.stderr_file or (subprocess.PIPE if self.capture else None)),
                 text=True,
                 check=True,
             )
-
             if self.capture:
                 return result.stdout, result.stderr
             return result.returncode == 0
         except subprocess.CalledProcessError as e:
-            logging.error(
-                "Command failed with return code %d:\n%s\n%s",
-                e.returncode,
-                e.cmd,
-                e.stderr,
-            )
+            logging.error("Command failed with return code %d:\n%s\n%s", e.returncode, e.cmd, e.stderr)
             if not self.allow_fail:
                 raise SubprocessError(e.stderr) from e
             return False

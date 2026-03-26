@@ -41,11 +41,7 @@ from io import StringIO
 
 import pytest
 
-from preprocessing.exceptions.determine_input_type_exceptions import (
-    InvalidFastaOrFastqError,
-    InvalidSequenceError,
-    InvalidSequencingTypesError,
-)
+from preprocessing.exceptions.determine_input_type_exceptions import InvalidFastaOrFastqError, InvalidSequenceError, InvalidSequencingTypesError
 from preprocessing.validation.determine_input_type import InputFileInspector
 
 skip_in_ci = pytest.mark.skipif(
@@ -68,13 +64,8 @@ def setup_valid_data() -> dict[str, str]:
         "valid_fasta": ">header1\nACTGACTG\n>header2\nGTACTGAC\n",
         "invalid_fasta_no_header": "ACTGACTG\nGTACTGAC\n",
         "invalid_fasta_invalid_sequence": ">header1\nACTGXCTG\n",
-        "valid_fastq": (
-            "@header1\nACTGACTG\n+\nB@@FDFFF\n"
-            "@header2\nGTACTGAC\n+\nB@@FDFFF\n"
-        ),
-        "invalid_fastq_missing_plus": (
-            "@header1\nACTGACTG\nINVALID_LINE\n!~@#$%^&*\n"
-        ),
+        "valid_fastq": ("@header1\nACTGACTG\n+\nB@@FDFFF\n@header2\nGTACTGAC\n+\nB@@FDFFF\n"),
+        "invalid_fastq_missing_plus": ("@header1\nACTGACTG\nINVALID_LINE\n!~@#$%^&*\n"),
         "invalid_fastq_length_mismatch": ("@header1\nACTGACTG\n+\n!~@#\n"),
     }
 
@@ -187,9 +178,7 @@ def test_determine_file_type_fastq():
     Function that tests file type determination for a FASTQ file.
     It is tested with a real file and should give FASTQ as output.
     """
-    paired_validator = InputFileInspector(
-        ["test_data/VIB_EA5348AA_AS_1.fq", "test_data/VIB_EA5348AA_AS_2.fq"]
-    )
+    paired_validator = InputFileInspector(["test_data/VIB_EA5348AA_AS_1.fq", "test_data/VIB_EA5348AA_AS_2.fq"])
     assert paired_validator.get_file_type() == "FASTQ"
 
 
@@ -215,9 +204,7 @@ def test_compare_types_same():
     So this only applies to two FASTA files in this case.
     """
     with pytest.raises(InvalidSequencingTypesError):
-        InputFileInspector(
-            ["test_data/vibrio_genes.fasta", "test_data/VIB_EA5348AA_AS.fasta"]
-        )
+        InputFileInspector(["test_data/vibrio_genes.fasta", "test_data/VIB_EA5348AA_AS.fasta"])
 
 
 def test_empty_file():
