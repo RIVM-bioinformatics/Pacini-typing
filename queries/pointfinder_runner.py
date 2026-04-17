@@ -37,7 +37,7 @@ class PointFinder(Enum):
     DATABASE_PATH_OPTION = "--databasePath"
     # PointFinder requires the database path and a species.
     # The 'species' is actually the subdirname of the specific
-    # database that is used. This could therfore be a bit misleading.
+    # database that is used. This could therefore be a bit misleading.
     DATABASE_SUBDIR_OPTION = "--species"
 
     @staticmethod

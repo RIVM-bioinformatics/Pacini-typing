@@ -20,6 +20,8 @@ __date__ = "2024-12-02"
 __all__ = ["ParsingManager"]
 
 import logging
+import os
+from pathlib import Path
 from typing import Any
 
 import pandas as pd
@@ -32,6 +34,28 @@ from parsing.parser import Parser
 from parsing.read_config_pattern import ReadConfigPattern
 from parsing.snp_parser import SNPParser
 from preprocessing.exceptions.parsing_exceptions import HandlingError
+
+# ? col names used in the final report, slight diffs between gene and SNP version, hence a base
+BASE_REPORT_COLUMNS = [
+    "ID",
+    "Input",
+    "Configuration",
+    "Type/Genes",
+    "Mode",
+    "Hits",
+]
+GENE_REPORT_COLUMNS = [
+    *BASE_REPORT_COLUMNS,
+    "Percentage Identity",
+    "Percentage Coverage",
+]
+SNP_REPORT_COLUMNS = [
+    *BASE_REPORT_COLUMNS,
+    "Reference nucleotide",
+    "Alternative nucleotide",
+    "Position",
+    "Amino acid change",
+]
 
 
 class ParsingManager:
@@ -70,6 +94,7 @@ class ParsingManager:
         file_type: str,
         sample_name: str,
         search_mode: str,
+        output_report_dir: Path | str | None = None,
     ) -> None:
         """
         Constructor of the ParsingManager class.
@@ -89,9 +114,10 @@ class ParsingManager:
         self.file_type = file_type
         self.sample_name = sample_name
         self.search_mode: str = search_mode
+        self.output_report_dir: Path | None = Path(output_report_dir) if output_report_dir else None
         # Define the gene parser as a class variable,
         # since this is easier for adding filters and operations
-        self.parser = pd.DataFrame()
+        self.parser: Parser
         # define the handler functions for the right search mode
         self.handlers: dict[str, Any] = {
             "genes": self._run_genes,
@@ -118,9 +144,7 @@ class ParsingManager:
         try:
             handler = self.handlers[self.search_mode]
         except KeyError as exc:
-            logging.error(
-                "No handler found for search mode %s", self.search_mode
-            )
+            logging.error("No handler found for search mode %s", self.search_mode)
             raise HandlingError(self.search_mode) from exc
         handler()
 
@@ -153,22 +177,19 @@ class ParsingManager:
         """
         Basic helper function that formats the correct
         method name according to the file type.
-        This name is used to determine the ouput file
+        This name is used to determine the output file
         of the PointFinder run.
         ----------
         Output:
             - str: the correct method name
         ----------
         """
-        if self.file_type == "FASTQ":
-            return "kma"
-        else:
-            return "blastn"
+        return "kma" if self.file_type == "FASTQ" else "blastn"
 
-    def get_path_to_pointfinder_file(self) -> str:
+    def get_path_to_pointfinder_output_file(self) -> str:
         """
         Little helper function that combines the path to the
-        PointFinder file with the hits information.
+        PointFinder output file containing the hits information.
         The file name is based on the sample name and method used.
         PointFinder has a odd way of naming the output files,
         and therefore this function is used to create the correct name.
@@ -183,16 +204,29 @@ class ParsingManager:
         The above code is sort of reproduced in this function.
         ----------
         Output:
-            - str: path to the PointFinder file
+            - str: path to the PointFinder output file
         ----------
         """
-        return (
-            self.pattern.creation_dict["run_output_snps"]
-            + self.sample_name.split(".")[0].split("_")[0]
-            + "_"
-            + self._get_correct_method_name()
-            + "_results.tsv"
-        )
+        sample_prefix = self.sample_name.split(".")[0].split("_")[0]
+        method_name = self._get_correct_method_name()
+        output_dir = self.pattern.creation_dict["run_output_snps"]
+        filename = f"{sample_prefix}_{method_name}_results.tsv"
+        expected_path = os.path.join(output_dir, filename)
+        if os.path.isfile(expected_path):
+            return expected_path
+
+        # ? Fallback for when input names are transformed upstream (i.e., merged temporary FASTQ input for KMA with paired fq input)
+        fallback_name = f"pf_{method_name}_results.tsv"
+        fallback_path = os.path.join(output_dir, fallback_name)
+        if os.path.isfile(fallback_path):
+            logging.warning(
+                "Expected PointFinder output %s not found; using fallback report %s",
+                expected_path,
+                fallback_path,
+            )
+            return fallback_path
+
+        return expected_path
 
     def _create_snp_parser(self):
         """
@@ -205,13 +239,13 @@ class ParsingManager:
             - SNPParser: SNP parser object
         ----------
         """
-        logging.info(self.get_path_to_pointfinder_file())
+        logging.info(self.get_path_to_pointfinder_output_file())
         logging.debug("Setting up the SNP parser object...")
         return SNPParser(
             self.pattern.pattern,
             self.sample_name,
             self.file_type,
-            self.get_path_to_pointfinder_file(),
+            self.get_path_to_pointfinder_output_file(),
         )
 
     def _run_genes(self) -> None:
@@ -225,15 +259,14 @@ class ParsingManager:
         parser = self._prepare_gene_parser()
         parser.parse()
         if parser.data_frame.empty:
-            logging.warning("Gene report is empty, skipping...")
+            logging.warning("Gene report is empty, writing empty report...")
+            self.write_report(self.create_empty_report_frame(), "report", self.sample_name)
             return
         # Search mode was genes if the code reaches this point,
         # so we can write the report write away without checking
         self.write_report(parser.output_report, "report", self.sample_name)
 
-    def process_reports(
-        self, gene_report: pd.DataFrame, snp_report: pd.DataFrame
-    ) -> None:
+    def process_reports(self, gene_report: pd.DataFrame, snp_report: pd.DataFrame) -> None:
         """
         Function that processes the reports of either genes, SNPs or both.
         If both reports are empty, a warning is logged and the function
@@ -246,7 +279,8 @@ class ParsingManager:
         ----------
         """
         if gene_report.empty and snp_report.empty:
-            logging.warning("Both gene and SNP reports are empty, skipping...")
+            logging.warning("Both gene and SNP reports are empty, writing empty report...")
+            self.write_report(self.create_empty_report_frame(), "report", self.sample_name)
             return
         if gene_report.empty:
             final_report = snp_report
@@ -255,17 +289,13 @@ class ParsingManager:
             final_report = gene_report
             logging.info("SNP report is empty, writing gene report only...")
         else:
-            logging.info(
-                "Found both gene and SNP reports, concatenating and writing..."
-            )
-            final_report = pd.concat(
-                [gene_report, snp_report], ignore_index=True
-            )
+            logging.info("Found both gene and SNP reports, concatenating and writing...")
+            final_report = pd.concat([gene_report, snp_report], ignore_index=True)
             # Reset the index of the final report
             if "ID" in final_report.columns:
                 final_report["ID"] = range(1, len(final_report) + 1)
 
-        ParsingManager.write_report(final_report, "report", self.sample_name)
+        self.write_report(final_report, "report", self.sample_name)
 
     def _run_snps(self) -> None:
         """
@@ -277,9 +307,41 @@ class ParsingManager:
         parser = self._create_snp_parser()
         parser.parse()
         if parser.data_frame.empty:
-            logging.warning("SNP report is empty, skipping...")
+            logging.warning("SNP report is empty, writing empty report...")
+            self.write_report(self.create_empty_report_frame(), "report", self.sample_name)
             return
         self.write_report(parser.output_report, "report", self.sample_name)
+
+    def get_expected_report_columns(self) -> list[str]:
+        """
+        Return the expected report headers for the active search mode.
+
+        For gene reports the final significance column depends on the
+        parser strategy: `e-value` for FASTA and `p-value` for FASTQ.
+        """
+        get_significance_col = lambda: "e-value" if self.file_type == "FASTA" else "p-value"
+
+        if self.search_mode == "genes":
+            return [*GENE_REPORT_COLUMNS, get_significance_col()]
+        if self.search_mode == "SNPs":
+            return SNP_REPORT_COLUMNS
+        if self.search_mode == "both":
+            return [*GENE_REPORT_COLUMNS, get_significance_col(), *SNP_REPORT_COLUMNS[6:]]
+        raise HandlingError(f"Unexpected search mode: {self.search_mode}")
+
+    def create_empty_report_frame(self) -> pd.DataFrame:
+        """
+        Create a one-row empty report with NA values, sample name and ID of 1.
+
+        This ensures a report file is always written even when no hits are found.
+        This improves compatibility with Snakemake. The NA's help differentiate
+        between "not tested" and "tested but found no hits" downstream of Pacini.
+        """
+        columns = self.get_expected_report_columns()
+        empty_row: dict[str, Any] = {column: pd.NA for column in columns}
+        empty_row["Input"] = self.sample_name
+        empty_row["ID"] = 1
+        return pd.DataFrame([empty_row], columns=columns)
 
     def _run_both(self) -> None:
         """
@@ -296,16 +358,8 @@ class ParsingManager:
         snp_parser.parse()
         # Define the reports and check their content
         # Check if parsers generated any data
-        gene_report = (
-            gene_parser.output_report
-            if not gene_parser.data_frame.empty
-            else pd.DataFrame()
-        )
-        snp_report = (
-            snp_parser.output_report
-            if not snp_parser.data_frame.empty
-            else pd.DataFrame()
-        )
+        gene_report = pd.DataFrame() if gene_parser.data_frame.empty else gene_parser.output_report
+        snp_report = pd.DataFrame() if snp_parser.data_frame.empty else snp_parser.output_report
 
         logging.debug("Gene report has %d entries", len(gene_report))
         logging.debug("SNP report has %d entries", len(snp_report))
@@ -322,10 +376,7 @@ class ParsingManager:
             - list with gene names
         ----------
         """
-        return [
-            item["gene_name"]
-            for item in self.pattern.pattern["pattern"]["gene"]
-        ]
+        return [item["gene_name"] for item in self.pattern.pattern["pattern"]["gene"]]
 
     def get_config_identity(self) -> float:
         """
@@ -358,20 +409,11 @@ class ParsingManager:
         getter functions.
         """
         logging.info("Adding filters to Parser object...")
-        self.parser.add_filter(
-            PercentageIdentityFilter(
-                self.get_config_identity(), self.file_type
-            )
-        )
-        self.parser.add_filter(
-            CoverageFilter(self.get_config_coverage(), self.file_type)
-        )
+        self.parser.add_filter(PercentageIdentityFilter(self.get_config_identity(), self.file_type))
+        self.parser.add_filter(CoverageFilter(self.get_config_coverage(), self.file_type))
         logging.debug("Filters: %s successfully added", self.parser.filters)
 
-    @staticmethod
-    def write_report(
-        report: pd.DataFrame, suffix: str, input_sequence_sample: str
-    ) -> None:
+    def write_report(self, report: pd.DataFrame, suffix: str, input_sequence_sample: str) -> None:
         """
         Function that writes a given DataFrame to a csv file.
         The pandas DataFrame is created by other methods,
@@ -383,11 +425,14 @@ class ParsingManager:
         ----------
         """
         logging.debug("Writing the %s...", suffix)
-        file_name = f"{input_sequence_sample}_{suffix}.csv"
-        # last check to see if the report is empty
+        if self.output_report_dir is not None:
+            self.output_report_dir.mkdir(parents=True, exist_ok=True)
+            file_name = Path(self.output_report_dir) / f"{input_sequence_sample}_{suffix}.csv"
+        else:
+            file_name = Path(f"{input_sequence_sample}_{suffix}.csv")
+
         if report.empty:
-            logging.info("Skipping writing %s as report is empty", file_name)
-            return
+            raise HandlingError("Report is empty, this should not happen, check the previous logs for more info")
 
         report.to_csv(
             file_name,

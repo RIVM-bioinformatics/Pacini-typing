@@ -27,9 +27,7 @@ from typing import Any
 
 import pandas as pd
 
-from preprocessing.exceptions.snp_detection_exceptions import (
-    PointFinderScriptError,
-)
+from preprocessing.exceptions.snp_detection_exceptions import PointFinderReportError
 
 
 class SNPParser:
@@ -150,9 +148,7 @@ class SNPParser:
         # Extract digits from the string and return
         return "".join(char for char in after_dot if char.isdigit())
 
-    def construct_report_record(
-        self, index: int, item: pd.Series
-    ) -> dict[str, Any]:
+    def construct_report_record(self, index: int, item: pd.Series) -> dict[str, Any]:
         """
         Function that constructs a single record for the output report.
         The incoming item is a row and the corresponding values are
@@ -165,9 +161,7 @@ class SNPParser:
             - dict: A dictionary containing the record
         ----------
         """
-        ref_nucl, alt_nucl = self.get_sequence_change(
-            item["Nucleotide change"]
-        )
+        ref_nucl, alt_nucl = self.get_sequence_change(item["Nucleotide change"])
         ref_aa, alt_aa = self.get_sequence_change(item["Amino acid change"])
         pos = self.get_mutation_position(item["Mutation"])
         return {
@@ -212,17 +206,9 @@ class SNPParser:
         try:
             self.read_run_output(self.pointfinder_output_filename)
         except FileNotFoundError as e:
-            logging.error(
-                "PointFinder's report not found: %s",
-                self.pointfinder_output_filename,
-            )
-            raise PointFinderScriptError(
-                self.pointfinder_output_filename
-            ) from e
+            logging.error("PointFinder's report not found: %s", self.pointfinder_output_filename)
+            raise PointFinderReportError(self.pointfinder_output_filename) from e
         except pd.errors.EmptyDataError:
-            logging.warning(
-                "No content in the query file, found no hits "
-                "in the input files"
-            )
+            logging.warning("No content in the query file, found no hits in the input files")
         if not self.data_frame.empty:
             self.output_report = self.create_output_report()

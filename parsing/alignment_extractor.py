@@ -66,9 +66,7 @@ class AlignmentExtractor:
     ----------
     """
 
-    def __init__(
-        self, alignment_file: str, genes_list: list[str], output_file: str
-    ) -> None:
+    def __init__(self, alignment_file: str, genes_list: list[str], output_file: str) -> None:
         """
         Constructor method that accepts the file to extract from
         and the list of genes to extract.
@@ -94,9 +92,7 @@ class AlignmentExtractor:
         --------
         """
         if not os.path.exists(self.alignment_file):
-            logging.error(
-                "Alignment file not found: %s, exiting...", self.alignment_file
-            )
+            logging.error("Alignment file not found: %s, exiting...", self.alignment_file)
             raise AlignmentFileNotFoundError(self.alignment_file)
 
     def parse_alignment_file(self) -> None:
@@ -112,20 +108,14 @@ class AlignmentExtractor:
         with open(self.alignment_file, "r", encoding="utf-8") as file:
             for line in file:
                 if line.startswith("#"):
-                    current_gene, current_query_sequence = (
-                        self.update_query_sequences(
-                            line, current_query_sequence, current_gene
-                        )
-                    )
+                    current_gene, current_query_sequence = self.update_query_sequences(line, current_query_sequence, current_gene)
                 elif line.startswith("query:"):
                     query_seq = line.split()[1]
                     query_seq = query_seq.replace("-", "").upper()
                     current_query_sequence.append(query_seq)
         # Save the last gene's sequence
         if current_gene and current_query_sequence:
-            self.query_sequences[current_gene] = "".join(
-                current_query_sequence
-            )
+            self.query_sequences[current_gene] = "".join(current_query_sequence)
 
     def update_query_sequences(
         self,
@@ -147,9 +137,7 @@ class AlignmentExtractor:
         ----------
         """
         if current_gene and current_query_sequence:
-            self.query_sequences[current_gene] = "".join(
-                current_query_sequence
-            )
+            self.query_sequences[current_gene] = "".join(current_query_sequence)
         current_gene, current_query_sequence = self.get_gene_match(line)
 
         return current_gene, current_query_sequence
@@ -182,11 +170,7 @@ class AlignmentExtractor:
         Only the genes that are in the genes list are kept
         and then saved to a file later on.
         """
-        self.query_sequences = {
-            gene: seq
-            for gene, seq in self.query_sequences.items()
-            if gene in self.genes_list
-        }
+        self.query_sequences = {gene: seq for gene, seq in self.query_sequences.items() if gene in self.genes_list}
 
     @staticmethod
     def write_fasta(output_file: str, query_sequences: dict[str, str]) -> None:

@@ -1,3 +1,2 @@
-ID,Input,Configuration,Type/Genes,Mode,Hits,Percentage Coverage,e-value
-1,VIB_EA5348AA_AS,O1.yaml,V. cholerae O1 Genes,Gene,rfbV_O1,100.0,1.0
-2,VIB_EA5348AA_AS,O1.yaml,V. cholerae O1 Genes,Gene,ctxA,100.0,1.0
+ID,Input,Configuration,Type/Genes,Mode,Hits,Percentage Identity,Percentage Coverage,e-value
+1,VIB_EA5348AA_AS,VIB_EA5348AA-scheme.yaml,V. cholerae O1 Genes,Gene,my_test_gene,100.0,100.0,5.46e-111

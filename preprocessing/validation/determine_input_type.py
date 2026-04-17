@@ -127,9 +127,7 @@ class InputFileInspector:
 
         if not has_header:
             logging.error("No headers found in FASTA file: %s", file)
-            raise InvalidFastaOrFastqError(
-                f"No headers found in FASTA file: {file}"
-            )
+            raise InvalidFastaOrFastqError(f"No headers found in FASTA file: {file}")
         # Validate the last sequence
         if sequence:
             self.validate_sequence("".join(sequence), file)
@@ -163,9 +161,7 @@ class InputFileInspector:
             self.validate_sequence(seq_line, file)
             self.validate_sequence_length(file, seq_line, qual_line)
 
-    def validate_sequence_length(
-        self, file: str, seq_line: str, qual_line: str
-    ) -> None:
+    def validate_sequence_length(self, file: str, seq_line: str, qual_line: str) -> None:
         """
         Simple function that validates the length of the
         sequence and quality scores.
@@ -180,12 +176,8 @@ class InputFileInspector:
             - InvalidFastaOrFastqError: If an invalid length is found
         """
         if len(seq_line) != len(qual_line):
-            logging.error(
-                "Sequence and quality scores length mismatch, exiting..."
-            )
-            raise InvalidFastaOrFastqError(
-                f"Sequence and quality scores length mismatch in FASTQ file: {file}"
-            )
+            logging.error("Sequence and quality scores length mismatch, exiting...")
+            raise InvalidFastaOrFastqError(f"Sequence and quality scores length mismatch in FASTQ file: {file}")
 
     def validate_plus_line(self, file: str, plus_line: str) -> None:
         """
@@ -202,9 +194,7 @@ class InputFileInspector:
         """
         if not plus_line.startswith("+"):
             logging.error("Missing '+' line in FASTQ file, exiting...")
-            raise InvalidFastaOrFastqError(
-                f"Missing '+' line in FASTQ file: {file}"
-            )
+            raise InvalidFastaOrFastqError(f"Missing '+' line in FASTQ file: {file}")
 
     def validate_sequence(self, sequence: str, file: str) -> None:
         """

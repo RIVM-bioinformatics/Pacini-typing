@@ -32,6 +32,7 @@ import pytest
 from queries.blast_runner import BLASTn
 from queries.gene_query_runner import GeneQueryRunner
 from queries.kma_runner import KMA
+from queries.snp_query_runnner import SNPQueryRunner
 
 skip_in_ci = pytest.mark.skipif(
     os.getenv("CI") == "true",
@@ -169,7 +170,7 @@ def test_blast_prepare_query(setup_query_input: Dict[str, Any]) -> None:
         "-out",
         "./dummy/path.tsv",
         "-outfmt",
-        f"'6 {" ".join(BLASTn.FORMATS.value)}'",
+        f"6 {" ".join(BLASTn.FORMATS.value)}",
         "-num_threads",
         "6",
     ]
@@ -195,10 +196,48 @@ def test_blast_get_query_different(setup_query_input: Dict[str, Any]) -> None:
         "-out",
         "./dummy/path.tsv",
         "-outfmt",
-        f"'6 {" ".join(BLASTn.FORMATS.value)}'",
+        f"6 {" ".join(BLASTn.FORMATS.value)}",
         "-num_threads",
         "6",
     ]
+
+
+def test_pointfinder_replace_inputfiles_args() -> None:
+    """Replace --inputfiles values while preserving other query flags."""
+    query = [
+        "python",
+        "PointFinder.py",
+        "--inputfiles",
+        "r1.fastq.gz",
+        "r2.fastq.gz",
+        "--out_path",
+        "outdir",
+    ]
+
+    replaced = SNPQueryRunner._replace_inputfiles_args(query, ["merged.fastq.gz"])
+
+    assert replaced == [
+        "python",
+        "PointFinder.py",
+        "--inputfiles",
+        "merged.fastq.gz",
+        "--out_path",
+        "outdir",
+    ]
+
+
+def test_pointfinder_merge_input_files(tmp_path: Any) -> None:
+    """Merged file should contain the concatenated content in order."""
+    r1 = tmp_path / "r1.fastq"
+    r2 = tmp_path / "r2.fastq"
+    merged = tmp_path / "merged.fastq"
+
+    r1.write_text("@a\nAC\n+\n!!\n", encoding="utf-8")
+    r2.write_text("@b\nGT\n+\n!!\n", encoding="utf-8")
+
+    SNPQueryRunner._merge_input_files([str(r1), str(r2)], str(merged))
+
+    assert merged.read_text(encoding="utf-8") == "@a\nAC\n+\n!!\n@b\nGT\n+\n!!\n"
 
 
 @skip_in_ci

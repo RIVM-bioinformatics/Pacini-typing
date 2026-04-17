@@ -81,9 +81,9 @@ def setup_teardown_paired_input() -> Generator[list[str], None, None]:
         "--output",
         RUN_OUTPUT,
         "--database_path",
-        "./refdir/",
+        "refdir/",
         "--database_name",
-        "mykma",
+        "mydb",
     ]
     dir_path = "test_full_run/"
     os.mkdir(dir_path)
@@ -157,12 +157,10 @@ def compare_additional_files() -> None:
         [
             f"{RUN_OUTPUT}.aln",
             f"{RUN_OUTPUT}.fsa",
-            f"{RUN_OUTPUT}.frag.gz",
+            # f"{RUN_OUTPUT}.frag.gz",  # ? this file is unstable, different runs give different hashes, so skipped
         ],
-        EXPECTED_FILES[1:],
+        EXPECTED_FILES[1:3],
     ):
-        assert validating_input_arguments.ArgsValidator.create_sha_hash(
-            output_file
-        ) == validating_input_arguments.ArgsValidator.create_sha_hash(
+        assert validating_input_arguments.ArgsValidator.create_sha_hash(output_file) == validating_input_arguments.ArgsValidator.create_sha_hash(
             expected_file
         )

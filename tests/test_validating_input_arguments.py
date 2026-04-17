@@ -111,9 +111,7 @@ def test_get_file_extension(file_list: list[str], expected: str) -> None:
         - expected: Expected file extension
     ----------
     """
-    args_obj = ArgsValidator(
-        option={"input_file_list": [], "run_path": "./pacini_typing.py"}
-    )
+    args_obj = ArgsValidator(option={"input_file_list": [], "run_path": "./pacini_typing.py"})
     assert args_obj.get_file_extension(file_list) == expected
 
 
@@ -131,9 +129,7 @@ def test_validate_file_extensions(filename: str, expected: bool) -> None:
         - expected: Expected result of the validation
     ----------
     """
-    args_obj = ArgsValidator(
-        option={"input_file_list": [], "run_path": "./pacini_typing.py"}
-    )
+    args_obj = ArgsValidator(option={"input_file_list": [], "run_path": "./pacini_typing.py"})
 
     if expected is False:
         with pytest.raises(InvalidFileExtensionError):
@@ -150,9 +146,7 @@ def test_validate_file_extension_fail() -> None:
     exception if the file extension is not valid. The test verifies that the
     function correctly identifies and handles invalid file extensions.
     """
-    v = ArgsValidator(
-        option={"input_file_list": [], "run_path": "./pacini_typing.py"}
-    )
+    v = ArgsValidator(option={"input_file_list": [], "run_path": "./pacini_typing.py"})
 
     with pytest.raises(InvalidFileExtensionError):
         v.validate_file_extensions("not_a_valid_file_extension")
@@ -172,9 +166,7 @@ def test_check_file_existence_good(file: str, expected: bool) -> None:
         - expected: Expected result of the check
     ----------
     """
-    v = ArgsValidator(
-        option={"input_file_list": [], "run_path": "./pacini_typing.py"}
-    )
+    v = ArgsValidator(option={"input_file_list": [], "run_path": "./pacini_typing.py"})
     assert v.check_file_existence(file) == expected
 
 
@@ -191,9 +183,7 @@ def test_check_file_existence_fail(file: str, expected: bool) -> None:
         - expected: Expected result of the check
     ----------
     """
-    v = ArgsValidator(
-        option={"input_file_list": [], "run_path": "./pacini_typing.py"}
-    )
+    v = ArgsValidator(option={"input_file_list": [], "run_path": "./pacini_typing.py"})
     with pytest.raises(FileNotExistsError):
         v.check_file_existence(file)
 

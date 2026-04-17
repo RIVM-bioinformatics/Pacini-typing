@@ -30,9 +30,7 @@ from queries.gene_query_runner import GeneQueryRunner
 from queries.snp_query_runnner import SNPQueryRunner
 
 
-def run_query(
-    query_runner_class: Type[Any], query_runner_builder: dict[str, Any]
-) -> None:
+def run_query(query_runner_class: Type[Any], query_runner_builder: dict[str, Any]) -> None:
     """
     Generic function to run a query using a specified QueryRunner class.
     The incoming class could either be the GeneQueryRunner or SNPQueryRunner.
