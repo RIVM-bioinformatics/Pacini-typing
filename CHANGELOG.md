@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.0](https://github.com/RIVM-bioinformatics/Pacini-typing/compare/v3.0.1...v3.1.0) (2026-04-17)
+
+
+### Features
+
+* glob input allowed, improved output specification, report.csv is now always generated to improve Snakemake compatibility ([c59af15](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/c59af1539b6e68d79bcfb4dd8caee1402ddd2a1c))
+
 ## [3.0.1](https://github.com/RIVM-bioinformatics/Pacini-typing/compare/v3.0.0...v3.0.1) (2026-02-26)
 
 
