@@ -1,0 +1,90 @@
+publiccodeYmlVersion: "0.5.0"
+
+name: Pacini-typing
+url: https://github.com/RIVM-bioinformatics/Pacini-typing
+softwareType: standalone/other
+developmentStatus: stable
+
+platforms:
+  - linux
+  - mac
+
+categories:
+  - data-analytics
+
+localisation:
+  localisationReady: false
+  availableLanguages:
+    - en
+
+description:
+  en:
+    shortDescription: >-
+      A command-line application for detecting DNA sequences and SNPs in
+      FASTA and FASTQ files for bacterial genotyping.
+    longDescription: |
+      Pacini-typing is a user-friendly command-line application for the
+      detection of DNA sequences and Single Nucleotide Polymorphisms (SNPs)
+      in both FASTA and FASTQ genome files. It was primarily developed for
+      genotyping Yersinia pestis and Vibrio cholerae, but is designed to
+      be flexible and applicable to other bacterial species.
+
+      The application is configured via a YAML-based configuration file
+      and supports three search modes: gene detection, SNP detection, or
+      both. It uses BLAST and KMA as underlying alignment tools and
+      produces CSV output reports with detailed hit information including
+      percentage identity, coverage, and e-values.
+
+      Pacini-typing is available via Bioconda and can be installed with
+      conda install bioconda::pacini_typing.
+    documentation: https://github.com/RIVM-bioinformatics/Pacini-typing#readme
+    features:
+      - Gene detection in FASTA and FASTQ genome files using BLAST
+      - SNP detection using KMA and PointFinder
+      - YAML-based configuration for flexible genotyping schemes
+      - CSV output reports with identity, coverage, and e-value metrics
+      - Optional FASTA output of detected sequences
+      - Available via Bioconda for easy installation
+
+  nl:
+    shortDescription: >-
+      Een command-line applicatie voor het detecteren van DNA-sequenties
+      en SNPs in FASTA- en FASTQ-bestanden voor bacteriële genotypering.
+    longDescription: |
+      Pacini-typing is een gebruiksvriendelijke command-line applicatie
+      voor het detecteren van DNA-sequenties en Single Nucleotide
+      Polymorphisms (SNPs) in zowel FASTA- als FASTQ-genoombestanden. De
+      applicatie is primair ontwikkeld voor de genotypering van Yersinia
+      pestis en Vibrio cholerae, maar is flexibel ontworpen en toepasbaar
+      op andere bacteriële soorten.
+
+      De applicatie wordt geconfigureerd via een YAML-configuratiebestand
+      en ondersteunt drie zoekmodi: gendetectie, SNP-detectie of beide.
+      BLAST en KMA worden gebruikt als onderliggende alignmenttools. De
+      uitvoer bestaat uit CSV-rapporten met gedetailleerde informatie
+      over gevonden treffers, waaronder percentage identiteit, dekking en
+      e-waarden.
+
+      Pacini-typing is beschikbaar via Bioconda en kan worden
+      geïnstalleerd met conda install bioconda::pacini_typing.
+    documentation: https://github.com/RIVM-bioinformatics/Pacini-typing#readme
+    features:
+      - Gendetectie in FASTA- en FASTQ-genoombestanden via BLAST
+      - SNP-detectie met KMA en PointFinder
+      - YAML-configuratie voor flexibele genotyperingsschema's
+      - CSV-uitvoer met identiteit, dekking en e-waarden per treffer
+      - Optionele FASTA-uitvoer van gevonden sequenties
+      - Beschikbaar via Bioconda voor eenvoudige installatie
+
+legal:
+  license: AGPL-3.0-only
+  mainCopyrightOwner: >-
+    Infectieziekteonderzoek, Diagnostiek en laboratorium
+    Surveillance-Bioinformatics (RIVM, The Netherlands)
+
+maintenance:
+  type: internal
+  contacts:
+    - name: Mark van de Streek
+      email: mark.van.de.streek@rivm.nl
+      affiliation: Rijksinstituut voor Volksgezondheid en Milieu (RIVM)
