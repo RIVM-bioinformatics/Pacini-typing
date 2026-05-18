@@ -29,6 +29,7 @@ from typing import Any
 
 import yaml
 
+from command_utils import normalize_path
 from preprocessing.exceptions.parsing_exceptions import YAMLLoadingError, YAMLStructureError
 from preprocessing.exceptions.snp_detection_exceptions import IncorrectSNPConfiguration, PathError, PointFinderScriptError
 
@@ -212,9 +213,9 @@ class ReadConfigPattern:
         """
         logging.debug("Creating database from config file...")
         self.creation_dict = {
-            "database_path": self.pattern["database"]["path"],
+            "database_path": normalize_path(self.pattern["database"]["path"]),
             "database_name": self.pattern["database"]["name"],
-            "input_fasta_file": self.pattern["database"]["target_genes_file"],
+            "input_fasta_file": normalize_path(self.pattern["database"]["target_genes_file"]),
             "database_type": self.input_file_type,
             "file_type": self.input_file_type,
         }
@@ -226,7 +227,7 @@ class ReadConfigPattern:
         that will return the required parameters.
         These getter functions also validate the variables.
         """
-        self.creation_dict["path_snps"] = self.pattern["database"]["path_snps"]
+        self.creation_dict["path_snps"] = normalize_path(self.pattern["database"]["path_snps"])
         self.creation_dict["species"] = self.pattern["database"]["species"]
         self.creation_dict["method"] = "blastn" if self.input_file_type == "FASTA" else "kma"
         self.creation_dict["method_path"] = self.get_method_path()
@@ -257,10 +258,11 @@ class ReadConfigPattern:
         If the directory already exists, it returns the path to the directory.
         ----------
         Output:
-            - str: Path to the output directory
+            - str: Path to the output directory (~ and $HOME are expanded)
         ----------
         """
         path: str = self.pattern["global_settings"]["run_output_snps"]
+        path = normalize_path(path)  # ? Expand ~ and environment variables
         path = path if path.endswith("/") else f"{path}/"
         if not os.path.exists(path) or not os.path.isdir(path):
             os.makedirs(path, exist_ok=True)
@@ -274,10 +276,11 @@ class ReadConfigPattern:
         before usage.
         ----------
         Output:
-            - str: Path to the PointFinder script
+            - str: Path to the PointFinder script (it will expand ~ and env variables)
         ----------
         """
         path: str = self.pattern["metadata"]["pointfinder_script_path"]
+        path = normalize_path(path)  # ? Expand ~ and environment variables
         if path.endswith("PointFinder.py"):
             return path
         logging.error("The PointFinder script is incorrectly specified or missing in the config file, exiting...")
@@ -445,6 +448,7 @@ class ReadConfigPattern:
                 is not found
         ----------
         """
+        target_snps_file = normalize_path(target_snps_file)
         if os.path.exists(target_snps_file):
             return target_snps_file
         logging.error("PointFinder genes file %s not found, exiting...", target_snps_file)

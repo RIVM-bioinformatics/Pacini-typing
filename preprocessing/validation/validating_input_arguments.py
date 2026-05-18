@@ -24,6 +24,7 @@ from typing import Any
 
 import yaml
 
+from command_utils import normalize_path
 from preprocessing.exceptions.validation_exceptions import (
     FileNotExistsError,
     InvalidFileExtensionError,
@@ -67,7 +68,8 @@ class ArgsValidator:
         self.config = None
         self.config = None
         self.get_config_input()
-        self.input_file_list: list[str] = self.option["input_file_list"]
+        # ? Normalize all input file paths (expand ~ and environment (e.g., $HOME) variables)
+        self.input_file_list: list[str] = [normalize_path(file) for file in self.option["input_file_list"]]
 
     def validate_file_extensions(self, file: str) -> bool:
         """
