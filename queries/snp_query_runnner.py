@@ -25,7 +25,7 @@ import tempfile
 import time
 from pathlib import Path
 
-from command_utils import CommandInvoker, ShellCommand
+from command_utils import CommandInvoker, ShellCommand, normalize_path
 from queries.base_query_runner import BaseQueryRunner
 from queries.pointfinder_runner import PointFinder
 
@@ -63,6 +63,7 @@ class SNPQueryRunner(BaseQueryRunner):
         ----------
         """
         super().__init__(run_options)
+        self.run_options["pointfinder_script_path"] = normalize_path(self.run_options["pointfinder_script_path"])
         self.check_pointfinder_existence(self.run_options["pointfinder_script_path"])
         self.query = PointFinder.get_query(option=self.run_options)
         self.version_command = PointFinder.get_version_command()
@@ -103,6 +104,7 @@ class SNPQueryRunner(BaseQueryRunner):
             - path: Path to the PointFinder script
         ----------
         """
+        os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
         if not os.path.isfile(path):
             logging.info("PointFinder script not found, downloading...")
             CommandInvoker(

@@ -41,9 +41,10 @@ but is built in for future use.
 
 __author__ = "Mark van de Streek"
 __date__ = "2024-11-01"
-__all__ = ["ShellCommand", "CommandInvoker", "Command"]
+__all__ = ["ShellCommand", "CommandInvoker", "Command", "normalize_path"]
 
 import logging
+import os
 import shlex
 import subprocess
 from abc import ABC, abstractmethod
@@ -51,6 +52,19 @@ from pathlib import Path
 from typing import IO, Any, Tuple
 
 from preprocessing.exceptions.command_utils_exceptions import SubprocessError
+
+
+def normalize_path(path: str) -> str:
+    """
+    Expand user home (~) and environment variables in a file path.
+    ----------
+    Input:
+        - path: string with the file path (may contain ~ or env variables, e.g., $HOME)
+    Output:
+        - str: Path with ~ and environment variables expanded to absolute path
+    ----------
+    """
+    return os.path.expandvars(os.path.expanduser(path))
 
 
 class Command(ABC):
