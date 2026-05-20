@@ -1,5 +1,14 @@
 # Changelog
 
+## [3.1.1](https://github.com/RIVM-bioinformatics/Pacini-typing/compare/v3.1.0...v3.1.1) (2026-05-18)
+
+
+### Bug Fixes
+
+* expand homedir and env variables in pathing ([17de4d8](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/17de4d8c8345df55f757feeb6adfffbd61b8a081))
+* expand homedir and env variables in pathing ([17de4d8](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/17de4d8c8345df55f757feeb6adfffbd61b8a081))
+* expand homedir and env variables in pathing ([71eb1b2](https://github.com/RIVM-bioinformatics/Pacini-typing/commit/71eb1b21d20c5ef594d85a51decb7b74396ce753))
+
 ## [3.1.0](https://github.com/RIVM-bioinformatics/Pacini-typing/compare/v3.0.1...v3.1.0) (2026-04-17)
 
 
